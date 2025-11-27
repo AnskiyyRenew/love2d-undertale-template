@@ -1,4 +1,4 @@
-# SoulEngine - love2d template
+# SoulEngine - love2d UNDERTALE template
 A template designed for creating fan games based on [Undertale](https://undertale.com/), offering a straightforward way for those who wish to create their own fan games using the [LOVE2D (LÖVE)](https://love2d.org/) engine.<br>
 This template is influenced by the [Create Your Frisk](https://github.com/RhenaudTheLukark/CreateYourFrisk/) engine. As such, its usage is similar in certain aspects to the aforementioned engine.
 
