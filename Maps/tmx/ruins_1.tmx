@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="20" tileheight="20" infinite="1" nextlayerid="6" nextobjectid="9">
+ <editorsettings>
+  <export target="../ruins_1.lua" format="lua"/>
+ </editorsettings>
+ <tileset firstgid="1" name="unnamed_3482" tilewidth="20" tileheight="20" tilecount="72" columns="8">
+  <image source="../../../../Create Your Frisk/CYF.v0.6.6.LTS.1/CYF.v0.6.6.LTS.1/Mods/Overworld Editor/Sprites/Scene/Ruins/unnamed_3482.png" width="160" height="180"/>
+  <wangsets>
+   <wangset name="big_wall" type="corner" tile="-1">
+    <wangcolor name="idk" color="#ff0000" tile="-1" probability="1"/>
+    <wangcolor name="door" color="#0000ff" tile="-1" probability="1"/>
+    <wangtile tileid="5" wangid="0,0,0,1,0,0,0,0"/>
+    <wangtile tileid="6" wangid="0,0,0,1,0,1,0,0"/>
+    <wangtile tileid="7" wangid="0,0,0,0,0,1,0,0"/>
+    <wangtile tileid="13" wangid="0,1,0,1,0,0,0,0"/>
+    <wangtile tileid="14" wangid="0,1,0,1,0,1,0,1"/>
+    <wangtile tileid="15" wangid="0,0,0,0,0,1,0,1"/>
+    <wangtile tileid="21" wangid="0,1,0,0,0,0,0,0"/>
+    <wangtile tileid="22" wangid="0,1,0,0,0,0,0,1"/>
+    <wangtile tileid="23" wangid="0,0,0,0,0,0,0,1"/>
+    <wangtile tileid="29" wangid="0,1,0,0,0,1,0,1"/>
+    <wangtile tileid="30" wangid="0,1,0,1,0,0,0,1"/>
+    <wangtile tileid="37" wangid="0,0,0,1,0,1,0,1"/>
+    <wangtile tileid="38" wangid="0,1,0,1,0,1,0,0"/>
+    <wangtile tileid="46" wangid="0,0,0,2,0,0,0,0"/>
+    <wangtile tileid="47" wangid="0,0,0,0,0,2,0,0"/>
+    <wangtile tileid="54" wangid="0,2,0,2,0,0,0,0"/>
+    <wangtile tileid="55" wangid="0,0,0,0,0,2,0,2"/>
+    <wangtile tileid="62" wangid="0,2,0,0,0,0,0,0"/>
+    <wangtile tileid="63" wangid="0,0,0,0,0,0,0,2"/>
+   </wangset>
+   <wangset name="small_wall" type="corner" tile="-1">
+    <wangcolor name="ms1" color="#ff0000" tile="-1" probability="1"/>
+    <wangtile tileid="1" wangid="0,1,0,1,0,0,0,0"/>
+    <wangtile tileid="2" wangid="0,1,0,1,0,1,0,1"/>
+    <wangtile tileid="3" wangid="0,0,0,0,0,1,0,1"/>
+    <wangtile tileid="9" wangid="0,1,0,0,0,0,0,0"/>
+    <wangtile tileid="10" wangid="0,1,0,0,0,0,0,1"/>
+    <wangtile tileid="11" wangid="0,0,0,0,0,0,0,1"/>
+   </wangset>
+  </wangsets>
+ </tileset>
+ <layer id="1" name="图块层 1" width="30" height="20">
+  <data encoding="csv">
+   <chunk x="0" y="0" width="16" height="16">
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9
+</chunk>
+  </data>
+ </layer>
+ <objectgroup id="2" name="marks">
+  <object id="1" x="162" y="141">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="walls">
+  <object id="3" x="-2" y="-40" width="321" height="41"/>
+  <object id="4" x="321" y="0" width="41" height="319"/>
+  <object id="5" x="-41" y="2" width="41" height="319"/>
+  <object id="6" x="-1" y="322" width="259" height="33"/>
+ </objectgroup>
+ <objectgroup id="4" name="warps">
+  <object id="7" x="261" y="319" width="61" height="40">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="5" name="signs">
+  <object id="8" x="52" y="52">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+</map>

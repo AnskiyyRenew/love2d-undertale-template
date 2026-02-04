@@ -1,0 +1,3 @@
+local atkpattern = {}
+
+return atkpattern
