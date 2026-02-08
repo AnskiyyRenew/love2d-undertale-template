@@ -30,7 +30,7 @@ local particle_time = 0
 local inButton, inSelect, actionSelect, currentPage
 local time_krs, bar_krs, _kr_configuration, _kr_image
 local time_kr, fleeing, fleetime, fleelegs, attacking, attacktime
-local hp, maxhp, hp_text, hpname
+local hp, maxhp, hp_text, hpname, lv, name
 
 -- helper clear functions
 function uiTexts.clear()
@@ -187,6 +187,12 @@ function Battle.HandleFlee()
     audio.PlaySound("snd_flee.wav", 1, false)
 end
 
+function Battle.FleeUpdate()
+    if (fleelegs and battle.Player.sprite) then
+        fleelegs:MoveTo(battle.Player.sprite.x, battle.Player.sprite.y + 12)
+    end
+end
+
 function ChangeScene(scene)
     scenes.switchTo(scene)
 end
@@ -283,13 +289,13 @@ function Battle.Init(game)
     currentPage = 1
 
     -- player name / lv / hp UI (keeps fonts and layout from scene_battle)
-    local name = typers.DrawText(battle_.Player.name, {30, 400}, 1)
+    name = typers.DrawText(battle_.Player.name, {30, 400}, 1)
     name.font = "Mars Needs Cunnilingus.ttf"
     name.fontsize = 24
     name:Reparse()
 
     local len, _ = name:GetLettersSize()
-    local lv = typers.DrawText("Lv[spaceX=0]  " .. battle_.Player.lv, {name.x + len + 28, 400}, 1)
+    lv = typers.DrawText("Lv[spaceX=0]  " .. battle_.Player.lv, {name.x + len + 28, 400}, 1)
     lv.font = "Mars Needs Cunnilingus.ttf"
     lv.fontsize = 24
     lv:Reparse()
@@ -422,12 +428,61 @@ function Battle.Update(dt)
     if not battle then return end
 
     battle.Player.Update(dt)
+    local Player = battle.Player
+
+    -- HP/KR UI update
+    if (hp_text) then
+        maxhp.xscale = maths.Clamp(battle.Player.maxhp * 1.21, 20 * 1.21, 99 * 1.21)
+        hp.xscale = (Player.hp / Player.maxhp) * maxhp.xscale
+
+        if (battle.Player.kr + battle.Player.hp > battle.Player.maxhp) then
+            battle.Player.kr = battle.Player.maxhp - battle.Player.hp
+        end
+
+        lv:SetText("Lv[spaceX=0]  " .. battle.Player.lv)
+        hp_text:SetText(battle.Player.hp + battle.Player.kr .. " / " .. battle.Player.maxhp)
+        hp_text.x = math.max(maxhp.x + maxhp.xscale + 10, maxhp.x + hp.xscale + 10)
+
+        if (_kr_configuration) then
+            _kr_image.alpha = 1
+            _kr_image:MoveTo(maxhp.x + math.max(hp.xscale, maxhp.xscale) + 10, 404)
+            hp_text.x = maxhp.x + math.max(hp.xscale, maxhp.xscale) + 50
+
+            for i = 1, #bar_krs do
+                local bkrb = bar_krs[i]
+                if (bkrb.isactive) then
+                    bkrb.xscale = (battle.Player.kr / battle.Player.maxhp) * maxhp.xscale
+                    bkrb.x = hp.x + hp.xscale
+                end
+            end
+        else
+            hp_text.x = maxhp.x + math.max(hp.xscale, maxhp.xscale) + 10
+        end
+
+        battle.Player.kr = math.min(battle.Player.kr, battle.Player.maxhp - 1)
+        if (battle.Player.kr > 0) then
+            hp_text.color = {1, 0, 1}
+            hp_text:Reparse()
+            if (battle.Player.hp <= 0) then battle.Player.hp = 1 end
+            time_kr = time_kr + 1
+            if (battle.Player.kr > 20) then
+                if (time_kr >= 15) then battle.Player.kr = math.max(math.floor(battle.Player.kr - 1), 0); time_kr = 0 end
+            elseif (battle.Player.kr > 10) then
+                if (time_kr >= 30) then battle.Player.kr = math.max(math.floor(battle.Player.kr - 1), 0); time_kr = 0 end
+            elseif (battle.Player.kr > 0) then
+                if (time_kr >= 40) then battle.Player.kr = math.max(math.floor(battle.Player.kr - 1), 0); time_kr = 0 end
+            else
+                battle.Player.kr = 0
+            end
+        else
+            battle.Player.kr = 0
+            hp_text.color = {1, 1, 1}
+        end
+    end
 
     if (not battle.WIN) then
         if (fleeing) then
-            if fleelegs and battle.Player.sprite then
-                fleelegs:MoveTo(battle.Player.sprite.x, battle.Player.sprite.y + 12)
-            end
+            Battle.FleeUpdate()
         end
 
         local enemies = battle.Enemies
@@ -437,55 +492,6 @@ function Battle.Update(dt)
         if (Battle._last_state ~= battle.STATE) then
             Battle.EnteringState(battle.STATE, Battle._last_state)
             Battle._last_state = battle.STATE
-        end
-
-        -- HP/KR UI update
-        if (hp_text) then
-            maxhp.xscale = maths.Clamp(battle.Player.maxhp * 1.21, 20 * 1.21, 99 * 1.21)
-            hp.xscale = (Player.hp / Player.maxhp) * maxhp.xscale
-
-            if (battle.Player.kr + battle.Player.hp > battle.Player.maxhp) then
-                battle.Player.kr = battle.Player.maxhp - battle.Player.hp
-            end
-
-            hp_text:SetText(battle.Player.hp + battle.Player.kr .. " / " .. battle.Player.maxhp)
-            hp_text.x = math.max(maxhp.x + maxhp.xscale + 10, maxhp.x + hp.xscale + 10)
-
-            if (_kr_configuration) then
-                _kr_image.alpha = 1
-                _kr_image:MoveTo(maxhp.x + math.max(hp.xscale, maxhp.xscale) + 10, 404)
-                hp_text.x = maxhp.x + math.max(hp.xscale, maxhp.xscale) + 50
-
-                for i = 1, #bar_krs do
-                    local bkrb = bar_krs[i]
-                    if (bkrb.isactive) then
-                        bkrb.xscale = (battle.Player.kr / battle.Player.maxhp) * maxhp.xscale
-                        bkrb.x = hp.x + hp.xscale
-                    end
-                end
-            else
-                hp_text.x = maxhp.x + math.max(hp.xscale, maxhp.xscale) + 10
-            end
-
-            battle.Player.kr = math.min(battle.Player.kr, battle.Player.maxhp - 1)
-            if (battle.Player.kr > 0) then
-                hp_text.color = {1, 0, 1}
-                hp_text:Reparse()
-                if (battle.Player.hp <= 0) then battle.Player.hp = 1 end
-                time_kr = time_kr + 1
-                if (battle.Player.kr > 20) then
-                    if (time_kr >= 15) then battle.Player.kr = math.max(math.floor(battle.Player.kr - 1), 0); time_kr = 0 end
-                elseif (battle.Player.kr > 10) then
-                    if (time_kr >= 30) then battle.Player.kr = math.max(math.floor(battle.Player.kr - 1), 0); time_kr = 0 end
-                elseif (battle.Player.kr > 0) then
-                    if (time_kr >= 40) then battle.Player.kr = math.max(math.floor(battle.Player.kr - 1), 0); time_kr = 0 end
-                else
-                    battle.Player.kr = 0
-                end
-            else
-                battle.Player.kr = 0
-                hp_text.color = {1, 1, 1}
-            end
         end
 
         -- UI buttons visuals
@@ -561,6 +567,7 @@ function Battle.Update(dt)
                     bcg.color = {0, 0, 0}
                     bcg:MoveTo(hpt.x - 4, hpt.y + h / 2)
                     bcg.xpivot = 0
+                    table.insert(uiElements, bcg)
                     table.insert(uiTexts, hpt)
                 else
                     local hpt = typers.DrawText(enemy.defensetext, {enemy.position.x, 40}, 1)
@@ -576,6 +583,7 @@ function Battle.Update(dt)
                     bcg.color = {0, 0, 0}
                     bcg:MoveTo(hpt.x - 4, hpt.y + h / 2)
                     bcg.xpivot = 0
+                    table.insert(uiElements, bcg)
                     table.insert(uiTexts, hpt)
                 end
             end

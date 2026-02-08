@@ -25,9 +25,6 @@ function SCENE.update(dt)
     if (keyboard.GetState("confirm") == 1) then
         scenes.switchTo("Battle/scene_battle")
     end
-    if (keyboard.GetState("f3") == 1) then
-        scenes.switchTo("Overworld/scene_ow_new")
-    end
 
     time = time + 1
     if (time >= 180 and time % 60 == 0) then

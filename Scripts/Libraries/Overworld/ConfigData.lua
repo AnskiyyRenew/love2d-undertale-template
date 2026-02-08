@@ -2,7 +2,7 @@ DATA = DATA or global:GetSaveVariable("Overworld") or
 {
     time = 0,
     room_name = "--",
-    room = "Overworld/scene_ow_ruins_0",
+    room = "Overworld/scene_ow_new",
     marker = 2,
     position = {0, 0},
     direction = "down",

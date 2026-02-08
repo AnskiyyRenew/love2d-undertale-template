@@ -39,6 +39,35 @@ PlayerLib.soul_variables = {
     }
 }
 
+function PlayerLib.ResetVariables()
+    PlayerLib.soul_variables = {
+        red = {
+            rotated = false
+        },
+        orange = {
+            direction = "idle",
+            shadows = {},
+            time = 0
+        },
+        blue = {
+            gravity = 0.15,
+            glide = 1,
+            maxspeed = 5,
+            currentspd = 0,
+            angle = 0,
+            canjump = false,
+            jumping = true,
+            slamming = false,
+            direction = "down",
+            platforms = {},
+            iscolliding = false,
+
+            slamhp = 0,
+            slaminvtime = 0,
+        }
+    }
+end
+
 function PlayerLib.Init(tab)
     local args = (tab or {})
 
@@ -83,6 +112,7 @@ function PlayerLib.Heal(value, sound)
 end
 
 function PlayerLib.SetSoul(number, args)
+    PlayerLib.ResetVariables()
     PlayerLib.soulMode = number
     local vars = PlayerLib.soul_variables
     local args = (args or {})

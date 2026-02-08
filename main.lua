@@ -51,7 +51,7 @@ global:SetVariable("FPS", 60)
 global:SetVariable("ScreenShaders", {})
 global:SetVariable("LAYER", 30)
 global:SetVariable("EncounterNobody", false)
-local reset_room = "scene_logo"
+local reset_room = "Battle/scene_battle_spider"
 
 -- Display configuration
 local Camera = require("Scripts.Libraries.Utils.Camera")

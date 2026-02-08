@@ -132,6 +132,34 @@ local functions = {
         end
     },
     _WALL = {
+        SetStencils = function (wall, masks)
+            if (wall.warning) then
+                wall.warning:SetStencils(masks)
+            end
+            for i = #wall.bones, 1, -1
+            do
+                local b = wall.bones[i]
+                b:SetStencils(masks)
+            end
+        end,
+        Destroy = function (wall)
+            for i = #Bones._WALL, 1, -1
+            do
+                local w = Bones._WALL[i]
+                if (w == wall) then
+                    for j = #wall.bones, 1, -1
+                    do
+                        local bone = wall.bones[j]
+                        bone:Destroy()
+                        table.remove(wall.bones, j)
+                    end
+                    wall = {}
+                    table.remove(Bones._WALL, i)
+                end
+            end
+        end
+    },
+    _WALLC = {
         SetStencils = function(wall, masks)
             if (wall.warning) then
                 wall.warning:SetStencils(masks)
@@ -158,7 +186,7 @@ local functions = {
                 end
             end
         end
-    }
+    },
 }
 functions._2D.__index = functions._2D
 functions._3D.__index = functions._3D
@@ -237,6 +265,169 @@ function Bones:New3D(points)
 end
 
 function Bones:Wall(arena, whose, warntime, staytime, length, direction, rotation, interval, animation)
+    local X, Y = arena.black:GetPosition()
+    local W, H = arena.width, arena.height
+    local cos, sin = math.cos(math.rad(rotation)), math.sin(math.rad(rotation))
+    local wall = {
+        time = 0,
+        bones = {},
+        stencils = {},
+        interval = (interval or 12),
+        rotation = (rotation or 0),
+        warntime = warntime,
+        warning = sprites.CreateSprite("px.png", global:GetVariable("LAYER"))
+    }
+
+    wall.warning:Scale(999, length * 2 + 12)
+    wall.warning.alpha = 0.5
+
+    -- No more angles calculation, just move the warning sprite directly.
+    -- 0, 90, 180, 270 degrees only.
+    if (direction == "down") then
+        wall.warning:MoveTo(X, Y + H / 2)
+        local wallspr = sprites.CreateSprite("Attacks/" .. (whose) .. "/spr_wall.png", global:GetVariable("LAYER"))
+        wallspr:MoveTo(X, Y + 480 / 2 + H / 2 + 20)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.In, self.y, Y + H / 2 + 240 - (length + 6), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.Out, self.y, Y + 480 / 2 + H / 2 + 20, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                self:Destroy()
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    elseif (direction == "up") then
+        wall.warning:MoveTo(X, Y - H / 2)
+        local wallspr = sprites.CreateSprite("Attacks/" .. (whose) .. "/spr_wall.png", global:GetVariable("LAYER"))
+        wallspr:MoveTo(X, Y - 480 / 2 - H / 2 - 20)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.In, self.y, Y - H / 2 - 240 + (length + 6), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.Out, self.y, Y - 480 / 2 - H / 2 - 20, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                self:Destroy()
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    elseif (direction == "left") then
+        wall.warning.rotation = wall.warning.rotation + 90
+        wall.warning:MoveTo(X - W / 2, Y)
+        local wallspr = sprites.CreateSprite("Attacks/" .. (whose) .. "/spr_wall.png", global:GetVariable("LAYER"))
+        wallspr.rotation = wallspr.rotation + 90
+        wallspr:MoveTo(X - 480 / 2 - W / 2 - 20, Y)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.In, self.x, X - W / 2 - 240 + (length + 3), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.Out, self.x, X - 480 / 2 - W / 2 - 30, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                self:Destroy()
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    elseif (direction == "right") then
+        wall.warning.rotation = wall.warning.rotation + 90
+        wall.warning:MoveTo(X + W / 2, Y)
+        local wallspr = sprites.CreateSprite("Attacks/" .. (whose) .. "/spr_wall.png", global:GetVariable("LAYER"))
+        wallspr.rotation = wallspr.rotation + 90
+        wallspr:MoveTo(X + 480 / 2 + W / 2 + 20, Y)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.In, self.x, X + W / 2 + 240 - (length + 3), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.Out, self.x, X + 480 / 2 + W / 2 + 20, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                self:Destroy()
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    end
+
+    wall.logic = function (self)
+        self.time = self.time + 1
+        if (self.time <= self.warntime) then
+            if (self.time % 6 == 0) then
+                self.warning.color = {1, 0, 0}
+                audio.PlaySound("snd_warning_0.wav")
+            elseif (self.time % 6 == 3) then
+                self.warning.color = {1, 1, 0}
+                audio.PlaySound("snd_warning_1.wav")
+            end
+        else
+            if (self.time == self.warntime) then
+                audio.PlaySound("snd_pierce.wav")
+            end
+            if (self.warning.isactive) then
+                self.warning:Destroy()
+            end
+        end
+        for i = #self.bones, 1, -1
+        do
+            local bone = self.bones[i]
+            bone:logic()
+        end
+    end
+
+    setmetatable(wall, functions._WALL)
+    return wall
+end
+
+
+function Bones:WallComplex(arena, whose, warntime, staytime, length, direction, rotation, interval, animation)
     local X, Y = arena.black:GetPosition()
     local W, H = arena.width, arena.height
     local cos, sin = math.cos(math.rad(rotation)), math.sin(math.rad(rotation))
@@ -585,8 +776,7 @@ function Bones:Wall(arena, whose, warntime, staytime, length, direction, rotatio
         end
     end
 
-    setmetatable(wall, functions._WALL)
-
+    setmetatable(wall, functions._WALLC)
     return wall
 end
 

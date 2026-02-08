@@ -170,10 +170,10 @@ function love.errhand(msg)
             --love.graphics.printf(debugStr, 30, 160, love.graphics.getWidth() - 60)
 
             love.graphics.setColor(0.5, 0.8, 0.5)
-            love.graphics.printf("Press ALT+F4 quit the game", 30, love.graphics.getHeight() - 60, love.graphics.getWidth() - 60, "right")
+            love.graphics.printf("Press ALT+F4 quit the game", 30, 45, love.graphics.getWidth() - 60, "right")
 
             love.graphics.setColor(0.8, 0.8, 0.5)
-            love.graphics.printf("Press CTRL+C to copy the message", 30, love.graphics.getHeight() - 30, love.graphics.getWidth() - 60, "right")
+            love.graphics.printf("Press CTRL+C to copy the message", 30, 25, love.graphics.getWidth() - 60, "right")
 
             love.graphics.present()
         end

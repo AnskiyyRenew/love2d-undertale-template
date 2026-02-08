@@ -11,7 +11,6 @@ blurshader:send("direction", {1, 0})
 
 local frame = 0
 local bul = sprites.CreateSprite("poseur.png", 10)
-bul:Scale(2, 2)
 bul.color = {1, 1, 0}
 
 tween.CreateTween(

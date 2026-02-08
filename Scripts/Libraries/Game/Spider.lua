@@ -19,7 +19,7 @@ local encounter = {
             name = "Spider",
             defensetext = "MISS",
             misstext = "MISS",
-            exp = 1,
+            exp = 9999,
             gold = 1,
             maxhp = 100,
             hp = 100,
@@ -55,9 +55,9 @@ local encounter = {
     -- This is the table that contains your player data.
     Player = PlayerLib.Init({
         name = "Chara",
-        lv = 1,
-        maxhp = 20,
-        hp = 20
+        lv = DATA.player.lv,
+        maxhp = DATA.player.maxhp,
+        hp = DATA.player.hp
     }),
 
     -- And don't touch this one...

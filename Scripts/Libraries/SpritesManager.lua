@@ -38,7 +38,9 @@ local functions = {
         -- Change path and realName
         self.path = path
         self.realName = self.path:sub(1, #self.path - 4)
-        self.collision.area = rectangulation.rectangulate(self.imagedata)
+        if (self.isBullet) then
+            self.collision.area = rectangulation.rectangulate(self.imagedata)
+        end
     end,
     GetPosition = function(self)
         return self.x, self.y
@@ -74,6 +76,12 @@ local functions = {
     end,
     SetPPCollision = function (self, bool)
         self.collision.pp = bool
+
+        if (bool) then
+            self.collision.area = rectangulation.rectangulate(self.imagedata)
+        else
+            self.collision.area = {}
+        end
     end,
     GetCollisionRectangles = function(self)
         local collisionRects = {}
@@ -220,8 +228,8 @@ function sprites.CreateSprite(path, layer)
 
     -- Collision.
     sprite.collision = {
-        pp = true,
-        area = rectangulation.rectangulate(sprite.imagedata)
+        pp = false,
+        area = {}
     }
 
     -- Animation.

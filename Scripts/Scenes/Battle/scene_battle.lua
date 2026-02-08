@@ -8,15 +8,22 @@ b.SetAtkPattern(atkp)
 
 local function HandleActions(enemy_name, action)
     local battle = b.battle
+    local temp_tab = {}
+
+    -- Deep copy
+    for k, v in pairs(battle.Enemies) do
+        temp_tab[k] = v
+    end
+
     if not battle or not battle.Enemies then return end
-    if (enemy_name == battle.Enemies[1].name) then
+    if (enemy_name == temp_tab[1].name) then
         local enemy = battle.Enemies[1]
         if (action == enemy.actions[1]) then
             b.BattleDialogue(localize.Act11)
         elseif (action == enemy.actions[2]) then
             b.BattleDialogue(localize.Act12)
         end
-    elseif (enemy_name == battle.Enemies[2].name) then
+    elseif (enemy_name == temp_tab[2].name) then
         local enemy = battle.Enemies[2]
         if (action == enemy.actions[1]) then
             b.BattleDialogue(localize.Act21)
@@ -45,7 +52,7 @@ local function HandleSpare()
 end
 
 local nextwaves = {"wave_test1", "wave_test2", "wave_test3", "wave_test4"}
-b.battle.nextwave = "wave_test4"
+b.battle.nextwave = "wave_test1"
 local waveProgress = 1
 local function DefenseEnding()
     waveProgress = waveProgress + 1
@@ -98,7 +105,7 @@ function SCENE.update(dt)
     -- For example, you might update animations, handle input, etc.
     b.Update(dt)
     if (b.GetSelectedEnemy() == 1 and b.GetState() == "ATTACKING") then
-        print("Selected Poseur")
+        -- print("Selected Poseur")
     end
 end
 
