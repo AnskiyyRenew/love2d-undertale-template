@@ -1,0 +1,2323 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/6.html">
+      
+      
+        <link rel="next" href="2.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>认识战斗场景 - SoulEngine Documentation (2.5.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/custom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="SoulEngine Documentation (2.5.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (2.5.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (2.5.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              认识战斗场景
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="SoulEngine Documentation (2.5.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (2.5.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (2.5.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fyf.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    翻译与本地化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.入门部分
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    1.入门部分
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1.%E5%85%A5%E9%97%A8%E9%83%A8%E5%88%86/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1.%E5%85%A5%E9%97%A8%E9%83%A8%E5%88%86/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础知识
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1.%E5%85%A5%E9%97%A8%E9%83%A8%E5%88%86/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发过程的注意事项
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.基础开发
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2.基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    主文件（main.lua）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/11.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    配置文件（conf.lua）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/21.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩（Mask）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/22.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动动画（Tween）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/23.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍器（Beat）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/24.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    摄像机（Camera）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/25.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家（Player）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景（Scene）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图（Sprites）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    文本（Typers）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入（Keyboard）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频（Audio）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量（Global）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/9.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞（Collisions）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/90.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    超步（SuperStep）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    3.高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器（Shader）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON库（dkjson）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    安全JSON检测（SafeJson）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器（TimeManager）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    窗口管理（Windows）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4.战斗场景开发
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4.战斗场景开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    认识战斗场景
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="1.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    认识战斗场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗场景的位置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗场景的内容
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="战斗场景的内容">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗系统初始化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        回调函数
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        内置函数
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗场景变量
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="战斗场景变量">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        敌人的设置
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗状态（STATE）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏、敌人系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合的开发
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5.Overworld开发
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    5.Overworld开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    认识结构和位置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧起步准备
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧创建并绘制地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧利用地形块迅速绘制地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧在地图中添加对象
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧导出地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    使用地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua教程速通
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Lua教程速通
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一章 变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第二章 计算和操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第三章 条件和判断
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第四章 循环
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第五章 函数
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第六章 表
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第七章 表中的函数
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗场景的位置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗场景的内容
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="战斗场景的内容">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗系统初始化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        回调函数
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        内置函数
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗场景变量
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="战斗场景变量">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        敌人的设置
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        战斗状态（STATE）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">认识战斗场景<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>在 <code>SoulEngine</code> 中，玩家遭遇一个战斗，会进入到一个特定的场景之中，所有的战斗逻辑，都写在了这个场景里面。</p>
+<hr />
+<h2 id="_2">战斗场景的位置<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>所有的战斗场景，均被放置在了 <code>Scenes/Battle/</code> 文件夹中，使用的是 <code>scene_battle</code> 这个场景制作战斗。<br></p>
+<p>也许你也发现了还有一个场景，叫做 <code>scene_battle_origin</code> ，这是老版本的战斗场景，内部逻辑量极大，<strong>很容易导致 <code>upvalues</code> 超出阈值的报错</strong>，出于这个原因， <code>scene_battle</code> 是 <code>origin</code> 版本的精简版，它只提供了几个接口，便可以完成整场战斗的制作。<br></p>
+<p><strong>但是，这并不代表着 <code>scene_battle_origin</code> 就没有任何作用了，由于这个场景过于底层，当你想要全面修改整个战斗逻辑中的元素，你就可以直接使用这个场景进行修改。</strong><br></p>
+<p>接下来，我们看看 <code>scene_battle</code> 里面有什么。</p>
+<hr />
+<h2 id="_3">战斗场景的内容<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>下面展示的是 <code>scene_battle</code> 的默认代码：
+<div class="highlight"><pre><span></span><code><span class="c1">-- This is a template for creating a new scene in the game.</span>
+<span class="c1">-- You can use this as a starting point for your own scenes.</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">SCENE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;Scripts.Libraries.Battle.BattleInit&quot;</span><span class="p">)</span>
+<span class="nv">battle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="p">.</span><span class="nf">Init</span><span class="p">(</span><span class="s2">&quot;Scripts.Libraries.Game.Encounter&quot;</span><span class="p">)</span>
+<span class="nv">atkp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;Scripts.Libraries.Battle.Patterns.template&quot;</span><span class="p">)</span>
+<span class="nv">b</span><span class="p">.</span><span class="nf">SetAtkPattern</span><span class="p">(</span><span class="nv">atkp</span><span class="p">)</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">HandleActions</span><span class="p">(</span><span class="nv">enemy_name</span><span class="p">,</span><span class="w"> </span><span class="nv">action</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">battle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="p">.</span><span class="py">battle</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">temp_tab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="c1">-- Deep copy</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">k</span><span class="p">,</span><span class="w"> </span><span class="nv">v</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">pairs</span><span class="p">(</span><span class="nv">battle</span><span class="p">.</span><span class="py">Enemies</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nv">temp_tab</span><span class="p">[</span><span class="nv">k</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">v</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">battle</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">battle</span><span class="p">.</span><span class="py">Enemies</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">enemy_name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">temp_tab</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">name</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">enemy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">battle</span><span class="p">.</span><span class="py">Enemies</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">enemy</span><span class="p">.</span><span class="py">actions</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nv">b</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span><span class="nv">localize</span><span class="p">.</span><span class="py">Act11</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">elseif</span><span class="w"> </span><span class="p">(</span><span class="nv">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">enemy</span><span class="p">.</span><span class="py">actions</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nv">b</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span><span class="nv">localize</span><span class="p">.</span><span class="py">Act12</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">elseif</span><span class="w"> </span><span class="p">(</span><span class="nv">enemy_name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">temp_tab</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nv">name</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">enemy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">battle</span><span class="p">.</span><span class="py">Enemies</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">enemy</span><span class="p">.</span><span class="py">actions</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nv">b</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span><span class="nv">localize</span><span class="p">.</span><span class="py">Act21</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">elseif</span><span class="w"> </span><span class="p">(</span><span class="nv">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">enemy</span><span class="p">.</span><span class="py">actions</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nv">b</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span><span class="nv">localize</span><span class="p">.</span><span class="py">Act22</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">HandleItems</span><span class="p">(</span><span class="nv">itemID</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">battle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="p">.</span><span class="py">battle</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">battle</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">inventory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">battle</span><span class="p">.</span><span class="py">Inventory</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">randomText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s2">&quot;* No.&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nv">b</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">({</span>
+<span class="w">        </span><span class="s2">&quot;* You found an item...[wait:30]</span><span class="se">\n</span><span class="s2">  [colorRGB:255, 255, 0]&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">itemID</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;!&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">randomText</span><span class="p">[</span><span class="nv">love</span><span class="p">.</span><span class="py">math</span><span class="p">.</span><span class="nf">random</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">#</span><span class="nv">randomText</span><span class="p">)]</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">HandleSpare</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">b</span><span class="p">.</span><span class="py">battle</span><span class="p">.</span><span class="py">STATE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ACTIONSELECT&quot;</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">nextwaves</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;wave_test1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;wave_test2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;wave_test3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;wave_test4&quot;</span><span class="p">}</span>
+<span class="nv">b</span><span class="p">.</span><span class="py">battle</span><span class="p">.</span><span class="py">nextwave</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;wave_test1&quot;</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">waveProgress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">DefenseEnding</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">waveProgress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">waveProgress</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">waveProgress</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">#</span><span class="nv">nextwaves</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="nv">waveProgress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="nv">b</span><span class="p">.</span><span class="py">battle</span><span class="p">.</span><span class="py">nextwave</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">nextwaves</span><span class="p">[</span><span class="nv">waveProgress</span><span class="p">]</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">OnHit</span><span class="p">(</span><span class="nv">Bullet</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">battle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="p">.</span><span class="py">battle</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">battle</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Bullet</span><span class="p">[</span><span class="s1">&#39;HurtMode&#39;</span><span class="p">]</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;normal&quot;</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="nv">mode</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;nil&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">battle</span><span class="p">.</span><span class="py">Player</span><span class="p">.</span><span class="nf">Hurt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">b</span><span class="p">.</span><span class="nf">AddKR</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">elseif</span><span class="w"> </span><span class="p">(</span><span class="nv">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;cyan&quot;</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;blue&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">keyboard</span><span class="p">.</span><span class="nf">GetState</span><span class="p">(</span><span class="s2">&quot;arrows&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nv">battle</span><span class="p">.</span><span class="py">Player</span><span class="p">.</span><span class="nf">Hurt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">            </span><span class="nv">b</span><span class="p">.</span><span class="nf">AddKR</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">elseif</span><span class="w"> </span><span class="p">(</span><span class="nv">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;orange&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">keyboard</span><span class="p">.</span><span class="nf">GetState</span><span class="p">(</span><span class="s2">&quot;arrows&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nv">battle</span><span class="p">.</span><span class="py">Player</span><span class="p">.</span><span class="nf">Hurt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">            </span><span class="nv">b</span><span class="p">.</span><span class="nf">AddKR</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">elseif</span><span class="w"> </span><span class="p">(</span><span class="nv">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;green&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">battle</span><span class="p">.</span><span class="py">Player</span><span class="p">.</span><span class="nf">Heal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="nv">Bullet</span><span class="p">:</span><span class="nf">Destroy</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+
+<span class="nv">b</span><span class="p">.</span><span class="py">HandleActions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">HandleActions</span>
+<span class="nv">b</span><span class="p">.</span><span class="py">HandleItems</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nv">HandleItems</span>
+<span class="nv">b</span><span class="p">.</span><span class="py">HandleSpare</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nv">HandleSpare</span>
+<span class="nv">b</span><span class="p">.</span><span class="py">DefenseEnding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DefenseEnding</span>
+<span class="nv">b</span><span class="p">.</span><span class="py">OnHit</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="nv">OnHit</span>
+
+
+
+
+
+<span class="c1">-- This is a fake scene for testing purposes.</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">SCENE</span><span class="p">.</span><span class="nf">load</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">-- Load any resources needed for this scene here.</span>
+<span class="w">    </span><span class="c1">-- For example, you might load images, sounds, etc.</span>
+<span class="kr">end</span>
+
+<span class="c1">-- This function is called to update the scene.</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">SCENE</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- Update any game logic for this scene here.</span>
+<span class="w">    </span><span class="c1">-- For example, you might update animations, handle input, etc.</span>
+<span class="w">    </span><span class="nv">b</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">b</span><span class="p">.</span><span class="nf">GetSelectedEnemy</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">b</span><span class="p">.</span><span class="nf">GetState</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;ATTACKING&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="c1">-- print(&quot;Selected Poseur&quot;)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+
+<span class="c1">-- This function is called to draw the scene.</span>
+<span class="c1">-- It is called after the main game loop has finished updating.</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">SCENE</span><span class="p">.</span><span class="nf">draw</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">-- Draw the scene here.</span>
+<span class="w">    </span><span class="c1">-- For example, you might draw images, text, etc.</span>
+<span class="w">    </span><span class="nv">b</span><span class="p">.</span><span class="nf">Draw</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="c1">-- This function is called when the scene is switched away from.</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">SCENE</span><span class="p">.</span><span class="nf">clear</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">-- Clear any resources used by this scene here.</span>
+<span class="w">    </span><span class="c1">-- For example, you might unload images, sounds, etc.</span>
+<span class="w">    </span><span class="nv">b</span><span class="p">.</span><span class="nf">Clear</span><span class="p">()</span>
+<span class="w">    </span><span class="nb">package.loaded</span><span class="p">[</span><span class="s2">&quot;Scripts.Libraries.Battle.BattleInit&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="kr">end</span>
+
+<span class="c1">-- Don&#39;t touch this(just one line).</span>
+<span class="kr">return</span><span class="w"> </span><span class="nv">SCENE</span>
+</code></pre></div></p>
+<h3 id="_4">战斗系统初始化<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;Scripts.Libraries.Battle.BattleInit&quot;</span><span class="p">)</span>
+<span class="nv">battle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="p">.</span><span class="nf">Init</span><span class="p">(</span><span class="s2">&quot;Scripts.Libraries.Game.Encounter&quot;</span><span class="p">)</span>
+<span class="nv">atkp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;Scripts.Libraries.Battle.Patterns.template&quot;</span><span class="p">)</span>
+<span class="nv">b</span><span class="p">.</span><span class="nf">SetAtkPattern</span><span class="p">(</span><span class="nv">atkp</span><span class="p">)</span>
+</code></pre></div>
+第一行：调用战斗场景框架。<br>
+第二行：这场战斗要面对的敌人是哪个文件来的，这里的内容也包括玩家初始的血量，名字等内容。（制作的时候需要修改）<br>
+第三行：玩家的攻击方式是什么。（如果没有手动修改那么默认就是木棍和真刀的攻击动画）。<br>
+第四行：给战斗系统声明一下我要用第三行的这个攻击样式了。</p>
+<h3 id="_5">回调函数<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>这些回调函数在<strong>玩家执行特定操作的时候会被触发</strong>，注意下面所描述的触发时机来制作出自己想要的效果：<br></p>
+<ul>
+<li><code>HandleActions(enemy_name, action)</code>：当选中 <code>enemy_name</code> 名字的敌人而且选中的行动为 <code>action</code> 时，执行这里面的内容。</li>
+<li><code>HandleItems(itemID)</code>：当选择名字为 <code>itemID</code> 的物品时，执行里面的内容。</li>
+<li><code>HandleSpare()</code>：当玩家选择Spare按钮的时候，执行里面的内容。</li>
+<li><code>DefenseEnding()</code>：当玩家从敌人回合中回到自己回合的时候执行里面的内容。</li>
+<li><code>OnHit(Bullet)</code>：当玩家和一个具有攻击性的贴图 <code>isBullet = true</code> 进行碰撞时，执行里面的内容。</li>
+</ul>
+<p>下面这些内容没有直接出现在 <code>scene_battle</code> 里，但还是可以被修改的：<br></p>
+<ul>
+<li><code>HandleFlee()</code>：当玩家逃跑成功的一瞬间触发。</li>
+<li><code>FleeUpdate()</code>：玩家逃跑成功之后持续执行此函数。</li>
+</ul>
+<h3 id="_6">内置函数<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>这些函数有的可以检测玩家攻击的是什么怪物、有的可以在战斗框直接打出特定内容（旁白），下面是这些所有内置函数的列举：<br></p>
+<ul>
+<li><code>b.BattleDialogue(texts, targetState)</code>：让旁白打字机打出 <code>texts</code> 中的内容，随后在打完所有内容之后，让状态自动跳转到 <code>targetState</code> 。</li>
+<li><code>b.AddKR(kramount)</code>：给玩家添加kr。</li>
+<li><code>b.SetAtkPattern(pattern)</code>：设置战斗攻击动画。</li>
+<li><code>b.SetWinText(func)</code>：手动设置战斗胜利之后的文本。</li>
+<li><code>b.GetUIButtons()</code>：获取底部四个按钮（这四个按钮会被放到一个表里）。</li>
+<li><code>b.GetSelectedEnemy()</code>：获取玩家现在选择的是第几个敌人。</li>
+<li><code>b.GetSelectedEnemyName()</code>：获取玩家现在选择的敌人是什么名字。</li>
+<li><code>b.GetState()</code>：获取现在是什么状态。</li>
+<li><code>b.WinBattleCall()</code>：胜利的一瞬间执行这个函数（里面有上述的SetWinText设置胜利文本）。</li>
+</ul>
+<hr />
+<h2 id="_7">战斗场景变量<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>也许你好奇Sans的开头杀是怎么制作的，应该如何迅速进入第一个场景，又或者如何找到敌人的位置。</p>
+<h3 id="_8">敌人的设置<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>所有的敌人文件都位于 <code>Scripts/Libraries/Game/</code>文件夹中，玩家的一些基础变量比如名字、血量都在这里。</p>
+<h3 id="state">战斗状态（STATE）<a class="headerlink" href="#state" title="Permanent link">&para;</a></h3>
+<p>STATE是比较复杂的一个系统，拥有多个结果来定位目前的UI状态，下面是所有STATE的列举：<br></p>
+<p>一层状态菜单，可通过单次按键达到的地方：<br></p>
+<ul>
+<li><code>ACTIONSELECT</code>：玩家回合，选择四个按钮的状态。</li>
+<li><code>FIGHTMENU</code>：战斗菜单，当玩家点击FIGHT按钮的时候STATE会变成FIGHTMENU。</li>
+<li><code>ACTMENU</code>：同理，点击的是ACT按钮。</li>
+<li><code>ITEMMENU</code>：同理。</li>
+<li><code>MERCYMENU</code>：同理。</li>
+<li><code>DEFENDING</code>：敌人回合的状态。</li>
+</ul>
+<p>二层状态菜单，可能需要从上一个状态进入当前状态：<br></p>
+<ul>
+<li><code>ATTACKING</code>：玩家开始校准、根据时机按下攻击条的状态。需要从 <code>FIGHTMENU</code> 进入。</li>
+<li><code>ACTSELECTING</code>：玩家在行动中选择了敌人，准备选择对敌人的行动。需要从 <code>ACTMENU</code> 进入。</li>
+<li><code>DIALOGUERESULT</code>：进入了战斗框的旁白状态（通常是使用了物品或者选择了行动）。</li>
+</ul>
+<p><strong>STATE全分支详解（首尾循环状态部分加星号）：</strong><br></p>
+<p>无开头杀：
+<div class="highlight"><pre><span></span><code>ACTIONSELECT* -&gt; FIGHTMENU -&gt; ATTACKING -&gt; DEFENDING -&gt; ACTIONSELECT*
+</code></pre></div></p>
+<p>有开头杀：
+<div class="highlight"><pre><span></span><code>DEFENDING* -&gt; ACTIONSELECT -&gt; FIGHTMENU -&gt; ATTACKING -&gt; DEFENDING*
+</code></pre></div></p>
+<p>选择行动：
+<div class="highlight"><pre><span></span><code>ACTIONSELECT* -&gt; ACTMENU -&gt; ACTSELECTING -&gt; DIALOGUERESULT -&gt; ACTIONSELECT*
+</code></pre></div></p>
+<p>选择物品：
+<div class="highlight"><pre><span></span><code>ACTIONSELECT* -&gt; ITEMMENU -&gt; DIALOGUERESULT -&gt; ACTIONSELECT*
+</code></pre></div></p>
+<p>选择仁慈：
+<div class="highlight"><pre><span></span><code>ACTIONSELECT* -&gt; MERCYMENU -&gt; ACTIONSELECT*(/DEFENDING -&gt; ACTIONSELECT*)
+</code></pre></div></p>
+<p>选择逃跑：
+<div class="highlight"><pre><span></span><code>ACTIONSELECT* -&gt; MERCYMENU -&gt; FLEEING(/DEFENDING) -&gt; ACTIONSELECT*
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>

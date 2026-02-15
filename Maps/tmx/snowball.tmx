@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="20" tileheight="20" infinite="1" nextlayerid="5" nextobjectid="12">
+ <editorsettings>
+  <export target="../snowball.lua" format="lua"/>
+ </editorsettings>
+ <layer id="1" name="图块层 1" width="30" height="20">
+  <data encoding="csv"/>
+ </layer>
+ <objectgroup id="2" name="marks">
+  <object id="1" x="0" y="0">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="triggers">
+  <object id="11" x="0" y="0" width="20" height="20">
+   <properties>
+    <property name="id" type="int" value="1"/>
+    <property name="type" value="snowball"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="walls">
+  <object id="5" x="-160" y="-140" width="440" height="80"/>
+ </objectgroup>
+</map>

@@ -304,7 +304,6 @@ function sprites.CreateSprite(path, layer)
     return sprite
 end
 
-
 function sprites.CreateSpriteAtlas(path, x, y, w, h, layer)
     local sprite = sprites.CreateSprite(path, layer)
     sprite.quad = love.graphics.newQuad(x, y, w, h, sprite.image:getDimensions())

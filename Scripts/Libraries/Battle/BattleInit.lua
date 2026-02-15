@@ -399,6 +399,13 @@ function Battle.GetSelectedEnemy()
     return inSelect
 end
 
+-- Get the name of the currently selected enemy (or nil if no selection or battle)
+function Battle.GetSelectedEnemyName()
+    local battle = Battle.battle
+    if not battle or not battle.Enemies or not battle.Enemies[inSelect] then return nil end
+    return battle.Enemies[inSelect].name
+end
+
 -- Get current state.
 function Battle.GetState()
     if Battle.battle then

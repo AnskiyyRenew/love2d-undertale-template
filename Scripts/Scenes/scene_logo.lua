@@ -1,5 +1,6 @@
 local SCENE = {
-    PRIORITY = true
+    PRIORITY = true,
+    SAVESHADERS = true
 }
 
 audio.ClearAll()

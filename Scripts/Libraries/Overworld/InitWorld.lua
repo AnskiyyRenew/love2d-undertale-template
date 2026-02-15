@@ -34,6 +34,7 @@ oworld.DEBUG = false
 oworld.NAME = ""
 oworld.pworld = love.physics.newWorld(0, 0, true)
 oworld.configs ={
+    debugdraw = true,
     draw = {
         map = true,
         signs = true,
@@ -44,16 +45,6 @@ oworld.configs ={
         texts = true,
         chests = true,
         player = true,
-    },
-    collide = {
-        signs = true,
-        walls = true,
-        saves = true,
-        warps = true,
-        triggers = true,
-        texts = true,
-        chests = true,
-        player = true
     },
     colors = {
         mark = {0.5, 0, 0, 0.3},
@@ -113,9 +104,362 @@ oworld.char = {
 oworld.heart = sprites.CreateSprite("Soul Library Sprites/spr_default_heart.png", 100000)
 oworld.heart.alpha = 0
 oworld.heart.color = {1, 0, 0}
+---------------------------------------------------
+local layerHandlers = {}
+
+function layerHandlers.triggers(layer)
+    local objects = oworld.objects.triggers
+
+    for _, obj in ipairs(layer.objects) do
+        local id = obj.properties.id or (#objects + 1)
+
+        local body = love.physics.newBody(
+            oworld.pworld,
+            (obj.x + obj.width / 2) * 2,
+            (obj.y + obj.height / 2) * 2,
+            "kinematic"
+        )
+
+        local shape = love.physics.newRectangleShape(
+            obj.width * 2,
+            obj.height * 2
+        )
+
+        local fixture = love.physics.newFixture(body, shape, 1)
+        fixture:setSensor(true)
+        fixture:setUserData({ type = "trigger", id = id })
+
+        table.insert(objects, {
+            x = obj.x * 2,
+            y = obj.y * 2,
+            width = obj.width * 2,
+            height = obj.height * 2,
+            id = id,
+            triggered = 0,
+            properties = obj.properties,
+            body = body
+        })
+    end
+end
+
+function layerHandlers.marks(layer)
+    local objects = oworld.objects.marks
+    
+    for _, obj in ipairs(layer.objects) do
+        local id = obj.properties.id or (#objects + 1)
+
+        table.insert(objects, {
+            x = (obj.x) * 2,
+            y = (obj.y) * 2,
+            direction = obj.properties.direction or "right",
+            id = id,
+            properties = obj.properties
+        })
+    end
+end
+
+function layerHandlers.chests(layer)
+    local objects = oworld.objects.chests
+
+    for _, obj in ipairs(layer.objects) do
+
+        local sprite = sprites.CreateSprite("Scene/Everywhere/spr_chestbox_0.png", 2000 + (obj.y + obj.height/2) * 2)
+        sprite:MoveTo(
+            (obj.x + obj.width / 2 ) * 2,
+            (obj.y + obj.height / 2) * 2
+        )
+        sprite:Scale(2, 2)
+
+        if (not oworld.configs.draw.chests) then
+            sprite.alpha = 0
+        end
+
+        local id = obj.properties.id or (#objects.chests + 1)
+        local body = love.physics.newBody(oworld.pworld,
+            (obj.x + obj.width / 2 ) * 2,
+            (obj.y + obj.height / 2) * 2 + 10,
+            "kinematic"
+        )
+        table.insert(objects.chests, {
+            x = (obj.x + obj.width/2) * 2,
+            y = (obj.y + obj.height/2) * 2,
+            width = obj.width * 2,
+            height = obj.height * 2,
+            id = id,
+            give = (obj.properties.give or false),
+            properties = obj.properties,
+            body = body,
+        })
+        local shape = love.physics.newRectangleShape(sprite.width * 2, sprite.height / 2 * 2)
+        local fixture = love.physics.newFixture(body, shape, 1)
+        fixture:setUserData({type = "chest", object = obj, id = id})
+    end
+end
+
+function layerHandlers.warps(layer)
+    local objects = oworld.objects.warps
+
+    for _, obj in ipairs(layer.objects) do
+        local body = love.physics.newBody(oworld.pworld,
+            (obj.x + obj.width/2) * 2,
+            (obj.y + obj.height/2) * 2,
+            "kinematic")
+        local shape = love.physics.newRectangleShape(
+            obj.width  * 2,
+            obj.height * 2)
+        local fixture = love.physics.newFixture(body, shape, 1)
+        fixture:setUserData({type = "warp", object = obj, id = obj.properties.id})
+        fixture:setSensor(true)
+
+        table.insert(objects.warps, {
+            x = (obj.x) * 2,
+            y = (obj.y) * 2,
+            width = obj.width * 2,
+            height = obj.height * 2,
+            id = obj.properties.id,
+            properties = obj.properties,
+            body = body,
+        })
+    end
+end
+
+function layerHandlers.walls(layer)
+    local objects = oworld.objects
+    local scale = 2
+
+    local function polygonCentroid(points)
+        local A = 0
+        local Cx, Cy = 0, 0
+        local n = #points
+        for i = 1, n do
+            local x0, y0 = points[i].x, points[i].y
+            local j = (i % n) + 1
+            local x1, y1 = points[j].x, points[j].y
+            local cross = x0 * y1 - x1 * y0
+            A = A + cross
+            Cx = Cx + (x0 + x1) * cross
+            Cy = Cy + (y0 + y1) * cross
+        end
+        A = A * 0.5
+        if A == 0 then
+            local sx, sy = 0, 0
+            for _, p in ipairs(points) do sx = sx + p.x; sy = sy + p.y end
+            return sx / (#points), sy / (#points)
+        end
+        Cx = Cx / (6 * A)
+        Cy = Cy / (6 * A)
+        return Cx, Cy
+    end
+
+    local function rotatePoint(px, py, angle)
+        local ca = math.cos(angle)
+        local sa = math.sin(angle)
+        return px * ca - py * sa, px * sa + py * ca
+    end
+
+    for _, obj in ipairs(layer.objects) do
+        local rotDeg = obj.rotation or 0
+        local angle = math.rad(rotDeg)
+
+        local bodyX_world, bodyY_world
+        local shape
+
+        if obj.polygon and #obj.polygon >= 3 then
+            local first = obj.polygon[1]
+            local body = love.physics.newBody(oworld.pworld, (obj.x) * scale, (obj.y) * scale, "static")
+            body:setAngle(angle)
+
+            local verts = {}
+            for i, p in ipairs(obj.polygon) do
+                table.insert(verts, (p.x - first.x) * scale)
+                table.insert(verts, (p.y - first.y) * scale)
+            end
+
+            local ok, shape_or_err = pcall(function() return love.physics.newPolygonShape(verts) end)
+            if not ok then
+                error("创建 PolygonShape 失败: "..tostring(shape_or_err).." (顶点数或凹多边形?)")
+            end
+            local shape = shape_or_err
+            local fixture = love.physics.newFixture(body, shape, 1)
+            fixture:setUserData({ type = "wall", object = obj })
+
+            table.insert(objects.walls, {
+                x = (obj.x) * 2,
+                y = (obj.y) * 2,
+                width = obj.width * 2,
+                height = obj.height * 2,
+                id = obj.properties.id or (#objects.walls + 1),
+                properties = obj.properties,
+                body = body
+            })
+
+        elseif obj.ellipse or obj.circle then
+            local w = obj.width or (obj.radius and obj.radius * 2) or 0
+            local h = obj.height or (obj.radius and obj.radius * 2) or 0
+            local radius = math.min(w, h) / 2
+
+            local cx, cy = w / 2, h / 2
+            local rcx, rcy = rotatePoint(cx, cy, angle)
+            bodyX_world = (obj.x + rcx) * scale
+            bodyY_world = (obj.y + rcy) * scale
+
+            local body = love.physics.newBody(oworld.pworld, bodyX_world, bodyY_world, "static")
+            body:setAngle(angle)
+
+            shape = love.physics.newCircleShape(radius * scale)
+            local fixture = love.physics.newFixture(body, shape, 1)
+            fixture:setUserData({ type = "wall", object = obj })
+
+            table.insert(objects.walls, {
+                x = (obj.x) * 2,
+                y = (obj.y) * 2,
+                width = w * 2,
+                height = h * 2,
+                id = obj.properties.id or (#objects.walls + 1),
+                properties = obj.properties,
+                body = body
+            })
+
+        else
+            local w, h = obj.width or 0, obj.height or 0
+            local cx, cy = w / 2, h / 2
+            local rcx, rcy = rotatePoint(cx, cy, angle)
+            bodyX_world = (obj.x + rcx) * scale
+            bodyY_world = (obj.y + rcy) * scale
+
+            local body = love.physics.newBody(oworld.pworld, bodyX_world, bodyY_world, "static")
+            body:setAngle(angle)
+
+            shape = love.physics.newRectangleShape(w * scale, h * scale)
+            local fixture = love.physics.newFixture(body, shape, 1)
+            fixture:setUserData({ type = "wall", object = obj })
+
+            table.insert(objects.walls, {
+                x = (obj.x) * 2,
+                y = (obj.y) * 2,
+                width = w * 2,
+                height = h * 2,
+                id = obj.properties.id or (#objects.walls + 1),
+                properties = obj.properties,
+                body = body
+            })
+        end
+    end
+end
+
+function layerHandlers.signs(layer)
+    local objects = oworld.objects.signs
+
+    for _, obj in ipairs(layer.objects) do
+        local sprite = sprites.CreateSprite("Scene/Everywhere/spr_sign.png", 2000 + (obj.y + obj.height/2) * 2)
+        sprite:MoveTo(
+            (obj.x + obj.width/2) * 2,
+            (obj.y + obj.height/2) * 2
+        )
+        sprite:Scale(2, 2)
+        if (not oworld.configs.draw.signs) then
+            sprite.alpha = 0
+        end
+        local id = (obj.properties.id or #objects.signs + 1)
+        local body = love.physics.newBody(oworld.pworld,
+            (obj.x + obj.width/2) * 2,
+            (obj.y + obj.height/2) * 2 + 10,
+            "kinematic")
+        table.insert(objects.signs, {
+            x = (obj.x + obj.width/2) * 2,
+            y = (obj.y + obj.height/2) * 2,
+            width = obj.width * 2,
+            height = obj.height * 2,
+            id = id,
+            triggered = 0,
+            properties = obj.properties,
+            body = body
+        })
+        local shape = love.physics.newRectangleShape(
+            sprite.width * 2,
+            sprite.height / 2 * 2)
+        local fixture = love.physics.newFixture(body, shape, 1)
+        fixture:setUserData({type = "sign", object = obj, id = id})
+    end
+end
+
+function layerHandlers.saves(layer)
+    local objects = oworld.objects.saves
+
+    for _, obj in ipairs(layer.objects) do
+        local sprite = sprites.CreateSprite("Scene/Everywhere/spr_savepoint_0.png", 2000 + (obj.y + obj.height/2) * 2)
+        sprite:SetAnimation({
+            "Scene/Everywhere/spr_savepoint_1.png",
+            "Scene/Everywhere/spr_savepoint_0.png"
+        }, 15)
+        sprite:MoveTo(
+            (obj.x + obj.width/2) * 2,
+            (obj.y + obj.height/2) * 2
+        )
+        sprite:Scale(2, 2)
+        if (not oworld.configs.draw.saves) then
+            sprite.alpha = 0
+        end
+        local id = (obj.properties.id or #objects.signs + 1)
+        local body = love.physics.newBody(oworld.pworld,
+            (obj.x + obj.width/2) * 2,
+            (obj.y + obj.height/2) * 2 + 10,
+            "kinematic")
+        table.insert(objects.saves, {
+            x = (obj.x + obj.width/2) * 2,
+            y = (obj.y + obj.height/2) * 2,
+            width = obj.width * 2,
+            height = obj.height * 2,
+            id = id,
+            room = obj.properties.room,
+            triggered = 0,
+            position = {obj.properties.x, obj.properties.y},
+            properties = obj.properties,
+            body = body
+        })
+        local shape = love.physics.newRectangleShape(
+            sprite.width * 2,
+            sprite.height / 2 * 2)
+        local fixture = love.physics.newFixture(body, shape, 1)
+        fixture:setUserData({type = "save", object = obj, id = id})
+    end
+end
+
+local function scanLayers(map)
+    for _, layer in ipairs(map.layers) do
+        print("Scanning layer:", layer.name, layer.type)
+
+        local handler = layerHandlers[layer.name]
+        if handler and layer.type == "objectgroup" then
+            handler(layer)
+        end
+    end
+end
+
+---------------------------------------------------
 
 function oworld.SetBattleScene(scene)
     oworld.BATTLESCENE = scene
+end
+
+function oworld.FindObject(type, varname, value, first_only)
+    local objects = oworld.objects
+    local found_objects = {}
+
+    if (objects[type]) then
+        for _, obj in pairs(objects[type]) do
+            if (obj.properties and obj.properties[varname] == value) then
+                if first_only then
+                    return obj
+                else
+                    found_objects[#found_objects + 1] = obj
+                end
+            end
+        end
+    end
+    if not first_only then
+        return found_objects
+    end
 end
 
 local exc = sprites.CreateSprite("Overworld/spr_exc.png", 12000)
@@ -473,10 +817,31 @@ function oworld.InitMusic(file)
     end
 end
 
+local function resetObjects(objects)
+    for k, v in pairs(objects) do
+        if type(v) == "table" then
+            for i = #v, 1, -1 do
+                local obj = v[i]
+                if obj.body and not obj.body:isDestroyed() then
+                    obj.body:destroy()
+                end
+                v[i] = nil
+            end
+        end
+    end
+end
+
 ---Init the scene.
 ---@param stifile string
 ---@param name string
 function oworld.Init(stifile, name)
+    if oworld._initialized then
+        print("[InitWorld] Init skipped (already initialized)")
+        return
+    end
+    oworld._initialized = true
+    resetObjects(oworld.objects)
+
     oworld.NAME = (name or stifile:sub(-4, -1))
     DATA.room = "Overworld/" .. name
     global:SetVariable("ROOM", name)
@@ -484,275 +849,16 @@ function oworld.Init(stifile, name)
     oworld.MAP.draw_objects = false
 
     -- Init objects in the layers.
-    local objects = oworld.objects
-    for _, layer in pairs(oworld.MAP.layers)
-    do
-        if (layer.name == "marks") then
-            for _, obj in ipairs(layer.objects) do
-                table.insert(objects.marks, {
-                    x = (obj.x) * 2,
-                    y = (obj.y) * 2,
-                    direction = obj.properties.direction or "right",
-                    id = obj.properties.id or 0
-                })
-            end
-        elseif (layer.name == "chests") then
-            for _, obj in ipairs(layer.objects) do
-
-                local sprite = sprites.CreateSprite("Scene/Everywhere/spr_chestbox_0.png", 2000 + (obj.y + obj.height/2) * 2)
-                sprite:MoveTo(
-                    (obj.x + obj.width / 2 ) * 2,
-                    (obj.y + obj.height / 2) * 2
-                )
-                sprite:Scale(2, 2)
-
-                if (not oworld.configs.draw.chests) then
-                    sprite.alpha = 0
-                end
-
-                local id = obj.properties.id or (#objects.chests + 1)
-                table.insert(objects.chests, {
-                    x = (obj.x + obj.width/2) * 2,
-                    y = (obj.y + obj.height/2) * 2,
-                    width = obj.width * 2,
-                    height = obj.height * 2,
-                    id = id,
-                    give = (obj.properties.give or false)
-                })
-
-                local body = love.physics.newBody(oworld.pworld,
-                    (obj.x + obj.width / 2 ) * 2,
-                    (obj.y + obj.height / 2) * 2 + 10,
-                    "kinematic"
-                )
-                local shape = love.physics.newRectangleShape(sprite.width * 2, sprite.height / 2 * 2)
-                local fixture = love.physics.newFixture(body, shape, 1)
-                fixture:setUserData({type = "chest", object = obj, id = id})
-            end
-        elseif (layer.name == "warps") then
-            for _, obj in ipairs(layer.objects) do
-                local body = love.physics.newBody(oworld.pworld,
-                    (obj.x + obj.width/2) * 2,
-                    (obj.y + obj.height/2) * 2,
-                    "kinematic")
-                local shape = love.physics.newRectangleShape(
-                    obj.width  * 2,
-                    obj.height * 2)
-                local fixture = love.physics.newFixture(body, shape, 1)
-                fixture:setUserData({type = "warp", object = obj, id = obj.properties.id})
-                fixture:setSensor(true)
-
-                table.insert(objects.warps, {
-                    x = (obj.x) * 2,
-                    y = (obj.y) * 2,
-                    width = obj.width * 2,
-                    height = obj.height * 2,
-                    id = obj.properties.id
-                })
-            end
-        elseif (layer.name == "walls") then
-            local scale = 2  -- 缩放比例
-
-            -- 计算多边形重心（多边形以点表 { {x=..,y=..}, ... } 给出）
-            local function polygonCentroid(points)
-                local A = 0
-                local Cx, Cy = 0, 0
-                local n = #points
-                for i = 1, n do
-                    local x0, y0 = points[i].x, points[i].y
-                    local j = (i % n) + 1
-                    local x1, y1 = points[j].x, points[j].y
-                    local cross = x0 * y1 - x1 * y0
-                    A = A + cross
-                    Cx = Cx + (x0 + x1) * cross
-                    Cy = Cy + (y0 + y1) * cross
-                end
-                A = A * 0.5
-                if A == 0 then
-                    -- 退化情况：当面积为 0（不应发生），退回到点平均
-                    local sx, sy = 0, 0
-                    for _, p in ipairs(points) do sx = sx + p.x; sy = sy + p.y end
-                    return sx / (#points), sy / (#points)
-                end
-                Cx = Cx / (6 * A)
-                Cy = Cy / (6 * A)
-                return Cx, Cy
-            end
-
-            -- 旋转点 (px,py) by angle (弧度)
-            local function rotatePoint(px, py, angle)
-                local ca = math.cos(angle)
-                local sa = math.sin(angle)
-                return px * ca - py * sa, px * sa + py * ca
-            end
-
-            for _, obj in ipairs(layer.objects) do
-                local rotDeg = obj.rotation or 0
-                local angle = math.rad(rotDeg)
-
-                local bodyX_world, bodyY_world
-                local shape
-
-                if obj.polygon and #obj.polygon >= 3 then
-                    local first = obj.polygon[1]
-                    -- 将 body 放在第一个顶点的世界位置（乘 scale）
-                    local body = love.physics.newBody(oworld.pworld, (obj.x) * scale, (obj.y) * scale, "static")
-                    -- Tiled 的旋转是围绕 object.x,object.y（也就是第一个顶点）进行的，因此把 body 设为相同角度
-                    body:setAngle(angle)
-
-                    -- 顶点以第一个点为原点（减去 first.x/first.y），再乘 scale
-                    local verts = {}
-                    for i, p in ipairs(obj.polygon) do
-                        table.insert(verts, (p.x - first.x) * scale)
-                        table.insert(verts, (p.y - first.y) * scale)
-                    end
-
-                    -- 注意：Box2D 要求凸多边形且顶点数量有限制（若失败需拆分凸多边形）
-                    local ok, shape_or_err = pcall(function() return love.physics.newPolygonShape(verts) end)
-                    if not ok then
-                        error("创建 PolygonShape 失败: "..tostring(shape_or_err).." (顶点数或凹多边形?)")
-                    end
-                    local shape = shape_or_err
-                    local fixture = love.physics.newFixture(body, shape, 1)
-                    fixture:setUserData({ type = "wall", object = obj })
-
-                elseif obj.ellipse or obj.circle then
-                    -- 圆/椭圆：用圆近似（如果是椭圆需要多边形近似更精确）
-                    local w = obj.width or (obj.radius and obj.radius * 2) or 0
-                    local h = obj.height or (obj.radius and obj.radius * 2) or 0
-                    local radius = math.min(w, h) / 2
-
-                    -- 圆的本地中心是 (w/2, h/2)
-                    local cx, cy = w / 2, h / 2
-                    local rcx, rcy = rotatePoint(cx, cy, angle)
-                    bodyX_world = (obj.x + rcx) * scale
-                    bodyY_world = (obj.y + rcy) * scale
-
-                    local body = love.physics.newBody(oworld.pworld, bodyX_world, bodyY_world, "static")
-                    body:setAngle(angle)
-
-                    -- 用没有偏移的 newCircleShape(r)（body 在圆心）
-                    shape = love.physics.newCircleShape(radius * scale)
-                    local fixture = love.physics.newFixture(body, shape, 1)
-                    fixture:setUserData({ type = "wall", object = obj })
-
-                else
-                    -- 矩形：使用 newRectangleShape(w,h)（以 body 为中心）
-                    local w, h = obj.width or 0, obj.height or 0
-                    local cx, cy = w / 2, h / 2
-                    local rcx, rcy = rotatePoint(cx, cy, angle)
-                    bodyX_world = (obj.x + rcx) * scale
-                    bodyY_world = (obj.y + rcy) * scale
-
-                    local body = love.physics.newBody(oworld.pworld, bodyX_world, bodyY_world, "static")
-                    body:setAngle(angle)
-
-                    shape = love.physics.newRectangleShape(w * scale, h * scale) -- centered at body
-                    local fixture = love.physics.newFixture(body, shape, 1)
-                    fixture:setUserData({ type = "wall", object = obj })
-                end
-            end
-
-        elseif (layer.name == "signs") then
-            for _, obj in ipairs(layer.objects) do
-                local sprite = sprites.CreateSprite("Scene/Everywhere/spr_sign.png", 2000 + (obj.y + obj.height/2) * 2)
-                sprite:MoveTo(
-                    (obj.x + obj.width/2) * 2,
-                    (obj.y + obj.height/2) * 2
-                )
-                sprite:Scale(2, 2)
-                if (not oworld.configs.draw.signs) then
-                    sprite.alpha = 0
-                end
-                local id = (obj.properties.id or #objects.signs + 1)
-                table.insert(objects.signs, {
-                    x = (obj.x + obj.width/2) * 2,
-                    y = (obj.y + obj.height/2) * 2,
-                    width = obj.width * 2,
-                    height = obj.height * 2,
-                    id = id,
-                    triggered = 0
-                })
-
-                local body = love.physics.newBody(oworld.pworld,
-                    (obj.x + obj.width/2) * 2,
-                    (obj.y + obj.height/2) * 2 + 10,
-                    "kinematic")
-                local shape = love.physics.newRectangleShape(
-                    sprite.width * 2,
-                    sprite.height / 2 * 2)
-                local fixture = love.physics.newFixture(body, shape, 1)
-                fixture:setUserData({type = "sign", object = obj, id = id})
-            end
-        elseif (layer.name == "saves") then
-            for _, obj in ipairs(layer.objects) do
-                local sprite = sprites.CreateSprite("Scene/Everywhere/spr_savepoint_0.png", 2000 + (obj.y + obj.height/2) * 2)
-                sprite:SetAnimation({
-                    "Scene/Everywhere/spr_savepoint_1.png",
-                    "Scene/Everywhere/spr_savepoint_0.png"
-                }, 15)
-                sprite:MoveTo(
-                    (obj.x + obj.width/2) * 2,
-                    (obj.y + obj.height/2) * 2
-                )
-                sprite:Scale(2, 2)
-                if (not oworld.configs.draw.saves) then
-                    sprite.alpha = 0
-                end
-                local id = (obj.properties.id or #objects.signs + 1)
-                table.insert(objects.saves, {
-                    x = (obj.x + obj.width/2) * 2,
-                    y = (obj.y + obj.height/2) * 2,
-                    width = obj.width * 2,
-                    height = obj.height * 2,
-                    id = id,
-                    room = obj.properties.room,
-                    triggered = 0,
-                    position = {obj.properties.x, obj.properties.y}
-                })
-
-                local body = love.physics.newBody(oworld.pworld,
-                    (obj.x + obj.width/2) * 2,
-                    (obj.y + obj.height/2) * 2 + 10,
-                    "kinematic")
-                local shape = love.physics.newRectangleShape(
-                    sprite.width * 2,
-                    sprite.height / 2 * 2)
-                local fixture = love.physics.newFixture(body, shape, 1)
-                fixture:setUserData({type = "save", object = obj, id = id})
-            end
-        elseif (layer.name == "triggers") then
-            for _, obj in ipairs(layer.objects) do
-                local id = (obj.properties.id or #objects.signs + 1)
-                table.insert(objects.texts, {
-                    x = (obj.x * 2),
-                    y = (obj.y * 2),
-                    width = obj.width * 2,
-                    height = obj.height * 2,
-                    id = id
-                })
-                local body = love.physics.newBody(oworld.pworld,
-                    (obj.x + obj.width / 2 ) * 2,
-                    (obj.y + obj.height / 2) * 2,
-                    "kinematic")
-                local shape = love.physics.newRectangleShape(
-                    obj.width  * 2,
-                    obj.height * 2)
-                local fixture = love.physics.newFixture(body, shape, 1)
-                fixture:setSensor(true)
-                fixture:setUserData({type = "trigger", object = obj, id = id})
-            end
-        end
-    end
+    scanLayers(oworld.MAP)
 
     -- Init the oworld.char.
     local function findmarker(id)
-        for k, v in pairs(objects.marks) do
+        for k, v in pairs(oworld.objects.marks) do
             if (v.id == id) then return k end
         end
         return nil
     end
-    local startMark = objects.marks[findmarker(DATA.marker)] or objects.marks[1]
+    local startMark = oworld.objects.marks[findmarker(DATA.marker)] or oworld.objects.marks[1]
     oworld.char.direction = startMark.direction
     local sx, sy = startMark.x, startMark.y
 
@@ -801,15 +907,25 @@ end
 
 目前已经被使用的按键：上下左右ZXC
 
-Spacebar - Teleport the player object to the mouse's position.
+Spacebar    - Teleport the player object to the mouse's position.
+Q           - Show/Shut off all collision boxes.
+A           - Disable all collisions of walls.
 
 ]]
+local enabled_wallcoll = true
 function oworld.DEBUGfuncs()
     if (not oworld.DEBUG) then return end
     if (not oworld.char) then return end
 
     if (keyboard.GetState("space") == 1) then
-        oworld.char.collision.body:setPosition(keyboard.GetMousePosition())
+        local x, y = keyboard.GetMousePosition()
+        local realx, realy = _CAMERA_.x + x, _CAMERA_.y + y
+        oworld.char.collision.body:setPosition(realx, realy)
+    elseif (keyboard.GetState("q") == 1) then
+        oworld.configs.debugdraw = not oworld.configs.debugdraw
+    elseif (keyboard.GetState("a") == 1) then
+        enabled_wallcoll = not enabled_wallcoll
+        oworld.char.collision.fixture:setSensor(enabled_wallcoll)
     end
 end
 
@@ -1027,6 +1143,7 @@ function oworld.Draw()
     end
 
     if (oworld.DEBUG) then
+        if (not oworld.configs.debugdraw) then return end
         love.graphics.push()
 
             for _, body in pairs(oworld.pworld:getBodies()) do
@@ -1067,6 +1184,17 @@ function oworld.getInteractResult(obj_type, id)
     end
 
     return bool
+end
+
+---Check if two objects are interacting.
+---@param obj1 table
+---@param obj2 table
+---@return boolean
+function oworld.TwoObjectsInteract(obj1, obj2)
+    return (
+        math.abs(obj1.x - obj2.x) * 2 < (obj1.width  + obj2.width) and
+        math.abs(obj1.y - obj2.y) * 2 < (obj1.height + obj2.height)
+    )
 end
 
 ---This function will create a new dialog box.

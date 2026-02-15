@@ -26,7 +26,7 @@ local functions = {
         -- resource.
         typer.fonts = {"determination_mono.ttf", "simsun.ttc"}
         typer.currentfont = 1
-        typer.fontsize = {26, 13}
+        typer.fontsize = {27, 13}
         typer.color = {1, 1, 1}
         typer.alpha = 1
         typer.positions = {
@@ -380,7 +380,7 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
     typer.realfont = nil
     typer.fontCache = {}
     typer.currentfont = 1
-    typer.fontsize = {26, 13}
+    typer.fontsize = {27, 13}
     typer.color = {1, 1, 1}
     typer.alpha = 1
     typer.positions = {

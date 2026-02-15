@@ -18,7 +18,7 @@ typers = require("Scripts.Libraries.TyperManager")
 scenes = require("Scripts.Libraries.SceneManager")
 tween = require("Scripts.Libraries.Tween")
 windows = require("Scripts.Libraries.Utils.Windows")
-localize = require("Localization.zh_CN")
+localize = require("Localization.en")
 gui = require("Scripts.Libraries.GUIManager")
 luaex = require("Scripts.Libraries.Utils.LuaExtended")
 require("Localization.LOCALIZE")
@@ -51,7 +51,7 @@ global:SetVariable("FPS", 60)
 global:SetVariable("ScreenShaders", {})
 global:SetVariable("LAYER", 30)
 global:SetVariable("EncounterNobody", false)
-local reset_room = "Battle/scene_battle_spider"
+local reset_room = "Testplace/scene_shader"
 
 -- Display configuration
 local Camera = require("Scripts.Libraries.Utils.Camera")

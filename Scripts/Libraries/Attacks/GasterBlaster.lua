@@ -98,6 +98,8 @@ function GB:Update()
                     gb:Beam(0)
                     gb.TimeCall()
                     audio.PlaySound("Blaster/" .. gb.sounds_path .. "snd_fire.wav", false)
+                else
+                    gb.TimeCall()
                 end
             end
             if (gb.time >= gb.waittime) then
