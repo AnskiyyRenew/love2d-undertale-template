@@ -84,12 +84,14 @@ end
 local function winCall()
     local battle = b.battle
     if not battle then return end
-    
+
     -- Calculate rewards
     local exp = 0
     local gold = 0  -- Assuming gold is 0 or needs to be calculated from enemies
     exp = exp + battle.Exp
     gold = gold + battle.Gold
+    DATA.player.exp = DATA.player.exp + exp
+    DATA.player.gold = DATA.player.gold + gold
 
     local lv = battle.Player.lv
     local totalExp = lvdata_default[lv].totalExp + exp
@@ -102,16 +104,21 @@ local function winCall()
         end
     end
     if (newLv > lv) then
-        audio.PlaySound("snd_levelup.wav")
         battle.Player.maxhp = lvdata_default[newLv].hp
         battle.Player.at = lvdata_default[newLv].at
         battle.Player.df = lvdata_default[newLv].df
         battle.Player.lv = newLv
-        print("Level Up! New LV: " .. newLv)
+
+        DATA.player.maxhp = battle.Player.maxhp
+        DATA.player.hp = battle.Player.hp
+        DATA.player.lv = battle.Player.lv
+        DATA.player.atk = battle.Player.at
+        DATA.player.def = battle.Player.df
         b.BattleDialogue({
-            "* You won!\n* You earned " .. exp .. " EXP and " .. gold .. " gold.\n* Your LOVE increased.",
+            "* You won!\n* You earned " .. battle.Exp .. " EXP and " .. battle.Gold .. " gold.\n* Your LOVE increased.",
             "[noskip][function:ChangeScene|" .. DATA.room .. "][next]"
         })
+        audio.PlaySound("snd_levelup.wav")
     else
         b.BattleDialogue({
             "* You won!\n* You earned " .. exp .. " EXP and " .. gold .. " gold.",

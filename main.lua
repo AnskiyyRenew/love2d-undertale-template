@@ -18,9 +18,11 @@ typers = require("Scripts.Libraries.TyperManager")
 scenes = require("Scripts.Libraries.SceneManager")
 tween = require("Scripts.Libraries.Tween")
 windows = require("Scripts.Libraries.Utils.Windows")
-localize = require("Localization.en")
 gui = require("Scripts.Libraries.GUIManager")
 luaex = require("Scripts.Libraries.Utils.LuaExtended")
+
+global:SetVariable("LANGUAGE", "en")
+localize = require("Localization." .. global:GetVariable("LANGUAGE"))
 require("Localization.LOCALIZE")
 require("Scripts.Libraries.Overworld.ConfigData")
 
@@ -51,7 +53,7 @@ global:SetVariable("FPS", 60)
 global:SetVariable("ScreenShaders", {})
 global:SetVariable("LAYER", 30)
 global:SetVariable("EncounterNobody", false)
-local reset_room = "Testplace/scene_shader"
+local reset_room = "Overworld/scene_ow_new"
 
 -- Display configuration
 local Camera = require("Scripts.Libraries.Utils.Camera")

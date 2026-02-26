@@ -8,9 +8,9 @@ audio.ClearAll()
 local logo = sprites.CreateSprite("Logo.png", 0)
 audio.PlaySound("snd_intro.ogg")
 
-local license = typers.DrawText("[scale=0.5][spaceX=-8][red]UNDERTALE  ©2015 Toby Fox", {5, 445}, 1)
-local license2 = typers.DrawText("[scale=0.5][spaceX=-8][purple]SOULENGINE ©2024 Clavo Sophame", {5, 460}, 1)
-local version = typers.DrawText("[scale=0.5][spaceX=-8]v" .. _VERSION, {-90, 460}, 1)
+local license = typers.DrawText("[scale=0.5][red]UNDERTALE  ©2015 Toby Fox", {5, 445}, 1)
+local license2 = typers.DrawText("[scale=0.5][purple]SOULENGINE ©2024 Clavo Sophame", {5, 460}, 1)
+local version = typers.DrawText("[scale=0.5]v" .. _VERSION, {-90, 460}, 1)
 local length = version:GetLettersSize()
 version.x = 640 - length - 5
 _CAMERA_:setAngle(0)

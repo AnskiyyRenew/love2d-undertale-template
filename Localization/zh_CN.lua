@@ -15,12 +15,12 @@ return {
         },
     },
     Items = {
-        Chocolate = "[preset=chinese]巧克力",
-        End = "[preset=chinese]我是你的老婆"
+        Chocolate = "[preset=chd]巧克力",
+        End = "[preset=chd]我是你的老婆"
     },
-    ItemsPage = "[preset=chd]第  页[font=determination_mono.ttf][scale=1][offsetX=-82]",
-    Spare = "[preset=chinese]饶恕",
-    Flee = "[preset=chinese]逃跑",
+    ItemsPage = "[preset=chd]第  页[font=determination_mono.ttf][scale=1]%s",
+    Spare = "[preset=chd]饶恕",
+    Flee = "[preset=chd]逃跑",
 
     FleeTexts = {
         "* [pattern:chinese]你逃出了战斗。\n[pattern:english]* [pattern:chinese]你感到神清气爽。"

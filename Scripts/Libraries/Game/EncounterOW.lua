@@ -47,7 +47,7 @@ local encounter = {
     },
 
     -- The default state of the encounter.
-    STATE = "DEFENDING",
+    STATE = "ACTIONSELECT",
 
     -- This is the table that contains your player data.
     Player = PlayerLib.Init({

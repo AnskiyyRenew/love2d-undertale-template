@@ -21,16 +21,16 @@ DATA = DATA or global:GetSaveVariable("Overworld") or
         watk = 0,
         def = 0,
         edef = 0,
-        weapon = "[preset=chinese]木棍",
-        armor = "[preset=chinese]绷带",
+        weapon = "[preset=chinese][offsetX=90]木棍",
+        armor = "[preset=chinese][offsetX=90]绷带",
 
         items = {
-            "[preset=chinese]神秘小礼物",
-            "[preset=chinese]铁壶",
-            "[preset=chinese]吃我",
-            "[preset=chinese]安黛因的信",
-            "[preset=chinese]传单",
-            "[preset=chinese]别欺负我",
+            "[preset=chd]神秘小礼物",
+            "[preset=chd]铁壶",
+            "[preset=chd]吃我",
+            "[preset=chd]安黛因的信",
+            "[preset=chd]传单",
+            "[preset=chd]别欺负我",
         },
         cells = {}
     },
@@ -46,10 +46,10 @@ FLAG = FLAG or global:GetSaveVariable("Flag") or
 CHESTS = CHESTS or global:GetSaveVariable("Chests") or
 {
     chest1 = {
-        "[preset=chinese][red]蜘蛛",
+        "[preset=chd][red]蜘蛛",
     },
     chest2 = {
-        "[preset=chinese][yellow]看不见我"
+        "[preset=chd][yellow]看不见我"
     }
 }
 levelData = {

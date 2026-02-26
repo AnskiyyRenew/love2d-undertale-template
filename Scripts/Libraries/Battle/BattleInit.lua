@@ -425,7 +425,7 @@ function Battle.Update(dt)
     blasters:Update()
 
     -- if using atkpattern, call its Update (so patterns can handle input and animation)
-    if Battle.atkpattern and Battle.battle and Battle.battle.STATE == "ATTACKING" and Battle.atkpattern.Update then
+    if Battle.atkpattern and Battle.battle and Battle.atkpattern.Update then
         local ok, err = pcall(function() Battle.atkpattern.Update(dt) end)
         if not ok then print("[Battle] Error in atkpattern.Update: ", err) end
     end
@@ -630,6 +630,12 @@ function Battle.Update(dt)
                             if (enem.killable) then
                                 battle.Gold = battle.Gold + enem.gold
                                 battle.Exp = battle.Exp + enem.exp
+
+                                local flag = global:GetVariable("OVERWORLD_KILLFLAG")
+                                if (flag) then
+                                    -- Yeah you killed the monster.
+                                    FLAG[flag] = FLAG[flag] + 1
+                                end
                                 table.remove(enemies, i)
                                 enem = nil
                             end
@@ -869,10 +875,13 @@ function Battle.Update(dt)
                         if (inventory.Pattern == 1) then
                             for i = 1, 4 do
                                 if (inventory.Items[i]) then
-                                    local text = typers.DrawText("* " .. inventory.Items[i], {80 + dx, 270 + dy}, 14)
+                                    local text = typers.DrawText("*", {80 + dx, 270 + dy}, 14)
+                                    local item = typers.DrawText(inventory.Items[i], {110 + dx, 270 + dy}, 14)
+                                    text.color = item.color
                                     if (i == 2) then dx = 0; dy = dy + 35
                                     elseif (i == 1 or i == 3) then dx = dx + 250 end
                                     table.insert(uiTexts, text)
+                                    table.insert(uiElements, item)
                                 else
                                     local text = typers.DrawText("", {80 + dx, 270 + dy}, 14)
                                     if (i == 2) then dx = 0; dy = dy + 35
@@ -880,7 +889,7 @@ function Battle.Update(dt)
                                     table.insert(uiTexts, text)
                                 end
                             end
-                            local page = typers.DrawText(localize.ItemsPage .. " [font=determination_mono.ttf][scale=1][offsetY=1]1", {400, 340}, 14)
+                            local page = typers.DrawText(localizetext(global:GetVariable("LANGUAGE"), "ItemsPage", {"1"}), {400, 340}, 14)
                             table.insert(uiTexts, page)
                         elseif (inventory.Pattern == 2) then
                             if (#inventory.Items > 3) then
@@ -1077,18 +1086,20 @@ function Battle.Update(dt)
                         else
                             currentPage = math.min(currentPage + 1, math.ceil(#inventory.Items / 4))
                             for i = 1, 4 do
-                                local t = uiTexts[i]
+                                local t = uiElements[i]
                                 if (t.isactive) then
                                     if (inventory.Items[(currentPage - 1) * 4 + i]) then
                                         t.color = {1, 1, 1}
-                                        t:SetText("* " .. inventory.Items[(currentPage - 1) * 4 + i])
+                                        uiTexts[i]:SetText("*")
+                                        t:SetText(inventory.Items[(currentPage - 1) * 4 + i])
                                     else
                                         t.color = {1, 1, 1}
+                                        uiTexts[i]:SetText("")
                                         t:SetText("")
                                     end
                                 end
                             end
-                            if uiTexts[5] then uiTexts[5]:SetText(localize.ItemsPage .. " [font=determination_mono.ttf][scale=1][offsetY=1]" .. currentPage) end
+                            if uiTexts[5] then uiTexts[5]:SetText(localizetext(global:GetVariable("LANGUAGE"), "ItemsPage", {currentPage})) end
                             inSelect = math.min(#inventory.Items, inSelect + 3)
                         end
                     end
@@ -1099,18 +1110,20 @@ function Battle.Update(dt)
                         else
                             currentPage = math.max(1, currentPage - 1)
                             for i = 1, 4 do
-                                local t = uiTexts[i]
+                                local t = uiElements[i]
                                 if (t.isactive) then
                                     if (inventory.Items[(currentPage - 1) * 4 + i]) then
                                         t.color = {1, 1, 1}
-                                        t:SetText("* " .. inventory.Items[(currentPage - 1) * 4 + i])
+                                        uiTexts[i]:SetText("*")
+                                        t:SetText(inventory.Items[(currentPage - 1) * 4 + i])
                                     else
                                         t.color = {1, 1, 1}
+                                        uiTexts[i]:SetText("")
                                         t:SetText("")
                                     end
                                 end
                             end
-                            if uiTexts[5] then uiTexts[5]:SetText(localize.ItemsPage .. " [font=determination_mono.ttf][scale=1][offsetY=1]" .. currentPage) end
+                            if uiTexts[5] then uiTexts[5]:SetText(localizetext(global:GetVariable("LANGUAGE"), "ItemsPage", {currentPage})) end
                             inSelect = math.max(1, inSelect - 3)
                         end
                     end

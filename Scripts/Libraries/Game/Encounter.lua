@@ -65,7 +65,11 @@ local encounter = {
         -- Your items go here.
         Items = {
             localize.Items.Chocolate,
-            localize.Items.End
+            localize.Items.End,
+            localize.Items.Chocolate,
+            localize.Items.End,
+            localize.Items.Chocolate,
+            localize.Items.End,
         }
     },
 

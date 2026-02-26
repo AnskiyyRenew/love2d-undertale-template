@@ -12,7 +12,7 @@ ow.Init("Maps/ruins_0.lua", "scene_ow_new")
 ow.DEBUG = true
 ow.ENCOUNTER = true
 ow.InitEncounter(FLAG.ruins_killed, 80, 40, 3)
-ow.SetBattleScene("Battle/scene_battle_ow")
+ow.SetBattleScene("Battle/scene_battle_ow", "ruins_killed")
 
 -- This is a fake scene for testing purposes.
 function SCENE.load()

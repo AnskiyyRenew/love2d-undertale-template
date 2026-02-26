@@ -18,7 +18,7 @@ return {
         Chocolate = "Chocolate",
         End = "I'm end"
     },
-    ItemsPage = "PAGE",
+    ItemsPage = "PAGE %s",
     Spare = "Spare",
     Flee = "Flee",
 

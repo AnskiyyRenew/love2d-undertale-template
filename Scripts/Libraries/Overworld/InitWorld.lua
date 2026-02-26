@@ -2,6 +2,8 @@ oworld = {}
 
 -- Init the oworld.char's data.
 -- global:DeleteSaveVariable("Overworld")
+-- global:DeleteSaveVariable("CHESTS")
+-- global:DeleteSaveVariable("FLAG")
 
 -- Init libraries to update the map.
 local sti = require("Scripts.Libraries.STI")
@@ -159,7 +161,7 @@ function layerHandlers.marks(layer)
 end
 
 function layerHandlers.chests(layer)
-    local objects = oworld.objects.chests
+    local objects = oworld.objects
 
     for _, obj in ipairs(layer.objects) do
 
@@ -197,7 +199,7 @@ function layerHandlers.chests(layer)
 end
 
 function layerHandlers.warps(layer)
-    local objects = oworld.objects.warps
+    local objects = oworld.objects
 
     for _, obj in ipairs(layer.objects) do
         local body = love.physics.newBody(oworld.pworld,
@@ -348,7 +350,7 @@ function layerHandlers.walls(layer)
 end
 
 function layerHandlers.signs(layer)
-    local objects = oworld.objects.signs
+    local objects = oworld.objects
 
     for _, obj in ipairs(layer.objects) do
         local sprite = sprites.CreateSprite("Scene/Everywhere/spr_sign.png", 2000 + (obj.y + obj.height/2) * 2)
@@ -384,7 +386,7 @@ function layerHandlers.signs(layer)
 end
 
 function layerHandlers.saves(layer)
-    local objects = oworld.objects.saves
+    local objects = oworld.objects
 
     for _, obj in ipairs(layer.objects) do
         local sprite = sprites.CreateSprite("Scene/Everywhere/spr_savepoint_0.png", 2000 + (obj.y + obj.height/2) * 2)
@@ -438,8 +440,9 @@ end
 
 ---------------------------------------------------
 
-function oworld.SetBattleScene(scene)
+function oworld.SetBattleScene(scene, flag)
     oworld.BATTLESCENE = scene
+    global:SetVariable("OVERWORLD_KILLFLAG", flag)
 end
 
 function oworld.FindObject(type, varname, value, first_only)
@@ -605,7 +608,7 @@ function player_choosing_update()
                 local minutes = math.floor(tm.time / 60)
                 local seconds = math.floor(tm.time % 60)
                 tempbox.text = typers.DrawText(
-                    string.format("Chara    LV " .. DATA.player.lv .. "    %02d:%02d", minutes, seconds),
+                    string.format("Chara    LV " .. global:GetSaveVariable("Overworld").player.lv .. "    %02d:%02d", minutes, seconds),
                     {RelativePosition(140, 135)}, 100000
                 )
                 tempbox.room = typers.DrawText(
@@ -636,6 +639,7 @@ function player_choosing_update()
 
                     local minutes = math.floor(DATA.time / 60)
                     local seconds = math.floor(DATA.time % 60)
+                    DATA.player.lv = battle.Player.lv
                     tempbox.text:SetText(string.format(DATA.player.name .. "    LV " .. DATA.player.lv .. "    %02d:%02d", minutes, seconds))
                     tempbox.text.color = {1, 1, 0}
                     tempbox.text:Reparse()
@@ -920,7 +924,8 @@ function oworld.DEBUGfuncs()
     if (keyboard.GetState("space") == 1) then
         local x, y = keyboard.GetMousePosition()
         local realx, realy = _CAMERA_.x + x, _CAMERA_.y + y
-        oworld.char.collision.body:setPosition(realx, realy)
+        print(x, y, realx, realy)
+        oworld.char.collision.body:setPosition(x, y)
     elseif (keyboard.GetState("q") == 1) then
         oworld.configs.debugdraw = not oworld.configs.debugdraw
     elseif (keyboard.GetState("a") == 1) then
@@ -1241,7 +1246,7 @@ function oworld.ChestInteract(chest)
     -- Create a dialog box.
     tempchest = CHESTS[chest]
     local posy = (oworld.POSITION == "up") and 80 or 400
-    oworld.dialogNew({"* Use the box?\n\n        Yes           No[function:player_choosing_start|chestbox," .. posy + 35 .. "]"})
+    oworld.dialogNew({"* Use the box?[space:2, 38]\n\n        Yes           No[function:player_choosing_start|chestbox," .. posy + 35 .. "]"})
 end
 
 function oworld.SaveInteract(texts, room, position, direction)

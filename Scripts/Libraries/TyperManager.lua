@@ -207,7 +207,7 @@ local functions_instant = {
                     typer.fontCache[fontkey] = font
                 end
             end
-            width = width + font:getWidth(piece.char) + (typer.charspacing or 0)
+            width = width + font:getWidth(piece.char) * piece.scale + (typer.charspacing or 0)
             maxHeight = math.max(maxHeight, font:getHeight())
         end
 
@@ -215,7 +215,7 @@ local functions_instant = {
     end,
     SetText = function(typer, text)
         typer.defaultFont = "determination_mono.ttf"
-        typer.defaultSize = 26
+        typer.defaultSize = 27
         typer.charspacing = 0
         typer.offset = {0, 0}
         typer.alpha = 1
@@ -385,7 +385,7 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
     typer.alpha = 1
     typer.positions = {
         main = {0, 0},     -- This is the main position where the letters will be drawn.
-        spacing = {0, 5},  -- This is the spacing between each letter.
+        spacing = {0, 0},  -- This is the spacing between each letter.
         offset = {
             {0, 0}, {0, 2}
         },   -- This is the offset between the main position and the current letter.
@@ -858,7 +858,7 @@ function typers.DrawText(text, position, layer)
     typer.x, typer.y = unpack(position)
     typer.layer = layer
     typer.defaultFont = "determination_mono.ttf"
-    typer.defaultSize = 26
+    typer.defaultSize = 27
     typer.charspacing = 0
     typer.offset = {0, 0}
     typer.alpha = 1
@@ -866,23 +866,13 @@ function typers.DrawText(text, position, layer)
     typer.font = nil
     typer.fontsize = nil
     typer.fontCache = {}
-    typer.presets = {
-        --selection = "[font=simsun.ttc,13][offsetX=-20][offsetY=3][scale=2][spaceX=10]",
-        selection = function(state)
-            state.font = "simsun.ttc"
-            state.size = 13
-            state.offset = {-20, 3}
-            state.scale = 2
-            state.spaceX = 10
-            return state
-        end,
-    }
 
     local function getFont(fontname, size)
         local key = fontname .. "_" .. tostring(size)
         if not typer.fontCache[key] then
             local font = love.graphics.newFont("Resources/Fonts/" .. fontname, size)
             font:setFilter("nearest", "nearest")
+            --font:setFilter("linear", "linear")
             typer.fontCache[key] = font
         end
         return typer.fontCache[key]
@@ -896,10 +886,10 @@ function typers.DrawText(text, position, layer)
         local currentScale = 1
         local currentOffsetX = 0
         local currentOffsetY = 0
-        local prevCharWidth = 0
+        local currentSpaceX = 0
+        local currentSpaceY = 0
 
-        while (i <= #typer.rawtext)
-        do
+        while (i <= #typer.rawtext) do
             local tagStart, tagEnd, tag = typer.rawtext:find("%[(.-)%]", i)
             if (tagStart == i) then
                 if (colors[tag]) then
@@ -925,47 +915,51 @@ function typers.DrawText(text, position, layer)
                     if (presetKey == "chinese") then
                         currentFont = "simsun.ttc"
                         currentSize = 13
-                        currentOffsetX = -20
+                        currentOffsetX = 30
                         currentOffsetY = 3
                         currentScale = 2
-                        typer.charspacing = 10
+                        typer.charspacing = -8
                     elseif (presetKey == "chd") then
                         currentFont = "simsun.ttc"
                         currentSize = 13
-                        currentOffsetX = 0
+                        currentOffsetX = -20
                         currentOffsetY = 3
                         currentScale = 2
-                        typer.charspacing = 10
+                        typer.charspacing = -8
                     end
                 end
                 i = tagEnd + 1
             else
                 local textEnd = tagStart and tagStart - 1 or #typer.rawtext
-                while (i <= textEnd)
-                do
+                while (i <= textEnd) do
                     local byte = typer.rawtext:byte(i)
                     local length = ByteLength(byte)
                     local char = typer.rawtext:sub(i, i + length - 1)
 
                     typer.realfont = getFont(currentFont, currentSize)
-                    local width = typer.realfont:getWidth(char)
-                    if (length > 1) then width = width * 1.5 end
-                    width = width * currentScale
-
-                    table.insert(typer.parsed, {
-                        char = char,
-                        color = currentColor,
-                        font = currentFont,
-                        size = currentSize,
-                        scale = currentScale,
-                        spaceX = prevCharWidth + typer.charspacing,
-                        spaceY = 0,
-                        offsetX = currentOffsetX,
-                        offsetY = currentOffsetY
-                    })
-
-                    prevCharWidth = width
-                    i = i + length
+                    
+                    if (char == "\n") then
+                        currentOffsetX = 0
+                        currentOffsetY = currentOffsetY + typer.realfont:getHeight()
+                        i = i + 1
+                    else
+                        table.insert(typer.parsed, {
+                            char = char,
+                            color = currentColor,
+                            font = currentFont,
+                            size = currentSize,
+                            scale = currentScale,
+                            offsetX = currentOffsetX,
+                            offsetY = currentOffsetY
+                        })
+                        
+                        local width = typer.realfont:getWidth(char)
+                        if (length > 1) then width = width * 1.5 end
+                        width = width * currentScale
+                        currentOffsetX = currentOffsetX + width + typer.charspacing
+                        
+                        i = i + length
+                    end
                 end
             end
         end
@@ -987,8 +981,7 @@ function typers.DrawText(text, position, layer)
         if (self.alpha < 0) then self.alpha = 0 end
 
         local cx = self.x + self.offset[1]
-        for _, piece in ipairs(self.parsed)
-        do
+        for _, piece in ipairs(self.parsed) do
             local color = {piece.color[1], piece.color[2], piece.color[3], self.alpha}
             love.graphics.setColor(color)
 
@@ -1003,8 +996,7 @@ function typers.DrawText(text, position, layer)
             if (not piece.tc) then
                 piece.tc = love.graphics.newText(typer.realfont, piece.char)
             end
-            love.graphics.draw(piece.tc, cx + (piece.offsetX or 0), self.y + (piece.offsetY or 0), 0, piece.scale, piece.scale)
-            cx = cx + charWidth + self.charspacing
+            love.graphics.draw(piece.tc, cx + piece.offsetX, self.y + piece.offsetY, 0, piece.scale, piece.scale)
         end
 
         love.graphics.pop()
