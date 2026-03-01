@@ -1,9 +1,9 @@
 oworld = {}
 
 -- Init the oworld.char's data.
--- global:DeleteSaveVariable("Overworld")
--- global:DeleteSaveVariable("CHESTS")
--- global:DeleteSaveVariable("FLAG")
+global:DeleteSaveVariable("Overworld")
+global:DeleteSaveVariable("CHESTS")
+global:DeleteSaveVariable("FLAG")
 
 -- Init libraries to update the map.
 local sti = require("Scripts.Libraries.STI")

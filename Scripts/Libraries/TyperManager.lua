@@ -52,6 +52,12 @@ local functions = {
     GetLettersSize = function(typer)
         return unpack(typer.texturelen)
     end,
+    SetStencils = function (typer, masks)
+        typer.stencils = (masks or {})
+    end,
+    SetShaders = function (typer, shaders)
+        typer.shaders = (shaders or {})
+    end,
     BubbleSize = function(typer, w, h)
         typer.bubble.main_rect_h:Scale(w, h - 40)
         typer.bubble.main_rect_v:MoveTo(
@@ -225,6 +231,12 @@ local functions_instant = {
         end
         typer.rawtext = text
         typer:Reparse()
+    end,
+    SetStencils = function (typer, masks)
+        typer.stencils = (masks or {})
+    end,
+    SetShaders = function (typer, shaders)
+        typer.shaders = (shaders or {})
     end,
     MoveTo = function (typer, x, y)
         typer.x = x or typer.x
@@ -403,6 +415,8 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
         name = "",
         intensity = 0
     }
+    typer.stencils = {}
+    typer.shaders = {}
 
     -- Callback functions.
     typer.OnComplete = function() end
@@ -810,8 +824,19 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
                     local angle = math.rad(letter.rotation)
                     local sx, sy = letter.xscale, letter.yscale
 
+                    if (#typer.stencils > 0) then
+                        love.graphics.clear(false, false, true, 0)
+                        masks.Draw(typer.stencils)
+                        love.graphics.setStencilTest("greater", 0)
+                    end
+
+                    if (#typer.shaders > 0) then
+                        love.graphics.setShader(typer.shaders[#typer.shaders])
+                    end
+
                     local char = (letter.char)
                     love.graphics.setFont(letter.font)
+
                     if (letter.shadow) then
                         love.graphics.setColor(typer.shadow.color)
                         love.graphics.draw(
@@ -827,6 +852,9 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
                         angle, sx, sy
                     )
 
+                    masks.reset()
+                    love.graphics.setStencilTest()
+                    love.graphics.setShader()
                     love.graphics.pop()
                 end
             end
@@ -866,6 +894,8 @@ function typers.DrawText(text, position, layer)
     typer.font = nil
     typer.fontsize = nil
     typer.fontCache = {}
+    typer.stencils = {}
+    typer.shaders = {}
 
     local function getFont(fontname, size)
         local key = fontname .. "_" .. tostring(size)
@@ -996,7 +1026,19 @@ function typers.DrawText(text, position, layer)
             if (not piece.tc) then
                 piece.tc = love.graphics.newText(typer.realfont, piece.char)
             end
+
+            if (#typer.stencils > 0) then
+                love.graphics.clear(false, false, true, 0)
+                masks.Draw(typer.stencils)
+                love.graphics.setStencilTest("greater", 0)
+            end
+
+            if (#typer.shaders > 0) then
+                love.graphics.setShader(typer.shaders[#typer.shaders])
+            end
             love.graphics.draw(piece.tc, cx + piece.offsetX, self.y + piece.offsetY, 0, piece.scale, piece.scale)
+            love.graphics.setStencilTest()
+            love.graphics.setShader()
         end
 
         love.graphics.pop()

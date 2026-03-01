@@ -25,14 +25,17 @@ DATA = DATA or global:GetSaveVariable("Overworld") or
         armor = "[preset=chinese][offsetX=90]绷带",
 
         items = {
-            "[preset=chd]神秘小礼物",
-            "[preset=chd]铁壶",
-            "[preset=chd]吃我",
-            "[preset=chd]安黛因的信",
-            "[preset=chd]传单",
-            "[preset=chd]别欺负我",
+            "[preset=chinese][offsetX=0]神秘小礼物",
+            "[preset=chinese][offsetX=0]铁壶",
+            "[preset=chinese][offsetX=0]吃我",
+            "[preset=chinese][offsetX=0]安黛因的信",
+            "[preset=chinese][offsetX=0]传单",
+            "[preset=chinese][offsetX=0]别欺负我",
         },
-        cells = {}
+        getcell = true,
+        cells = {
+            "Toriel"
+        }
     },
 }
 FLAG = FLAG or global:GetSaveVariable("Flag") or

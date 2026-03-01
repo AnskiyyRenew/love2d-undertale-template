@@ -4,6 +4,7 @@ template.Elements = {}     -- pattern 用来保存自己创建的 sprites
 template.enemy = nil       -- Battle 会把当前 enemy 赋过来
 template.finalHurt = 0
 template._has_sliced = false
+template._end = false
 
 -- 可选：告诉 Battle 这个 pattern 的最大基础伤害
 function template.GetMaxDamage()
@@ -50,6 +51,7 @@ function template.Update(dt)
     -- 如果玩家按下 confirm（这里只用示例的 keyboard.GetState，和 Battle 一致）
     if keyboard.GetState("confirm") == 1 and not template._has_sliced then
         template._has_sliced = true
+        template._end = true
         print("ATTACKED BY LIBRARY")
 
         -- 播声音并生成 slice 特效，放在 enemy 的当前位置
@@ -92,6 +94,7 @@ function template.Update(dt)
     local bar = template.Elements[2]
     if bar and (bar.x < 40 or bar.x > 600) and not template._has_sliced then
         template._has_sliced = true
+        template._end = true
         template.finalHurt = -999
         bar.velocity.x = 0
     end
@@ -100,6 +103,7 @@ end
 function template.Reset()
     template.finalHurt = 0
     template._has_sliced = false
+    template._end = false
 end
 
 -- Destroy: 当 Battle 清理 pattern 或攻击结束时，销毁所有元素

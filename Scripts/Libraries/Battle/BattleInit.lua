@@ -721,7 +721,7 @@ function Battle.Update(dt)
             -- (大量 input 处理保持与 scene_battle.lua 一致，下面只做了直接移植)
             if (keyboard.GetState("confirm") == 1) then
                 encounterTyper:SetText({""})
-                if (battle.STATE == "ATTACKING") then
+                if (battle.STATE == "ATTACKING" and Battle.atkpattern._end) then
                     if (not attacking) then
                         attacking = true
 

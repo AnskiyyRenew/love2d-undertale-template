@@ -39,7 +39,6 @@ function SCENE.update(dt)
             )
         end
     end
-    print(ow.char.currentSprite:GetPosition())
 
     if (ow.getInteractResult("trigger", 1)) then
         if (keyboard.GetState("confirm") == 1) then

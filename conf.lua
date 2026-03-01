@@ -1,5 +1,5 @@
 -- Soul Engine Configuration File
-_VERSION = "2.5.0-nightly"
+_VERSION = "2.5.1-stable"
 
 -- Set to true when building the game for release
 _RELEASED = false
