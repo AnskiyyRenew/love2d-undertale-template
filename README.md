@@ -1,24 +1,32 @@
-# SoulEngine - love2d UNDERTALE template
-A template designed for creating fan games based on [Undertale](https://undertale.com/), offering a straightforward way for those who wish to create their own fan games using the [LOVE2D (LÖVE)](https://love2d.org/) engine.<br>
-This template is influenced by the [Create Your Frisk](https://github.com/RhenaudTheLukark/CreateYourFrisk/) engine. As such, its usage is similar in certain aspects to the aforementioned engine.
+# SoulEngine - A LOVE2D UNDERTALE Fangame Template
 
-# Credits
-Used the [Kikito's MD5 lua library](https://github.com/kikito/md5.lua).<br>
-Used the [dkjson lua library](http://dkolf.de/dkjson-lua/).<br>
-Used the [karai17's sti lua library](https://github.com/karai17/Simple-Tiled-Implementation).<br>
+A template for creating fan games inspired by https://undertale.com/, built on the https://love2d.org/ framework. It provides a straightforward starting point for fans who wish to create their own Undertale-style games.
 
-# Prerequisites
-**Please ensure that you have played the game [Undertale](https://undertale.com/).**<br>
-**Please ensure that you have installed the [LOVE2D(LÖVE)](https://love2d.org/) engine.**<br>
-This template is designed for LOVE2D version **11.3**, and future updates will be made to adapt it to newer versions of the LOVE2D engine.
+This project is influenced by the https://github.com/RhenaudTheLukark/CreateYourFrisk engine and consequently shares similarities in certain aspects of its workflow and design.
 
-# How to Use the Template
-- **On PC**, it is recommended to use [Visual Studio Code](https://code.visualstudio.com/) with the appropriate plugins, or any code editor you prefer, to assist in game development and testing.
+## Credits
+This template utilizes the following excellent libraries:
+*   [MD5](https://github.com/kikito/md5.lua) by kikito – A pure-Lua 5.1 implementation of the MD5 algorithm.
+*   [dkjson](http://dkolf.de/dkjson-lua/) – A JSON module for Lua that supports UTF-8.
+*   [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 – A Tiled map loader and renderer for LÖVE.
+*   [sock](https://github.com/camchenry/sock.lua) by camchenry – A networking library for LÖVE, making it easy to get started with multiplayer features.
 
-    - If the necessary extension that supports running LOVE2D is not installed, to run the game, simply drag the game folder onto love.exe or lovec.exe.
+## Prerequisites
+*   **Familiarity with https://undertale.com/.**
+*   The **https://love2d.org/** engine, version **11.3** or compatible, must be installed on your system. Future updates will aim to maintain compatibility with newer LÖVE versions.
 
-- **On mobile**, you can use a file manager like [MT Manager](https://mt2.cn) to edit the game files
+## How to Use the Template
 
-# 🌍 Community
-- 🎮 Discord Server: Join [Here](https://discord.gg/QeCmVMX7Mk).
-- 💬 QQ Group: 626073642.
+### On PC (Recommended)
+For development and testing, it is recommended to use an editor like https://code.visualstudio.com/ with relevant extensions for LÖVE/Lua, or any other code editor of your choice.
+
+**To run the game:**
+*   If your editor supports running LÖVE projects, use that feature.
+*   Alternatively, you can run the game by dragging the main project folder onto the `love.exe` (or `lovec.exe` on Windows) executable.
+
+### On Mobile (Android)
+You can browse and edit the game's script files using a capable file manager application, such as https://mt2.cn.
+
+## 🌍 Community
+*   🎮 **Discord Server:** https://discord.gg/QeCmVMX7Mk
+*   💬 **QQ Group:** 626073642
