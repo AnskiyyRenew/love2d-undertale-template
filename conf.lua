@@ -77,6 +77,13 @@ function love.conf(t)
     t.modules.window = true             -- 启用窗口模块（布尔值）
 end
 
+if (not _RELEASED) then
+    if (love.system.getOS() == "Windows") then
+        local handle = io.popen("chcp 65001", "r")
+        handle:close()
+    end
+end
+
 if (not USE_ERRHANDLER) then
     return
 end

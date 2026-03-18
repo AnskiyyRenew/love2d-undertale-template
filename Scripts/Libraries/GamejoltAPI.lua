@@ -4,8 +4,7 @@ local gamejolt = {}
 
 local md5 = require("Scripts.Libraries.Utils.MD5")
 local json = require("Scripts.Libraries.Utils.dkjson")
-local http = require("socket.http")
-local ltn12 = require("ltn12")
+local https = require("https")
 
 -- Generates a signature for the GameJolt API request by hashing the input with MD5.
 local function generate_signature(request_path)
@@ -13,19 +12,15 @@ local function generate_signature(request_path)
     return md5.sumhexa(input)
 end
 
--- Sends an HTTP request to the GameJolt API and returns the response or error message.
+-- Sends an HTTPS request to the GameJolt API and returns the response or error message.
 local function api_request(url)
-    local response_body = {}
-    local res, code, headers = http.request{
-        url = url,
-        sink = ltn12.sink.table(response_body)
-    }
+    -- lua-https (https.dll) API: returns code, body, headers
+    local code, response, headers = https.request(url)
 
     if (code ~= 200) then
         return false, "HTTP error: "..tostring(code)
     end
 
-    local response = table.concat(response_body)
     local data, pos, err = json.decode(response)
     if (not data) then
         return false, "JSON decode error: "..tostring(err).."\nResponse: "..tostring(response)
@@ -115,11 +110,7 @@ function gamejolt.unlock_achievement(trophy_id)
     if (result) then
         return true
     else
-        local browser_url = "https://gamejolt.com/api/game/v1_2" .. endpoint .. base_params ..
-                           "&signature=" .. generate_signature(endpoint .. base_params)
-        print(browser_url)
-        love.system.openURL(browser_url)
-        return false, "Falling back to browser: " .. tostring(err)
+        return false, err
     end
 end
 
@@ -289,18 +280,7 @@ function gamejolt.submit_score(score, table_id, sort, extra_data)
     if (result) then
         return true
     else
-        local browser_url = "https://gamejolt.com/api/game/v1_2" .. "/scores/add/?game_id=" .. gamejolt.app_id ..
-                           "&score=" .. score ..
-                           (table_id and "&table_id=" .. table_id or "") ..
-                           (sort and "&sort=" .. sort or "") ..
-                           (extra_data and "&extra_data=" .. extra_data or "") ..
-                           "&signature=" .. generate_signature("/scores/add/?game_id=" .. gamejolt.app_id ..
-                                                             "&score=" .. score ..
-                                                             (table_id and "&table_id=" .. table_id or "") ..
-                                                             (sort and "&sort=" .. sort or "") ..
-                                                             (extra_data and "&extra_data=" .. extra_data or ""))
-        love.system.openURL(browser_url)
-        return false, "Falling back to browser: " .. tostring(err)
+        return false, err
     end
 end
 

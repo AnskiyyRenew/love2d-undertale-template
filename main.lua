@@ -1,10 +1,3 @@
-if (not _RELEASED) then
-    if (love.system.getOS() == "Windows") then
-        local handle = io.popen("chcp 65001", "r")
-        handle:close()
-    end
-end
-
 -- Libraries
 global = require("Scripts.Libraries.GlobalVariables")
 maths = require("Scripts.Libraries.Utils.Mathematics")
@@ -53,7 +46,7 @@ global:SetVariable("FPS", 60)
 global:SetVariable("ScreenShaders", {})
 global:SetVariable("LAYER", 30)
 global:SetVariable("EncounterNobody", false)
-local reset_room = "Overworld/scene_ow_new"
+local reset_room = "scene_logo"
 
 -- Display configuration
 local Camera = require("Scripts.Libraries.Utils.Camera")
