@@ -1,3 +1,10 @@
+if (not _RELEASED) then
+    if (love.system.getOS() == "Windows") then
+        local handle = io.popen("chcp 65001", "r")
+        handle:close()
+    end
+end
+
 -- Libraries
 global = require("Scripts.Libraries.GlobalVariables")
 maths = require("Scripts.Libraries.Utils.Mathematics")

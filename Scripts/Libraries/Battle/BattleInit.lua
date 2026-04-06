@@ -1246,7 +1246,7 @@ end
 -- Clear: teardown and package.loaded cleanup
 function Battle.Clear()
     if not Battle.battle then return end
-    tween.clear()
+    tween.Clear()
     blasters:clear()
     if encounterTyper and encounterTyper.Destroy then encounterTyper:Destroy() end
     arenas.clear()

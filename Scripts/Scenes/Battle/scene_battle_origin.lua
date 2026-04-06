@@ -1090,7 +1090,7 @@ function SCENE.draw()
 end
 
 function SCENE.clear()
-    tween.clear()
+    tween.Clear()
     blasters:clear()
     encounterTyper:Destroy()
     arenas.clear()

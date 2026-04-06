@@ -1057,7 +1057,7 @@ function SCENE.clear()
     package.loaded["Scripts.Libraries.Attacks.Arenas"] = nil
     package.loaded["Scripts.Waves." .. battle.nextwave] = nil
 
-    tween.clear()
+    tween.Clear()
     blasters:clear()
     encounterTyper:Destroy()
     package.loaded["Scripts.Libraries.Attacks.GasterBlaster"] = nil

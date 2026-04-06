@@ -1109,6 +1109,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡联机开发（sock）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2322,7 +2350,7 @@
 <p><strong>这些变量均不可以被省略，必须进行设置，因为更底层的系统需要它们有一个确切的值。</strong></p>
 <ul>
 <li><code>enemy</code>：每一个战斗动画都会需要这个enemy进行获取敌人信息，包括你怎么知道敌人位置的，都在这个变量里面。</li>
-<li><code>_end</code>：如果设置为了 <code>true</code> ，那么底层战斗系统会立刻更新弹出字体的逻辑，请只在确保攻击真的结束之后设置为 <code>true</code> 。例如如果制作单刀效果（如木棍、真刀等），则在按下确认键定住校准条之后设置为 <code>true</code> 。</li>
+<li><code>_end</code>：如果设置为了 <code>true</code> ，那么底层战斗系统会立刻更新弹出字体的逻辑，请只在确保攻击真的结束之后设置为 <code>true</code> 。例如如果制作单刀效果（如木棍、真刀等），则在按下确认键校准条停止之后设置为 <code>true</code> 。</li>
 <li><code>finalHurt</code>：在 <code>_end</code> 之前设置 <code>finalHurt</code> 。如果不想给敌人造成伤害请填写负数来制作出 <code>MISS</code> 的效果。</li>
 </ul>
 <p>其余所有变量均为自己创建（参考 <code>template</code> 文件中的内容）。</p>

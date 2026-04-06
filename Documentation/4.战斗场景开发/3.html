@@ -1109,6 +1109,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡联机开发（sock）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2561,7 +2589,7 @@
 <li><code>EndWave()</code>：最重要的函数，可以结束当前回合，回到主线。</li>
 <li><code>Arena:Resize(155, 130)</code>：当进入回合后，把战斗框的尺寸改成(155, 130)。</li>
 <li><code>Player.sprite:MoveTo(320, 320)</code>：进入回合后，将玩家的灵魂放在战斗框的正中间。</li>
-<li><code>mask = maasks.New</code>：详情请见<a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/21.html">遮罩</a>部分的 内容。</li>
+<li><code>mask = masks.New</code>：详情请见<a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/21.html">遮罩</a>部分的 内容。</li>
 </ul>
 <hr />
 <h2 id="_4">战斗框<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
@@ -2606,7 +2634,7 @@
 <span class="kd">local</span><span class="w"> </span><span class="nv">bone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">bones</span><span class="p">:</span><span class="nf">New2D</span><span class="p">(</span><span class="s2">&quot;Sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">130</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">12</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="2d_1">2D骨头的方法<a class="headerlink" href="#2d_1" title="Permanent link">&para;</a></h3>
-<p>诚然，有些骨头也是只会显示在战斗框里的，它们不会出框，这是遮罩齐了作用，那么骨头也可以设置遮罩等一系列内容：</p>
+<p>诚然，有些骨头也是只会显示在战斗框里的，它们不会出框，这是遮罩起了作用，那么骨头也可以设置遮罩等一系列内容：</p>
 <ul>
 <li><code>bone:SetStencils(masks)</code>：设置骨头的遮罩。</li>
 <li><code>bone:Length(length)</code>：改变骨头的长度，只能大于等于0。</li>

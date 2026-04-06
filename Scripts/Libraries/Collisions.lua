@@ -135,12 +135,23 @@ function collisions.RectangleWithRectangle(rectangle1, rectangle2)
 end
 
 function collisions.RectangleWithCircle(rectangle, circle)
+
+    local rHalfDiag = math.sqrt(rectangle.w^2 + rectangle.h^2) / 2
+    local cHalfDiag = math.sqrt(circle.w^2 + circle.h^2) / 2  -- circle.w/h 是直径
+    local dx = rectangle.x - circle.x
+    local dy = rectangle.y - circle.y
+    if dx*dx + dy*dy > (rHalfDiag + cHalfDiag)^2 then
+        return false  -- 连包围圆都不碰，直接跳过
+    end
+
+    -- 检测点是否在矩形内（矩形以原点为中心，方向为 (cos,sin)）
     local function p2r(w, h, cos, sin, dx, dy)
         return math.abs(dx*cos + dy*sin)*2 <= w and math.abs(-dx*sin + dy*cos)*2 <= h
     end
 
-    local function solve(a,b, p,q)
-        -- {x^2/a^2 + y^2/b^2 == 1} & {p*x + q*y == 0}
+    -- 求椭圆 x²/a² + y²/b² = 1 与过原点直线 p*x + q*y = 0 的交点（取 x≥0 的一侧）
+    -- 即椭圆在矩形某条轴方向上的极值点
+    local function solve(a, b, p, q)
         if q == 0 then
             return 0, b
         elseif p == 0 then
@@ -151,69 +162,64 @@ function collisions.RectangleWithCircle(rectangle, circle)
         end
     end
 
+    -- 检测点是否在椭圆内
     local function p2e(a, b, x, y)
         return (x*x)/(a*a) + (y*y)/(b*b) <= 1
     end
 
+    -- 【新增】检测线段 P→Q 是否与椭圆 x²/a² + y²/b² = 1 的边界相交
+    -- 将线段参数化为 P + t*(Q-P)，代入椭圆方程得关于 t 的二次方程，
+    -- 判断是否存在 t ∈ [0,1] 的实数根
+    local function segmentIntersectsEllipse(a, b, px, py, qx, qy)
+        local dx, dy = qx - px, qy - py
+        local A = dx*dx/(a*a) + dy*dy/(b*b)
+        if A == 0 then return false end
+        local B = 2*(px*dx/(a*a) + py*dy/(b*b))
+        local C = px*px/(a*a) + py*py/(b*b) - 1
+        local disc = B*B - 4*A*C
+        if disc < 0 then return false end
+        local sqrtD = math.sqrt(disc)
+        local t1 = (-B - sqrtD) / (2*A)
+        local t2 = (-B + sqrtD) / (2*A)
+        return (t1 >= 0 and t1 <= 1) or (t2 >= 0 and t2 <= 1)
+    end
+
+    -- 椭圆（原点，半轴 a/b，轴对齐）与矩形（中心 (x,y)，宽 w 高 h，方向 (cos,sin)）的碰撞检测
     local function ellipseToRectangle(a, b, x, y, w, h, cos, sin)
-        -- 中心在(0,0), 半长轴长为a, 半短轴长为b的椭圆
-        -- 中心在(x,y), 宽为w, 高为h, 方向为(cos,sin)的矩形
-        -- 解四切点, 对应矩形的象限来区分
-        --[[
-        -- 新情况: 实际上不需要区分象限
-        local x1, y1 = solve(a, b, -sin/(a*a), cos/(b*b))
-        local x3, y3 if (cos >= 0) == (x1 >= 0) then
-            x3 = -x1
-            y3 = -y1
-        else
-            x3 = x1
-            y3 = y1
-            x1 = -x3
-            y1 = -y3
-        end
-        local x2, y2 = solve(a, b, cos/(a*a), sin/(b*b))
-        local x4, y4 if (sin <= 0) == (x2 >= 0) then
-            x4 = -x2
-            y4 = -y2
-        else
-            x4 = x2
-            y4 = y2
-            x2 = -x4
-            y2 = -y4
-        end
-        --]]
+        -- 椭圆在矩形两条轴方向上的极值点（各取正负两侧，共4点）
         local x1, y1 = solve(a, b, -sin/(a*a), cos/(b*b))
         local x2, y2 = solve(a, b, cos/(a*a), sin/(b*b))
+
+        -- 矩形的宽/高方向向量（全长）
         local wx, wy = w*cos, w*sin
         local hx, hy = -h*sin, h*cos
-        --[[
-        local lg = require "love.graphics"
-        local points = {x1,y1, x2,y2, x3,y3, x4,y4}
-        for i = 1, 4 do
-            lg.push()
-            lg.translate(points[i*2-1], points[i*2])
-            lg.rotate(math.atan2(sin, cos))
-            lg.setColor(1,0,0,0.5)
-            lg.rectangle("line", -w/2,-h/2, w,h)
-            lg.pop()
-        end
-        lg.setColor(1,0,0,0.5)
-        lg.ellipse("line", (wx+hx)/2, (wy+hy)/2, a, b)
-        lg.ellipse("line", (-wx+hx)/2, (-wy+hy)/2, a, b)
-        lg.ellipse("line", (-wx-hx)/2, (-wy-hy)/2, a, b)
-        lg.ellipse("line", (wx-hx)/2, (wy-hy)/2, a, b)
-        --]]
 
-        return p2r(w,h, cos,sin, x-x1,y-y1)
-        or p2r(w,h, cos,sin, x-x2,y-y2)
-        --or p2r(w,h, cos,sin, x-x3,y-y3)
-        --or p2r(w,h, cos,sin, x-x4,y-y4)
-        or p2r(w,h, cos,sin, x+x1,y+y1)
-        or p2r(w,h, cos,sin, x+x2,y+y2)
-        or p2e(a,b, x-(wx+hx)/2,y-(wy+hy)/2)
-        or p2e(a,b, x-(-wx+hx)/2,y-(-wy+hy)/2)
-        or p2e(a,b, x-(-wx-hx)/2,y-(-wy-hy)/2)
-        or p2e(a,b, x-(wx-hx)/2,y-(wy-hy)/2)
+        -- 检测1：椭圆极值点是否在矩形内
+        if p2r(w,h, cos,sin, x-x1,y-y1) then return true end
+        if p2r(w,h, cos,sin, x-x2,y-y2) then return true end
+        if p2r(w,h, cos,sin, x+x1,y+y1) then return true end
+        if p2r(w,h, cos,sin, x+x2,y+y2) then return true end
+
+        -- 检测2：矩形4个顶点是否在椭圆内
+        if p2e(a,b, x-(wx+hx)/2, y-(wy+hy)/2) then return true end
+        if p2e(a,b, x-(-wx+hx)/2, y-(-wy+hy)/2) then return true end
+        if p2e(a,b, x-(-wx-hx)/2, y-(-wy-hy)/2) then return true end
+        if p2e(a,b, x-(wx-hx)/2, y-(wy-hy)/2) then return true end
+
+        -- 检测3：矩形4条边是否与椭圆边界相交
+        -- （修复漏检：椭圆边缘穿过矩形边，但极值点不在矩形内、顶点也不在椭圆内的情况）
+        -- 4个顶点坐标
+        local c1x, c1y = x + wx/2 + hx/2, y + wy/2 + hy/2
+        local c2x, c2y = x - wx/2 + hx/2, y - wy/2 + hy/2
+        local c3x, c3y = x - wx/2 - hx/2, y - wy/2 - hy/2
+        local c4x, c4y = x + wx/2 - hx/2, y + wy/2 - hy/2
+
+        if segmentIntersectsEllipse(a, b, c1x, c1y, c2x, c2y) then return true end
+        if segmentIntersectsEllipse(a, b, c2x, c2y, c3x, c3y) then return true end
+        if segmentIntersectsEllipse(a, b, c3x, c3y, c4x, c4y) then return true end
+        if segmentIntersectsEllipse(a, b, c4x, c4y, c1x, c1y) then return true end
+
+        return false
     end
 
     local rec_x = rectangle.x - circle.x
