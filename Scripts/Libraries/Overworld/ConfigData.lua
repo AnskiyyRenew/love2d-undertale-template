@@ -1,3 +1,21 @@
+local ItemDB = require("Scripts.Libraries.Overworld.Items.ItemDB")
+
+local function resolveEquipment(kind, value)
+    local aliases = {
+        weapon = {
+            stick = "stick",
+            ["[preset=chinese][offsetX=90]木棍"] = "stick",
+            ["Stick"] = "stick"
+        },
+        armor = {
+            bandage = "bandage",
+            ["[preset=chinese][offsetX=90]绷带"] = "bandage",
+            ["Bandage"] = "bandage"
+        }
+    }
+    return (aliases[kind] and aliases[kind][value]) or value
+end
+
 DATA = DATA or global:GetSaveVariable("Overworld") or
 {
     time = 0,
@@ -21,16 +39,16 @@ DATA = DATA or global:GetSaveVariable("Overworld") or
         watk = 0,
         def = 0,
         edef = 0,
-        weapon = "[preset=chinese][offsetX=90]木棍",
-        armor = "[preset=chinese][offsetX=90]绷带",
+        weapon = "stick",
+        armor = "bandage",
 
         items = {
-            "[preset=chinese][offsetX=0]神秘小礼物",
-            "[preset=chinese][offsetX=0]铁壶",
-            "[preset=chinese][offsetX=0]吃我",
-            "[preset=chinese][offsetX=0]安黛因的信",
-            "[preset=chinese][offsetX=0]传单",
-            "[preset=chinese][offsetX=0]别欺负我",
+            "mystery_gift",
+            "iron_kettle",
+            "eat_me",
+            "undyne_letter",
+            "flyer",
+            "dont_bully_me",
         },
         getcell = true,
         cells = {
@@ -49,10 +67,10 @@ FLAG = FLAG or global:GetSaveVariable("Flag") or
 CHESTS = CHESTS or global:GetSaveVariable("Chests") or
 {
     chest1 = {
-        "[preset=chd][red]蜘蛛",
+        "spider",
     },
     chest2 = {
-        "[preset=chd][yellow]看不见我"
+        "invisible_me"
     }
 }
 levelData = {
@@ -86,4 +104,17 @@ if (not global:GetSaveVariable("Flag")) then
 end
 if (not global:GetSaveVariable("Chests")) then
     global:SetSaveVariable("Chests", CHESTS)
+end
+
+DATA.player.weapon = resolveEquipment("weapon", DATA.player.weapon)
+DATA.player.armor = resolveEquipment("armor", DATA.player.armor)
+
+for i = 1, #(DATA.player.items or {}) do
+    DATA.player.items[i] = ItemDB.resolveKey(DATA.player.items[i])
+end
+
+for _, chest in pairs(CHESTS) do
+    for i = 1, #(chest or {}) do
+        chest[i] = ItemDB.resolveKey(chest[i])
+    end
 end

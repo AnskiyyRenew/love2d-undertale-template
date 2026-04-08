@@ -53,7 +53,7 @@ global:SetVariable("FPS", 60)
 global:SetVariable("ScreenShaders", {})
 global:SetVariable("LAYER", 30)
 global:SetVariable("EncounterNobody", false)
-local reset_room = "scene_logo"
+local reset_room = "Overworld/scene_ow_new"
 
 -- Display configuration
 local Camera = require("Scripts.Libraries.Utils.Camera")
@@ -243,7 +243,8 @@ function love.keypressed(key)
             scenes.current.keypressed(key)
         end
     end
-    if (love.system.getOS ~= "Android" or love.system.getOS ~= "iOS") then
+    local os_name = love.system.getOS()
+    if (os_name ~= "Android" and os_name ~= "iOS") then
         if (key == "f4") then
             love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
             scale = math.min(love.graphics.getWidth() / LOGICAL_WIDTH, love.graphics.getHeight() / LOGICAL_HEIGHT)
@@ -255,7 +256,6 @@ function love.keypressed(key)
     end
 
     if (not _RELEASED) then
-
         -- Reload the current scene
         if (key == "f7") then
             scenes.switchTo(scenes.name_current)

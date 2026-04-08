@@ -105,25 +105,28 @@ function PlayerLib.Heal(value, sound)
     else
         PlayerLib.hp = PlayerLib.hp + value
     end
-    local s = sound or true
+    local s = sound ~= false
     if (s) then
         audio.PlaySound("snd_heal.wav", 1, false)
     end
 end
 
-function PlayerLib.SetSoul(number, args)
+function PlayerLib.SetSoul(number, args, play_sound)
     PlayerLib.ResetVariables()
     PlayerLib.soulMode = number
     local vars = PlayerLib.soul_variables
     local args = (args or {})
     local Player = PlayerLib.sprite
+    local play_sound = play_sound ~= false
 
-    audio.PlaySound("snd_ding.wav", 1, false)
+    if (play_sound ~= false) then
+        audio.PlaySound("snd_ding.wav", 1, false)
+    end
     if (number == 1) then
         Player:Set("Soul Library Sprites/spr_default_heart.png")
         Player.color = {1, 0, 0, 1}
 
-        vars.red.rotated = (args.rotated or false)
+        vars.red.rotated = (args.rotated == true)
     elseif (number == 2) then
         Player:Set("Soul Library Sprites/spr_default_heart.png")
         Player.color = {1, 0.5, 0, 1}

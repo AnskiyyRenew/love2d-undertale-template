@@ -122,22 +122,18 @@ function Battle.BattleDialogue(texts, targetState)
 end
 
 -- Actions/Items/Spare/Flee handlers (kept logic from scene_battle)
-function Battle.HandleActions(enemy_name, action)
+function Battle.HandleActions(enemy, action)
     local battle = Battle.battle
     if not battle or not battle.Enemies then return end
-    if (enemy_name == battle.Enemies[1].name) then
-        local enemy = battle.Enemies[1]
-        if (action == enemy.actions[1]) then
-            Battle.BattleDialogue(localize.Act11)
-        elseif (action == enemy.actions[2]) then
-            Battle.BattleDialogue(localize.Act12)
-        end
-    elseif (enemy_name == battle.Enemies[2].name) then
-        local enemy = battle.Enemies[2]
-        if (action == enemy.actions[1]) then
-            Battle.BattleDialogue(localize.Act21)
-        elseif (action == enemy.actions[2]) then
-            Battle.BattleDialogue(localize.Act22)
+    if not enemy or not enemy.actions then return end
+
+    for i = 1, #enemy.actions do
+        if (action == enemy.actions[i]) then
+            local dialogue = enemy.acttexts and enemy.acttexts[i]
+            if dialogue then
+                Battle.BattleDialogue(dialogue)
+            end
+            return
         end
     end
 end
@@ -188,7 +184,8 @@ function Battle.HandleFlee()
 end
 
 function Battle.FleeUpdate()
-    if (fleelegs and battle.Player.sprite) then
+    local battle = Battle.battle
+    if (battle and battle.Player and battle.Player.sprite and fleelegs) then
         fleelegs:MoveTo(battle.Player.sprite.x, battle.Player.sprite.y + 12)
     end
 end
@@ -247,6 +244,7 @@ function Battle.Init(game)
     local battle_ = require(name)
     Battle._name = name
     Battle.battle = battle_
+    Battle._last_state = nil
 
     -- initialize scene-level variables
     global:SetVariable("PlayerPosition", {0, 0})
@@ -762,7 +760,7 @@ function Battle.Update(dt)
 
                 if (battle.STATE == "ACTSELECTING") then
                     uiTexts.clear()
-                    Battle.HandleActions(enemies[inSelect].name, enemies[inSelect].actions[actionSelect])
+                    Battle.HandleActions(enemies[inSelect], enemies[inSelect].actions[actionSelect])
                     Player.sprite:MoveTo(9999, 9999)
                     battle.STATE = "DIALOGUERESULT"
                     audio.PlaySound("snd_menu_1.wav")
@@ -845,18 +843,20 @@ function Battle.Update(dt)
                                 local text = typers.DrawText("* " .. enemies[i].name, {80, 270 + 35 * (i - 1)}, 14)
                                 if (enemies[i].canspare) then text.color = {1, 1, 0}; text:Reparse() end
                                 table.insert(uiTexts, text)
-                                local maxhpbar = sprites.CreateSprite("px.png", 13)
-                                maxhpbar.xpivot = 0
-                                maxhpbar:Scale(100, 20)
-                                maxhpbar:MoveTo(380, 288 + 35 * (i - 1))
-                                maxhpbar.color = {1, 0, 0}
-                                local hpbar = sprites.CreateSprite("px.png", 14)
-                                hpbar.xpivot = 0
-                                hpbar:Scale(enemies[i].hp / enemies[i].maxhp * 100, 20)
-                                hpbar:MoveTo(380, 288 + 35 * (i - 1))
-                                hpbar.color = {0, 1, 0}
-                                table.insert(uiElements, maxhpbar)
-                                table.insert(uiElements, hpbar)
+                                if (enemies[i].showhpbar) then
+                                    local maxhpbar = sprites.CreateSprite("px.png", 13)
+                                    maxhpbar.xpivot = 0
+                                    maxhpbar:Scale(100, 20)
+                                    maxhpbar:MoveTo(380, 288 + 35 * (i - 1))
+                                    maxhpbar.color = {1, 0, 0}
+                                    local hpbar = sprites.CreateSprite("px.png", 14)
+                                    hpbar.xpivot = 0
+                                    hpbar:Scale(enemies[i].hp / enemies[i].maxhp * 100, 20)
+                                    hpbar:MoveTo(380, 288 + 35 * (i - 1))
+                                    hpbar.color = {0, 1, 0}
+                                    table.insert(uiElements, maxhpbar)
+                                    table.insert(uiElements, hpbar)
+                                end
                             end
                         end
                     elseif (inButton == 2) then
@@ -1274,6 +1274,7 @@ function Battle.Clear()
     -- nulllify references
     Battle.battle = nil
     Battle._name = nil
+    Battle._last_state = nil
 end
 
 return Battle

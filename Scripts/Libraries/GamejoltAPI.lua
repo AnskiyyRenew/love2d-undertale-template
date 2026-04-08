@@ -4,7 +4,18 @@ local gamejolt = {}
 
 local md5 = require("Scripts.Libraries.Utils.MD5")
 local json = require("Scripts.Libraries.Utils.dkjson")
-local https = require("https")
+local https_ok, https_module = pcall(require, "https")
+local https = https_ok and https_module or nil
+local https_error = https_ok and nil or tostring(https_module)
+
+gamejolt._session_auto = {
+    enabled = false,
+    interval = 30,
+    status = "active",
+    elapsed = 0,
+    installed = false,
+    last_error = nil
+}
 
 -- Generates a signature for the GameJolt API request by hashing the input with MD5.
 local function generate_signature(request_path)
@@ -14,6 +25,12 @@ end
 
 -- Sends an HTTPS request to the GameJolt API and returns the response or error message.
 local function api_request(url)
+    if (not https or type(https.request) ~= "function") then
+        local platform = (love and love.system and love.system.getOS and love.system.getOS()) or "Unknown"
+        local reason = https_error or "missing native https module"
+        return false, "GameJolt API unavailable on "..tostring(platform)..": "..reason
+    end
+
     -- lua-https (https.dll) API: returns code, body, headers
     local code, response, headers = https.request(url)
 
@@ -33,6 +50,42 @@ local function api_request(url)
     return data.response
 end
 
+local function session_auto_tick(dt)
+    local state = gamejolt._session_auto
+    if (not state.enabled) then
+        return
+    end
+
+    state.elapsed = state.elapsed + (tonumber(dt) or 0)
+    if (state.elapsed < state.interval) then
+        return
+    end
+
+    state.elapsed = 0
+    local result, err = gamejolt.session_ping(state.status)
+    if (result == false) then
+        state.last_error = err
+    else
+        state.last_error = nil
+    end
+end
+
+local function install_session_auto_update()
+    if (gamejolt._session_auto.installed) then
+        return
+    end
+
+    local previous_update = love.update
+    love.update = function(dt, ...)
+        if (previous_update) then
+            previous_update(dt, ...)
+        end
+        session_auto_tick(dt)
+    end
+
+    gamejolt._session_auto.installed = true
+end
+
 ---Initializes the GameJolt API with the provided app ID and private key.
 ---@param app_id number|string
 ---@param private_key string
@@ -41,6 +94,17 @@ function gamejolt.init(app_id, private_key)
     gamejolt.private_key = private_key
     gamejolt.base_url = "https://api.gamejolt.com/api/game/v1_2"
     return (gamejolt.app_id ~= nil and gamejolt.private_key ~= nil)
+end
+
+---Returns whether the native HTTPS dependency required by the GameJolt API is available.
+---@return boolean, string|nil
+function gamejolt.is_available()
+    if (https and type(https.request) == "function") then
+        return true
+    end
+
+    local platform = (love and love.system and love.system.getOS and love.system.getOS()) or "Unknown"
+    return false, "GameJolt API native HTTPS module is unavailable on "..tostring(platform)..": "..tostring(https_error or "missing native https module")
 end
 
 --------------------------------------------USERS--------------------------------------------
@@ -127,6 +191,30 @@ function gamejolt.session_open()
     return api_request(url)
 end
 
+---Automatically opens a session and periodically pings GameJolt to keep it alive.
+-- Only needs to be called once; the library will handle subsequent heartbeats for you.
+---@param interval number|nil
+---@param status string|nil
+---@return boolean|false, string|nil
+function gamejolt.session_update(interval, status)
+    local state = gamejolt._session_auto
+    state.interval = math.max(1, tonumber(interval) or state.interval or 30)
+    state.status = status or "active"
+    state.elapsed = 0
+    state.last_error = nil
+
+    install_session_auto_update()
+
+    local result, err = gamejolt.session_open()
+    if (result == false) then
+        state.enabled = false
+        return false, err
+    end
+
+    state.enabled = true
+    return true
+end
+
 ---Pings the current session to keep it active or update its status.
 -- Syntax: /sessions/ping/?game_id=xxxxx&username=myusername&user_token=mytoken&status=active
 ---@param status string|nil
@@ -146,6 +234,8 @@ end
 -- Syntax: /sessions/close/?game_id=xxxxx&username=myusername&user_token=mytoken
 ---@return table|false, string|nil
 function gamejolt.session_close()
+    gamejolt._session_auto.enabled = false
+    gamejolt._session_auto.elapsed = 0
     local url = gamejolt.base_url .. "/sessions/close/?game_id=" .. gamejolt.app_id ..
                 "&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token ..
                 "&signature=" .. generate_signature("/sessions/close/?game_id=" .. gamejolt.app_id ..

@@ -1,5 +1,6 @@
 -- Get the player's soul movement functions.
 local PlayerLib = require("Scripts.Libraries.Attacks.PlayerLib")
+local Enemy = require("Scripts.Libraries.Battle.Enemy")
 
 -- This is where we init the encounter.
 -- All the encounter data is stored here.
@@ -15,7 +16,7 @@ local encounter = {
     -- This table is for the enemy data.
     -- You can add as many enemies as you want, but the first one will be the one that is displayed first.
     Enemies = {
-        {
+        Enemy.new({
             name = localize.Enemies.Poseur.Name,
             defensetext = "MISS",
             misstext = "MISS",
@@ -30,12 +31,16 @@ local encounter = {
             dead = false,
 
             actions = localize.Enemies.Poseur.Actions,
+            acttexts = {
+                localize.Act11,
+                localize.Act12
+            },
             position = {
                 x = 320 - 150,
                 y = 140
             }
-        },
-        {
+        }),
+        Enemy.new({
             name = localize.Enemies.TheOther.Name,
             defensetext = "MISS",
             misstext = "MISS",
@@ -50,11 +55,17 @@ local encounter = {
             dead = false,
 
             actions = localize.Enemies.TheOther.Actions,
+            acttexts = {
+                localize.Act21,
+                localize.Act22
+            },
             position = {
                 x = 320,
                 y = 140
-            }
-        }
+            },
+
+            showhpbar = false
+        })
     },
 
     -- This is the table that contains your inventory.

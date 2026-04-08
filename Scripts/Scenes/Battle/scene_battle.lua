@@ -6,29 +6,18 @@ battle = b.Init("Scripts.Libraries.Game.Encounter")
 atkp = require("Scripts.Libraries.Battle.Patterns.template")
 b.SetAtkPattern(atkp)
 
-local function HandleActions(enemy_name, action)
+local function HandleActions(enemy, action)
     local battle = b.battle
-    local temp_tab = {}
-
-    -- Deep copy
-    for k, v in pairs(battle.Enemies) do
-        temp_tab[k] = v
-    end
-
     if not battle or not battle.Enemies then return end
-    if (enemy_name == temp_tab[1].name) then
-        local enemy = battle.Enemies[1]
-        if (action == enemy.actions[1]) then
-            b.BattleDialogue(localize.Act11)
-        elseif (action == enemy.actions[2]) then
-            b.BattleDialogue(localize.Act12)
-        end
-    elseif (enemy_name == temp_tab[2].name) then
-        local enemy = battle.Enemies[2]
-        if (action == enemy.actions[1]) then
-            b.BattleDialogue(localize.Act21)
-        elseif (action == enemy.actions[2]) then
-            b.BattleDialogue(localize.Act22)
+    if not enemy or not enemy.actions then return end
+
+    for i = 1, #enemy.actions do
+        if (action == enemy.actions[i]) then
+            local dialogue = enemy.acttexts and enemy.acttexts[i]
+            if dialogue then
+                b.BattleDialogue(dialogue)
+            end
+            return
         end
     end
 end

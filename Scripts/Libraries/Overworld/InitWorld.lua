@@ -8,6 +8,11 @@ oworld = {}
 -- Init libraries to update the map.
 local sti = require("Scripts.Libraries.STI")
 require("Scripts.Libraries.Overworld.ConfigData")
+local ItemDB = require("Scripts.Libraries.Overworld.Items.ItemDB")
+
+local function OWText()
+    return localize.Overworld
+end
 
 -- Init the overworld's physics oworld.pworld.
 local FADEOUT = sprites.CreateSprite("px.png", 10000)
@@ -578,20 +583,20 @@ function player_choosing_update()
                     tempbox.line:Scale(2, 300)
                     tempbox.line.color = {0.5, 0, 0}
                     tempbox.line:MoveTo(RelativePosition(320, 240))
-                    tempbox.title = typers.DrawText("[preset=chinese]物品栏             箱子", {RelativePosition(150, 30)}, 9903)
+                    tempbox.title = typers.DrawText(OWText().Menu.BoxTitle, {RelativePosition(150, 30)}, 9903)
                     oworld.choose_case = 1
                     oworld.choose_obj = "inchestbox"
 
                     for i = 1, 9
                     do
                         local item = DATA.player.items[i]
-                        local t = typers.DrawText(item or "", {RelativePosition(90, 80 + 35 * (i - 1))}, 9990)
+                        local t = typers.DrawText(item and ItemDB.getDisplayName(item) or "", {RelativePosition(90, 80 + 35 * (i - 1))}, 9990)
                         table.insert(invtexts, t)
                     end
                     for i = 1, 9
                     do
                         local item = tempchest[i]
-                        local t = typers.DrawText(item or "", {RelativePosition(390, 80 + 35 * (i - 1))}, 9990)
+                        local t = typers.DrawText(item and ItemDB.getDisplayName(item) or "", {RelativePosition(390, 80 + 35 * (i - 1))}, 9990)
                         table.insert(boxtexts, t)
                     end
                 end
@@ -608,7 +613,7 @@ function player_choosing_update()
                 local minutes = math.floor(tm.time / 60)
                 local seconds = math.floor(tm.time % 60)
                 tempbox.text = typers.DrawText(
-                    string.format("Chara    LV " .. global:GetSaveVariable("Overworld").player.lv .. "    %02d:%02d", minutes, seconds),
+                    string.format(OWText().Menu.SavePreview, global:GetSaveVariable("Overworld").player.name, global:GetSaveVariable("Overworld").player.lv, minutes, seconds),
                     {RelativePosition(140, 135)}, 100000
                 )
                 tempbox.room = typers.DrawText(
@@ -616,7 +621,7 @@ function player_choosing_update()
                     {RelativePosition(140, 185)}, 100000
                 )
                 tempbox.choe = typers.DrawText(
-                    "Save       Cancel",
+                    OWText().Menu.SaveOptions,
                     {RelativePosition(165, 235)}, 100000
                 )
                 oworld.choose_obj = "insave"
@@ -640,7 +645,7 @@ function player_choosing_update()
                     local minutes = math.floor(DATA.time / 60)
                     local seconds = math.floor(DATA.time % 60)
                     DATA.player.lv = battle.Player.lv
-                    tempbox.text:SetText(string.format(DATA.player.name .. "    LV " .. DATA.player.lv .. "    %02d:%02d", minutes, seconds))
+                    tempbox.text:SetText(string.format(OWText().Menu.SavePreview, DATA.player.name, DATA.player.lv, minutes, seconds))
                     tempbox.text.color = {1, 1, 0}
                     tempbox.text:Reparse()
 
@@ -648,7 +653,7 @@ function player_choosing_update()
                     tempbox.room.color = {1, 1, 0}
                     tempbox.room:Reparse()
 
-                    tempbox.choe:SetText("Saved Successfully")
+                    tempbox.choe:SetText(OWText().Menu.SaveSuccess)
                     tempbox.choe.color = {1, 1, 0}
                     tempbox.choe:Reparse()
 
@@ -731,13 +736,13 @@ function player_choosing_update()
                 do
                     local item = DATA.player.items[i]
                     local t = invtexts[i]
-                    t:SetText(item or "")
+                    t:SetText(item and ItemDB.getDisplayName(item) or "")
                 end
                 for i = 1, 9
                 do
                     local item = tempchest[i]
                     local t = boxtexts[i]
-                    t:SetText(item or "")
+                    t:SetText(item and ItemDB.getDisplayName(item) or "")
                 end
 
                 if (oworld.choose_case == 1) then
@@ -1246,7 +1251,7 @@ function oworld.ChestInteract(chest)
     -- Create a dialog box.
     tempchest = CHESTS[chest]
     local posy = (oworld.POSITION == "up") and 80 or 400
-    oworld.dialogNew({"* Use the box?[space:2, 38]\n\n        Yes           No[function:player_choosing_start|chestbox," .. posy + 35 .. "]"})
+    oworld.dialogNew({string.format(OWText().Menu.UseBoxPrompt, posy + 35)})
 end
 
 function oworld.SaveInteract(texts, room, position, direction)

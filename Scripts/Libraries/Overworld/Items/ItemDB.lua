@@ -1,193 +1,163 @@
 local ItemDB = {}
 
-ItemDB["[preset=chd]甜甜圈"] = {
+local locales = {
+    require("Localization.en"),
+    require("Localization.zh_CN")
+}
+
+local aliasToId = {
+    ["mystery_gift"] = "mystery_gift",
+    ["tiny_mystery_gift"] = "tiny_mystery_gift",
+    ["iron_kettle"] = "iron_kettle",
+    ["eat_me"] = "eat_me",
+    ["undyne_letter"] = "undyne_letter",
+    ["flyer"] = "flyer",
+    ["dont_bully_me"] = "dont_bully_me",
+    ["bully_once"] = "bully_once",
+    ["spider"] = "spider",
+    ["invisible_me"] = "invisible_me",
+    ["donut"] = "donut"
+}
+
+for _, lang in ipairs(locales) do
+    if lang.Overworld and lang.Overworld.Items then
+        for itemId, itemData in pairs(lang.Overworld.Items) do
+            if itemData.name then
+                aliasToId[itemData.name] = itemId
+            end
+        end
+    end
+end
+
+local function getLocalizedItem(itemId)
+    return localize.Overworld.Items[itemId]
+end
+
+local function createText(lines, args)
+    local texts = {}
+    for i = 1, #lines do
+        if args then
+            texts[i] = string.format(lines[i], unpack(args))
+        else
+            texts[i] = lines[i]
+        end
+    end
+    texts[#texts + 1] = "[noskip][function:RemoveBlocks][next]"
+    typers.CreateText(texts, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+end
+
+function ItemDB.resolveKey(itemKey)
+    if not itemKey then return itemKey end
+    return aliasToId[itemKey] or itemKey
+end
+
+function ItemDB.getDisplayName(itemKey)
+    local itemId = ItemDB.resolveKey(itemKey)
+    local item = localize.Overworld.Items[itemId]
+    return (item and item.name) or itemKey
+end
+
+local function defineItem(itemId, handlers)
+    ItemDB[itemId] = handlers
+end
+
+defineItem("donut", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你吃了甜甜圈。",
-            "[colorHEX:9900ff]* [pattern:chinese]吃了。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("donut").use)
         table.remove(stat.items, stat.initem)
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了甜甜圈。",
-            "[colorHEX:9900ff]* [pattern:chinese]一个甜甜圈有什么好查看的？",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("donut").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了甜甜圈。",
-            "[colorHEX:9900ff]* [pattern:chinese]对的，就是扔了。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("donut").drop)
         table.remove(stat.items, stat.initem)
     end
-}
+})
 
-ItemDB["[preset=chd]神秘小礼物"] = {
+defineItem("mystery_gift", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你打开了神秘小礼物。",
-            "* [pattern:chinese]里面有一个神秘的东西。",
-            "* [pattern:chinese]噢，看起来是另一个小礼物！",
-            "* [pattern:chinese]（你得到了神秘小小礼物。）",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("mystery_gift").use)
         table.remove(stat.items, stat.initem)
-        table.insert(stat.items, "[preset=chd]神秘小小礼物")
+        table.insert(stat.items, "tiny_mystery_gift")
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了神秘小礼物。",
-            "[colorHEX:9900ff]* [pattern:chinese]打开它，看看里面有什么吧。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("mystery_gift").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了神秘小礼物。",
-            "[colorHEX:9900ff]* [pattern:chinese]但是小礼物又回去了！",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("mystery_gift").drop)
     end
-}
+})
 
-ItemDB["[preset=chd]神秘小小礼物"] = {
+defineItem("tiny_mystery_gift", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你打开了神秘小小礼物。",
-            "* [pattern:chinese]噢，你被开了。",
-            "* [pattern:chinese]（你得知你现在位于[pattern:english]" .. global:GetVariable("ROOM") .. "[pattern:chinese]房间中）",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("tiny_mystery_gift").use, {global:GetVariable("ROOM")})
         table.remove(stat.items, stat.initem)
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了神秘小小礼物。",
-            "[colorHEX:9900ff]* [pattern:chinese]打开它，看看里面有什么吧。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("tiny_mystery_gift").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了神秘小小礼物。",
-            "[colorHEX:9900ff]* [pattern:chinese]但是小礼物又回去了！",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("tiny_mystery_gift").drop)
     end
-}
+})
 
-ItemDB["[preset=chd]安黛因的信"] = {
+defineItem("undyne_letter", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你尝试打开安黛因的信。",
-            "* [pattern:chinese]封的太死了，你打不开。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("undyne_letter").use)
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了安黛因的信。",
-            "* [pattern:chinese][voice:v_flowey.wav]嘿！[wait:30]看什么呢！？",
-            "* [pattern:chinese]你吓得连忙把信放回包里。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("undyne_letter").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了安黛因的信。",
-            "[colorHEX:9900ff]* [pattern:chinese]信又跟了回去！",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("undyne_letter").drop)
     end
-}
+})
 
-ItemDB["[preset=chd]铁壶"] = {
+defineItem("iron_kettle", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你打开了铁壶。",
-            "* [pattern:chinese][sound:snd_doghurt1.wav]嘭[sound:snd_slice.wav]啪[sound:snd_save.wav]嘭[sound:snd_menu_0.wav]啪[sound:snd_levelup.wav][sound:snd_ding.wav]！[sound:snd_dimbox.wav]霹[sound:snd_bomb.wav]雳[sound:snd_drumroll.wav]乓[sound:snd_icespell.ogg]啷[sound:snd_notice.wav][sound:snd_mysterygo.wav]！[sound:snd_mtt_burst.wav]呜[sound:snd_saber3.wav]呜[sound:snd_spawn_0.wav]渣[sound:snd_snowgrave.ogg]渣[sound:snd_warning_0.wav]！",
-            "* [pattern:chinese]啊，多么好听的音乐啊。",
-            "* [pattern:chinese]（你吓得赶紧把铁壶扔了。）",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("iron_kettle").use)
         table.remove(stat.items, stat.initem)
         global:SetVariable("KEY", true)
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了铁壶。",
-            "* [pattern:chinese]这位铁壶看起来是一名音乐家。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("iron_kettle").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了铁壶。",
-            "[sound:snd_doghurt1.wav]* [pattern:chinese]看来音乐剧到此结束了。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("iron_kettle").drop)
     end
-}
+})
 
-ItemDB["[preset=chd]别欺负我"] = {
+defineItem("dont_bully_me", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你打开了别欺负我纸条。",
-            "* [pattern:chinese]这是什么？[wait:30][pattern:english]end[pattern:chinese]？",
-            "* [pattern:chinese][colorHEX:99ff99]捏一下。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("dont_bully_me").use)
         table.remove(stat.items, stat.initem)
-        table.insert(stat.items, "[preset=chd]欺负一下")
+        table.insert(stat.items, "bully_once")
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了别欺负我纸条。",
-            "* [pattern:chinese]上面写着：[wait:30][pattern:english]end[pattern:chinese]。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("dont_bully_me").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了别欺负我纸条。",
-            "[colorHEX:ffff99]* [pattern:chinese]欺负人可是不对的。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("dont_bully_me").drop)
         table.remove(stat.items, stat.initem)
     end
-}
+})
 
-ItemDB["[preset=chd]欺负一下"] = {
+defineItem("bully_once", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你打开了欺负一下纸条。",
-            "* [pattern:chinese][colorHEX:ffff33][effect:shake, 1]你真该死啊。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("bully_once").use)
         table.remove(stat.items, stat.initem)
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了欺负一下纸条。",
-            "* [pattern:chinese]上面写着：[wait:30][pattern:english]end[pattern:chinese]。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("bully_once").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了欺负一下纸条。",
-            "[colorHEX:ffff99]* [pattern:chinese]欺负人可是不对的。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("bully_once").drop)
         table.remove(stat.items, stat.initem)
     end
-}
+})
 
-ItemDB["[preset=chd]传单"] = {
+defineItem("flyer", {
     use = function(player, stat)
         OPENED_ARC = true
         RemoveBlocks()
@@ -197,69 +167,62 @@ ItemDB["[preset=chd]传单"] = {
         stat.blocks[#stat.blocks + 1] = poseur
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了传单。",
-            "* [pattern:chinese]是关于前五个丢失的孩子的。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("flyer").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "[colorHEX:ffff33]* [pattern:chinese]为了正义，请不要放弃。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("flyer").drop)
     end
-}
+})
 
-ItemDB["[preset=chd]吃我"] = {
+defineItem("eat_me", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]这么想被吃就乖乖下肚。",
-            "* [pattern:chinese]（血量回满了。）",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("eat_me").use)
         table.remove(stat.items, stat.initem)
         player.hp = player.maxhp
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你查看了吃我。",
-            "* [pattern:chinese]上面写着：[wait:30][pattern:english]eat me[pattern:chinese]。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("eat_me").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "[colorHEX:ff0000]* [pattern:chinese]你丢弃了吃我。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("eat_me").drop)
         table.remove(stat.items, stat.initem)
     end
-}
+})
 
-ItemDB["[preset=chd][red]蜘蛛"] = {
+defineItem("spider", {
     use = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你从背包中拿出了[colorHEX:ff0000]蜘蛛[function:drawredSpider][colorHEX:ffffff]。",
+        local texts = {
+            getLocalizedItem("spider").use[1],
             "[noskip][function:RemoveBlocks][function:runSpider][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        }
+        typers.CreateText(texts, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
         table.remove(stat.items, stat.initem)
     end,
     inspect = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]蜘蛛[wait:30] - 也许是大螃蟹。",
-            "* [pattern:chinese]总的来讲，我怕蜘蛛。",
-            "[noskip][function:RemoveBlocks][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        createText(getLocalizedItem("spider").inspect)
     end,
     drop = function(player, stat)
-        local t = typers.CreateText({
-            "* [pattern:chinese]你丢弃了蜘蛛。",
-            "* [pattern:chinese]但是什么都没发生。",
+        local texts = {
+            getLocalizedItem("spider").drop[1],
+            getLocalizedItem("spider").drop[2],
             "[noskip][sound:snd_phurt.wav][function:RemoveBlocks][function:encounterSpider][next]"
-        }, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
+        }
+        typers.CreateText(texts, {TPos(60, 400 - 55)}, 10004, {0, 0}, "manual")
         table.remove(stat.items, stat.initem)
     end
-}
+})
+
+defineItem("invisible_me", {
+    use = function(player, stat)
+        createText(getLocalizedItem("invisible_me").use)
+    end,
+    inspect = function(player, stat)
+        createText(getLocalizedItem("invisible_me").inspect)
+    end,
+    drop = function(player, stat)
+        createText(getLocalizedItem("invisible_me").drop)
+        table.remove(stat.items, stat.initem)
+    end
+})
 
 return ItemDB

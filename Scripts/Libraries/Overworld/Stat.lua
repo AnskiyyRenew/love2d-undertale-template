@@ -58,6 +58,21 @@ local stat = {
         return self.levelData[currentLv].totalExp
     end
 }
+local ItemDB = require("Scripts.Libraries.Overworld.Items.ItemDB")
+
+local function OWText()
+    return localize.Overworld
+end
+
+local function GetEquipmentName(kind, value)
+    local equipment = OWText().Equipment[kind] or {}
+    return equipment[value] or value
+end
+
+local function GetItemName(itemKey)
+    return ItemDB.getDisplayName(itemKey)
+end
+
 local OPENED_ARC = false
 local spidermoving = false
 local spidertime = 0
@@ -69,7 +84,7 @@ function TPos(x, y)
 end
 
 function drawredSpider()
-    spidertext = typers.DrawText("[preset=chd][offsetX=20][red]蜘蛛", {TPos(312, 344)}, 10004)
+    spidertext = typers.DrawText(GetItemName("spider"), {TPos(312, 344)}, 10004)
 end
 
 function runSpider()
@@ -193,7 +208,7 @@ function stat:Update(dt)
             audio.PlaySound("snd_menu_0.wav", 1)
             stat.initemc = math.max(stat.initemc - 1, 1)
         end
-        stat.heart:MoveTo(TPos(212 + (stat.initemc - 1) * 95, 378))
+        stat.heart:MoveTo(TPos(212 + (stat.initemc - 1) * 105, 378))
     end
 
     if (keyboard.GetState("menu") == 1 and oworld.CSTATE == "Controlling") then
@@ -227,9 +242,9 @@ function stat:Update(dt)
                 info_gold.fontsize = 16
                 info_gold:Reparse()
 
-                local items = DrawText("[preset=chd]物品", TPos(110, 190))
-                local state = DrawText("[preset=chd]状态", TPos(110, 225))
-                local cells = DrawText("[preset=chd]电话", TPos(110, 260))
+                local items = DrawText(OWText().Menu.Items, TPos(90, 190))
+                local state = DrawText(OWText().Menu.Stats, TPos(90, 225))
+                local cells = DrawText(OWText().Menu.Cell, TPos(90, 260))
 
                 if (#stat.items == 0) then items.color = {.5, .5, .5} items:Reparse() end
                 if (#stat.cells == 0) then cells.color = {.5, .5, .5} cells:Reparse() end
@@ -296,9 +311,9 @@ function stat:Update(dt)
 
                 for i = 1, #stat.items
                 do
-                    stat.temps[i] = DrawText(stat.items[i], x - 130, y - 160 + (i - 1) * 35)
+                    stat.temps[i] = DrawText(GetItemName(stat.items[i]), x - 130, y - 160 + (i - 1) * 35)
                 end
-                stat.temps[#stat.temps + 1] = DrawText("[preset=chd][offsetX=20]使用     查看     丢弃", x - 150, y + 130)
+                stat.temps[#stat.temps + 1] = DrawText(OWText().Menu.ItemActions, x - 150, y + 130)
             elseif (stat.inbutton == 2) then -- stat page.
                 audio.PlaySound("snd_menu_1.wav", 1)
                 stat.page = "STAT"
@@ -317,9 +332,9 @@ function stat:Update(dt)
                 stat.temps[#stat.temps + 1] = DrawText("HP " .. Player.hp .. "/" .. Player.maxhp, x - 150, y - 90)
                 stat.temps[#stat.temps + 1] = DrawText("AT " .. Player.atk .. "(" .. Player.watk .. ")" .. atkspace .. "EXP:" .. Player.exp, x - 150, y - 20)
                 stat.temps[#stat.temps + 1] = DrawText("DF " .. Player.def ..  "(" .. Player.edef .. ")" .. defspace .. "NEXT:" .. (stat:getNextExp(Player.lv) or 0) - Player.exp, x - 150, y + 10)
-                stat.temps[#stat.temps + 1] = DrawText("[preset=chd][offsetX=0]武器： " .. Player.weapon, x - 150, y + 70)
-                stat.temps[#stat.temps + 1] = DrawText("[preset=chd][offsetX=0]防具： " .. Player.armor, x - 150, y + 100)
-                stat.temps[#stat.temps + 1] = DrawText("[preset=chd][offsetX=0]金钱：", x - 150, y + 150)
+                stat.temps[#stat.temps + 1] = DrawText(OWText().Menu.WeaponLabel .. GetEquipmentName("weapon", Player.weapon), x - 150, y + 70)
+                stat.temps[#stat.temps + 1] = DrawText(OWText().Menu.ArmorLabel .. GetEquipmentName("armor", Player.armor), x - 150, y + 100)
+                stat.temps[#stat.temps + 1] = DrawText(OWText().Menu.GoldLabel, x - 150, y + 150)
                 stat.temps[#stat.temps + 1] = DrawText(Player.gold, x - 65, y + 150)
             elseif (stat.inbutton == 3 and #stat.cells > 0) then
                 audio.PlaySound("snd_menu_1.wav", 1)
@@ -430,9 +445,8 @@ function stat:Update(dt)
     end
 end
 
-local ItemDB = require("Scripts.Libraries.Overworld.Items.ItemDB")
 function stat:UseItem(itemKey, choice)
-    local item = ItemDB[itemKey]
+    local item = ItemDB[ItemDB.resolveKey(itemKey)]
     if not item then
         print("Undefined item: ", itemKey)
         return

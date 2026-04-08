@@ -79,8 +79,8 @@ function audio.PlaySound(sound, volume, looping)
     instance.name = sound
     instance.type = "static"
     instance.source = love.audio.newSource("Resources/Sounds/" .. sound, "static")
-    instance.source:setVolume(volume or 1)
-    instance.source:setLooping(looping or false)
+    instance.source:setVolume(type(volume) == "number" and volume or 1)
+    instance.source:setLooping(looping == true)
     instance.source:play()
 
     instance.effect = nil
@@ -115,8 +115,8 @@ function audio.PlayMusic(music, volume, looping)
     instance.name = music
     instance.type = "stream"
     instance.source = love.audio.newSource("Resources/Music/" .. music, "stream")
-    instance.source:setVolume(volume or 1)
-    instance.source:setLooping(looping == nil and true or looping)
+    instance.source:setVolume(type(volume) == "number" and volume or 1)
+    instance.source:setLooping(looping ~= false)
     instance.source:play()
 
     instance.effect = nil
@@ -157,7 +157,7 @@ function audio.MusicPause(inst)
 end
 
 function audio.MusicUnpause(inst)
-    if (inst.source and inst.source:isStopped()) then
+    if (inst and inst.source and not inst.source:isPlaying()) then
         inst.source:seek(inst.pausePosition or 0)
         inst.source:play()
         return true
