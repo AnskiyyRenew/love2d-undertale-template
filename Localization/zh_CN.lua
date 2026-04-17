@@ -52,8 +52,8 @@ return {
             WeaponLabel = "[preset=chd][offsetX=0]武器： ",
             ArmorLabel = "[preset=chd][offsetX=0]防具： ",
             GoldLabel = "[preset=chd][offsetX=0]金钱：",
-            BoxTitle = "[preset=chinese]物品栏             箱子",
-            UseBoxPrompt = "* [pattern:chinese]要使用箱子吗？[space:2, 38]\n\n        是           否[function:player_choosing_start|chestbox,%d]",
+            BoxTitle = "[preset=chinese]物品栏                  箱子",
+            UseBoxPrompt = "* [pattern:chinese]要使用箱子吗？[space:2, 20]\n\n             是                     否[function:player_choosing_start|chestbox,%d]",
             SaveOptions = "保存       取消",
             SaveSuccess = "保存成功",
             SavePreview = "%s    LV %d    %02d:%02d"
@@ -83,7 +83,7 @@ return {
                 }
             },
             mystery_gift = {
-                name = "[preset=chinese][offsetX=0]神秘小礼物",
+                name = "[preset=chd]神秘小礼物",
                 use = {
                     "* [pattern:chinese]你打开了神秘小礼物。",
                     "* [pattern:chinese]里面有一个神秘的东西。",
@@ -116,7 +116,7 @@ return {
                 }
             },
             iron_kettle = {
-                name = "[preset=chinese][offsetX=0]铁壶",
+                name = "[preset=chd]铁壶",
                 use = {
                     "* [pattern:chinese]你打开了铁壶。",
                     "* [pattern:chinese][sound:snd_doghurt1.wav]嘭[sound:snd_slice.wav]啪[sound:snd_save.wav]嘭[sound:snd_menu_0.wav]啪[sound:snd_levelup.wav][sound:snd_ding.wav]！[sound:snd_dimbox.wav]霹[sound:snd_bomb.wav]雳[sound:snd_drumroll.wav]乓[sound:snd_icespell.ogg]啷[sound:snd_notice.wav][sound:snd_mysterygo.wav]！[sound:snd_mtt_burst.wav]呜[sound:snd_saber3.wav]呜[sound:snd_spawn_0.wav]渣[sound:snd_snowgrave.ogg]渣[sound:snd_warning_0.wav]！",
@@ -133,7 +133,7 @@ return {
                 }
             },
             eat_me = {
-                name = "[preset=chinese][offsetX=0]吃我",
+                name = "[preset=chd]吃我",
                 use = {
                     "* [pattern:chinese]这么想被吃就乖乖下肚。",
                     "* [pattern:chinese]（血量回满了。）"
@@ -147,7 +147,7 @@ return {
                 }
             },
             undyne_letter = {
-                name = "[preset=chinese][offsetX=0]安黛因的信",
+                name = "[preset=chd]安黛因的信",
                 use = {
                     "* [pattern:chinese]你尝试打开安黛因的信。",
                     "* [pattern:chinese]封的太死了，你打不开。"
@@ -163,7 +163,7 @@ return {
                 }
             },
             flyer = {
-                name = "[preset=chinese][offsetX=0]传单",
+                name = "[preset=chd]传单",
                 inspect = {
                     "* [pattern:chinese]你查看了传单。",
                     "* [pattern:chinese]是关于前五个丢失的孩子的。"
@@ -173,7 +173,7 @@ return {
                 }
             },
             dont_bully_me = {
-                name = "[preset=chinese][offsetX=0]别欺负我",
+                name = "[preset=chd]别欺负我",
                 use = {
                     "* [pattern:chinese]你打开了别欺负我纸条。",
                     "* [pattern:chinese]这是什么？[wait:30][pattern:english]end[pattern:chinese]？",

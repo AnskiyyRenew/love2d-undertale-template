@@ -590,13 +590,13 @@ function player_choosing_update()
                     for i = 1, 9
                     do
                         local item = DATA.player.items[i]
-                        local t = typers.DrawText(item and ItemDB.getDisplayName(item) or "", {RelativePosition(90, 80 + 35 * (i - 1))}, 9990)
+                        local t = typers.DrawText(item and ItemDB.getDisplayName(item) or "", {RelativePosition(70, 80 + 35 * (i - 1))}, 9990)
                         table.insert(invtexts, t)
                     end
                     for i = 1, 9
                     do
                         local item = tempchest[i]
-                        local t = typers.DrawText(item and ItemDB.getDisplayName(item) or "", {RelativePosition(390, 80 + 35 * (i - 1))}, 9990)
+                        local t = typers.DrawText(item and ItemDB.getDisplayName(item) or "", {RelativePosition(370, 80 + 35 * (i - 1))}, 9990)
                         table.insert(boxtexts, t)
                     end
                 end
@@ -644,7 +644,9 @@ function player_choosing_update()
 
                     local minutes = math.floor(DATA.time / 60)
                     local seconds = math.floor(DATA.time % 60)
-                    DATA.player.lv = battle.Player.lv
+                    if (battle) then
+                        DATA.player.lv = battle.Player.lv
+                    end
                     tempbox.text:SetText(string.format(OWText().Menu.SavePreview, DATA.player.name, DATA.player.lv, minutes, seconds))
                     tempbox.text.color = {1, 1, 0}
                     tempbox.text:Reparse()
@@ -1145,11 +1147,9 @@ end
 
 function oworld.Draw()
     if (oworld.configs.draw.map) then
-
         love.graphics.push()
-            oworld.MAP:draw(-_CAMERA_.x / 2, -_CAMERA_.y / 2, 2 * scale, 2 * scale)
+            oworld.MAP:draw(-_CAMERA_.x / 2, -_CAMERA_.y / 2, 2, 2)
         love.graphics.pop()
-
     end
 
     if (oworld.DEBUG) then

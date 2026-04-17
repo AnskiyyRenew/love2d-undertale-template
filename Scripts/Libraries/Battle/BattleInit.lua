@@ -291,12 +291,14 @@ function Battle.Init(game)
     name.font = "Mars Needs Cunnilingus.ttf"
     name.fontsize = 24
     name:Reparse()
+    table.insert(UI, name)
 
     local len, _ = name:GetLettersSize()
     lv = typers.DrawText("Lv[spaceX=0]  " .. battle_.Player.lv, {name.x + len + 28, 400}, 1)
     lv.font = "Mars Needs Cunnilingus.ttf"
     lv.fontsize = 24
     lv:Reparse()
+    table.insert(UI, lv)
 
     local lenlv, _ = lv:GetLettersSize()
     hpname = sprites.CreateSprite("UI/Battle Screen/spr_hpname_0.png", 0)
@@ -315,6 +317,10 @@ function Battle.Init(game)
     hp_text.font = "Mars Needs Cunnilingus.ttf"
     hp_text.fontsize = 24
     hp_text:Reparse()
+    table.insert(UI, hpname)
+    table.insert(UI, maxhp)
+    table.insert(UI, hp)
+    table.insert(UI, hp_text)
 
     -- KR bars & state
     time_krs = {0, 0, 0}
@@ -324,6 +330,7 @@ function Battle.Init(game)
     _kr_image.font = "8bit-wonder.ttf"
     _kr_image.fontsize = 12
     _kr_image.alpha = 0
+    table.insert(UI, _kr_image)
     for i = 1, 1 do
         local bar_kr = sprites.CreateSprite("px.png", 1)
         bar_kr.xscale = 0
@@ -332,6 +339,8 @@ function Battle.Init(game)
         bar_kr.y = 411
         if (i == 1) then bar_kr.color = {1, 0, 1} end
         table.insert(bar_krs, bar_kr)
+
+        table.insert(UI, bar_krs)
     end
 
     -- reset other runtime vars
@@ -402,6 +411,10 @@ function Battle.GetSelectedEnemyName()
     local battle = Battle.battle
     if not battle or not battle.Enemies or not battle.Enemies[inSelect] then return nil end
     return battle.Enemies[inSelect].name
+end
+
+function Battle.GetUI()
+    return UI
 end
 
 -- Get current state.

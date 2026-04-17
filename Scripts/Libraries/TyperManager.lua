@@ -952,7 +952,7 @@ function typers.DrawText(text, position, layer)
                     elseif (presetKey == "chd") then
                         currentFont = "simsun.ttc"
                         currentSize = 13
-                        currentOffsetX = -20
+                        currentOffsetX = 0
                         currentOffsetY = 3
                         currentScale = 2
                         typer.charspacing = -8

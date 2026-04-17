@@ -21,7 +21,9 @@ windows = require("Scripts.Libraries.Utils.Windows")
 gui = require("Scripts.Libraries.GUIManager")
 luaex = require("Scripts.Libraries.Utils.LuaExtended")
 
-global:SetVariable("LANGUAGE", "en")
+local lang_order = {"en", "zh_CN"}
+local lang_index = 1
+global:SetVariable("LANGUAGE", "en") -- Default language is Chinese. You can change it to "en" for English.
 localize = require("Localization." .. global:GetVariable("LANGUAGE"))
 require("Localization.LOCALIZE")
 require("Scripts.Libraries.Overworld.ConfigData")
@@ -259,6 +261,12 @@ function love.keypressed(key)
         -- Reload the current scene
         if (key == "f7") then
             scenes.switchTo(scenes.name_current)
+        elseif (key == "f8") then
+            -- Language switching for testing
+            lang_index = lang_index % #lang_order + 1
+            local new_lang = lang_order[lang_index]
+            global:SetVariable("LANGUAGE", new_lang)
+            localize = require("Localization." .. global:GetVariable("LANGUAGE"))
         end
     end
 

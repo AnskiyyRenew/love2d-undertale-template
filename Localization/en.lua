@@ -48,7 +48,7 @@ return {
             Items = "ITEM",
             Stats = "STAT",
             Cell = "CELL",
-            ItemActions = " Use    Info    Drop",
+            ItemActions = " Use    [offsetX=120]Info   [offsetX=230]Drop",
             WeaponLabel = "Weapon: ",
             ArmorLabel = "Armor: ",
             GoldLabel = "Gold:",

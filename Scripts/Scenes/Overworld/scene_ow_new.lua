@@ -46,7 +46,7 @@ function SCENE.update(dt)
         end
     end
     if (ow.getInteractResult("warp")) then
-        ow.ChangeScene("Overworld/scene_ow_ruins_1", 1)
+        ow.ChangeScene("Overworld/Shops/scene_shop_test", 1)
     end
 
     if (ow.getInteractResult("chest", 1)) then

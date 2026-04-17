@@ -30,7 +30,7 @@ function encstep.Update()
             encstep.time = encstep.time + 1
             if (encstep.time >= 20) then
                 global:SetVariable("EncounterNobody", true)
-                encstep.rho = 9999
+                encstep.rho = 999999
                 encstep.time = 0
                 encstep.encountered = true
             end
