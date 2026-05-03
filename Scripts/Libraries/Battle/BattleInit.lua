@@ -92,8 +92,13 @@ function STATE(sname)
     if Battle.battle then Battle.battle.STATE = sname end
 end
 
+function Battle.EnteringStateInherited(newstate, oldstate)
+    -- placeholder for user override
+end
+
 -- EnteringState behaviour (extracted from scene_battle)
 function Battle.EnteringState(newstate, oldstate)
+    Battle.EnteringStateInherited(newstate, oldstate)
     if (newstate == "ACTIONSELECT") then
         Battle.battle.mainarena:Resize(565, 130)
         Battle.battle.mainarena:MoveTo(320, 320)
@@ -192,6 +197,16 @@ end
 
 function ChangeScene(scene)
     scenes.switchTo(scene)
+end
+
+function Battle.ToggleKR()
+    _kr_configuration = not _kr_configuration
+    if (not _kr_configuration) then
+        local p = Battle.battle.Player
+
+        p.hp = p.hp + p.kr
+        p.kr = 0
+    end
 end
 
 function Battle.AddKR(kramount)

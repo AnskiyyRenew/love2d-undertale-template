@@ -279,4 +279,19 @@ function audio.GroupFade(name, fadeIn, duration)
     end
 end
 
+function audio.ClearAll()
+    for i = #audio.sources, 1, -1 do
+        local inst = audio.sources[i]
+        if inst.source then
+            inst.source:stop()
+            inst.source:release()
+            inst.source = nil
+        end
+        table.remove(audio.sources, i)
+    end
+
+    audio.musicGroups = {}
+    
+end
+
 return audio

@@ -79,4 +79,17 @@ function luaextended.findTableValue(t, value)
     return recurse(t)
 end
 
+---Patch table
+---@param t table
+---@param patch table
+function luaextended.patchTable(t, patch)
+    for k, v in pairs(patch) do
+        if type(v) == "table" and type(t[k]) == "table" then
+            luaextended.patchTable(t[k], v)
+        else
+            t[k] = v
+        end
+    end
+end
+
 return luaextended

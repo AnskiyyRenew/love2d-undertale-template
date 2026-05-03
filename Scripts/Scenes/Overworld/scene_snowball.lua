@@ -19,27 +19,52 @@ local snowball = sprites.CreateSprite("Scene/Snowdin/spr_rollsnow_0.png", 0)
 snowball:Scale(4, 4)
 snowball._speed = 0
 snowball._angle = 0
+snowball.velocity = { x = 0, y = 0 }
 
-local function bounceAABB(ball, wall)
-    local xx, yy = wall.body:getPosition()
-    local dx = ball.x - xx
-    local dy = ball.y - yy
-    
-    local overlapX = dx - math.abs(dx)
-    local overlapY = dy - math.abs(dy)
+local function getCenter(rect)
+    return rect.x + rect.width / 2, rect.y + rect.height / 2
+end
+
+local function intersectsAABB(ax, ay, aw, ah, bx, by, bw, bh)
+    local aCenterX = ax + aw / 2
+    local aCenterY = ay + ah / 2
+    local bCenterX = bx + bw / 2
+    local bCenterY = by + bh / 2
+
+    return math.abs(aCenterX - bCenterX) * 2 < (aw + bw) and
+        math.abs(aCenterY - bCenterY) * 2 < (ah + bh)
+end
+
+local function bounceAABB(ball, wall, nextX, nextY)
+    if not intersectsAABB(nextX, nextY, ball.width, ball.height, wall.x, wall.y, wall.width, wall.height) then
+        return nextX, nextY, false
+    end
+
+    local ballCenterX = nextX + ball.width / 2
+    local ballCenterY = nextY + ball.height / 2
+    local wallCenterX = wall.x + wall.width / 2
+    local wallCenterY = wall.y + wall.height / 2
+
+    local overlapX = (ball.width + wall.width) / 2 - math.abs(ballCenterX - wallCenterX)
+    local overlapY = (ball.height + wall.height) / 2 - math.abs(ballCenterY - wallCenterY)
 
     if overlapX < overlapY then
+        if ballCenterX < wallCenterX then
+            nextX = wall.x - ball.width
+        else
+            nextX = wall.x + wall.width
+        end
         snowball.velocity.x = -snowball.velocity.x
     else
+        if ballCenterY < wallCenterY then
+            nextY = wall.y - ball.height
+        else
+            nextY = wall.y + wall.height
+        end
         snowball.velocity.y = -snowball.velocity.y
     end
-    
-    if (
-        math.abs(ball.x - wall.x) < (ball.width + wall.width) / 2 and
-        math.abs(ball.y - wall.y) < (ball.height + wall.height) / 2
-    ) then
-        print("Collision detected between ball and wall!")
-    end
+
+    return nextX, nextY, true
 end
 
 function SCENE.load()
@@ -52,43 +77,33 @@ function SCENE.update(dt)
 
     ow.Update(dt)
     local obj = ow.FindObject("triggers", "type", "snowball", true)
-    local xx, yy = obj.body:getPosition()
+    if not obj then
+        return
+    end
+
+    local centerX, centerY = getCenter(obj)
     snowball.layer = obj.y + 2000
 
-    print("Snowball position:", obj.x, obj.y)
-
     if (ow.getInteractResult("trigger", 1)) then
-        -- Push the ball away from the player
-        -- Infact, it's the snowball's object.
-        local dx = obj.x - ow.char.currentSprite.x
-        local dy = obj.y - (ow.char.currentSprite.y + 20)
+        -- Push the ball away from the player.
+        local dx = centerX - ow.char.currentSprite.x
+        local dy = centerY - (ow.char.currentSprite.y + 20)
         snowball._angle = math.atan2(dy, dx)
-        snowball.velocity = {
-            x = math.cos(snowball._angle) * 10,
-            y = math.sin(snowball._angle) * 10
-        }
+        snowball.velocity.x = math.cos(snowball._angle) * 10
+        snowball.velocity.y = math.sin(snowball._angle) * 10
     end
+
+    local nextX = obj.x + snowball.velocity.x
+    local nextY = obj.y + snowball.velocity.y
 
     for _, wall in pairs(ow.objects.walls) do
-        local snowball_x, snowball_y = snowball:GetPosition()
-        local wall_x, wall_y = wall.body:getPosition()
-        print("Snowball position:", snowball_x, snowball_y)
-        print("Wall position:", wall_x, wall_y)
-        print("Snowball size:", obj.width, obj.height)
-        print("Wall size:", wall.width, wall.height)
-
-
-        if oworld.TwoObjectsInteract(obj, wall) then
-
-            bounceAABB(obj, wall)
-            print("bounce")
-        end
+        nextX, nextY = bounceAABB(obj, wall, nextX, nextY)
     end
 
+    obj.x = nextX
+    obj.y = nextY
+    obj.body:setPosition(obj.x + obj.width / 2, obj.y + obj.height / 2)
 
-    obj.x = obj.x + snowball.velocity.x
-    obj.y = obj.y + snowball.velocity.y
-    obj.body:setPosition(obj.x, obj.y)
     if (math.abs(snowball.velocity.x) > 0.1 or math.abs(snowball.velocity.y) > 0.1) then
         -- Friction
         snowball.velocity.x = snowball.velocity.x * 0.95
@@ -97,7 +112,9 @@ function SCENE.update(dt)
         snowball.velocity.x = 0
         snowball.velocity.y = 0
     end
-    snowball:MoveTo(obj.x, obj.y)
+
+    local renderX, renderY = getCenter(obj)
+    snowball:MoveTo(renderX, renderY)
 
     if (ow.NEXTSTATE ~= nil) then
         ow.CSTATE = ow.NEXTSTATE

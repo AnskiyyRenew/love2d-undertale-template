@@ -49,6 +49,9 @@ local function DefenseEnding()
     b.battle.nextwave = nextwaves[waveProgress]
 end
 
+local function EnteringState(new, old)
+end
+
 local function OnHit(Bullet)
     local battle = b.battle
     if not battle then return end
@@ -76,6 +79,7 @@ b.HandleActions = HandleActions
 b.HandleItems   = HandleItems
 b.HandleSpare   = HandleSpare
 b.DefenseEnding = DefenseEnding
+b.EnteringStateInherited = EnteringState
 b.OnHit         = OnHit
 
 
@@ -92,10 +96,11 @@ end
 function SCENE.update(dt)
     -- Update any game logic for this scene here.
     -- For example, you might update animations, handle input, etc.
-    b.Update(dt)
     if (b.GetSelectedEnemy() == 1 and b.GetState() == "ATTACKING") then
         -- print("Selected Poseur")
     end
+    
+    b.Update(dt)
 end
 
 -- This function is called to draw the scene.

@@ -55,7 +55,7 @@ global:SetVariable("FPS", 60)
 global:SetVariable("ScreenShaders", {})
 global:SetVariable("LAYER", 30)
 global:SetVariable("EncounterNobody", false)
-local reset_room = "Overworld/scene_ow_new"
+local reset_room = "scene_logo"
 
 -- Display configuration
 local Camera = require("Scripts.Libraries.Utils.Camera")

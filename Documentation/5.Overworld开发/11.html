@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="4.html">
+        <link rel="prev" href="1.html">
       
       
-        <link rel="next" href="6.html">
+        <link rel="next" href="2.html">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>🔧在地图中添加对象 - SoulEngine Documentation (2.5.2)</title>
+        <title>🟡底层原理 - SoulEngine Documentation (2.5.2)</title>
       
     
     
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              🔧在地图中添加对象
+              🟡底层原理
             
           </span>
         </div>
@@ -1419,10 +1419,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="11.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡底层原理
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="11.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1438,6 +1465,76 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        底层变量分析
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="底层变量分析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overworld" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overworld变量内容
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags变量内容
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chests变量内容
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1531,37 +1628,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🔧在地图中添加对象
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="5.html" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="5.html" class="md-nav__link">
         
   
   
@@ -1577,126 +1647,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        对象的概念
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        搭建对象层
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="搭建对象层">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        创建对象层图层
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        对象层的命名规则
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        在指定对象层中添加对象
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="在指定对象层中添加对象">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        每个图层对应的形状
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        给物体添加一个属性
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        自动对齐网格
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2319,30 +2269,19 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        对象的概念
+        底层变量分析
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        搭建对象层
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="搭建对象层">
+    <nav class="md-nav" aria-label="底层变量分析">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#overworld" class="md-nav__link">
     <span class="md-ellipsis">
       
-        创建对象层图层
+        Overworld变量内容
       
     </span>
   </a>
@@ -2350,38 +2289,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        对象层的命名规则
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        在指定对象层中添加对象
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="在指定对象层中添加对象">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        每个图层对应的形状
+        Flags变量内容
       
     </span>
   </a>
@@ -2389,21 +2300,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#chests" class="md-nav__link">
     <span class="md-ellipsis">
       
-        给物体添加一个属性
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        自动对齐网格
+        Chests变量内容
       
     </span>
   </a>
@@ -2432,91 +2332,60 @@
 
 
 
-<h1 id="_1">🔧在地图中添加对象<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<h1 id="_1">🟡底层原理<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>也许你写过一个房间，想让它和Overworld联系起来，但是一直都不知道从何下手。</p>
+<p>接下来就来了解一下Overworld另一套系统和底层其他场景的联系。</p>
 <hr />
-<p>如果你从第一个专题看到了这一专题，那么，在这一专题结束后，在Tiled中制作的地图就可以实装到游戏内了。</p>
-<h2 id="_2">对象的概念<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>你可能会好奇，Tiled中制作的地图，是怎么变的可玩的，也许你会想：<br></p>
+<h2 id="_2">底层变量分析<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li>玩家是怎么被放置到地图里的。</li>
-<li>玩家为什么可以和里面的一些物体交互（甚至墙面可以阻挡玩家）。</li>
+<li><code>Overworld</code>：全局变量，需要通过 <code>global:GetSaveVariable</code> 进行获取，存储为可用的 <code>DATA</code> 全局变量。</li>
+<li><code>Flags</code>：全局变量，需要通过 <code>global:GetSaveVariable</code> 进行获取，存储为可用的 <code>FLAG</code> 全局变量。</li>
+<li><code>Chests</code>：全局变量，需要通过 <code>global:GetSaveVariable</code> 进行获取，存储为可用的 <code>CHESTS</code> 全局变量。</li>
 </ul>
-<p>对象只是一个 <code>接口</code> 罢了，实际的背后操作，还在之后的专题中有所讲解，目前，我们只需要了解<strong>如何创建对象</strong>即可。</p>
-<hr />
-<h2 id="_3">搭建对象层<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<h3 id="_4">创建对象层图层<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>对象，不和之前专题中所说的 <code>图块层</code> 一样在一个层中，而是位于 <code>对象层</code> 中。<br>
-下面我们来创建对象层，首先点击右下角的 <code>图层</code> 选项进入图层页面，然后点击 <code>对象层</code> 来创建一个可以放入物体的图层。<br></p>
-<p><img alt="" src="../img/overworld/4-1.png" /><br></p>
-<h3 id="_5">对象层的命名规则<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>在 <code>SoulEngine</code> 中，每一个对象层都不是随意命名的，都是有规则的。<br>
-由于要准确管理Overworld的所有对象以保证它们发挥出应有的功能，不允许随意命名，下面是命名规则以及含义：<br></p>
+<h3 id="overworld">Overworld变量内容<a class="headerlink" href="#overworld" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>marks</code>：地标点，当玩家初次进入此场景时，玩家会来到的地点，通常一个房间会有不止一个地标点。假设你进入了一个走廊，左右两端可以去往不同的房间。而当从其他房间回到当前场景的时候，则有 <code>两个</code> 不同的玩家初始位置（一个在左边一个在右边）。</li>
-<li><code>warps</code>：传送区域，当玩家踏入的时候，会通往其他房间的某个地标点上。</li>
-<li><code>walls</code>：墙壁阻挡区域，玩家碰到之后会被阻挡在墙壁外，需要使用这个物品类型来放置在一个场景所有玩家不可走的区域上。</li>
-<li><code>saves</code>：存档点位置，当玩家碰到之后按下 <code>确认键</code> 可以与它交互并确认是否存档。</li>
-<li><code>signs</code>：告示牌位置，当玩家碰到之后按下 <code>确认键</code> 可以与它交互并产生对应的对话，如果想要制作一个NPC对话，那么我不建议使用这个，我建议使用 <code>triggers</code> 来制作一个NPC对话。</li>
-<li><code>chests</code>：箱子位置，玩家碰到之后按下 <code>确认键</code> 可以和箱子交互并打开箱子存放/拿取物品。也可以制作成三角符文那种从箱子中获取物体之后打开为空的操作。</li>
-<li><code>triggers</code>：触发器，这是最强大的一个功能，相当于在地图上绘制你想要的所有你想管辖的区域。遗迹墙壁上的开关、可以被踩的按钮、甚至剧情触发、隐藏位置寻找、包括上文提到的NPC对话，都可以使用 <code>triggers</code> 来完成。</li>
-</ul>
-<p>如果你创建好了这些层，那么它会如下所示。<br>
-<img alt="" src="../img/overworld/4-2.png" /><br></p>
-<p><strong><em>完成了之后，我们可以开始往对象层里面添加对象了。</em></strong></p>
-<hr />
-<h2 id="_6">在指定对象层中添加对象<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>首先让我们点击其中一个对象层，然后你会发现顶部菜单栏有一些选项亮了起来。<br></p>
-<p><img alt="" src="../img/overworld/4-3.png" /><br></p>
-<p>在正常开发中，我们只会用到第一个 <code>（选择一个物体）</code>、第三个 <code>（绘制矩形物体）</code> 、第四个 <code>（绘制点状物体）</code> 。</p>
-<h3 id="_7">每个图层对应的形状<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p>可能你会认为存档点需要用一个矩形？毕竟存档点可是有一个小区域可以阻挡玩家的。但实际上，存档点用的就是点！<br></p>
-<p>为了防止在后续制作中混淆每个图层使用的类型，在这里我会将它们一一列出：<br></p>
-<ul>
-<li><code>marks</code>：地标点，使用 <code>点</code> 。</li>
-<li><code>warps</code>：传送区域，使用 <code>矩形</code> 。</li>
-<li><code>walls</code>：墙壁障碍区域，使用 <code>矩形</code> 。</li>
-<li><code>saves</code>：存档点，使用 <code>点</code> 。</li>
-<li><code>signs</code>：告示牌，使用 <code>点</code> 。</li>
-<li><code>chests</code>：箱子，使用 <code>点</code> 。</li>
-<li><code>triggers</code>：触发器，使用 <code>矩形</code> 或者 <code>点</code> 均可。</li>
-</ul>
-<h3 id="_8">给物体添加一个属性<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>让我们想一下：一个地标点，除了可以记录玩家一开始进入房间的位置以外，还可以记录什么？<br>
-答案是：方向。<br></p>
-<p>但是我只是在某个地方放置了这个地标点，从哪里设置玩家的面朝方向呢？<br>
-<strong>答案是：属性。</strong><br></p>
-</blockquote>
-<p>让我们选中一个地标点（这需要你优先点击marks图层随后选中一个物体），我们可以看到左侧有一个空白的 <code>自定义属性</code> 区域，那么我们可以在这里输入我们想要给予一个地标点的属性。<br></p>
-<p>接下来请新增变量，输入 <code>direction</code> 确保类型为 <code>string</code> 之后，点击ok，即可成功创建 <code>direction</code> 变量。<br>
-同理，让我们创建 <code>id</code> 变量，确保类型为 <code>int</code> 。<br>
-<img alt="" src="../img/overworld/4-4.png" /><br></p>
-<p><strong>下面给出所有类型物体可以设置的属性，及其类型和可选值：</strong><br></p>
-<ul>
-<li>
-<p><code>marks</code></p>
-<ul>
-<li><code>direction</code>：玩家面朝方向，类型 <code>string</code> ，可选值为 <code>up, down, left, right</code> 四个值其中之一。</li>
-</ul>
-</li>
-<li>
-<p><code>其他</code></p>
-<ul>
-<li><code>任意</code></li>
+<li><code>time</code>：全局时间，只要打开了游戏，不是在存档页面，就会持续 +1。</li>
+<li><code>room_name</code>：并不是真正的房间位置，只是存档点显示的房间名称。</li>
+<li><code>room</code>：请一定填写准确位置，这是玩家存档的地方，当读档时，玩家会率先到达这里。</li>
+<li><code>marker</code>：使用了第几个地标点作为这个房间的第一个位置点，<strong>通常用于切换房间</strong>。</li>
+<li><code>position</code>：记录玩家存档后位置在哪里，若读档则率先到达这里；或记录玩家遭遇怪物后的当前位置，战斗结束后重新回来。</li>
+<li><code>direction</code>：和position存储时间一致，但只是负责玩家面朝方向。</li>
+<li><code>savedpos</code>：确认切换房间时是否存储当前信息，若不为 <code>true</code> ，那么position和direction会被清除记录。</li>
+<li><code>player</code>：玩家表格，包含玩家属性。<ul>
+<li><code>name</code>：玩家的名字。</li>
+<li><code>lv</code>：玩家的等级。</li>
+<li><code>maxhp</code>：玩家的最大血量。</li>
+<li><code>hp</code>：玩家的血量。</li>
+<li><code>gold</code>：玩家的钱包。</li>
+<li><code>exp</code>：玩家的经验。</li>
+<li><code>atk</code>：玩家自身因等级提升的攻击。</li>
+<li><code>watk</code>：武器加成攻击。</li>
+<li><code>def</code>：玩家自身因等级提升的防御。</li>
+<li><code>edef</code>：防具加成防御。</li>
+<li><code>weapon</code>：武器，默认为 <code>Stick</code> 。</li>
+<li><code>armor</code>：防具，默认为 <code>Bandage</code> 。</li>
+<li><code>items</code>：背包里默认的物品，以后战斗内也需要这个。</li>
+<li><code>getcell</code>：是否获取电话了（开启电话菜单）。</li>
+<li><code>cells</code>：有谁的选项。</li>
 </ul>
 </li>
 </ul>
-<p>看到上面这样的结果你可能有点意外，但是事实是：<br>
-<strong>只有marks被强制要求设置direction，剩下的类型均没有做任何强制要求。</strong><br></p>
-<p>注意：请保持良好习惯，在每个新物体被创建时，请给予一个 id 名字的变量，类型为 int ，给予一个独一无二的值，这会对以后的制作有巨大帮助。</p>
-<h3 id="_9">自动对齐网格<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>让我们设想一下你正在绘制walls，来限制玩家的移动区域，但是你突然发现，想要精准的对齐墙面十分困难。</p>
-</blockquote>
-<p>这时，你可能在想：如果能对齐网格就好了，这样就不用手动对齐了。<br></p>
-<p>Tiled当然支持这个功能，只需要你按住 <code>Ctrl</code> 键，然后点击鼠标、或者拖拽鼠标，就会发现所有的物体都被精确的吸附到了网格中。<br>
-下图演示内容中，左上角的虚线框为没有按住ctrl键直接绘制的，右下方的虚线框为按住ctrl键直接绘制的，对比情况一目了然。<br></p>
-<p><img alt="" src="../img/overworld/4-5.png" /></p>
+<h3 id="flags">Flags变量内容<a class="headerlink" href="#flags" title="Permanent link">&para;</a></h3>
+<p>注：这些都是默认内容，如果自行添加新的变量完全是可行的</p>
+<ul>
+<li><code>ruins_killed</code>：遗迹杀了多少怪，杀一个就加一，通过 <code>OVERWORLD_KILLFLAG</code> 为媒介加一。</li>
+<li><code>ruins_0</code>：这是测试用的变量，专门做出 <code>三角符文</code> 里获取物品的操作。设想一下，一个箱子只能拿出一次物品，而不能多次拿取。<ul>
+<li><code>donut_chest</code>：是否从箱子里拿出了甜甜圈（这也是为什么甜甜圈作为一个从来没出现的物品，因为我已经把这段代码删了，但你还是能从物品库里面找出它）。</li>
+</ul>
+</li>
+<li><code>text_inst</code>：此为测试剧情触发式trigger，比如你经过了这部分trigger触发了剧情，那么你再次重新经过这里它一定不会二次触发，除非剧情特殊，不然Toriel永远不会和失忆了一样和你用同样的话语打招呼两次。</li>
+</ul>
+<h3 id="chests">Chests变量内容<a class="headerlink" href="#chests" title="Permanent link">&para;</a></h3>
+<p>注：这里会存储多个箱子的内容，也就是可以做次元箱子的时候用。</p>
+<ul>
+<li><code>chest1</code>：第一个箱子，也是目前用的默认箱子。</li>
+<li><code>chest2</code>：第二个箱子，测试用的，如果后续想继续使用可以拿来放电话里用。</li>
+</ul>
 
 
 

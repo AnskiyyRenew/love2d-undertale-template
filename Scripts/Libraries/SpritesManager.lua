@@ -392,6 +392,12 @@ function sprites.Update(dt)
                 end
                 sprite:Set(sprite.animation.frames[sprite.animation.index])
             end
+
+            if (sprite.animation.mode == "oneshot") then
+                if (sprite.animation.index == #sprite.animation.frames) then
+                    sprite.animation.frames = {}
+                end
+            end
         end
 
         if (sprite.parent) then

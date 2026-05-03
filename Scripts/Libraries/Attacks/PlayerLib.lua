@@ -40,32 +40,14 @@ PlayerLib.soul_variables = {
 }
 
 function PlayerLib.ResetVariables()
-    PlayerLib.soul_variables = {
-        red = {
-            rotated = false
-        },
-        orange = {
-            direction = "idle",
-            shadows = {},
-            time = 0
-        },
-        blue = {
-            gravity = 0.15,
-            glide = 1,
-            maxspeed = 5,
-            currentspd = 0,
-            angle = 0,
-            canjump = false,
-            jumping = true,
-            slamming = false,
-            direction = "down",
-            platforms = {},
-            iscolliding = false,
-
-            slamhp = 0,
-            slaminvtime = 0,
-        }
-    }
+    PlayerLib.soul_variables.blue.gravity = 0.15
+    PlayerLib.soul_variables.blue.glide = 1
+    PlayerLib.soul_variables.blue.maxspeed = 5
+    PlayerLib.soul_variables.blue.currentspd = 0
+    PlayerLib.soul_variables.blue.angle = 0
+    PlayerLib.soul_variables.blue.canjump = false
+    PlayerLib.soul_variables.blue.jumping = true
+    PlayerLib.soul_variables.blue.slamming = false
 end
 
 function PlayerLib.Init(tab)
@@ -491,6 +473,7 @@ function PlayerLib.Update(dt)
         if (PlayerLib.hurtingTime <= 0) then
             PlayerLib.hurting = false
             PlayerLib.hurtingTime = 60
+            PlayerLib.sprite.alpha = 1
         else
             if (PlayerLib.hurtingTime % 10 == 0) then
                 PlayerLib.sprite.alpha = 0.4
