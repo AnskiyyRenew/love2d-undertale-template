@@ -1,5 +1,7 @@
 ﻿# SoulEngine - A LOVE2D UNDERTALE Fangame Template
 
+![ICON](./icon.png)
+
 `SoulEngine` is a LOVE2D-based template and framework for creating games inspired by [UNDERTALE](https://undertale.com/).
 
 It is not just a simple battle demo. The template already includes a relatively complete development workflow covering battle scenes, overworld exploration, dialogue presentation, map production, localization, debugging, and packaging, making it a practical starting point for real fangame projects.
