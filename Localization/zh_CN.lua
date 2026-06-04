@@ -54,8 +54,8 @@ return {
             GoldLabel = "[preset=chd][offsetX=0]金钱：",
             BoxTitle = "[preset=chinese]物品栏                  箱子",
             UseBoxPrompt = "* [pattern:chinese]要使用箱子吗？[space:2, 20]\n\n             是                     否[function:player_choosing_start|chestbox,%d]",
-            SaveOptions = "保存       取消",
-            SaveSuccess = "保存成功",
+            SaveOptions = "[preset=chd]保存                           取消",
+            SaveSuccess = "[preset=chd]保存成功",
             SavePreview = "%s    LV %d    %02d:%02d"
         },
         Equipment = {

@@ -1,6 +1,7 @@
 -- This is a template for creating a new scene in the game.
 -- You can use this as a starting point for your own scenes.
 local SCENE = {}
+_CAMERA_.boundActive = false
 
 -- Load level data
 local lvdata = require("Scripts.Libraries.Battle.LevelData")
@@ -96,11 +97,11 @@ local function winCall()
     local gold = 0  -- Assuming gold is 0 or needs to be calculated from enemies
     exp = exp + battle.Exp
     gold = gold + battle.Gold
-    DATA.player.exp = DATA.player.exp + exp
+    local totalExp = DATA.player.exp + exp
+    DATA.player.exp = totalExp
     DATA.player.gold = DATA.player.gold + gold
 
     local lv = battle.Player.lv
-    local totalExp = lvdata_default[lv].totalExp + exp
     local newLv = lv
     for i = lv, #lvdata_default do
         if (totalExp >= lvdata_default[i].totalExp) then

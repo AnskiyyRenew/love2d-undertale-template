@@ -9,6 +9,7 @@ ow.Init("Maps/ruins_1.lua", "scene_ow_ruins_1")
 ow.DEBUG = true
 ow.ENCOUNTER = true
 ow.InitEncounter(FLAG.ruins_killed, 80, 40, 3)
+ow.SetBattleScene("Battle/scene_battle_ow", "ruins_killed")
 
 -- This is a fake scene for testing purposes.
 function SCENE.load()
@@ -33,7 +34,18 @@ function SCENE.update(dt)
         end
     end
     if (ow.getInteractResult("warp", 1)) then
-        ow.ChangeScene("Overworld/scene_ow_new")
+        ow.ChangeScene("Overworld.scene_ow_new")
+    end
+
+    if (ow.getInteractResult("save", 1)) then
+        if (keyboard.GetState("confirm") == 1) then
+            ow.SaveInteract(
+                {
+                    "[colorHEX:99ffff]* Testing...",
+                },
+                "Idk where", {200, 420}, "down"
+            )
+        end
     end
 
     if (ow.getInteractResult("sign", 1)) then

@@ -96,6 +96,10 @@ function Battle.EnteringStateInherited(newstate, oldstate)
     -- placeholder for user override
 end
 
+function Battle.EnemyJustDied()
+    -- placeholder for user override
+end
+
 -- EnteringState behaviour (extracted from scene_battle)
 function Battle.EnteringState(newstate, oldstate)
     Battle.EnteringStateInherited(newstate, oldstate)
@@ -662,6 +666,7 @@ function Battle.Update(dt)
                                     -- Yeah you killed the monster.
                                     FLAG[flag] = FLAG[flag] + 1
                                 end
+                                Battle.EnemyJustDied()
                                 table.remove(enemies, i)
                                 enem = nil
                             end

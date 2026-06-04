@@ -43,7 +43,7 @@ local functions = {
         if (shell.target.width < 16) then
             shell.target.width = 16
         end
-        shell.target.x = shell.target.x + value / 2
+        shell.target.x = shell.target.x - value / 2
         shell.speed.width = 15
         shell.speed.x = 7.5
     end,
@@ -52,7 +52,7 @@ local functions = {
         if (shell.target.width < 16) then
             shell.target.width = 16
         end
-        shell.target.x = shell.target.x - value / 2
+        shell.target.x = shell.target.x + value / 2
         shell.speed.width = 15
         shell.speed.x = 7.5
     end,

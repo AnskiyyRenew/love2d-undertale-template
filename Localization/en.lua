@@ -210,7 +210,7 @@ return {
                 },
                 inspect = {
                     "* Spider[wait:30] - maybe a giant crab.",
-                    "* Generally speaking, I'm afraid of spiders."
+                    "* Generally speaking, I'm afraid\n  of spiders."
                 },
                 drop = {
                     "* You threw away the Spider.",

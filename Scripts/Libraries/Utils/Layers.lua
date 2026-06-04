@@ -9,7 +9,7 @@ function layers.sort()
 
     for _, object in ipairs(layers.objects)
     do
-        if (object.isactive) then
+        if (object.isactive and object.Draw) then
             object:Draw()
         end
     end

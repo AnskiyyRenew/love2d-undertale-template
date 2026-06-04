@@ -17,12 +17,12 @@ body[data-md-color-scheme="slate"]::before,
 html[data-md-color-scheme="slate"] body::before,
 .md-toggle[data-md-state="primary"] ~ * body::before {
     background-color: black !important;
-    background-image: url('../img/background-dark.png');
+    background-image: url('../background/background-dark.png');
     opacity: 0.2 !important;
 }
 
 body::before {
     background-color: white;
-    background-image: url('../img/background-light.png');
+    background-image: url('../background/background-light.png');
     opacity: 0.3;
 }

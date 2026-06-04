@@ -85,6 +85,15 @@ function audio.PlaySound(path, volume, looping)
     return inst.source, inst
 end
 
+function audio.NameExists(name)
+    for _, inst in pairs(audio.sources) do
+        if inst.name == name then
+            return true
+        end
+    end
+    return false
+end
+
 function audio.Update()
     local dt = love.timer.getDelta()
 

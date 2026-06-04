@@ -1,0 +1,3287 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="3.html">
+      
+      
+        <link rel="next" href="5.html">
+      
+      
+        
+          <link rel="alternate" href="../../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/4.html" hreflang="zh">
+        
+          <link rel="alternate" href="4.html" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>GameJolt API - SoulEngine Documentation (2.5.3)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gamejolt-api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="SoulEngine Documentation (2.5.3)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (2.5.3)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (2.5.3)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GameJolt API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../3.%E9%AB%98%E9%98%B6%E5%BC%80%E5%8F%91/4.html" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="4.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="SoulEngine Documentation (2.5.3)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (2.5.3)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (2.5.3)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1.%E5%85%A5%E9%97%A8%E9%83%A8%E5%88%86/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1.%E5%85%A5%E9%97%A8%E9%83%A8%E5%88%86/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Knowledge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1.%E5%85%A5%E9%97%A8%E9%83%A8%E5%88%86/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basic Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Main file (main.lua)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/11.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration file (conf.lua)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/21.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Masks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/22.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tween animations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/23.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/24.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Camera
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/25.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keyboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/9.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.%E5%9F%BA%E7%A1%80%E5%BC%80%E5%8F%91/90.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SuperStep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shaders (Shader)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡 Lua Extended Library (LuaExtended)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Library (dkjson)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safe JSON Detection (SafeJson)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="4.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#connecting-your-game-to-the-gamejolt-website" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connecting Your Game to the GameJolt Website
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Connecting Your Game to the GameJolt Website">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-your-game-on-the-gamejolt-website" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create your game on the GameJolt website
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connect-the-game-to-gamejolt-in-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connect the game to GameJolt in code
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-system-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User System (User)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="User System (User)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-find-your-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to find your token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-user-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch user information
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trophies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trophies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trophies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#add-trophies-to-your-game" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add trophies to your game
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-player-achievements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch player achievements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unlock-an-achievement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unlock an achievement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sessions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sessions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-display" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example display
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open a session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keep-the-session-alive-with-heartbeats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keep the session alive with heartbeats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#close-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Close a session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-storage-system-datastore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Storage System (DataStore)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Storage System (DataStore)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#store-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delete data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scores-leaderboard-system-scores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scores / Leaderboard System (Scores)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scores / Leaderboard System (Scores)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fetch-local-scores-no-user-login-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch local scores (no user login required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-global-leaderboard-scores-user-login-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch global leaderboard scores (user login required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submit-a-score-to-the-leaderboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submit a score to the leaderboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TimeManager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GUI Library (GUIManager)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Window Management (Windows)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Online Development (sock)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Scene Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Battle Scene Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.%E6%88%98%E6%96%97%E5%9C%BA%E6%99%AF%E5%BC%80%E5%8F%91/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Understanding Battle Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.%E6%88%98%E6%96%97%E5%9C%BA%E6%99%AF%E5%BC%80%E5%8F%91/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game and Enemy System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.%E6%88%98%E6%96%97%E5%9C%BA%E6%99%AF%E5%BC%80%E5%8F%91/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wave Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.%E6%88%98%E6%96%97%E5%9C%BA%E6%99%AF%E5%BC%80%E5%8F%91/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Attack Effects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld Structure and Location
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/11.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Overworld Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create and Draw a Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Terrain Tiles to Draw Maps Quickly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Objects to the Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exporting Maps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5.Overworld%E5%BC%80%E5%8F%91/7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using Maps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Translation and Localization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Translation and Localization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6.%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%9C%AC%E5%9C%B0%E5%8C%96/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Localization and Internationalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua Quick Start
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Lua Quick Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter One: Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter Two: Calculations and Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/3.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter Three: Conditionals and Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/4.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter Four: Loops
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter Five: Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/6.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter Six: Tables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Lua%E6%95%99%E7%A8%8B%E9%80%9F%E9%80%9A/7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter Seven: Functions Inside Tables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packaging and Release
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Packaging and Release
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E6%89%93%E5%8C%85%E4%B8%8E%E5%8F%91%E5%B8%83/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packaging and Releasing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Handling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Error Handling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E6%8A%A5%E9%94%99%E5%A4%84%E7%90%86/1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua Errors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E6%8A%A5%E9%94%99%E5%A4%84%E7%90%86/2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine Errors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#connecting-your-game-to-the-gamejolt-website" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connecting Your Game to the GameJolt Website
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Connecting Your Game to the GameJolt Website">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-your-game-on-the-gamejolt-website" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create your game on the GameJolt website
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connect-the-game-to-gamejolt-in-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connect the game to GameJolt in code
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-system-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User System (User)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="User System (User)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-find-your-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to find your token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-user-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch user information
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trophies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trophies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trophies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#add-trophies-to-your-game" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add trophies to your game
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-player-achievements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch player achievements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unlock-an-achievement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unlock an achievement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sessions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sessions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-display" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example display
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open a session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keep-the-session-alive-with-heartbeats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keep the session alive with heartbeats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#close-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Close a session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-storage-system-datastore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Storage System (DataStore)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Storage System (DataStore)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#store-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delete data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scores-leaderboard-system-scores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scores / Leaderboard System (Scores)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scores / Leaderboard System (Scores)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fetch-local-scores-no-user-login-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch local scores (no user login required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetch-global-leaderboard-scores-user-login-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch global leaderboard scores (user login required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submit-a-score-to-the-leaderboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submit a score to the leaderboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="gamejolt-api">GameJolt API<a class="headerlink" href="#gamejolt-api" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="connecting-your-game-to-the-gamejolt-website">Connecting Your Game to the GameJolt Website<a class="headerlink" href="#connecting-your-game-to-the-gamejolt-website" title="Permanent link">&para;</a></h2>
+<h3 id="create-your-game-on-the-gamejolt-website">Create your game on the GameJolt website<a class="headerlink" href="#create-your-game-on-the-gamejolt-website" title="Permanent link">&para;</a></h3>
+<ol>
+<li>First go to the <a href="https://gamejolt.com/dashboard/games/add">GameJolt game publishing page</a>. Choose one of these three options based on your current development stage.<br>
+<img alt="" src="../img/h-gamejoltapi/1.png" /><br><ul>
+<li><code>Devlog-Only</code>: You don't have playable content yet, but you want to share your development progress (such as images, videos, posts, or other materials).</li>
+<li><code>Early Access</code>: Your game has playable content but isn't complete yet; you will continue updating it.</li>
+<li><code>Complete/Stable</code>: Your game is finished, and you only plan to fix bugs, optimize, or make small updates.</li>
+</ul>
+</li>
+</ol>
+<p>If you just want to test, I recommend choosing the first option. It gives you a perfect personal space.<br>
+2. This shows the options after selecting Devlog-Only.<br><img alt="" src="../img/h-gamejoltapi/2.png" /><br></p>
+<ul>
+<li><code>Title</code>: Your game name, which appears on GameJolt and forms the first impression.</li>
+<li><code>URL Path</code>: Your game path. Choose an appropriate English path; combined with the random ID, this becomes your game page URL.</li>
+<li><code>Website(optional)</code>: If your game has an official website (for example, an AU page or a dedicated game site), enter it here.</li>
+<li><code>Engine/Language/Creation Tool</code>: The engine/framework used to create the game. <strong>Note: SoulEngine is not listed here, so do not keep looking for it. Choose LOVE instead, because LOVE is the birthplace of SoulEngine.</strong> Of course, if you want to write SoulEngine by hand, that's fine too.</li>
+<li><code>Add to partner system?</code>: If enabled, you can earn revenue through GameJolt's share system. The more fans you have, the more energy orbs you charge, and the more stickers you can get. However, you must first apply to become a GameJolt creator.</li>
+</ul>
+<p>Then click <code>Save &amp; Next</code> to proceed to the next page.<br>
+3. Fill in the Description, Design, and Maturity fields yourself. <strong>After that, click Save Draft to reach this page:</strong><br>
+<img alt="" src="../img/h-gamejoltapi/3.png" /><br>
+4. Click <code>Game API</code> in the top menu to open this page:<br>
+<img alt="" src="../img/h-gamejoltapi/4.png" /><br></p>
+<p><strong>This is the area that the GameJoltAPI library handles.</strong></p>
+<h3 id="connect-the-game-to-gamejolt-in-code">Connect the game to GameJolt in code<a class="headerlink" href="#connect-the-game-to-gamejolt-in-code" title="Permanent link">&para;</a></h3>
+<p>Add the following code in <code>main.lua</code> at the start of your game to connect to GameJolt.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">gamejolt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;GamejoltAPI&quot;</span><span class="p">)</span>
+
+<span class="c1">-- Initialize the API (requires GameJolt-provided app_id and private_key)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="mi">123456</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;your_private_key_here&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initialization failed: missing app_id or private_key&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">return</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>After this, if the game hiccups slightly during startup, it means the connection is being established.</p>
+<hr />
+<h2 id="user-system-user">User System (User)<a class="headerlink" href="#user-system-user" title="Permanent link">&para;</a></h2>
+<h3 id="how-to-find-your-token">How to find your token<a class="headerlink" href="#how-to-find-your-token" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Click your avatar in the upper right corner (or wherever it appears).</li>
+<li>Find the <code>Game Token</code> option and click it to view your token.<br>
+<img alt="" src="../img/h-gamejoltapi/u1.png" /></li>
+</ol>
+<h3 id="user-login">User login<a class="headerlink" href="#user-login" title="Permanent link">&para;</a></h3>
+<p>After the connection is established, the game needs to link to the player's account. The player must enter their username and <code>token</code> to log in using <code>gamejolt.auth_user(name, token)</code>:<br></p>
+<p><strong><em>Warning: do not ask for passwords inside the game. GameJolt explicitly states that requesting passwords is illegal.</em></strong></p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">auth_user</span><span class="p">(</span><span class="s2">&quot;myusername&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;myusertoken&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User authentication successful&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- After authentication, you can perform other operations that require login</span>
+<span class="kr">else</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Authentication failed: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">error</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h3 id="fetch-user-information">Fetch user information<a class="headerlink" href="#fetch-user-information" title="Permanent link">&para;</a></h3>
+<p>If you're making an online game and want to see how many friends a player has, you can query that player's information using <code>gamejolt.fetch_user(id, name)</code>: </p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Player enters a friend&#39;s username to search</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">friend_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;friend_name_to_search&quot;</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">friend_data</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">fetch_user</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nv">friend_name</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">friend_data</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="c1">-- Show friend information and provide an option to add them</span>
+<span class="w">    </span><span class="c1">-- This function doesn&#39;t exist by default; define a suitable one yourself</span>
+<span class="w">    </span><span class="nf">show_friend_profile</span><span class="p">(</span><span class="nv">friend_data</span><span class="p">)</span>
+<span class="kr">else</span>
+<span class="w">    </span><span class="c1">-- This function also doesn&#39;t exist by default; define your own</span>
+<span class="w">    </span><span class="nf">show_message</span><span class="p">(</span><span class="s2">&quot;User not found&quot;</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>You can also fetch information after login:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- After successful authentication, get full user information</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">auth_success</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">auth_user</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;token&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">auth_success</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">user_info</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">fetch_user</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nv">user_info</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="c1">-- Check account status (for example, whether the email is verified)</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">user_info</span><span class="p">.</span><span class="py">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;Active&quot;</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nf">proceed_to_main_game</span><span class="p">()</span>
+<span class="w">        </span><span class="kr">else</span>
+<span class="w">            </span><span class="nf">show_verification_required_message</span><span class="p">()</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<hr />
+<h2 id="trophies">Trophies<a class="headerlink" href="#trophies" title="Permanent link">&para;</a></h2>
+<h3 id="add-trophies-to-your-game">Add trophies to your game<a class="headerlink" href="#add-trophies-to-your-game" title="Permanent link">&para;</a></h3>
+<p>On the <code>Game API</code> page, click <code>Trophies</code> to enter the trophy interface.<br>
+<img alt="" src="../img/h-gamejoltapi/t1.png" /><br>
+There are four trophy tiers:</p>
+<ul>
+<li><code>Bronze</code>: the lowest-tier trophy, usually the easiest to obtain (for example, login or rename).</li>
+<li><code>Silver</code>: the third-tier trophy, usually achievable with some effort (for example, beating Sans).</li>
+<li><code>Gold</code>: the second-tier trophy, usually requires greater skill (for example, a no-medicine Sans fight).</li>
+<li><code>Platinum</code>: the highest-tier trophy, typically very difficult (for example, no-damage Sans fight or finding all secrets and completing everything).</li>
+</ul>
+<p><strong>Note: regardless of difficulty, the designer decides the trophy conditions and the code decides how they are awarded.</strong><br></p>
+<p>When adding a trophy, provide a square image, then enter a name and a short description.</p>
+<h3 id="fetch-player-achievements">Fetch player achievements<a class="headerlink" href="#fetch-player-achievements" title="Permanent link">&para;</a></h3>
+<p>When a player logs in, you can fetch all the achievements they have unlocked and display them in the game.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Fetch all achievements</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">achievements</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">fetch_achievements</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">achievements</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="p">,</span><span class="w"> </span><span class="nv">trophy</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">achievements</span><span class="p">.</span><span class="py">trophies</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Achievement: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">trophy</span><span class="p">.</span><span class="py">title</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; - Status: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="p">(</span><span class="nv">trophy</span><span class="p">.</span><span class="py">achieved</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;Unlocked&quot;</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;Locked&quot;</span><span class="p">))</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+
+<span class="c1">-- Fetch only unlocked achievements</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">unlocked_achievements</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">fetch_achievements</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="unlock-an-achievement">Unlock an achievement<a class="headerlink" href="#unlock-an-achievement" title="Permanent link">&para;</a></h3>
+<p>For this, you need the trophy ID from GameJolt, which is usually six digits.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">unlock_achievement</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Achievement unlocked successfully!&quot;</span><span class="p">)</span>
+<span class="kr">else</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Achievement unlock failed: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">error</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<hr />
+<h2 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h2>
+<p>If a player opens the game, you can choose to view how many players are online and the total playtime.</p>
+<h3 id="example-display">Example display<a class="headerlink" href="#example-display" title="Permanent link">&para;</a></h3>
+<p>This is the session overview when a game is first created:<br>
+<img alt="" src="../img/h-gamejoltapi/s1.png" /><br></p>
+<p>If Sessions are enabled and a player plays for a while and then quits, it looks like this:<br>
+<img alt="" src="../img/h-gamejoltapi/s2.png" /><br>
+There are <code>0</code> active sessions (no one currently has the game open), the game has been played for <code>57</code> seconds total, the average session length is <code>28</code> seconds, and one player has played the game.<br></p>
+<p>You can infer that 28 seconds means the same player played two separate sessions.</p>
+<h3 id="open-a-session">Open a session<a class="headerlink" href="#open-a-session" title="Permanent link">&para;</a></h3>
+<p>Use <code>gamejolt.session_open()</code> to start a session.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">result</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">session_open</span><span class="p">()</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Session opened successfully&quot;</span><span class="p">)</span>
+<span class="kr">else</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Session open failed: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">error</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h3 id="keep-the-session-alive-with-heartbeats">Keep the session alive with heartbeats<a class="headerlink" href="#keep-the-session-alive-with-heartbeats" title="Permanent link">&para;</a></h3>
+<p>After a session opens, GameJolt may consider it a timed-out session unless you periodically send an activity signal to let GameJolt know the session is still active. This resets the timeout.</p>
+<p>Because each session consumes GameJolt server resources, you must keep sending updates to keep the session valid.</p>
+<p>Use <code>gamejolt.session_ping(status)</code> to maintain session activity.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Default state is active</span>
+<span class="c1">-- This heartbeat can be sent every two minutes</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">result</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">session_ping</span><span class="p">(</span><span class="s2">&quot;active&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Session heartbeat sent successfully&quot;</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="c1">-- If the player briefly leaves the game (for example by pausing), you can send idle instead without affecting the session</span>
+<span class="nv">gamejolt</span><span class="p">.</span><span class="nf">session_ping</span><span class="p">(</span><span class="s2">&quot;idle&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="close-a-session">Close a session<a class="headerlink" href="#close-a-session" title="Permanent link">&para;</a></h3>
+<p>When closing the game, add <code>gamejolt.session_close()</code> in <code>love.quit</code> to tell GameJolt the game has ended and the session no longer needs updates.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">result</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">session_close</span><span class="p">()</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Session closed successfully&quot;</span><span class="p">)</span>
+<span class="kr">else</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Session close failed: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">error</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<hr />
+<h2 id="data-storage-system-datastore">Data Storage System (DataStore)<a class="headerlink" href="#data-storage-system-datastore" title="Permanent link">&para;</a></h2>
+<p>If a player switches to another device (for example a different computer or phone), you can upload their local storage to the GameJolt cloud so they can continue using their previous saved data.</p>
+<h3 id="store-data">Store data<a class="headerlink" href="#store-data" title="Permanent link">&para;</a></h3>
+<p>Use <code>gamejolt.data_store(key, data, user_data)</code> to save data.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Save global game data</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">data_store</span><span class="p">(</span><span class="s2">&quot;level_progress&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;level_5_completed&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data stored successfully&quot;</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="c1">-- Save user-specific data</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">data_store</span><span class="p">(</span><span class="s2">&quot;player_settings&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;{&quot;</span><span class="nv">sound</span><span class="s2">&quot;:true,&quot;</span><span class="nv">music</span><span class="s2">&quot;:false}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</code></pre></div>
+<p>Of course, <code>SoulEngine</code> does not need to manually build JSON strings like this; use the <code>dkjson</code> library instead.<br>
+<a href="2.html">Jump to this page to see how to use the dkjson library</a></p>
+<h3 id="fetch-data">Fetch data<a class="headerlink" href="#fetch-data" title="Permanent link">&para;</a></h3>
+<p>Use <code>gamejolt.data_fetch(key, user_data)</code> to retrieve data.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Fetch global data</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">data_fetch</span><span class="p">(</span><span class="s2">&quot;level_progress&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fetched data: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">data</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="c1">-- Fetch user-specific data</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">user_data</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">data_fetch</span><span class="p">(</span><span class="s2">&quot;player_settings&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</code></pre></div>
+<p>Or use <code>gamejolt.data_fetch_all(user_data)</code> to retrieve all data.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Fetch all global data keys</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">all_data</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">data_fetch_all</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">all_data</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="p">,</span><span class="w"> </span><span class="nv">key_info</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">all_data</span><span class="p">.</span><span class="py">keys</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data key: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">key_info</span><span class="p">.</span><span class="py">key</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Use <code>gamejolt.data_get_keys(user_data)</code> to get all keys stored in the data.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">keys</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">data_get_keys</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">keys</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="p">,</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">keys</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Key: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">key</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h3 id="delete-data">Delete data<a class="headerlink" href="#delete-data" title="Permanent link">&para;</a></h3>
+<p>When a player chooses to RESET or otherwise clear data, use <code>gamejolt.data_delete(key, user_data)</code> to delete an entry.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">data_delete</span><span class="p">(</span><span class="s2">&quot;temp_data&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data deleted successfully&quot;</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<hr />
+<h2 id="scores-leaderboard-system-scores">Scores / Leaderboard System (Scores)<a class="headerlink" href="#scores-leaderboard-system-scores" title="Permanent link">&para;</a></h2>
+<p>If you're developing a rhythm game or an UNDERTALE-style game and want a leaderboard, use the score system to record and upload player scores to GameJolt.</p>
+<h3 id="fetch-local-scores-no-user-login-required">Fetch local scores (no user login required)<a class="headerlink" href="#fetch-local-scores-no-user-login-required" title="Permanent link">&para;</a></h3>
+<p>Use <code>gamejolt.fetch_scores_local(table_id)</code> to get local scores.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">scores</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">fetch_scores_local</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span><span class="w">  </span><span class="c1">-- 123 is the score table ID</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">scores</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="p">,</span><span class="w"> </span><span class="nv">score</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">scores</span><span class="p">.</span><span class="py">scores</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Score: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">score</span><span class="p">.</span><span class="py">score</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; - User: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">score</span><span class="p">.</span><span class="py">user</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h3 id="fetch-global-leaderboard-scores-user-login-required">Fetch global leaderboard scores (user login required)<a class="headerlink" href="#fetch-global-leaderboard-scores-user-login-required" title="Permanent link">&para;</a></h3>
+<p>Use <code>gamejolt.fetch_scores_global(table_id)</code> to get the global leaderboard.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">scores</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">fetch_scores_global</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">scores</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="p">,</span><span class="w"> </span><span class="nv">score</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">scores</span><span class="p">.</span><span class="py">scores</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Score: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">score</span><span class="p">.</span><span class="py">score</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; - Sort value: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">score</span><span class="p">.</span><span class="py">sort</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h3 id="submit-a-score-to-the-leaderboard">Submit a score to the leaderboard<a class="headerlink" href="#submit-a-score-to-the-leaderboard" title="Permanent link">&para;</a></h3>
+<p>Use <code>gamejolt.submit_score(score, table_id, sort, extra_data)</code> to submit a score.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">submit_score</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="mi">1500</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Clear time: 2:30&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Score submitted successfully&quot;</span><span class="p">)</span>
+<span class="kr">else</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Score submission failed: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">error</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p><code>extra_data</code> refers to additional submission details, as shown above with <code>Clear time: 2:30</code>. It can also be something like: <code>"Time:2:30|Difficulty:Hard|Stage:5"</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
