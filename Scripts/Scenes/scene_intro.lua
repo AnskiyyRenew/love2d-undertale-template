@@ -27,7 +27,7 @@ local cutscenes = {
         function(value)
           sprite:MoveTo(320, value)
         end,
-        "linear", "", -100, 500, 60 * 4.2
+        "linear", "", 440, -50, 60 * 4.2
       )
     end,
 
