@@ -25,7 +25,7 @@ local cutscenes = {
       sprite:MoveTo(320, -100)
       tween.CreateTween(
         function(value)
-          sprite.y = value
+          sprite:MoveTo(320, value)
         end,
         "linear", "", -100, 500, 60 * 4.2
       )
@@ -65,7 +65,7 @@ function SCENE.load()
   -- For example, you might load images, sounds, etc.
   local first_scene = cutscenes[current_index]
   if first_scene and first_scene.onDisplayStart then
-    first_scene.onDisplayStart()
+    first_scene.onDisplayStart(first_scene, sprite)
   end
 end
 
@@ -111,12 +111,14 @@ function SCENE.update(dt)
       current_index = current_index + 1
 
       if current_index <= #cutscenes then
-        sprite:Set(cutscenes[current_index].path)
-        t:SetText(cutscenes[current_index].text)
+        local next_cutscene = cutscenes[current_index]
+
+        sprite:Set(next_cutscene.path)
+        t:SetText(next_cutscene.text)
         state = "fade_in"
 
-        if current_cutscene.onDisplayStart then
-          current_cutscene.onDisplayStart(current_cutscene, sprite)
+        if next_cutscene.onDisplayStart then
+          next_cutscene.onDisplayStart(next_cutscene, sprite)
         end
       else
         state = "finished"
