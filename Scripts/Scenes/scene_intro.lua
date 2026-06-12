@@ -3,15 +3,18 @@
 local SCENE = {}
 
 
-local function NewCutscene(path, duration)
+local function NewCutscene(path, duration, text)
   return {
     path = path or "default.png",
-    duration = duration or 3.0
+    duration = duration or 3.0,
+    text = text or "undefined"
   }
 end
 
 local cutscenes = {
-  NewCutscene("Cutscene/spr_introimage_0.png", 5.0),
+  NewCutscene("Cutscene/spr_introimage_0.png", 7.0,
+    "[space:1, 2][space:2, 4][speed:0.95][voice:uifont.wav]Long ago, [wait:30]two races\nruled over Earth:\n[wait:30]HUMANS and MONSTERS."
+  ),
   NewCutscene("Cutscene/spr_introimage_1.png", 3.5),
   NewCutscene("Cutscene/spr_introimage_2.png", 4.2)
 }
@@ -23,6 +26,11 @@ local fade = 1.0
 local cutscene = sprites.CreateSprite(cutscenes[1].path, 0)
 cutscene:Scale(2, 2)
 
+local t = typers.CreateText(cutscenes[1].text, { 118, 319 }, 1.1, { 0, 0 }, "none")
+
+local mask = masks.New("rectangle", 320, 170, 400, 220, 0)
+cutscene:SetStencils({ mask })
+
 -- In the original Undertale assets,
 -- the sprites at the end of the Pacifist Route (such as spr_asrielpanels_0.png) do not have black borders,
 -- so their coordinates need to be adjusted as follows.
@@ -31,14 +39,6 @@ cutscene:Scale(2, 2)
 --
 -- cutscene:MoveTo(320, 166)
 
-
-local mask = masks.New("rectangle", 320, 170, 400, 220, 0)
-
-cutscene:SetStencils({ mask })
-
-local t = typers.CreateText({
-  "[space:1, 2][space:2, 4][speed:0.95][voice:uifont.wav]Long ago, [wait:30]two races\nruled over Earth:\n[wait:30]HUMANS and MONSTERS."
-}, { 118, 319 }, 1.1, { 0, 0 }, "manual")
 
 -- This is a fake scene for testing purposes.
 function SCENE.load()
@@ -75,6 +75,7 @@ function SCENE.update(dt)
     if timer >= current_data.duration then
       timer = 0
       state = "fade_out"
+      t:SetText("")
     end
   elseif state == "fade_out" then
     cutscene.alpha = 1.0 - math.min(timer / fade, 1.0)
@@ -85,6 +86,7 @@ function SCENE.update(dt)
 
       if current_index <= #cutscenes then
         cutscene:Set(cutscenes[current_index].path)
+        t:SetText(cutscenes[current_index].text)
         state = "fade_in"
       else
         state = "finished"
