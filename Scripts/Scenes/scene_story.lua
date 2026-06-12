@@ -6,7 +6,6 @@ local SCENE = {}
 local cutscene = sprites.CreateSprite("Cutscene/spr_introimage_0.png", 0)
 cutscene:Scale(2, 2)
 
-cutscene.color = { 0, 1, 0 }
 -- In the original Undertale assets,
 -- the sprites at the end of the Pacifist Route (such as spr_asrielpanels_0.png) do not have black borders,
 -- so their coordinates need to be adjusted as follows.
@@ -20,8 +19,10 @@ local mask = masks.New("rectangle", 320, 170, 400, 220, 0)
 
 cutscene:SetStencils({ mask })
 
+local t = typers.CreateText({
+  "[space:1, 2][space:2, 4][speed:0.95][voice:uifont.wav]Long ago, [wait:30]two races\nruled over Earth:\n[wait:30]HUMANS and MONSTERS."
+}, { 118, 319 }, 1.1, { 0, 0 }, "manual")
 
-local debug_image = love.graphics.newImage("debug.png") -- todo: will delete soon
 
 -- This is a fake scene for testing purposes.
 function SCENE.load()
@@ -40,7 +41,6 @@ end
 function SCENE.draw()
   -- Draw the scene here.
   -- For example, you might draw images, text, etc.
-  love.graphics.draw(debug_image) -- todo: will delete soon
 end
 
 -- This function is called when the scene is switched away from.
