@@ -2,6 +2,27 @@
 -- You can use this as a starting point for your own scenes.
 local SCENE = {}
 
+
+local cutscene = sprites.CreateSprite("Cutscene/spr_introimage_0.png", 0)
+cutscene:Scale(2, 2)
+
+cutscene.color = { 0, 1, 0 }
+-- In the original Undertale assets,
+-- the sprites at the end of the Pacifist Route (such as spr_asrielpanels_0.png) do not have black borders,
+-- so their coordinates need to be adjusted as follows.
+--
+-- Uncomment below as needed
+--
+-- cutscene:MoveTo(320, 166)
+
+
+local mask = masks.New("rectangle", 320, 170, 400, 220, 0)
+
+cutscene:SetStencils({ mask })
+
+
+local debug_image = love.graphics.newImage("debug.png") -- todo: will delete soon
+
 -- This is a fake scene for testing purposes.
 function SCENE.load()
   -- Load any resources needed for this scene here.
@@ -19,6 +40,7 @@ end
 function SCENE.draw()
   -- Draw the scene here.
   -- For example, you might draw images, text, etc.
+  love.graphics.draw(debug_image) -- todo: will delete soon
 end
 
 -- This function is called when the scene is switched away from.
