@@ -117,6 +117,16 @@ local time = 0
 local printed = false
 function love.update(dt)
 
+    -- Reload the current scene when the trigger file exists.
+    if (not _RELEASED) then
+        local trigger = io.open(".reload_trigger", "r")
+        if (trigger) then
+            trigger:close()
+            os.remove(".reload_trigger")
+            scenes.switchTo(scenes.name_current)
+        end
+    end
+
     -- These are the libraries' update functions.
     keyboard.Update()
     gui.update(dt)
