@@ -5,6 +5,8 @@ beats.cycle_length = 4    -- 默认4拍一个循环
 beats.event_handlers = {} -- 事件回调表
 beats._triggered = {}     -- 记录每个目标节拍上次触发时所在的小节编号
 
+beats.last_beat = -1
+
 -- 设置BPM值
 function beats.SetBPM(new_bpm)
     assert(type(new_bpm) == "number" and new_bpm > 0,
@@ -102,6 +104,21 @@ function beats.Update(dt)
 
     -- 触发本帧内所有跨越的整数节拍事件
     for b = prev_beat + 1, curr_beat do
+        if beats.event_handlers.beat then
+            beats.event_handlers.beat(b + 1)
+        end
+    end
+end
+
+function beats.UpdateFromTime(time)
+    assert(type(time) == "number" and time >= 0,
+        "Invalid delta time: must be a non-negative number")
+
+    beats.time = time / (60 / beats.bpm)
+
+    local b = math.floor(beats.time)
+    if b ~= beats.last_beat then
+        beats.last_beat = b
         if beats.event_handlers.beat then
             beats.event_handlers.beat(b + 1)
         end
