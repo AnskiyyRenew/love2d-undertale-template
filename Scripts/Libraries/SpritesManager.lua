@@ -150,6 +150,7 @@ local functions = {
         self.dust.image = love.graphics.newCanvas(self.width, self.height)
         self.dust.iter_image = love.graphics.newCanvas(self.width, self.height)
         love.graphics.setCanvas(self.dust.image)
+        self.image:setFilter("nearest", "nearest")
         love.graphics.draw(self.image)
         love.graphics.setCanvas()
         if (sound) then
@@ -298,6 +299,20 @@ function sprites.CreateSprite(path, layer)
         local drawOY = (sprite.ypivot or 0.5) * sprite.height
         local drawKX = sprite.xshear or 0
         local drawKY = sprite.yshear or 0
+
+        -- The default is to add a pixel-perfect rendering shader to the sprite
+        if not sprite.shaders.use and not sprite.dust.use then
+            local shader = getSmoothPixelShader()
+            -- Use linear. See the reference link within the shader for details
+            sprite.image:setFilter("linear", "linear")
+            shader:send("texture_pixel_size", {
+                1 / sprite.image:getWidth(),
+                1 / sprite.image:getHeight()
+            })
+            love.graphics.setShader(shader)
+        else
+            sprite.image:setFilter("nearest", "nearest")
+        end
 
         love.graphics.draw(finalDrawable, drawX, drawY, drawR, drawSX, drawSY, drawOX, drawOY, drawKX, drawKY)
 
