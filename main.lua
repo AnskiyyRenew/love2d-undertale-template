@@ -21,7 +21,7 @@ windows = require("Scripts.Libraries.Utils.Windows")
 gui = require("Scripts.Libraries.GUIManager")
 luaex = require("Scripts.Libraries.Utils.LuaExtended")
 
-local lang_order = {"en", "zh_CN"}
+local lang_order = { "en", "zh_CN" }
 local lang_index = 1
 global:SetVariable("LANGUAGE", "en") -- Default language is Chinese. You can change it to "en" for English.
 localize = require("Localization." .. global:GetVariable("LANGUAGE"))
@@ -62,14 +62,19 @@ local Camera = require("Scripts.Libraries.Utils.Camera")
 _CAMERA_ = Camera:new(0, 0, 1, 1, 0)
 
 -- Screen variables
-screen_w, screen_h = love.graphics.getDimensions()
-if (FILL_SCREEN) then
-    scale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
-else
-    scale = 1
+
+local function updateScreenLayout()
+    screen_w, screen_h = love.graphics.getDimensions()
+    if (FILL_SCREEN) then
+        scale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
+    else
+        scale = 1
+    end
+    draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
+    draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
 end
-draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
-draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
+
+updateScreenLayout()
 
 -- Frame rate control
 local frameTime = 1 / global:GetVariable("FPS")
@@ -85,14 +90,7 @@ function love.load()
     -- If it's mobile player, then fullscreen automatically
     if (love.system.getOS() == "Android" or love.system.getOS() == "iOS") then
         love.window.setFullscreen(true, "desktop")
-        screen_w, screen_h = love.graphics.getDimensions()
-        if (FILL_SCREEN) then
-            scale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
-        else
-            scale = 1
-        end
-        draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
-        draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
+        updateScreenLayout()
     end
 
     --[[if (love.system.openURL) then
@@ -116,7 +114,6 @@ end
 local time = 0
 local printed = false
 function love.update(dt)
-
     -- Reload the current scene when the trigger file exists.
     if (not _RELEASED) then
         local trigger = io.open(".reload_trigger", "r")
@@ -153,100 +150,80 @@ function love.update(dt)
 
     -- The following code is used to update the audio manager.
     audio.Update()
-
 end
 
 function love.resize(w, h)
+    updateScreenLayout()
     screen_w, screen_h = w, h
-    if (FILL_SCREEN) then
-        scale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
-        draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
-        draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
-    else
-        scale = 1
-        draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
-        draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
-    end
 end
 
 function love.draw()
-    screen_w, screen_h = love.graphics.getDimensions()
-    if (FILL_SCREEN) then
-        scale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
-        draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
-        draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
-    else
-        scale = 1
-        draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
-        draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
-    end
-
-    love.graphics.setCanvas({CANVAS, stencil = true})
+    updateScreenLayout()
+    love.graphics.setCanvas({ CANVAS, stencil = true })
     love.graphics.clear(true, true, true)
 
     love.graphics.push()
 
-        gui.draw()
+    gui.draw()
 
-        _CAMERA_:apply()
-        love.graphics.setColor(1, 1, 1)
+    _CAMERA_:apply()
+    love.graphics.setColor(1, 1, 1)
 
-        if (scenes.current) then
-            if (not scenes.current.PRIORITY) then
-                if scenes.current and scenes.current.draw then
-                    scenes.current.draw()
-                end
-                layers.sort()
-            else
-                layers.sort()
-                if scenes.current and scenes.current.draw then
-                    scenes.current.draw()
-                end
+    if (scenes.current) then
+        if (not scenes.current.PRIORITY) then
+            if scenes.current and scenes.current.draw then
+                scenes.current.draw()
+            end
+            layers.sort()
+        else
+            layers.sort()
+            if scenes.current and scenes.current.draw then
+                scenes.current.draw()
             end
         end
+    end
 
-        _CAMERA_:reset()
+    _CAMERA_:reset()
 
     love.graphics.pop()
 
     love.graphics.push()
-        love.graphics.setCanvas()
-        love.graphics.translate(draw_x, draw_y)
-        love.graphics.scale(scale, scale)
-        love.graphics.setColor(1, 1, 1)
+    love.graphics.setCanvas()
+    love.graphics.translate(draw_x, draw_y)
+    love.graphics.scale(scale, scale)
+    love.graphics.setColor(1, 1, 1)
 
-        local shaders = global:GetVariable("ScreenShaders") or {}
+    local shaders = global:GetVariable("ScreenShaders") or {}
 
-        if (#shaders > 0) then
-            local source = CANVAS
-            local target = INTERMEDIATE_CANVAS
+    if (#shaders > 0) then
+        local source = CANVAS
+        local target = INTERMEDIATE_CANVAS
 
-            love.graphics.push()
-            love.graphics.origin()
+        love.graphics.push()
+        love.graphics.origin()
 
-                for _, shader in ipairs(shaders) do
-                    love.graphics.setCanvas(target)
-                    love.graphics.clear()
+        for _, shader in ipairs(shaders) do
+            love.graphics.setCanvas(target)
+            love.graphics.clear()
 
-                    love.graphics.setShader(shader)
-                    love.graphics.draw(source)
-                    love.graphics.setShader()
-
-                    source, target = target, source
-                end
-                
-            love.graphics.pop()
-
-            love.graphics.setCanvas()
+            love.graphics.setShader(shader)
             love.graphics.draw(source)
-        else
-            love.graphics.draw(CANVAS)
+            love.graphics.setShader()
+
+            source, target = target, source
         end
+
+        love.graphics.pop()
+
+        love.graphics.setCanvas()
+        love.graphics.draw(source)
+    else
+        love.graphics.draw(CANVAS)
+    end
     love.graphics.pop()
 end
 
 function love.keypressed(key)
-
     -- This is the main key pressed function.
     -- It is called when a key is pressed.
     -- However, we already have a key pressed function in the keyboard library.
@@ -279,7 +256,6 @@ function love.keypressed(key)
             localize = require("Localization." .. global:GetVariable("LANGUAGE"))
         end
     end
-
 end
 
 function love.mousepressed(x, y, button)
