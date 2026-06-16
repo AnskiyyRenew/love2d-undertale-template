@@ -1,0 +1,17 @@
+extern vec4 color_tl;
+extern vec4 color_tr;
+extern vec4 color_bl;
+extern vec4 color_br;
+extern vec4 sColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+    vec4 texColor = Texel(texture, texture_coords);
+
+    vec4 top = mix(color_tl, color_tr, texture_coords.x);
+    vec4 bottom = mix(color_bl, color_br, texture_coords.x);
+
+    vec4 finalColor = mix(top, bottom, texture_coords.y);
+    finalColor *= sColor;
+
+    return texColor * finalColor;
+}

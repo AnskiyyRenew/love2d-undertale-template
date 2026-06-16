@@ -3,6 +3,23 @@ local sprites = {
 }
 sprites.imageCache = {}
 
+local function getImage(path)
+    if (not sprites.imageCache[path]) then
+        sprites.imageCache[path] = love.graphics.newImage("Resources/Sprites/" .. path)
+        sprites.imageCache[path]:setFilter("nearest", "nearest")
+    end
+    return sprites.imageCache[path]
+end
+
+sprites.smoothPixelShader = nil
+
+local function getSmoothPixelShader()
+    if (not sprites.smoothPixelShader) then
+        sprites.smoothPixelShader = love.graphics.newShader("Scripts/Shaders/smooth_pixel.frag")
+    end
+    return sprites.smoothPixelShader
+end
+
 local rectangulation = require("Scripts.Libraries.PerfectPixel")
 
 local functions = {
@@ -31,8 +48,7 @@ local functions = {
         self.yshear = y
     end,
     Set = function(self, path)
-        self.image = love.graphics.newImage("Resources/Sprites/" .. path)
-        self.image:setFilter("nearest", "nearest")
+        self.image = getImage(path)
         self.imagedata = love.image.newImageData("Resources/Sprites/" .. path)
 
         -- Change path and realName
@@ -125,7 +141,7 @@ local functions = {
     Dust = function(self, sound)
         self.dust.totaltime = 1.2
         self.dust.use = true
-        self.dust.shader = love.graphics.newShader("Scripts/Shaders/dust")
+        self.dust.shader = love.graphics.newShader("Scripts/Shaders/dust.frag")
         self.dust.shader:send("screen_size_inv", { 1 / self.width, 1 / self.height })
         self.dust.shader:send("scale_factor", { self.xscale, self.yscale })
 
@@ -134,6 +150,7 @@ local functions = {
         self.dust.image = love.graphics.newCanvas(self.width, self.height)
         self.dust.iter_image = love.graphics.newCanvas(self.width, self.height)
         love.graphics.setCanvas(self.dust.image)
+        self.image:setFilter("nearest", "nearest")
         love.graphics.draw(self.image)
         love.graphics.setCanvas()
         if (sound) then
@@ -190,13 +207,7 @@ function sprites.CreateSprite(path, layer)
     sprite.parent = nil
     sprite.realName = sprite.path:sub(1, #sprite.path - 4)
     sprite.isBullet = false
-    if (sprites.imageCache[sprite.path]) then
-        sprite.image = sprites.imageCache[sprite.path]
-    else
-        sprites.imageCache[sprite.path] = love.graphics.newImage("Resources/Sprites/" .. sprite.path)
-        sprites.imageCache[sprite.path]:setFilter("nearest", "nearest")
-        sprite.image = sprites.imageCache[sprite.path]
-    end
+    sprite.image = getImage(sprite.path)
     sprite.imagedata = love.image.newImageData("Resources/Sprites/" .. sprite.path)
     sprite.layer = layer
     sprite.dust = {
@@ -273,14 +284,6 @@ function sprites.CreateSprite(path, layer)
         sprite.height = sprite.image:getHeight()
         local drawX = sprite.x or 0
         local drawY = sprite.y or 0
-
-        if sprite.width % 2 == 1 then
-            drawX = drawX + 0.5 / (sprite.xscale or 1)
-        end
-        if sprite.height % 2 == 1 then
-            drawY = drawY + 0.5 / (sprite.yscale or 1)
-        end
-
         local drawR = math.rad(sprite.rotation or 0)
         local drawSX = sprite.xscale or 1
         local drawSY = sprite.yscale or 1
@@ -288,6 +291,20 @@ function sprites.CreateSprite(path, layer)
         local drawOY = (sprite.ypivot or 0.5) * sprite.height
         local drawKX = sprite.xshear or 0
         local drawKY = sprite.yshear or 0
+
+        -- The default is to add a pixel-perfect rendering shader to the sprite
+        if not sprite.shaders.use and not sprite.dust.use then
+            local shader = getSmoothPixelShader()
+            -- Use linear. See the reference link within the shader for details
+            sprite.image:setFilter("linear", "linear")
+            shader:send("texture_pixel_size", {
+                1 / sprite.image:getWidth(),
+                1 / sprite.image:getHeight()
+            })
+            love.graphics.setShader(shader)
+        else
+            sprite.image:setFilter("nearest", "nearest")
+        end
 
         love.graphics.draw(finalDrawable, drawX, drawY, drawR, drawSX, drawSY, drawOX, drawOY, drawKX, drawKY)
 
@@ -357,6 +374,18 @@ function sprites.CreateSpriteAtlas(path, x, y, w, h, layer)
                     sprite.xscale, sprite.yscale, sprite.xpivot * sprite.width, sprite.ypivot * sprite.height,
                     sprite.xshear, sprite.yshear)
             else
+                if not sprite.shaders.use then
+                    local shader = getSmoothPixelShader()
+                    sprite.image:setFilter("linear", "linear")
+                    shader:send("texture_pixel_size", {
+                        1 / sprite.image:getWidth(),
+                        1 / sprite.image:getHeight()
+                    })
+                    love.graphics.setShader(shader)
+                else
+                    sprite.image:setFilter("nearest", "nearest")
+                end
+
                 love.graphics.draw(sprite.image, sprite.quad, sprite.x, sprite.y, math.rad(sprite.rotation),
                     sprite.xscale, sprite.yscale, sprite.xpivot * sprite.width, sprite.ypivot * sprite.height,
                     sprite.xshear, sprite.yshear)
@@ -451,14 +480,17 @@ function sprites.Draw()
 end
 
 function sprites.RemoveImage(path)
-    for i = #sprites.images, 1, -1
-    do
+    for i = #sprites.images, 1, -1 do
         local sprite = sprites.images[i]
         if (sprite.path == path) then
             sprite:Destroy()
-            table.remove(sprites.images, i)
         end
     end
+
+    if sprites.imageCache[path] and sprites.imageCache[path].release then
+        sprites.imageCache[path]:release()
+    end
+
     sprites.imageCache[path] = nil
 end
 
@@ -500,11 +532,15 @@ function sprites.clear()
                 end
             end
 
-            sprite.image:release()
-            sprite:Destroy()
+            sprite.image = nil
 
             table.remove(sprites.images, i)
         end
+    end
+
+    if sprites.smoothPixelShader and sprites.smoothPixelShader.release then
+        sprites.smoothPixelShader:release()
+        sprites.smoothPixelShader = nil
     end
 
     for path, img in pairs(sprites.imageCache) do

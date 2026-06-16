@@ -1,11 +1,11 @@
 local SCENE = {}
-local shader = love.graphics.newShader("Scripts/Shaders/gradient")
+local shader = love.graphics.newShader("Scripts/Shaders/gradient.frag")
 shader:send("color_tl", {1, 0, 0, 1})
 shader:send("color_tr", {0, 0, 1, 1})
 shader:send("color_br", {0, 1, 0, 1})
 shader:send("color_bl", {1, 1, 0, 1})
 
-local blurshader = love.graphics.newShader("Scripts/Shaders/blur")
+local blurshader = love.graphics.newShader("Scripts/Shaders/blur.frag")
 blurshader:send("radius", 1)
 blurshader:send("direction", {1, 0})
 
