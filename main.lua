@@ -170,11 +170,16 @@ end
 
 function love.draw()
     updateScreenLayout()
+    ensureCanvases()
+
     love.graphics.setCanvas({ CANVAS, stencil = true })
-    love.graphics.clear(true, true, true)
+    love.graphics.clear(0, 0, 0, 1, true, true)
 
     love.graphics.push()
     do
+        love.graphics.translate(draw_x, draw_y)
+        love.graphics.scale(scale, scale)
+
         gui.draw()
 
         _CAMERA_:apply()
@@ -201,8 +206,6 @@ function love.draw()
     love.graphics.push()
     do
         love.graphics.setCanvas()
-        love.graphics.translate(draw_x, draw_y)
-        love.graphics.scale(scale, scale)
         love.graphics.setColor(1, 1, 1)
 
         local shaders = global:GetVariable("ScreenShaders") or {}
