@@ -29,26 +29,34 @@ require("Localization.LOCALIZE")
 require("Scripts.Libraries.Overworld.ConfigData")
 
 -- Canvases
-CANVAS = love.graphics.newCanvas(
-    CANVAS_WIDTH,
-    CANVAS_HEIGHT,
-    nil,
-    {
+CANVAS = nil
+INTERMEDIATE_CANVAS = nil
+
+local canvas_w = 0
+local canvas_h = 0
+
+local function newCanvas(w, h)
+    local canvas = love.graphics.newCanvas(w, h, nil, {
         format = "stencil",
         readable = true
-    }
-)
-CANVAS:setFilter("nearest", "nearest")
-INTERMEDIATE_CANVAS = love.graphics.newCanvas(
-    CANVAS_WIDTH,
-    CANVAS_HEIGHT,
-    nil,
-    {
-        format = "stencil",
-        readable = true
-    }
-)
-INTERMEDIATE_CANVAS:setFilter("nearest", "nearest")
+    })
+    canvas:setFilter("nearest", "nearest")
+    return canvas
+end
+
+local function ensureCanvases()
+    local w = math.max(1, math.floor(screen_w + 0.5))
+    local h = math.max(1, math.floor(screen_h + 0.5))
+
+    if CANVAS and canvas_w == w and canvas_h == h then return end
+    if CANVAS and CANVAS.release then CANVAS:release() end
+    if INTERMEDIATE_CANVAS and INTERMEDIATE_CANVAS.release then INTERMEDIATE_CANVAS:release() end
+
+    CANVAS = newCanvas(w, h)
+    INTERMEDIATE_CANVAS = newCanvas(w, h)
+    canvas_w = w
+    canvas_h = h
+end
 
 -- Global variables
 global:SetVariable("FPS", 60)
@@ -75,6 +83,7 @@ local function updateScreenLayout()
 end
 
 updateScreenLayout()
+ensureCanvases()
 
 -- Frame rate control
 local frameTime = 1 / global:GetVariable("FPS")
@@ -91,6 +100,7 @@ function love.load()
     if (love.system.getOS() == "Android" or love.system.getOS() == "iOS") then
         love.window.setFullscreen(true, "desktop")
         updateScreenLayout()
+        ensureCanvases()
     end
 
     --[[if (love.system.openURL) then
@@ -154,6 +164,7 @@ end
 
 function love.resize(w, h)
     updateScreenLayout()
+    ensureCanvases()
     screen_w, screen_h = w, h
 end
 
@@ -236,7 +247,8 @@ function love.keypressed(key)
     if (os_name ~= "Android" and os_name ~= "iOS") then
         if (key == "f4") then
             love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
-            scale = math.min(love.graphics.getWidth() / LOGICAL_WIDTH, love.graphics.getHeight() / LOGICAL_HEIGHT)
+            updateScreenLayout()
+            ensureCanvases()
         end
     end
     if (key == "f2") then
