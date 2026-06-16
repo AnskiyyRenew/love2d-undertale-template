@@ -284,14 +284,6 @@ function sprites.CreateSprite(path, layer)
         sprite.height = sprite.image:getHeight()
         local drawX = sprite.x or 0
         local drawY = sprite.y or 0
-
-        if sprite.width % 2 == 1 then
-            drawX = drawX + 0.5 / (sprite.xscale or 1)
-        end
-        if sprite.height % 2 == 1 then
-            drawY = drawY + 0.5 / (sprite.yscale or 1)
-        end
-
         local drawR = math.rad(sprite.rotation or 0)
         local drawSX = sprite.xscale or 1
         local drawSY = sprite.yscale or 1
