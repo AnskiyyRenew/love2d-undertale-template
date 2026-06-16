@@ -4,6 +4,14 @@ local SCENE = {}
 
 local SPR_ENEMY_TEST = sprites.CreateSprite("Cutscene/spr_charaphoto_0.png", -1)
 
+
+local SPR_1X = sprites.CreateSprite("bullet.png", -1)
+SPR_1X.y = 110
+
+local SPR_2X = sprites.CreateSprite("bullet.png", -1)
+SPR_2X.y = 160
+SPR_2X:Scale(2, 2)
+
 local beat_t = typers.DrawText("SRY but this image size \nhappens to be odd =)", { 50, 300 }, 1)
 -- This is a fake scene for testing purposes.
 function SCENE.load()
@@ -15,6 +23,8 @@ end
 function SCENE.update(dt)
     -- Update any game logic for this scene here.
     -- For example, you might update animations, handle input, etc.
+    SPR_1X.rotation = SPR_1X.rotation + 1
+    SPR_2X.rotation = SPR_1X.rotation
 end
 
 -- This function is called to draw the scene.
