@@ -125,7 +125,7 @@ local functions = {
     Dust = function(self, sound)
         self.dust.totaltime = 1.2
         self.dust.use = true
-        self.dust.shader = love.graphics.newShader("Scripts/Shaders/dust")
+        self.dust.shader = love.graphics.newShader("Scripts/Shaders/dust.frag")
         self.dust.shader:send("screen_size_inv", { 1 / self.width, 1 / self.height })
         self.dust.shader:send("scale_factor", { self.xscale, self.yscale })
 

@@ -10,7 +10,7 @@ end
 
 local mask1 = masks.New("rectangle", 320, 240, 400, 400, 0)
 
-local shader = love.graphics.newShader("Scripts/Shaders/gradient")
+local shader = love.graphics.newShader("Scripts/Shaders/gradient.frag")
 shader:send("color_tl", {1, 0, 1, 0.3})
 shader:send("color_tr", {1, 1, 1, 1})
 shader:send("color_br", {1, 1, 1, 1})

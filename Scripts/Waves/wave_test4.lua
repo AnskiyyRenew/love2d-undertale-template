@@ -31,9 +31,9 @@ battle.mainarena:Resize(155, 130)
 local mask1 = masks.New("rectangle", 320, 320, 155, 130, 0, 1)
 
 -- This is how we init a shader.
-local shader = love.graphics.newShader("Scripts/Shaders/gradient")
-local invert = love.graphics.newShader("Scripts/Shaders/invert")
-local blurshader = love.graphics.newShader("Scripts/Shaders/blur")
+local shader = love.graphics.newShader("Scripts/Shaders/gradient.frag")
+local invert = love.graphics.newShader("Scripts/Shaders/invert.frag")
+local blurshader = love.graphics.newShader("Scripts/Shaders/blur.frag")
 blurshader:send("radius", 0.5)
 blurshader:send("direction", {1, 0})
 
