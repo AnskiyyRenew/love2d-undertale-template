@@ -476,14 +476,17 @@ function sprites.Draw()
 end
 
 function sprites.RemoveImage(path)
-    for i = #sprites.images, 1, -1
-    do
+    for i = #sprites.images, 1, -1 do
         local sprite = sprites.images[i]
         if (sprite.path == path) then
             sprite:Destroy()
-            table.remove(sprites.images, i)
         end
     end
+
+    if sprites.imageCache[path] and sprites.imageCache[path].release then
+        sprites.imageCache[path]:release()
+    end
+
     sprites.imageCache[path] = nil
 end
 
