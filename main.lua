@@ -206,6 +206,7 @@ function love.draw()
     love.graphics.push()
     do
         love.graphics.setCanvas()
+        love.graphics.clear(0, 0, 0, 1)
         love.graphics.setColor(1, 1, 1)
 
         local shaders = global:GetVariable("ScreenShaders") or {}

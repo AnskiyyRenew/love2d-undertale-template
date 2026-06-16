@@ -374,6 +374,18 @@ function sprites.CreateSpriteAtlas(path, x, y, w, h, layer)
                     sprite.xscale, sprite.yscale, sprite.xpivot * sprite.width, sprite.ypivot * sprite.height,
                     sprite.xshear, sprite.yshear)
             else
+                if not sprite.shaders.use then
+                    local shader = getSmoothPixelShader()
+                    sprite.image:setFilter("linear", "linear")
+                    shader:send("texture_pixel_size", {
+                        1 / sprite.image:getWidth(),
+                        1 / sprite.image:getHeight()
+                    })
+                    love.graphics.setShader(shader)
+                else
+                    sprite.image:setFilter("nearest", "nearest")
+                end
+
                 love.graphics.draw(sprite.image, sprite.quad, sprite.x, sprite.y, math.rad(sprite.rotation),
                     sprite.xscale, sprite.yscale, sprite.xpivot * sprite.width, sprite.ypivot * sprite.height,
                     sprite.xshear, sprite.yshear)
@@ -522,13 +534,13 @@ function sprites.clear()
 
             sprite.image = nil
 
-            if sprites.smoothPixelShader and sprites.smoothPixelShader.release then
-                sprites.smoothPixelShader:release()
-                sprites.smoothPixelShader = nil
-            end
-
             table.remove(sprites.images, i)
         end
+    end
+
+    if sprites.smoothPixelShader and sprites.smoothPixelShader.release then
+        sprites.smoothPixelShader:release()
+        sprites.smoothPixelShader = nil
     end
 
     for path, img in pairs(sprites.imageCache) do
