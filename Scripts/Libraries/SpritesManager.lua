@@ -528,8 +528,12 @@ function sprites.clear()
                 end
             end
 
-            sprite.image:release()
-            sprite:Destroy()
+            sprite.image = nil
+
+            if sprites.smoothPixelShader and sprites.smoothPixelShader.release then
+                sprites.smoothPixelShader:release()
+                sprites.smoothPixelShader = nil
+            end
 
             table.remove(sprites.images, i)
         end
