@@ -3,6 +3,23 @@ local sprites = {
 }
 sprites.imageCache = {}
 
+local function getImage(path)
+    if (not sprites.imageCache[path]) then
+        sprites.imageCache[path] = love.graphics.newImage("Resources/Sprites/" .. path)
+        sprites.imageCache[path]:setFilter("nearest", "nearest")
+    end
+    return sprites.imageCache[path]
+end
+
+sprites.smoothPixelShader = nil
+
+local function getSmoothPixelShader()
+    if (not sprites.smoothPixelShader) then
+        sprites.smoothPixelShader = love.graphics.newShader("Scripts/Shaders/smooth_pixel.frag")
+    end
+    return sprites.smoothPixelShader
+end
+
 local rectangulation = require("Scripts.Libraries.PerfectPixel")
 
 local functions = {
@@ -31,8 +48,7 @@ local functions = {
         self.yshear = y
     end,
     Set = function(self, path)
-        self.image = love.graphics.newImage("Resources/Sprites/" .. path)
-        self.image:setFilter("nearest", "nearest")
+        self.image = getImage(path)
         self.imagedata = love.image.newImageData("Resources/Sprites/" .. path)
 
         -- Change path and realName
@@ -190,13 +206,7 @@ function sprites.CreateSprite(path, layer)
     sprite.parent = nil
     sprite.realName = sprite.path:sub(1, #sprite.path - 4)
     sprite.isBullet = false
-    if (sprites.imageCache[sprite.path]) then
-        sprite.image = sprites.imageCache[sprite.path]
-    else
-        sprites.imageCache[sprite.path] = love.graphics.newImage("Resources/Sprites/" .. sprite.path)
-        sprites.imageCache[sprite.path]:setFilter("nearest", "nearest")
-        sprite.image = sprites.imageCache[sprite.path]
-    end
+    sprite.image = getImage(sprite.path)
     sprite.imagedata = love.image.newImageData("Resources/Sprites/" .. sprite.path)
     sprite.layer = layer
     sprite.dust = {
