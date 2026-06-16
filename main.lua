@@ -174,62 +174,65 @@ function love.draw()
     love.graphics.clear(true, true, true)
 
     love.graphics.push()
+    do
+        gui.draw()
 
-    gui.draw()
+        _CAMERA_:apply()
+        love.graphics.setColor(1, 1, 1)
 
-    _CAMERA_:apply()
-    love.graphics.setColor(1, 1, 1)
-
-    if (scenes.current) then
-        if (not scenes.current.PRIORITY) then
-            if scenes.current and scenes.current.draw then
-                scenes.current.draw()
-            end
-            layers.sort()
-        else
-            layers.sort()
-            if scenes.current and scenes.current.draw then
-                scenes.current.draw()
+        if (scenes.current) then
+            if (not scenes.current.PRIORITY) then
+                if scenes.current and scenes.current.draw then
+                    scenes.current.draw()
+                end
+                layers.sort()
+            else
+                layers.sort()
+                if scenes.current and scenes.current.draw then
+                    scenes.current.draw()
+                end
             end
         end
+
+        _CAMERA_:reset()
     end
-
-    _CAMERA_:reset()
-
     love.graphics.pop()
 
     love.graphics.push()
-    love.graphics.setCanvas()
-    love.graphics.translate(draw_x, draw_y)
-    love.graphics.scale(scale, scale)
-    love.graphics.setColor(1, 1, 1)
-
-    local shaders = global:GetVariable("ScreenShaders") or {}
-
-    if (#shaders > 0) then
-        local source = CANVAS
-        local target = INTERMEDIATE_CANVAS
-
-        love.graphics.push()
-        love.graphics.origin()
-
-        for _, shader in ipairs(shaders) do
-            love.graphics.setCanvas(target)
-            love.graphics.clear()
-
-            love.graphics.setShader(shader)
-            love.graphics.draw(source)
-            love.graphics.setShader()
-
-            source, target = target, source
-        end
-
-        love.graphics.pop()
-
+    do
         love.graphics.setCanvas()
-        love.graphics.draw(source)
-    else
-        love.graphics.draw(CANVAS)
+        love.graphics.translate(draw_x, draw_y)
+        love.graphics.scale(scale, scale)
+        love.graphics.setColor(1, 1, 1)
+
+        local shaders = global:GetVariable("ScreenShaders") or {}
+
+        if (#shaders > 0) then
+            local source = CANVAS
+            local target = INTERMEDIATE_CANVAS
+
+            love.graphics.push()
+            do
+                love.graphics.origin()
+
+                for _, shader in ipairs(shaders) do
+                    love.graphics.setCanvas(target)
+                    love.graphics.clear()
+
+                    love.graphics.setShader(shader)
+                    love.graphics.draw(source)
+                    love.graphics.setShader()
+
+                    source, target = target, source
+                end
+            end
+            love.graphics.pop()
+
+            love.graphics.setCanvas()
+            love.graphics.draw(source)
+        else
+            love.graphics.draw(CANVAS)
+        end
     end
     love.graphics.pop()
 end
