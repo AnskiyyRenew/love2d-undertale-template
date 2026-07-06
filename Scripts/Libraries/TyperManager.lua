@@ -214,7 +214,7 @@ local functions_instant = {
             local fontkey = piece.font .. "_" .. piece.size
             local font = typer.fontCache and typer.fontCache[fontkey]
             if not font then
-                font = love.graphics.newFont("Resources/Fonts/" .. piece.font, piece.size)
+                font = love.graphics.newFont("Resources/Fonts/" .. piece.font, piece.size, "mono")
                 font:setFilter("nearest", "nearest")
                 if typer.fontCache then
                     typer.fontCache[fontkey] = font
@@ -393,6 +393,9 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
     typer.sentenceFinished = false
     typer.autoLefttime = 150
     typer.allowCtrlSkip = false
+    typer.outline = false
+    typer.outlinedepth = 1
+    typer.outlinecolor = {0, 0, 0}
 
     -- resource.
     typer.fonts = {"determination_mono.ttf", "simsun.ttc"}
@@ -437,7 +440,7 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
     local function getFont(fontname, size)
         local key = fontname .. "_" .. tostring(size)
         if (not typer.fontCache[key]) then
-            local font = love.graphics.newFont("Resources/Fonts/" .. fontname, size)
+            local font = love.graphics.newFont("Resources/Fonts/" .. fontname, size, "mono")
             font:setFilter("nearest", "nearest")
             typer.fontCache[key] = font
         end
@@ -641,6 +644,27 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
                             elseif (command_head == "speed") then
                                 typer.sleep = 4 / tonumber(command_body)
                                 typer.time = 0
+                            elseif (command_head == "outline") then
+                                typer.outline = true
+
+                                local elements = {}
+                                for element in string.gmatch(command_body, "[^,]+") do
+                                    table.insert(elements, element)
+                                end
+                                if (#elements == 1) then -- HEX
+                                    typer.outlinecolor = {
+                                        tonumber("0x" .. elements[1]:sub(1, 2)) / 255,
+                                        tonumber("0x" .. elements[1]:sub(3, 4)) / 255,
+                                        tonumber("0x" .. elements[1]:sub(5, 6)) / 255
+                                    }
+                                else
+                                    typer.outlinecolor = {
+                                        tonumber("0x" .. elements[1]:sub(1, 2)) / 255,
+                                        tonumber("0x" .. elements[1]:sub(3, 4)) / 255,
+                                        tonumber("0x" .. elements[1]:sub(5, 6)) / 255
+                                    }
+                                    typer.outlinedepth = tonumber(elements[2])
+                                end
                             elseif (command_head == "effect") then
                                 typer.effect.name = command_body:sub(1, command_body:find(",") - 1)
                                 typer.effect.intensity = tonumber(command_body:sub(command_body:find(",") + 1, -1))
@@ -722,6 +746,8 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
                                 typer.canvoice = false
                             elseif (command_all == "canskip") then
                                 typer.canskip = true
+                            elseif (command_all == "outline") then
+                                typer.outline = false
                             elseif (command_all == "next") then
                                 if (typer.sentence < #typer.sentences) then
                                     typer.sentence = typer.sentence + 1
@@ -885,6 +911,32 @@ function typers.CreateText(sentences, position, layer, bubblesize, progressmode)
                             angle, sx, sy
                         )
                     end
+                    if (typer.outline) then
+                        love.graphics.setColor(typer.outlinecolor)
+                        for d = 1, typer.outlinedepth
+                        do
+                            love.graphics.draw(
+                                char,
+                                x - d, y,
+                                angle, sx, sy
+                            )
+                            love.graphics.draw(
+                                char,
+                                x + d, y,
+                                angle, sx, sy
+                            )
+                            love.graphics.draw(
+                                char,
+                                x, y - d,
+                                angle, sx, sy
+                            )
+                            love.graphics.draw(
+                                char,
+                                x, y + d,
+                                angle, sx, sy
+                            )
+                        end
+                    end
                     love.graphics.setColor(letter.color)
                     love.graphics.draw(
                         char,
@@ -940,7 +992,7 @@ function typers.DrawText(text, position, layer)
     local function getFont(fontname, size)
         local key = fontname .. "_" .. tostring(size)
         if not typer.fontCache[key] then
-            local font = love.graphics.newFont("Resources/Fonts/" .. fontname, size)
+            local font = love.graphics.newFont("Resources/Fonts/" .. fontname, size, "mono")
             font:setFilter("nearest", "nearest")
             --font:setFilter("linear", "linear")
             typer.fontCache[key] = font

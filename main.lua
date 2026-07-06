@@ -95,6 +95,7 @@ function love.load()
     startTime = love.timer.getTime()
     math.randomseed(os.time())
     love.graphics.setBackgroundColor(0, 0, 0)
+    love.graphics.setDefaultFilter("nearest", "nearest")
 
     -- If it's mobile player, then fullscreen automatically
     if (love.system.getOS() == "Android" or love.system.getOS() == "iOS") then

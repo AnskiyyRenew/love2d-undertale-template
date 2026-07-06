@@ -88,7 +88,17 @@ if (not USE_ERRHANDLER) then
     return
 end
 
-function love.errhand(msg)
+print("Configuration loaded. Engine version: " .. _VERSION)
+local smallFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 16)
+local mainFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 20)
+local dogangle = 0
+local dogs = {
+    "spr_tinypombark_0", "spr_tinypomjump_0", "spr_tinypomsad_0", "spr_tinypomsadbark_0", "spr_tinypomwag_0",
+    "spr_tinypomwag_1", "spr_tinypomwalk_0", "spr_tinypomwalk_1"
+}
+local tdog = love.graphics.newImage("Resources/Sprites/Attacks/Dogs/" .. dogs[math.random(#dogs)] .. ".png")
+tdog:setFilter("nearest", "nearest")
+function love.errorhandler(msg)
 
     love.audio.stop()
 
@@ -100,14 +110,6 @@ function love.errhand(msg)
     msg = tostring(msg)
     local major, minor, revision = love.getVersion()
     local version_num = major * 10000 + minor * 100 + revision
-
-    local dogangle = 0
-    local dogs = {
-        "spr_tinypombark_0", "spr_tinypomjump_0", "spr_tinypomsad_0", "spr_tinypomsadbark_0", "spr_tinypomwag_0",
-        "spr_tinypomwag_1", "spr_tinypomwalk_0", "spr_tinypomwalk_1"
-    }
-    local tdog = love.graphics.newImage("Resources/Sprites/Attacks/Dogs/" .. dogs[math.random(#dogs)] .. ".png")
-    tdog:setFilter("nearest", "nearest")
 
     local debugInfo = {
         LOVEversion = version_num,
@@ -155,9 +157,6 @@ function love.errhand(msg)
             love.graphics.reset()
             love.graphics.setColor(1, 1, 1)
             love.graphics.clear(0.15, 0.1, 0.15)
-
-            local smallFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 16)
-            local mainFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 20)
 
             love.graphics.setColor(1, 1, 1, 1)
             love.graphics.draw(tdog, 200, 40, math.rad(dogangle), 1, 1, 54 / 2, 38 / 2)

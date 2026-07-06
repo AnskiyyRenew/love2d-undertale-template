@@ -2,13 +2,21 @@ local sprites = {
     images = {}
 }
 sprites.imageCache = {}
+sprites.imageDataCache = {}
 
 local function getImage(path)
     if (not sprites.imageCache[path]) then
-        sprites.imageCache[path] = love.graphics.newImage("Resources/Sprites/" .. path)
+        sprites.imageCache[path] = love.graphics.newImage("Resources/Sprites/" .. path, { mipmaps = true })
         sprites.imageCache[path]:setFilter("nearest", "nearest")
     end
     return sprites.imageCache[path]
+end
+
+local function getImageData(path)
+    if (not sprites.imageDataCache[path]) then
+        sprites.imageDataCache[path] = love.image.newImageData("Resources/Sprites/" .. path)
+    end
+    return sprites.imageDataCache[path]
 end
 
 sprites.smoothPixelShader = nil
@@ -49,7 +57,8 @@ local functions = {
     end,
     Set = function(self, path)
         self.image = getImage(path)
-        self.imagedata = love.image.newImageData("Resources/Sprites/" .. path)
+        self.image:setFilter("nearest", "nearest")
+        self.imagedata = getImageData(path)
 
         -- Change path and realName
         self.path = path
@@ -208,7 +217,8 @@ function sprites.CreateSprite(path, layer)
     sprite.realName = sprite.path:sub(1, #sprite.path - 4)
     sprite.isBullet = false
     sprite.image = getImage(sprite.path)
-    sprite.imagedata = love.image.newImageData("Resources/Sprites/" .. sprite.path)
+    sprite.image:setFilter("nearest", "nearest")
+    sprite.imagedata = getImageData(sprite.path)
     sprite.layer = layer
     sprite.dust = {
         use = false,
@@ -282,6 +292,12 @@ function sprites.CreateSprite(path, layer)
         love.graphics.setColor(sprite.color)
         sprite.width = sprite.image:getWidth()
         sprite.height = sprite.image:getHeight()
+
+        if (sprite.parent) then
+            local parentX, parentY = sprite.parent.x, sprite.parent.y
+            sprite.x = parentX + sprite.relx
+            sprite.y = parentY + sprite.rely
+        end
         local drawX = sprite.x or 0
         local drawY = sprite.y or 0
         local drawR = math.rad(sprite.rotation or 0)
@@ -439,12 +455,6 @@ function sprites.Update(dt)
                     sprite.animation.frames = {}
                 end
             end
-        end
-
-        if (sprite.parent) then
-            local parentX, parentY = sprite.parent.x, sprite.parent.y
-            sprite.x = parentX + sprite.relx
-            sprite.y = parentY + sprite.rely
         end
 
         if (sprite.dust.use) then

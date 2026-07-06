@@ -9,6 +9,14 @@ local functions = {
         shell.target.width = w
         shell.target.height = h
     end,
+    ResizeTime = function (shell, width, height, time)
+        local w = (width >= 16) and width or 16
+        local h = (height >= 16) and height or 16
+        shell.target.width = w
+        shell.target.height = h
+        shell.speed.width = math.abs(shell.width - w) / time * 15
+        shell.speed.height = math.abs(shell.height - h) / time * 15
+    end,
     MoveTo = function(shell, x, y)
         shell.x = x
         shell.y = y

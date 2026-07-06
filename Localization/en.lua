@@ -1,5 +1,5 @@
 return {
-    EncounterText = "* You encountered nothing!",
+    EncounterText = "[outline:9900ff, 2]* You encountered nothing!",
     Enemies = {
         Poseur = {
             Name = "Poseur",
