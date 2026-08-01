@@ -1,319 +1,251 @@
+-- Init
+love = require("love")
 if (not _RELEASED) then
     if (love.system.getOS() == "Windows") then
         local handle = io.popen("chcp 65001", "r")
-        handle:close()
+        if (handle) then
+            handle:close()
+        end
     end
 end
+require("Scripts.Libraries.Engine.PathDefiner")
+SE = ImportFile("Engine.FuncProtector")
+print("Configuration loaded, engine version: " .. _VER)
+print("配置已加载成功，引擎版本:             " .. _VER .. "\n")
 
 -- Libraries
-global = require("Scripts.Libraries.GlobalVariables")
-maths = require("Scripts.Libraries.Utils.Mathematics")
-collisions = require("Scripts.Libraries.Collisions")
-keyboard = require("Scripts.Libraries.Keyboard")
-masks = require("Scripts.Libraries.MaskManager")
-audio = require("Scripts.Libraries.AudioManager")
-layers = require("Scripts.Libraries.Utils.Layers")
-sprites = require("Scripts.Libraries.SpritesManager")
-typers = require("Scripts.Libraries.TyperManager")
-scenes = require("Scripts.Libraries.SceneManager")
-tween = require("Scripts.Libraries.Tween")
-windows = require("Scripts.Libraries.Utils.Windows")
-gui = require("Scripts.Libraries.GUIManager")
-luaex = require("Scripts.Libraries.Utils.LuaExtended")
+Global = ImportFile("Global")
+Collisions = ImportFile("Collisions")
+Tween = ImportFile("Tween")
+Masks = ImportFile("Masks")
+Camera = ImportFile("Camera"):New()
+Audio = ImportFile("Audio")
+Keyboard = ImportFile("Keyboard")
+Scenes = ImportFile("SceneManager")
+Layers = ImportFile("Layers")
+Sprites = ImportFile("Sprites")
+Typers = ImportFile("Typers")
+Debugger = ImportFile("Engine.Debugger")
+Localize = ImportFile("Localize")
+Localize.setFile("zh_CN")
+Gamejolt = ImportFile("GamejoltAPI")
 
-local lang_order = { "en", "zh_CN" }
-local lang_index = 1
-global:SetVariable("LANGUAGE", "en") -- Default language is Chinese. You can change it to "en" for English.
-localize = require("Localization." .. global:GetVariable("LANGUAGE"))
-require("Localization.LOCALIZE")
-require("Scripts.Libraries.Overworld.ConfigData")
+-- Limits
+--[[
+    The following are foolproof design measures: 
+    if the number of images/typewriter entries/audio files you create exceeds this limit,
+    you will be automatically notified.
+    If it exceeds twice the limit, creation will begin to be blocked.
 
--- Canvases
-CANVAS = nil
-INTERMEDIATE_CANVAS = nil
+    Under normal circumstances, we do not need this many resources,
+    so if you are blocked, please check whether the recycling function
+    has any vulnerabilities.
+]]
+Global.SetVariable("SE_MEMORY_SAFETY", true)    -- DANGEROUS
+Global.SetVariable("OPT_COUNT_SPRITES", 2000)
+Global.SetVariable("OPT_COUNT_TYPERS", 300)
+Global.SetVariable("OPT_MEMORY_MAXSIZE", 0.8)
+Global.SetVariable("OPT_LRU_SPRITES", {true, 180})      -- Unit: seconds. If this time is exceeded without using the texture, it will be removed from the cache according to the LRU algorithm to free up space.
+local guard = ImportFile("Engine.MemorySafety")
 
-local canvas_w = 0
-local canvas_h = 0
+-- Initialize
+Global.SetVariable("UseRealTime(dt)", true)
+--Global.SetVariable("MainColor", SE.tools.hexColor("#6B0684"))
+Global.SetVariable("MainColor", {1, 1, 1})
+Global.SetVariable("ScreenShaders", {})
+Global.SetVariable("FPS", 60)
+Global.SetVariable("F2Room", "scene_logo")
+Global.SetVariable("Volume", {
+    Master = 1,
+    Music  = 1,
+    Sounds = 1
+})
 
-local function newCanvas(w, h)
-    local canvas = love.graphics.newCanvas(w, h, nil, {
+local frameTime = 1 / Global.GetVariable("FPS")
+local startTime = SE.timer.getTime()
+
+local scene_
+Scenes.switchTo("scene_logo")
+
+ScreenScale = 1
+DrawX, DrawY = 0, 0
+local MAIN_CANVAS, INTERMEDIATE_CANVAS
+local function updateScreenScale()
+    local screen_w, screen_h = SE.graphics.getDimensions()
+    ScreenScale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
+    DrawX = math.floor((screen_w - CANVAS_WIDTH * ScreenScale) * 0.5 + 0.5)
+    DrawY = math.floor((screen_h - CANVAS_HEIGHT * ScreenScale) * 0.5 + 0.5)
+end
+
+function love.load()
+    scene_ = Scenes.current
+
+    MAIN_CANVAS = SE.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, nil, {
         format = "stencil",
         readable = true
     })
-    canvas:setFilter("nearest", "nearest")
-    return canvas
+    MAIN_CANVAS:setFilter("nearest", "nearest")
+
+    INTERMEDIATE_CANVAS = SE.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, nil, {
+        format = "stencil",
+        readable = true
+    })
+    INTERMEDIATE_CANVAS:setFilter("nearest", "nearest")
+
+    updateScreenScale()
 end
 
-local function ensureCanvases()
-    local w = math.max(1, math.floor(screen_w + 0.5))
-    local h = math.max(1, math.floor(screen_h + 0.5))
-
-    if CANVAS and canvas_w == w and canvas_h == h then return end
-    if CANVAS and CANVAS.release then CANVAS:release() end
-    if INTERMEDIATE_CANVAS and INTERMEDIATE_CANVAS.release then INTERMEDIATE_CANVAS:release() end
-
-    CANVAS = newCanvas(w, h)
-    INTERMEDIATE_CANVAS = newCanvas(w, h)
-    canvas_w = w
-    canvas_h = h
-end
-
--- Global variables
-global:SetVariable("FPS", 60)
-global:SetVariable("ScreenShaders", {})
-global:SetVariable("LAYER", 30)
-global:SetVariable("EncounterNobody", false)
-local reset_room = "scene_logo"
-
--- Display configuration
-local Camera = require("Scripts.Libraries.Utils.Camera")
-_CAMERA_ = Camera:new(0, 0, 1, 1, 0)
-
--- Screen variables
-
-local function updateScreenLayout()
-    screen_w, screen_h = love.graphics.getDimensions()
-    if (FILL_SCREEN) then
-        scale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
-    else
-        scale = 1
-    end
-    draw_x = math.floor((screen_w - CANVAS_WIDTH * scale) * 0.5 + 0.5)
-    draw_y = math.floor((screen_h - CANVAS_HEIGHT * scale) * 0.5 + 0.5)
-end
-
-updateScreenLayout()
-ensureCanvases()
-
--- Frame rate control
-local frameTime = 1 / global:GetVariable("FPS")
-local startTime
-
--- Main Love2D callbacks
-function love.load()
-    -- Initialization
-    startTime = love.timer.getTime()
-    math.randomseed(os.time())
-    love.graphics.setBackgroundColor(0, 0, 0)
-    love.graphics.setDefaultFilter("nearest", "nearest")
-
-    -- If it's mobile player, then fullscreen automatically
-    if (love.system.getOS() == "Android" or love.system.getOS() == "iOS") then
-        love.window.setFullscreen(true, "desktop")
-        updateScreenLayout()
-        ensureCanvases()
-    end
-
-    --[[if (love.system.openURL) then
-        if (love.system.getOS() == "Windows") then
-            os.execute("start \"\" \"" .. love.filesystem.getSaveDirectory() .. "/testplaceholder\"")
-        else
-            love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/testplaceholder")
-        end
-    end]]
-
-    -- Scene loading
-    local success, err = pcall(function()
-        scenes.switchTo(reset_room) -- Start with the logo scene.
-    end)
-
-    if (not success) then
-        error(err)
-    end
-end
-
-local time = 0
-local printed = false
 function love.update(dt)
-    -- Reload the current scene when the trigger file exists.
-    if (not _RELEASED) then
-        local trigger = io.open(".reload_trigger", "r")
-        if (trigger) then
-            trigger:close()
-            os.remove(".reload_trigger")
-            scenes.switchTo(scenes.name_current)
-        end
-    end
+    -- Libraries
+    guard.Update(dt)
+    Keyboard.Update()
+    Tween.Update(dt)
+    Sprites.Update(dt)
+    Typers.Update(dt)
+    Audio.Update(dt)
+    Debugger.Update()
+    Gamejolt.update(dt)
 
-    -- These are the libraries' update functions.
-    keyboard.Update()
-    gui.update(dt)
-    sprites.Update(dt)
-    typers.Update()
-    tween.Update(dt)
-    if (scenes.current) then
-        if (scenes.current.update) then
-            scenes.current.update(dt)
-        end
-    end
-    _CAMERA_:update(dt)
+    scene_ = Scenes.current
+    if (scene_.update and not scene_.pausing) then scene_.update(dt) end
 
-    -- The following code is used to limit the frame rate of the game.
-    frameTime = 1 / global:GetVariable("FPS")
-    local endTime = love.timer.getTime()
+    -- Frame Rate Control
+    frameTime = 1 / Global.GetVariable("FPS")
+    local endTime = SE.timer.getTime()
     local elapsedTime = endTime - startTime
     if (elapsedTime < frameTime) then
         local sleepTime = frameTime - elapsedTime
-        love.timer.sleep(sleepTime - 0.001)
-        while (love.timer.getTime() - startTime < frameTime) do end
+        SE.timer.sleep(sleepTime - 0.001)
+        while (SE.timer.getTime() - startTime < frameTime) do end
     end
-    startTime = love.timer.getTime()
-
-    -- The following code is used to update the audio manager.
-    audio.Update()
-end
-
-function love.resize(w, h)
-    updateScreenLayout()
-    ensureCanvases()
-    screen_w, screen_h = w, h
+    startTime = SE.timer.getTime()
 end
 
 function love.draw()
-    updateScreenLayout()
-    ensureCanvases()
+    SE.graphics.setCanvas({MAIN_CANVAS, stencil = true})
+    SE.graphics.clear(0, 0, 0, 1)
 
-    love.graphics.setCanvas({ CANVAS, stencil = true })
-    love.graphics.clear(0, 0, 0, 1, true, true)
-
-    love.graphics.push()
-    do
-        love.graphics.translate(draw_x, draw_y)
-        love.graphics.scale(scale, scale)
-
-        gui.draw()
-
-        _CAMERA_:apply()
-        love.graphics.setColor(1, 1, 1)
-
-        if (scenes.current) then
-            if (not scenes.current.PRIORITY) then
-                if scenes.current and scenes.current.draw then
-                    scenes.current.draw()
-                end
-                layers.sort()
-            else
-                layers.sort()
-                if scenes.current and scenes.current.draw then
-                    scenes.current.draw()
-                end
-            end
-        end
-
-        _CAMERA_:reset()
+    Camera:apply()
+    Layers.draw()
+    if (scene_.draw) then
+        scene_.draw()
     end
-    love.graphics.pop()
+    Camera:unload()
 
-    love.graphics.push()
-    do
-        love.graphics.setCanvas()
-        love.graphics.clear(0, 0, 0, 1)
-        love.graphics.setColor(1, 1, 1)
+    local shaders = Global.GetVariable("ScreenShaders") or {}
+    local source = MAIN_CANVAS
+    local target = INTERMEDIATE_CANVAS
 
-        local shaders = global:GetVariable("ScreenShaders") or {}
-
-        if (#shaders > 0) then
-            local source = CANVAS
-            local target = INTERMEDIATE_CANVAS
-
-            love.graphics.push()
-            do
-                love.graphics.origin()
-
-                for _, shader in ipairs(shaders) do
-                    love.graphics.setCanvas(target)
-                    love.graphics.clear()
-
-                    love.graphics.setShader(shader)
-                    love.graphics.draw(source)
-                    love.graphics.setShader()
-
-                    source, target = target, source
-                end
-            end
-            love.graphics.pop()
-
-            love.graphics.setCanvas()
-            love.graphics.draw(source)
-        else
-            love.graphics.draw(CANVAS)
+    if (#shaders > 0) then
+        for i, shader in ipairs(shaders) do
+            SE.graphics.setCanvas(target)
+            SE.graphics.clear(0, 0, 0, 0)
+            SE.graphics.setShader(shader)
+            SE.graphics.draw(source)
+            SE.graphics.setShader()
+            source, target = target, source
         end
     end
-    love.graphics.pop()
+
+    SE.graphics.setCanvas()
+    SE.graphics.clear(0, 0, 0, 1)
+
+    SE.graphics.push()
+    SE.graphics.translate(DrawX, DrawY)
+    SE.graphics.scale(ScreenScale, ScreenScale)
+
+    SE.graphics.setColor(1, 1, 1, 1)
+    SE.graphics.draw(source)
+
+    SE.graphics.pop()
+
+    Debugger.Draw()
 end
 
-function love.keypressed(key)
-    -- This is the main key pressed function.
-    -- It is called when a key is pressed.
-    -- However, we already have a key pressed function in the keyboard library.
-    if (scenes.current) then
-        if (scenes.current.keypressed) then
-            scenes.current.keypressed(key)
-        end
-    end
-    local os_name = love.system.getOS()
-    if (os_name ~= "Android" and os_name ~= "iOS") then
-        if (key == "f4") then
-            love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
-            updateScreenLayout()
-            ensureCanvases()
-        end
-    end
-    if (key == "f2") then
-        _CAMERA_:setPosition(0, 0)
-        scenes.switchTo(reset_room)
-    end
+function love.keypressed(key, scancode, isrepeat)
+    if (key == "f4") then
+        local fullscreen = SE.window.getFullscreen()
+        SE.window.setFullscreen(not fullscreen, "desktop")
 
+        updateScreenScale()
+        if (scene_.resize) then
+            local w, h = SE.graphics.getDimensions()
+            scene_.resize(w, h)
+        end
+        return
+    elseif (key == "f2") then
+        Localize.reload()
+        Scenes.switchTo(Global.GetVariable("F2Room"))
+    end
     if (not _RELEASED) then
-        -- Reload the current scene
-        if (key == "f7") then
-            scenes.switchTo(scenes.name_current)
-        elseif (key == "f8") then
-            -- Language switching for testing
-            lang_index = lang_index % #lang_order + 1
-            local new_lang = lang_order[lang_index]
-            global:SetVariable("LANGUAGE", new_lang)
-            localize = require("Localization." .. global:GetVariable("LANGUAGE"))
+        if (key == "f5") then
+            Localize.reload()
+            local sceneName = Scenes.name_current
+            package.loaded["Scripts.Scenes." .. sceneName] = nil
+            Scenes.switchTo(sceneName)
+            return
+        elseif (key == "f6") then
+            print("=== Debug Info ===")
+            print("FPS:", Global.GetVariable("FPS"))
+            print("Screen:", love.graphics.getDimensions())
+            print("Scale:", ScreenScale)
+            print("Scene:", Scenes.name_current)
+            print("Sprites:", #Sprites.images)
+            print("Layers objects:", Layers.count())
+            print("==================")
+            return
         end
     end
+
+    if (scene_.keypressed and not scene_.pausing) then scene_.keypressed(key, scancode, isrepeat) end
 end
 
-function love.mousepressed(x, y, button)
-    -- This is the main mouse pressed function.
-    -- It is called when a mouse button is pressed.
-    gui.mousepressed(x, y, button)
-    if (scenes.current) then
-        if (scenes.current.mousepressed) then
-            scenes.current.mousepressed(x, y, button)
-        end
-    end
+function love.keyreleased(key, scancode)
+    if (scene_.keyreleased and not scene_.pausing) then scene_.keyreleased(key, scancode) end
 end
 
-function love.mousereleased(x, y, button)
-    -- This is the main mouse released function.
-    -- It is called when a mouse button is released.
-    gui.mousereleased(x, y, button)
-    if (scenes.current) then
-        if (scenes.current.mousereleased) then
-            scenes.current.mousereleased(x, y, button)
-        end
-    end
+function love.textinput(text)
+    if (scene_.textinput and not scene_.pausing) then scene_.textinput(text) end
 end
 
-function love.touchpressed(id, x, y, dx, dy, pressure)
-    keyboard.TouchPressed(id, x, y)
+function love.mousepressed(x, y, button, istouch, presses)
+    if (scene_.mousepressed and not scene_.pausing) then scene_.mousepressed(x, y, button, istouch, presses) end
 end
 
-function love.touchmoved(id, x, y, dx, dy, pressure)
-    keyboard.TouchMoved(id, x, y)
+function love.mousereleased(x, y, button, istouch, presses)
+    if (scene_.mousereleased and not scene_.pausing) then scene_.mousereleased(x, y, button, istouch, presses) end
 end
 
-function love.touchreleased(id, x, y, dx, dy, pressure)
-    keyboard.TouchReleased(id, x, y)
+function love.mousemoved(x, y, dx, dy, istouch)
+    if (scene_.mousemoved and not scene_.pausing) then scene_.mousemoved(x, y, dx, dy, istouch) end
 end
 
--- This function is called when the game is closed.
--- It is used to clear any resources used by the game.
--- It is also used to save any data needed by the game.
+function love.wheelmoved(x, y)
+    if (scene_.wheelmoved and not scene_.pausing) then scene_.wheelmoved(x, y) end
+end
+
+function love.focus(f)
+    if (scene_.focus and not scene_.pausing) then scene_.focus(f) end
+end
+
+function love.resize(w, h)
+    updateScreenScale()
+    if (scene_.resize and not scene_.pausing) then scene_.resize(w, h) end
+end
+
+function love.visible(v)
+    if (scene_.visible and not scene_.pausing) then scene_.visible(v) end
+end
+
+function love.filedropped(file)
+    if (scene_.filedropped and not scene_.pausing) then scene_.filedropped(file) end
+end
+
+function love.directorydropped(dir)
+    if (scene_.directorydropped and not scene_.pausing) then scene_.directorydropped(dir) end
+end
+
 function love.quit()
+    print("quitting")
+    if (scene_.quit) then scene_.quit() end
 end

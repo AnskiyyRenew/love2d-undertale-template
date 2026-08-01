@@ -1,53 +1,45 @@
-local SCENE = {
-    PRIORITY = true,
-    SAVESHADERS = true
-}
+local scene = {}
 
-audio.ClearAll()
-
-local logo = sprites.CreateSprite("Logo.png", 0)
-audio.PlaySound("snd_intro.ogg")
-
-local license = typers.DrawText("[scale=0.5][red]UNDERTALE  ©2015 Toby Fox", {5, 445}, 1)
-local license2 = typers.DrawText("[scale=0.5][purple]SOULENGINE ©2024 Clavo Sophame", {5, 460}, 1)
-local version = typers.DrawText("[scale=0.5]v" .. _VERSION, {-90, 460}, 1)
-local length = version:GetLettersSize()
-version.x = 640 - length - 5
-_CAMERA_:setAngle(0)
-_CAMERA_:setPosition(0, 0)
-
+local logo = Sprites.CreateSprite("Logo.png")
 local time = 0
-local text_alpha = 0
+local alpha = 0
 
-function SCENE.load()
-end
+Audio.PlaySound("snd_intro.ogg")
+local font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13, "mono")
+font:setFilter("nearest", "nearest")
 
-function SCENE.update(dt)
-    if (keyboard.GetState("confirm") == 1) then
-        scenes.switchTo("Battle/scene_battle")
-    end
+local tip = SE.graphics.newFont("Resources/Fonts/Mars Needs Cunnilingus.ttf", 13, "mono")
+tip:setFilter("nearest", "nearest")
 
+function scene.update(dt)
     time = time + 1
     if (time >= 180 and time % 60 == 0) then
-        text_alpha = 1 - text_alpha
+        alpha = 1 - alpha
+    end
+
+    if (Keyboard.GetState("confirm") == 1) then
+        Scenes.switchTo("Battle.scene_battle_init")
     end
 end
 
-local tfont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13)
-tfont:setFilter("nearest", "nearest")
-function SCENE.draw()
-    love.graphics.push()
-        love.graphics.setColor(1, 1, 1, text_alpha)
-        love.graphics.setFont(tfont)
-        love.graphics.print("[Press z or enter]", 250, 320)
-    love.graphics.pop()
+function scene.draw()
+    SE.graphics.setFont(font)
+    SE.graphics.setColor(0.4, 0.4, 0.4, alpha)
+    SE.graphics.printf("[PRESS Z OR ENTER]", 0, 320, 640, "center")
+
+    SE.graphics.setFont(font)
+    SE.graphics.setColor(1, 0, 0, 1)
+    SE.graphics.printf("Undertale By Toby Fox © 2015", 0, 445, 640, "left")
+
+    SE.graphics.setColor(0.4, 0, 1, 1)
+    SE.graphics.printf("SoulEngine By Anskiyy © 2024", 0, 460, 640, "left")
+
+    SE.graphics.setColor(1, 1, 1, 1)
+    SE.graphics.printf(_VER, 0, 460, 640, "right")
 end
 
-function SCENE.clear()
-    tfont:release()
-
-    layers.clear()
-    audio.ClearAll()
+function scene.clear()
+    Layers.clear()
 end
 
-return SCENE
+return scene

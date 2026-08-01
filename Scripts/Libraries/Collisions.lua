@@ -4,14 +4,33 @@ function collisions.FollowShape(sprite)
     local data_tab = {}
 
     local x, y = sprite.x, sprite.y
-    local w, h = sprite.width * sprite.xscale, sprite.height * sprite.yscale
-    local angle = sprite.rotation
-    local xpivot, ypivot = sprite.xpivot, sprite.ypivot
+    local width, height = sprite.width, sprite.height
+    local xscale, yscale = sprite.xscale or 1, sprite.yscale or 1
+    local w, h = width * xscale, height * yscale
+    local angle = sprite.rotation or 0
 
-    local screenX, screenY = love.graphics.transformPoint(x, y)
+    -- Use the same pivot logic as Sprites.lua's GetPivotOffset():
+    -- pixel pivots take priority, otherwise proportional pivots.
+    local ox, oy
+    if (sprite.xpivot_px and sprite.xpivot_px ~= 0) or (sprite.ypivot_px and sprite.ypivot_px ~= 0) then
+        ox, oy = sprite.xpivot_px or 0, sprite.ypivot_px or 0
+    else
+        ox, oy = (sprite.xpivot or 0.5) * width, (sprite.ypivot or 0.5) * height
+    end
+
+    -- Offset from the pivot point to the image center, in scaled world units.
+    -- Sprites are rendered at (sprite.x, sprite.y) in WORLD space (the camera
+    -- transform is applied separately at draw time), so collision shapes must
+    -- stay in world space too -- do NOT pass through love.graphics.transformPoint.
+    local dx = (width * 0.5 - ox) * xscale
+    local dy = (height * 0.5 - oy) * yscale
+
+    local rad = math.rad(angle)
+    local cosA, sinA = math.cos(rad), math.sin(rad)
+
     data_tab = {
-        x = screenX + w * (0.5 - xpivot) * math.cos(math.rad(angle)) - h * (0.5 - ypivot) * math.sin(math.rad(angle)),
-        y = screenY + h * (0.5 - ypivot) * math.cos(math.rad(angle)) + w * (0.5 - xpivot) * math.sin(math.rad(angle)),
+        x = x + dx * cosA - dy * sinA,
+        y = y + dx * sinA + dy * cosA,
         w = math.abs(w),
         h = math.abs(h),
         angle = angle
@@ -137,20 +156,17 @@ end
 function collisions.RectangleWithCircle(rectangle, circle)
 
     local rHalfDiag = math.sqrt(rectangle.w^2 + rectangle.h^2) / 2
-    local cHalfDiag = math.sqrt(circle.w^2 + circle.h^2) / 2  -- circle.w/h 是直径
+    local cHalfDiag = math.sqrt(circle.w^2 + circle.h^2) / 2
     local dx = rectangle.x - circle.x
     local dy = rectangle.y - circle.y
     if dx*dx + dy*dy > (rHalfDiag + cHalfDiag)^2 then
-        return false  -- 连包围圆都不碰，直接跳过
+        return false
     end
 
-    -- 检测点是否在矩形内（矩形以原点为中心，方向为 (cos,sin)）
     local function p2r(w, h, cos, sin, dx, dy)
         return math.abs(dx*cos + dy*sin)*2 <= w and math.abs(-dx*sin + dy*cos)*2 <= h
     end
 
-    -- 求椭圆 x²/a² + y²/b² = 1 与过原点直线 p*x + q*y = 0 的交点（取 x≥0 的一侧）
-    -- 即椭圆在矩形某条轴方向上的极值点
     local function solve(a, b, p, q)
         if q == 0 then
             return 0, b
@@ -162,14 +178,10 @@ function collisions.RectangleWithCircle(rectangle, circle)
         end
     end
 
-    -- 检测点是否在椭圆内
     local function p2e(a, b, x, y)
         return (x*x)/(a*a) + (y*y)/(b*b) <= 1
     end
 
-    -- 【新增】检测线段 P→Q 是否与椭圆 x²/a² + y²/b² = 1 的边界相交
-    -- 将线段参数化为 P + t*(Q-P)，代入椭圆方程得关于 t 的二次方程，
-    -- 判断是否存在 t ∈ [0,1] 的实数根
     local function segmentIntersectsEllipse(a, b, px, py, qx, qy)
         local dx, dy = qx - px, qy - py
         local A = dx*dx/(a*a) + dy*dy/(b*b)
@@ -184,31 +196,23 @@ function collisions.RectangleWithCircle(rectangle, circle)
         return (t1 >= 0 and t1 <= 1) or (t2 >= 0 and t2 <= 1)
     end
 
-    -- 椭圆（原点，半轴 a/b，轴对齐）与矩形（中心 (x,y)，宽 w 高 h，方向 (cos,sin)）的碰撞检测
     local function ellipseToRectangle(a, b, x, y, w, h, cos, sin)
-        -- 椭圆在矩形两条轴方向上的极值点（各取正负两侧，共4点）
         local x1, y1 = solve(a, b, -sin/(a*a), cos/(b*b))
         local x2, y2 = solve(a, b, cos/(a*a), sin/(b*b))
 
-        -- 矩形的宽/高方向向量（全长）
         local wx, wy = w*cos, w*sin
         local hx, hy = -h*sin, h*cos
 
-        -- 检测1：椭圆极值点是否在矩形内
         if p2r(w,h, cos,sin, x-x1,y-y1) then return true end
         if p2r(w,h, cos,sin, x-x2,y-y2) then return true end
         if p2r(w,h, cos,sin, x+x1,y+y1) then return true end
         if p2r(w,h, cos,sin, x+x2,y+y2) then return true end
 
-        -- 检测2：矩形4个顶点是否在椭圆内
         if p2e(a,b, x-(wx+hx)/2, y-(wy+hy)/2) then return true end
         if p2e(a,b, x-(-wx+hx)/2, y-(-wy+hy)/2) then return true end
         if p2e(a,b, x-(-wx-hx)/2, y-(-wy-hy)/2) then return true end
         if p2e(a,b, x-(wx-hx)/2, y-(wy-hy)/2) then return true end
 
-        -- 检测3：矩形4条边是否与椭圆边界相交
-        -- （修复漏检：椭圆边缘穿过矩形边，但极值点不在矩形内、顶点也不在椭圆内的情况）
-        -- 4个顶点坐标
         local c1x, c1y = x + wx/2 + hx/2, y + wy/2 + hy/2
         local c2x, c2y = x - wx/2 + hx/2, y - wy/2 + hy/2
         local c3x, c3y = x - wx/2 - hx/2, y - wy/2 - hy/2

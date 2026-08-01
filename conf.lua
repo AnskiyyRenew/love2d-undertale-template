@@ -1,16 +1,17 @@
 -- Soul Engine Configuration File
-_VERSION = "2.5.3-stable"
+_VERSION = "Lua 5.1"
+_VER = "3.0.0-stable"
 
 -- Set to true when building the game for release
 _RELEASED = false
 
 -- The game's information
 _INFO = {
-    TITLE = "SOUL ENGINE",
-    VERSION = "0.0.0", -- THIS IS YOUR GAME'S VERSION, the "_VERSION" upon means the engine's version.
-    AUTHOR = "Clavo Sophame",
+    TITLE = "Soul Engine - v3.0.0",
+    VERSION = "0.0.0", -- THIS IS YOUR GAME'S VERSION, the "_VER" upon means the engine's version.
+    AUTHOR = "end",
     CONTACT = "NaN",
-    WEBSITE = "NaN"
+    WEBSITE = "NaN",
 }
 
 -- This is your window size. Change these values to set your desired resolution.
@@ -22,16 +23,16 @@ FILL_SCREEN = true
 
 -- Enable error handler to show custom error screen
 -- If you don't know which error crashed the game. Then you need to set it to false.
-USE_ERRHANDLER = true
+USE_ERRHANDLER = false
 
 function love.conf(t)
     t.identity = nil                    -- 保存目录的名称（字符串）
     t.appendidentity = false            -- 在保存目录之前搜索源目录中的文件（布尔值）
-    t.version = "11.5"                  -- 此游戏制作的 LÖVE 版本（字符串）
+    t.version = "12.0"                  -- 此游戏制作的 LÖVE 版本（字符串）
     t.console = not _RELEASED           -- 附加控制台（布尔值，仅限 Windows）
     t.accelerometerjoystick = true      -- 将其展现为为 Joystick ，从而启用 iOS 和 Android 上的加速度计（布尔值）
     t.externalstorage = false           -- 在 Android 上将文件保存（并从保存目录读取）在外部存储中（布尔值）
-    t.gammacorrect = false              -- 当系统支持时，对渲染启用伽马校正（布尔值）
+    t.graphics.gammacorrect = false              -- 当系统支持时，对渲染启用伽马校正（布尔值）
 
     t.audio.mic = false                 -- 在 Android 上请求并使用麦克风功能（布尔值）
     t.audio.mixwithsystem = false       -- 打开 LOVE 时保持后台音乐播放（布尔值，仅限 iOS 和 Android）
@@ -50,10 +51,10 @@ function love.conf(t)
     t.window.msaa = 0                   -- 使用多采样抗锯齿的样本数（数字）
     t.window.depth = nil                -- 深度缓冲区中每个样本的位数
     t.window.stencil = nil              -- 模板缓冲区中每个样本的位数
-    t.window.display = 1                -- 显示窗口的监视器索引（数字）
-    t.window.highdpi = false            -- 在Retina显示器上启用高 DPI 模式（布尔值）
-    t.window.usedpiscale = true         -- 当 highdpi 设置为 true 时启用自动 DPI 缩放（布尔值）
-    t.window.dpiscale = nil
+    t.window.displayindex = 1                -- 显示窗口的监视器索引（数字）
+    t.highdpi = false            -- 在Retina显示器上启用高 DPI 模式（布尔值）
+    t.window.usedpiscale = false         -- 当 highdpi 设置为 true 时启用自动 DPI 缩放（布尔值）
+    t.window.dpiscale = 1
     t.window.x = nil                    -- 窗口在指定显示中的 x 坐标位置（数字）
     t.window.y = nil                    -- 窗口在指定显示中的 y 坐标位置（数字）
 
@@ -77,50 +78,35 @@ function love.conf(t)
     t.modules.window = true             -- 启用窗口模块（布尔值）
 end
 
-if (not _RELEASED) then
-    if (love.system.getOS() == "Windows") then
-        local handle = io.popen("chcp 65001", "r")
-        handle:close()
-    end
-end
-
 if (not USE_ERRHANDLER) then
     return
 end
 
-print("Configuration loaded. Engine version: " .. _VERSION)
-local smallFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 16)
-local mainFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 20)
 local dogangle = 0
+local tdog = nil
 local dogs = {
     "spr_tinypombark_0", "spr_tinypomjump_0", "spr_tinypomsad_0", "spr_tinypomsadbark_0", "spr_tinypomwag_0",
     "spr_tinypomwag_1", "spr_tinypomwalk_0", "spr_tinypomwalk_1"
 }
-local tdog = love.graphics.newImage("Resources/Sprites/Attacks/Dogs/" .. dogs[math.random(#dogs)] .. ".png")
-tdog:setFilter("nearest", "nearest")
+local smallFont, mainFont
+
 function love.errorhandler(msg)
 
     love.audio.stop()
 
-    screen_w, screen_h = love.graphics.getDimensions()
-    scale = math.min(screen_w / 640, screen_h / 480)
-    draw_x = math.floor((screen_w - 640 * scale) * 0.5 + 0.5)
-    draw_y = math.floor((screen_h - 480 * scale) * 0.5 + 0.5)
-
     msg = tostring(msg)
     local major, minor, revision = love.getVersion()
     local version_num = major * 10000 + minor * 100 + revision
-
     local debugInfo = {
         LOVEversion = version_num,
         system = love.system.getOS(),
         time = os.date("%Y-%m-%d %H:%M:%S"),
-        version = _VERSION .. " - " .. _INFO.VERSION,
+        version = _VER .. " - " .. _INFO.VERSION,
         memory = string.format("%.2f MB", collectgarbage("count") / 1024),
         renderer = love.graphics.getRendererInfo()
     }
 
-    local debugStr = "\n\n--- DEBUG INFORMATION ---\n"
+    local debugStr = "\n\n\n"
     for k, v in pairs(debugInfo) do
         debugStr = debugStr .. string.format("%s: %s\n", k, tostring(v))
     end
@@ -153,13 +139,35 @@ function love.errorhandler(msg)
         end
 
         if (love.graphics and love.graphics.isActive()) then
-            dogangle = dogangle + 0.1
+            dogangle = dogangle + 0.01
             love.graphics.reset()
             love.graphics.setColor(1, 1, 1)
             love.graphics.clear(0.15, 0.1, 0.15)
 
+            -- The dog sprite is loaded lazily here, NOT during conf.lua load time:
+            -- love.graphics is nil while conf.lua runs (modules load afterwards),
+            -- so loading it there used to crash conf.lua before love.errorhandler
+            -- could even be defined.
+            if (not tdog) then
+                local dogFile = "Resources/Sprites/Attacks/Dogs/" .. dogs[math.random(#dogs)] .. ".png"
+                local ok, img = pcall(love.graphics.newImage, dogFile)
+                if (ok) then
+                    tdog = img
+                    tdog:setFilter("nearest", "nearest")
+                end
+            end
+
+            if (not smallFont) then
+                smallFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13, "mono")
+                mainFont = love.graphics.newFont("Resources/Fonts/determination_mono.ttf", 20, "mono")
+                smallFont:setFilter("nearest", "nearest")
+                mainFont:setFilter("nearest", "nearest")
+            end
+
             love.graphics.setColor(1, 1, 1, 1)
-            love.graphics.draw(tdog, 200, 40, math.rad(dogangle), 1, 1, 54 / 2, 38 / 2)
+            if (tdog) then
+                love.graphics.draw(tdog, 200, 40, math.rad(dogangle), 1, 1, 54 / 2, 38 / 2)
+            end
 
             love.graphics.setFont(mainFont)
             love.graphics.setColor(1, 0.3, 0.3)
@@ -173,7 +181,7 @@ function love.errorhandler(msg)
             love.graphics.printf("Error:\n"..msg, 30, 85, love.graphics.getWidth() - 60)
 
             love.graphics.setColor(0.6, 0.8, 1)
-            --love.graphics.printf(debugStr, 30, 160, love.graphics.getWidth() - 60)
+            love.graphics.printf(debugStr, 30, 220, love.graphics.getWidth() - 60, "right")
 
             love.graphics.setColor(0.5, 0.8, 0.5)
             love.graphics.printf("Press ALT+F4 quit the game", 30, 45, love.graphics.getWidth() - 60, "right")

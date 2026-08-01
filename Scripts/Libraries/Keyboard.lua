@@ -10,7 +10,7 @@ local Keyboard = {
     touchToMouse = false,    -- if true, first active touch will simulate "mouse1" (via simulatedKeys)
 }
 
--- 0, 1, 2, -1
+-- states: 0 (released), 1 (just pressed), 2 (held), -1 (just released)
 for i = 97, 122, 1
 do
     table.insert(Keyboard.keys, {id = string.char(i), state = 0, pressed = false, pressaux = false})
@@ -108,26 +108,26 @@ Keyboard.Bind("arrows", "up", "down", "left", "right")
 Keyboard.Bind("letter", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
 Keyboard.Bind("number", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 
---- 将屏幕坐标转换为游戏世界坐标
----@param sx number screen x (像素)
----@param sy number screen y (像素)
+--- Convert screen coordinates to game world coordinates
+---@param sx number screen x (pixels)
+---@param sy number screen y (pixels)
 ---@return number, number world x,y
 function Keyboard.ScreenToWorld(sx, sy)
-    local s = scale -- 你项目的全局 scale 变量
-    local x = sx - (draw_x or 0)
-    local y = sy - (draw_y or 0)
-    x = x / s + (_CAMERA_ and _CAMERA_.x or 0)
-    y = y / s + (_CAMERA_ and _CAMERA_.y or 0)
+    local s = ScreenScale
+    local x = sx - (DrawX or 0)
+    local y = sy - (DrawY or 0)
+    x = x / s + (Camera and Camera.x or 0)
+    y = y / s + (Camera and Camera.y or 0)
     return x, y
 end
 
---- 启用 / 禁用把第一个触点映射到 mouse1（默认 false）
+--- Enable / disable mapping the first touch to mouse1 (default false)
 ---@param bool boolean
 function Keyboard.EnableTouchToMouse(bool)
     Keyboard.touchToMouse = not not bool
 end
 
---- 当触摸开始时（在 love.touchpressed 中调用）
+--- When a touch starts (call this in SE.touchpressed)
 ---@param id any
 ---@param sx number screen x
 ---@param sy number screen y
@@ -139,7 +139,7 @@ function Keyboard.TouchPressed(id, sx, sy)
     t.pressed = true
     Keyboard.touches[id] = t
 
-    -- 可选：把第一个触点映射为 mouse1（使用 simulatedKeys，这样不会干扰 love.mouse）
+    -- Optional: map the first touch to mouse1 (using simulatedKeys so it doesn't interfere with SE.mouse)
     if Keyboard.touchToMouse then
         -- only map if no other simulated mouse1 currently from touch
         if not Keyboard.simulatedKeys["__touch_mouse1"] or not Keyboard.simulatedKeys["__touch_mouse1"].pressed then
@@ -150,14 +150,14 @@ function Keyboard.TouchPressed(id, sx, sy)
     end
 end
 
---- 当触摸移动时（在 love.touchmoved 中调用）
+--- When a touch moves (call this in SE.touchmoved)
 ---@param id any
 ---@param sx number
 ---@param sy number
 function Keyboard.TouchMoved(id, sx, sy)
     local t = Keyboard.touches[id]
     if not t then
-        -- 如果之前没有记录（某些平台可能只发 moved），创建它
+        -- If it wasn't recorded before (some platforms may only send moved), create it
         t = { id = id, pressed = true, pressaux = false, state = 1 }
         Keyboard.touches[id] = t
     end
@@ -166,7 +166,7 @@ function Keyboard.TouchMoved(id, sx, sy)
     t.x, t.y = Keyboard.ScreenToWorld(sx, sy)
 end
 
---- 当触摸结束时（在 love.touchreleased 中调用）
+--- When a touch ends (call this in SE.touchreleased)
 ---@param id any
 ---@param sx number
 ---@param sy number
@@ -190,7 +190,7 @@ function Keyboard.TouchReleased(id, sx, sy)
     end
 end
 
---- 返回某触点的世界坐标与状态
+--- Return the world coordinates and state of a given touch
 ---@param id any
 function Keyboard.GetTouch(id)
     local t = Keyboard.touches[id]
@@ -198,7 +198,7 @@ function Keyboard.GetTouch(id)
     return t.x, t.y, t.state, t
 end
 
---- 返回当前所有触点的浅拷贝表（便于遍历）
+--- Return a shallow copy of all current touches (for easy iteration)
 ---@return table
 function Keyboard.GetTouches()
     local out = {}
@@ -224,9 +224,9 @@ local function updateTouchStates()
         end
 
         -- optional: cleanup old released touches after they've been -1 then 0 for a frame
-        -- keep them around for a short time if you want; 这里我们在 state == 0 且 pressaux == false 时删除
+        -- keep them around for a short time if you want; here we remove them when state == 0 and pressaux == false
         if t.state == 0 and not t.pressed and (not t.keep) then
-            -- remove to avoid unbounded growth (如果你希望继续读到之前的触点，删掉这行)
+            -- remove to avoid unbounded growth (if you want to keep reading previous touches, delete this line)
             Keyboard.touches[id] = nil
         end
     end
@@ -320,13 +320,13 @@ end
 ---It doesn't matter if the game is scaled or not, it will always return the position in the game world.
 ---@return number, number
 function Keyboard.GetMousePosition()
-    local scale = scale
-    local x, y = love.mouse.getPosition()
-    x = x - draw_x
+    local ScreenScale = ScreenScale
+    local x, y = SE.mouse.getPosition()
+    x = x - DrawX
 
     -- Transform the position with CAMERA
-    x = x / scale + _CAMERA_.x
-    y = y / scale + _CAMERA_.y
+    x = x / ScreenScale + Camera.x - 320
+    y = y / ScreenScale + Camera.y - 240
     return x, y
 end
 
@@ -404,7 +404,7 @@ function Keyboard.Update()
     do
         if (type(v.id) == "string") then
             if (not string.find(v.id, "mouse")) then
-                if (love.keyboard.isDown(v.id)) then
+                if (SE.keyboard.isDown(v.id)) then
                     v.pressed = true
                 else
                     v.pressed = false
@@ -424,7 +424,7 @@ function Keyboard.Update()
                     v.pressaux = v.pressed
                 end
             else
-                if (love.mouse.isDown(v.id:sub(-1))) then
+                if (SE.mouse.isDown(v.id:sub(-1))) then
                     v.pressed = true
                 else
                     v.pressed = false

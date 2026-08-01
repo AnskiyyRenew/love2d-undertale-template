@@ -2,8 +2,8 @@
 
 local gamejolt = {}
 
-local md5 = require("Scripts.Libraries.Utils.MD5")
-local json = require("Scripts.Libraries.Utils.dkjson")
+local md5 = ImportFile("Utils.MD5")
+local json = ImportFile("Utils.dkjson")
 local https_ok, https_module = pcall(require, "https")
 local https = https_ok and https_module or nil
 local https_error = https_ok and nil or tostring(https_module)
@@ -13,7 +13,6 @@ gamejolt._session_auto = {
     interval = 30,
     status = "active",
     elapsed = 0,
-    installed = false,
     last_error = nil
 }
 
@@ -70,21 +69,6 @@ local function session_auto_tick(dt)
     end
 end
 
-local function install_session_auto_update()
-    if (gamejolt._session_auto.installed) then
-        return
-    end
-
-    local previous_update = love.update
-    love.update = function(dt, ...)
-        if (previous_update) then
-            previous_update(dt, ...)
-        end
-        session_auto_tick(dt)
-    end
-
-    gamejolt._session_auto.installed = true
-end
 
 ---Initializes the GameJolt API with the provided app ID and private key.
 ---@param app_id number|string
@@ -105,6 +89,10 @@ function gamejolt.is_available()
 
     local platform = (love and love.system and love.system.getOS and love.system.getOS()) or "Unknown"
     return false, "GameJolt API native HTTPS module is unavailable on "..tostring(platform)..": "..tostring(https_error or "missing native https module")
+end
+
+function gamejolt.is_loggedin()
+    return (gamejolt.user_token ~= nil and gamejolt.username ~= nil)
 end
 
 --------------------------------------------USERS--------------------------------------------
@@ -203,8 +191,6 @@ function gamejolt.session_update(interval, status)
     state.elapsed = 0
     state.last_error = nil
 
-    install_session_auto_update()
-
     local result, err = gamejolt.session_open()
     if (result == false) then
         state.enabled = false
@@ -213,6 +199,13 @@ function gamejolt.session_update(interval, status)
 
     state.enabled = true
     return true
+end
+
+---Manually ticks the session auto-ping mechanism.
+---Call this from your own love.update(dt) to keep the GameJolt session alive.
+---@param dt number
+function gamejolt.update(dt)
+    session_auto_tick(dt)
 end
 
 ---Pings the current session to keep it active or update its status.

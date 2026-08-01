@@ -1,3 +1,0 @@
-local atkpattern = {}
-
-return atkpattern

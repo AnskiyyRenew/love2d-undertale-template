@@ -1,0 +1,41 @@
+{
+  "Battle.SETRIO.Narration": "* 你遭遇到了Soul Engine\n  三人组！",
+
+  "Battle.Spare": "饶恕",
+  "Battle.Flee": "逃跑",
+
+  "Battle.WinTexts1": "* 你赢了！[wait:0.5]\n* 你获得了 %s XP 和 %s 金钱。\n",
+  "Battle.WinTexts2": "* 你的LOVE提升了！",
+
+  "Battle.GameoverText": ["* 我们的命运都\n  寄托于你...", "* %s![wait:0.5]\n  保持你的决心..."],
+  
+  "Battle.EnemiesName.Sol": "灵曦",
+  "Battle.EnemiesName.Sincera": "净语",
+  "Battle.EnemiesName.Spider": "知著",
+  "Battle.EnemiesName.Poseur": "颇似儿",
+  
+  "Battle.Actions.Names.Check": "查看",
+  "Battle.Actions.Names.Talk": "交谈",
+  "Battle.Actions.Names.Stare": "凝视",
+  "Battle.Actions.Names.Ignore": "无视",
+  "Battle.Actions.Names.Appreciate": "欣赏",
+  "Battle.Actions.Names.Knot": "打结",
+  "Battle.Actions.Names.Pose": "摆姿势",
+
+  "Battle.Actions.Texts.SOL.CHECK": ["* 灵曦[wait:0.5] - φ 攻击 φ 防御[wait:0.5]\n* 它是Soul Engine的第一个吉祥物。", "* 看起来像是一个正十二面体的框架。"],
+  "Battle.Actions.Texts.SOL.TALK": ["* 你试着和灵曦说话......\n* 它轻轻点了点头[wait:0.5]，\n  仿佛在处理你的话语。"],
+  "Battle.Actions.Texts.SOL.STARE": ["* 你凝视着灵曦，仿佛试图\n  揭开它的秘密......", "[noskip]* 它完成了一整圈旋转，\n  并且稍稍长大了一点！"],
+  "Battle.Actions.Texts.SOL.IGNORE": ["* 你无视了灵曦。\n* 灵曦看起来有点泄气。", "* 正十二面体的框架缩小了！"],
+
+  "Battle.Actions.Texts.SINCERA.CHECK": ["* 净语[wait:0.5] - 100 攻击 100 防御[wait:0.5]\n* 只是一面镜子。", "* 没那么有用。"],
+  "Battle.Actions.Texts.SINCERA.APPRECIATE1": ["* 你凝视着净语......\n* 感到有些困惑。"],
+  "Battle.Actions.Texts.SINCERA.APPRECIATE2": ["* 你对净语微笑，\n  净语也对你微笑。"],
+
+  "Battle.Actions.Texts.SPIDER.CHECK": ["* 知著？[wait:0.5] - 1 攻击 0 防御[wait:0.5]\n* 一只来自古代的蜘蛛。", "* 好吧，这只已经一岁了。"],
+  "Battle.Actions.Texts.SPIDER.TALK": ["* 你试着靠近蜘蛛\n  并和它说话......", "* 哦，我忘了问你\n  是不是怕蜘蛛。[func:Jser]", "* 哈哈，恶作剧好玩吗？"],
+  "Battle.Actions.Texts.SPIDER.KNOT": ["* 你在蜘蛛的丝线上\n  系了一个蝴蝶结......", "* 嗯，它又收紧成一条线了......", "* 看来这根丝线半途而废了。"],
+
+  "Battle.Actions.Texts.Poseur.Check": "* 颇似儿[wait:0.5] - 0 攻击 0 防御[wait:0.5]\n* 并不是我想要的。",
+  
+  "Items": {}
+}

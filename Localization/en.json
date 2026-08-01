@@ -1,0 +1,39 @@
+{
+  "Battle.Narration": "* You encountered Soul Engine\n  trio!",
+
+  "Battle.Spare": "Spare",
+  "Battle.Flee": "Flee",
+
+  "Battle.WinTexts1": "* You WON![wait:0.5]\n* You earned %s XP and %s Gold.\n",
+  "Battle.WinTexts2": "* Your LOVE increased!",
+  
+  "Battle.EnemiesName.Sol": "Sol",
+  "Battle.EnemiesName.Sincera": "Sincera",
+  "Battle.EnemiesName.Spider": "Spyder",
+  "Battle.EnemiesName.Poseur": "Poseur",
+  
+  "Battle.Actions.Names.Check": "Check",
+  "Battle.Actions.Names.Talk": "Talk",
+  "Battle.Actions.Names.Stare": "Stare",
+  "Battle.Actions.Names.Ignore": "Ignore",
+  "Battle.Actions.Names.Appreciate": "Appreciate",
+  "Battle.Actions.Names.Knot": "Knot",
+  "Battle.Actions.Names.Pose": "Pose",
+  
+  "Battle.Actions.Texts.SOL.CHECK": ["* Sol[wait:0.5] - φ ATK φ DEF[wait:0.5]\n* It is SoulEngine's first\n  mascot.", "* It looks like the framework\n  of a regular dodecahedron."],
+  "Battle.Actions.Texts.SOL.TALK": ["* You tried speaking to Sol...\n* It gives a slight nod[wait:0.5]\n  as if processing your words."],
+  "Battle.Actions.Texts.SOL.STARE": ["* You stare at Sol as if trying\n  to uncover its secrets...", "[noskip]* It completes one full\n  rotation, and grows just\n  a tiny bit!"],
+  "Battle.Actions.Texts.SOL.IGNORE": ["* You ignored Sol.\n* Sol looks a bit deflated.", "* The frame of the regular\n  dodecahedron has shrunk!"],
+
+  "Battle.Actions.Texts.SINCERA.CHECK": ["* Sincera[wait:0.5] - 100 ATK 100 DEF[wait:0.5]\n* Just a mirror.", "* Not that useful."],
+  "Battle.Actions.Texts.SINCERA.APPRECIATE1": ["* You stare at Sincera...\n* Feeling a bit puzzled."],
+  "Battle.Actions.Texts.SINCERA.APPRECIATE2": ["* You smile at Sincera, and\n  Sincera smiles back at you."],
+
+  "Battle.Actions.Texts.SPIDER.CHECK": ["* Spyder?[wait:0.5] - 1 ATK 0 DEF[wait:0.5]\n* A spider from ancient days.", "* This one is already a year\n  old."],
+  "Battle.Actions.Texts.SPIDER.TALK": ["* You try to move closer to the\n  spider and speak to it...", "* Oh, I forgot to ask whether\n  you're afraid of spiders.[func:Jser]", "* Haha, was the prank fun?"],
+  "Battle.Actions.Texts.SPIDER.KNOT": ["* You tied a bow around the\n  spider's silk thread...", "* Well, it tightened back into\n  a single line...", "* Looks like this silk\n  thread gave up halfway."],
+
+  "Battle.Actions.Texts.Poseur.Check": "* Poseur[wait:0.5] - 0 ATK 0 DEF[wait:0.5]\n* Not what I want.",
+  
+  "Items": {}
+}

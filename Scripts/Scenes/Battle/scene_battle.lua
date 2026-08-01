@@ -1,123 +1,121 @@
--- This is a template for creating a new scene in the game.
--- You can use this as a starting point for your own scenes.
-local SCENE = {}
-local b = require("Scripts.Libraries.Battle.BattleInit")
-battle = b.Init("Scripts.Libraries.Game.Encounter")
-atkp = require("Scripts.Libraries.Battle.Patterns.template")
-b.SetAtkPattern(atkp)
+local scene = {}
 
+-- Init layers
+Layers.new_layer("BOTTOM", -1000)
+Layers.new_layer("Background", -10)
+Layers.new_layer("UI", 0)
+Layers.new_layer("ArenasExtraW", 10)
+Layers.new_layer("ArenasExtraB", 10.01)
+Layers.new_layer("UponArena", 11)
+Layers.new_layer("BelowPlayer", 12)
+Layers.new_layer("Player", 13)
+Layers.new_layer("Bullets", 30)
+Layers.new_layer("ArenasCoverW", 50)
+Layers.new_layer("ArenasCoverB", 50.01)
+Layers.new_layer("TopAll", 60)
+Layers.new_layer("TOP", 1000)
+
+-- Import battle module
+Battle = ImportFile("Battle")
+Game = Battle.SetGame("TestMonster")
+
+-- Animations
+local sincera = require("Scripts.Game.Animations.Sincera")
+sincera.Init()
+local spyder = require("Scripts.Game.Animations.Spyder")
+spyder.Init()
+spyder.Line(520, 0)
+local sol = require("Scripts.Game.Animations.Sol")
+sol.Init()
+
+-- Register each enemy animation so attack patterns can trigger its Hurt()
+-- animation by the enemy's id. Safe even before those modules define Hurt().
+Battle.RegisterEnemyAnim("SINCERA", sincera)
+Battle.RegisterEnemyAnim("SPIDER", spyder)
+Battle.RegisterEnemyAnim("SOL", sol)
+
+function Jser()
+    spyder.JumpScare()
+end
+
+-- Handlers
+local sincera_ = 0
 local function HandleActions(enemy, action)
-    local battle = b.battle
-    if not battle or not battle.Enemies then return end
-    if not enemy or not enemy.actions then return end
-
-    for i = 1, #enemy.actions do
-        if (action == enemy.actions[i]) then
-            local dialogue = enemy.acttexts and enemy.acttexts[i]
-            if dialogue then
-                b.BattleDialogue(dialogue)
+    if (enemy.id == "SOL") then
+        if (action.id == "CHECK") then
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+        elseif (action.id == "TALK") then
+            sol.Bounce()
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+        elseif (action.id == "STARE") then
+            sol.Zoom(sol.cube.z - 200, 60)
+            sol.RotateFaster()
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+        elseif (action.id == "IGNORE") then
+            sol.Zoom(sol.cube.z + 200, 60)
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+        end
+    elseif (enemy.id == "SINCERA") then
+        if (action.id == "CHECK") then
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+        elseif (action.id == "APPRECIATE") then
+            sincera_ = sincera_ + 1
+            print(sincera_)
+            if (sincera_ == 1) then
+                Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts.SINCERA.APPRECIATE1"), "ACTIONSELECT")
+            else
+                Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts.SINCERA.APPRECIATE2"), "ACTIONSELECT")
             end
-            return
+        end
+    elseif (enemy.id == "SPIDER") then
+        if (action.id == "CHECK") then
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+        elseif (action.id == "TALK") then
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+        elseif (action.id == "KNOT") then
+            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
+            spyder.Bounce()
         end
     end
 end
 
-local function HandleItems(itemID)
-    local battle = b.battle
-    if not battle then return end
-    local inventory = battle.Inventory
-    local randomText = {
-        "* No."
-    }
+local function HandleFlee()
+    local p = (math.random() <= 0.75)
 
-    b.BattleDialogue({
-        "* You found an item...[wait:30]\n  [colorRGB:255, 255, 0]" .. itemID .. "!",
-        randomText[love.math.random(1, #randomText)]
-    })
-end
-
-local function HandleSpare()
-    b.battle.STATE = "ACTIONSELECT"
-end
-
-local nextwaves = {"wave_test1", "wave_test2", "wave_test3", "wave_test4"}
-b.battle.nextwave = "wave_test1"
-local waveProgress = 1
-local function DefenseEnding()
-    waveProgress = waveProgress + 1
-    if (waveProgress > #nextwaves) then waveProgress = 1 end
-    b.battle.nextwave = nextwaves[waveProgress]
-end
-
-local function EnteringState(new, old)
-end
-
-local function OnHit(Bullet)
-    local battle = b.battle
-    if not battle then return end
-    local mode = Bullet['HurtMode']
-    if (mode == "normal" or type(mode) == "nil") then
-        battle.Player.Hurt(1, 60, true)
-        b.AddKR(5)
-    elseif (mode == "cyan" or mode == "blue") then
-        if (keyboard.GetState("arrows") > 0) then
-            battle.Player.Hurt(1, 0, true)
-            b.AddKR(1)
-        end
-    elseif (mode == "orange") then
-        if (keyboard.GetState("arrows") <= 0) then
-            battle.Player.Hurt(1, 0, true)
-            b.AddKR(1)
-        end
-    elseif (mode == "green") then
-        battle.Player.Heal(1)
-        Bullet:Destroy()
+    if (p) then
+        Battle.ChangeState("FLEEING")
     end
 end
 
-b.HandleActions = HandleActions
-b.HandleItems   = HandleItems
-b.HandleSpare   = HandleSpare
-b.DefenseEnding = DefenseEnding
-b.EnteringStateInherited = EnteringState
-b.OnHit         = OnHit
-
-
-
-
-
--- This is a fake scene for testing purposes.
-function SCENE.load()
-    -- Load any resources needed for this scene here.
-    -- For example, you might load images, sounds, etc.
-end
-
--- This function is called to update the scene.
-function SCENE.update(dt)
-    -- Update any game logic for this scene here.
-    -- For example, you might update animations, handle input, etc.
-    if (b.GetSelectedEnemy() == 1 and b.GetState() == "ATTACKING") then
-        -- print("Selected Poseur")
-    end
+local function FleeUpdate(dt)
     
-    b.Update(dt)
 end
 
--- This function is called to draw the scene.
--- It is called after the main game loop has finished updating.
-function SCENE.draw()
-    -- Draw the scene here.
-    -- For example, you might draw images, text, etc.
-    b.Draw()
+local function EnteringState(oldstate, newstate)
+    Battle.defaultEnteringState(oldstate, newstate)
 end
 
--- This function is called when the scene is switched away from.
-function SCENE.clear()
-    -- Clear any resources used by this scene here.
-    -- For example, you might unload images, sounds, etc.
-    b.Clear()
-    package.loaded["Scripts.Libraries.Battle.BattleInit"] = nil
+
+
+
+Battle.HandleActions = HandleActions
+Battle.EnteringState = EnteringState
+Battle.HandleFlee = HandleFlee
+Battle.FleeUpdate = FleeUpdate
+
+
+
+
+
+function scene.update(dt)
+    Battle.Update(dt)
+    sol.Update(dt)
+    spyder.Update(dt)
 end
 
--- Don't touch this(just one line).
-return SCENE
+function scene.clear()
+    Layers.clear()
+    Battle.Clear()
+end
+
+return scene

@@ -1,3 +1,4 @@
+---@diagnostic disable: cast-local-type
 -- Module options:
 local always_use_lpeg = false
 local register_global_module_table = false

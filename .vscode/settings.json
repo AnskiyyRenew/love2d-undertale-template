@@ -4,14 +4,10 @@
     ],
     "Lua.diagnostics.disable": [
         "deprecated",
-        "redundant-parameter",
-        "undefined-doc-name",
-        "return-type-mismatch",
-        "lowercase-global",
-        "need-check-nil",
-        "cast-local-type",
-        "inject-field",
-        "undefined-field"
+        "undefined-doc-name"
     ],
-    "Lua.completion.autoRequire": false
+    "Lua.completion.autoRequire": false,
+    "Lua.runtime.special": {
+        "ImportFile": "require"
+    },
 }
