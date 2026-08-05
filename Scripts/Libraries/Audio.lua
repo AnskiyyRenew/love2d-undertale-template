@@ -259,6 +259,20 @@ function audio.Stop(inst)
     return inst
 end
 
+---@return nil
+function audio.Clear()
+    for _, inst in ipairs(audio.insts) do
+        if inst and inst.source then
+            pcall(function()
+                inst.source:stop()
+                inst.source:release()
+            end)
+        end
+    end
+
+    audio.insts = {}
+end
+
 ---@param inst table
 ---@param introEndTime number
 ---@param outroStartTime number
@@ -317,6 +331,7 @@ function audio.PlaySound(sound, volume, loop)
     source:setLooping(loop or false)
     source:play()
     inst.source = source
+    inst.name = audio._path_sound .. sound
 
     -- mark whether this instance is looping so Update can clean non-looping finished sources
     inst.loop = loop or false
@@ -340,6 +355,7 @@ function audio.PlayMusic(music, volume, loop)
     source:setLooping(loop ~= false)
     source:play()
     inst.source = source
+    inst.name = audio._path_music .. music
 
     -- mark whether this instance is looping so Update can clean non-looping finished sources
     inst.loop = loop ~= false
@@ -350,6 +366,16 @@ function audio.PlayMusic(music, volume, loop)
 
     table.insert(audio.insts, inst)
     return inst.source, inst
+end
+
+function audio.FindMusic(path)
+    for _, m in ipairs(audio.insts)
+    do
+        if (m.name == audio._path_music .. path) then
+            return true
+        end
+    end
+    return false
 end
 
 ---@param dt number

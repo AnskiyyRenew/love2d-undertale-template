@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="20" tileheight="20" infinite="1" nextlayerid="8" nextobjectid="39">
+ <editorsettings>
+  <export target="../main_scene/main_0.lua" format="lua"/>
+ </editorsettings>
+ <tileset firstgid="1" name="unnamed_3563" tilewidth="20" tileheight="20" tilecount="70" columns="7">
+  <image source="../images/Scene/True Lab/unnamed_3563.png" width="140" height="200"/>
+ </tileset>
+ <tileset firstgid="71" name="bed" tilewidth="50" tileheight="68" tilecount="2" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image source="../images/Scene/True Lab/spr_bed_dark_0.png" width="50" height="68"/>
+  </tile>
+  <tile id="1">
+   <image source="../images/Scene/True Lab/unnamed_3557.png" width="29" height="54"/>
+  </tile>
+ </tileset>
+ <layer id="1" name="图块层 1" width="30" height="20">
+  <data encoding="csv">
+   <chunk x="0" y="0" width="16" height="16">
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,8,29,30,31,9,9,10,11,12,9,10,11,12,9,10,
+1,15,36,37,38,16,16,17,18,19,16,17,18,19,16,17,
+1,22,43,44,45,23,23,24,25,26,23,24,25,26,23,24,
+1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+   <chunk x="16" y="0" width="16" height="16">
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+11,12,13,29,30,8,10,29,30,8,10,29,30,9,10,13,
+18,19,20,36,37,15,17,36,37,15,17,36,37,16,17,20,
+25,26,27,43,44,22,24,43,44,22,24,43,44,23,24,27,
+2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+   <chunk x="32" y="0" width="16" height="16">
+1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+29,30,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+36,37,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+43,44,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+  </data>
+ </layer>
+ <layer id="2" name="图块层 2" width="30" height="20">
+  <data encoding="csv">
+   <chunk x="0" y="0" width="16" height="16">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,32,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,39,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,46,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+   <chunk x="16" y="0" width="16" height="16">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,33,34,0,0,0,46,0,
+0,0,0,0,0,0,0,0,0,40,41,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,71,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+  </data>
+ </layer>
+ <objectgroup color="#00aaff" id="3" name="marks">
+  <object id="3" x="60" y="100">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="id" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="32" x="400" y="100">
+   <properties>
+    <property name="id" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="33" x="480" y="100">
+   <properties>
+    <property name="id" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="34" x="560" y="100">
+   <properties>
+    <property name="id" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="35" x="660" y="100">
+   <properties>
+    <property name="id" type="int" value="5"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup color="#aa55ff" id="4" name="warps" opacity="0.77">
+  <object id="2" x="40" y="60" width="40" height="19">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="19" x="380" y="60" width="40" height="19.125"/>
+  <object id="20" x="460" y="60" width="40" height="19.375"/>
+  <object id="21" x="540" y="60" width="40" height="18.75"/>
+  <object id="27" x="640" y="60" width="40" height="19"/>
+ </objectgroup>
+ <objectgroup color="#ffff00" id="7" name="saves">
+  <object id="30" x="480" y="140">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup color="#55ff7f" id="6" name="triggers" opacity="0.54">
+  <object id="8" x="20" y="100" width="20" height="20">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="9" x="160" y="40" width="40" height="20">
+   <properties>
+    <property name="rr" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="10" x="240" y="40" width="40" height="20">
+   <properties>
+    <property name="rr" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="11" x="320" y="40" width="40" height="20">
+   <properties>
+    <property name="rr" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="12" x="160" y="61.2337" width="40" height="20">
+   <properties>
+    <property name="id" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="13" x="240" y="61.2273" width="40" height="20">
+   <properties>
+    <property name="id" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="14" x="320" y="62" width="40" height="20">
+   <properties>
+    <property name="id" type="int" value="4"/>
+   </properties>
+  </object>
+  <object id="31" x="660" y="140" width="20" height="20">
+   <properties>
+    <property name="id" type="int" value="6"/>
+   </properties>
+  </object>
+  <object id="37" x="419.5" y="80" width="30" height="20.375">
+   <properties>
+    <property name="id" type="int" value="5"/>
+   </properties>
+  </object>
+  <object id="38" x="579.455" y="99.2727" width="52" height="60.7273">
+   <properties>
+    <property name="id" type="int" value="7"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup color="#aa557f" id="5" name="walls" opacity="0.53">
+  <object id="4" x="20" y="60" width="20" height="20"/>
+  <object id="6" x="80" y="60" width="300" height="20"/>
+  <object id="15" x="0" y="160" width="640" height="20"/>
+  <object id="16" x="420" y="60" width="40" height="20"/>
+  <object id="17" x="500" y="60" width="40" height="20"/>
+  <object id="23" x="0" y="60" width="20" height="100"/>
+  <object id="24" x="580" y="60" width="60" height="20"/>
+  <object id="25" x="680" y="60" width="20" height="120"/>
+  <object id="26" x="640" y="160" width="40" height="20"/>
+  <object id="28" x="580" y="100" width="50.5" height="60"/>
+  <object id="36" x="420" y="80" width="29.0145" height="20"/>
+ </objectgroup>
+</map>

@@ -69,6 +69,11 @@ function camera:unload()
 end
 
 function camera:reset()
+    self.min_x = nil
+    self.min_y = nil
+    self.max_x = nil
+    self.max_y = nil
+
     self.x = CANVAS_WIDTH / 2
     self.y = CANVAS_HEIGHT / 2
     self.w = CANVAS_WIDTH

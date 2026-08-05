@@ -1,4 +1,6 @@
 local scene = {}
+Audio.Clear()
+Camera:reset()
 
 local logo = Sprites.CreateSprite("Logo.png")
 local time = 0

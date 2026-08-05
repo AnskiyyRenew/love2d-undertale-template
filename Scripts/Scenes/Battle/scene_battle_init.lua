@@ -36,6 +36,13 @@ local function HandleActions(enemy, action)
     end
 end
 
+local function HandleItems(item)
+    print("Used " .. item.name)
+    Battle.BattleDialogue({
+        "* Wow"
+    }, "ACTIONSELECT")
+end
+
 local function HandleFlee()
     print("Flee")
 end
@@ -55,6 +62,7 @@ end
 
 -- Don't touch these.
 Battle.HandleActions = HandleActions
+Battle.HandleItems = HandleItems
 Battle.EnteringState = EnteringState
 Battle.HandleFlee = HandleFlee
 Battle.FleeUpdate = FleeUpdate

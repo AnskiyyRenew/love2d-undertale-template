@@ -271,6 +271,41 @@ local function state_behaviours_updater(dt)
             state.typers[choosing_action].x - 20,
             state.typers[choosing_action].y + 18
         )
+    elseif (s == "ITEMMENU") then
+        local items = game.items
+
+        if (Keyboard.GetState("right") == 1) then
+            if (items[choosing + 1]) then
+                choosing = math.min(#items, choosing + 1)
+                Audio.PlaySound("snd_menu_0.wav")
+            end
+        elseif (Keyboard.GetState("left") == 1) then
+            if (items[choosing - 1]) then
+                choosing = math.max(1, choosing - 1)
+                Audio.PlaySound("snd_menu_0.wav")
+            end
+        elseif (Keyboard.GetState("up") == 1) then
+            if (items[choosing - 2]) then
+                choosing = math.max(1, choosing - 2)
+                Audio.PlaySound("snd_menu_0.wav")
+            elseif (items[choosing - 1]) then
+                choosing = math.max(1, choosing - 1)
+                Audio.PlaySound("snd_menu_0.wav")
+            end
+        elseif (Keyboard.GetState("down") == 1) then
+            if (items[choosing + 2]) then
+                choosing = math.min(#items, choosing + 2)
+                Audio.PlaySound("snd_menu_0.wav")
+            elseif (items[choosing + 1]) then
+                choosing = math.min(#items, choosing + 1)
+                Audio.PlaySound("snd_menu_0.wav")
+            end
+        end
+
+        Player.sprite:MoveTo(
+            state.typers[choosing].x - 20,
+            state.typers[choosing].y + 18
+        )
     elseif (s == "MERCYMENU") then
         if (Keyboard.GetState("down") == 1) then
             choosing = math.min(choosing + 1, #state.typers)
@@ -371,6 +406,7 @@ function state.Update(dt)
 
                 Battle.selected_enemy_index = choosing_enemy
                 Battle.selected_action_index = choosing_action
+                Battle.selected_index = choosing
                 Battle.ChangeState(target_state)
 
                 -- When entering ATTACKING, skip the first updater frame

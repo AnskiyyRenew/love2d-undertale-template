@@ -14,6 +14,7 @@ print("Configuration loaded, engine version: " .. _VER)
 print("配置已加载成功，引擎版本:             " .. _VER .. "\n")
 
 -- Libraries
+LuaEX = ImportFile("Utils.LuaExtended")
 Global = ImportFile("Global")
 Collisions = ImportFile("Collisions")
 Tween = ImportFile("Tween")
@@ -65,7 +66,7 @@ local frameTime = 1 / Global.GetVariable("FPS")
 local startTime = SE.timer.getTime()
 
 local scene_
-Scenes.switchTo("scene_logo")
+Scenes.switchTo("Overworld.scene_ow_main_0")
 
 ScreenScale = 1
 DrawX, DrawY = 0, 0
@@ -105,6 +106,7 @@ function love.update(dt)
     Audio.Update(dt)
     Debugger.Update()
     Gamejolt.update(dt)
+    Camera:Update(dt)
 
     scene_ = Scenes.current
     if (scene_.update and not scene_.pausing) then scene_.update(dt) end

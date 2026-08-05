@@ -9,6 +9,7 @@ local battle = {
 
     selected_enemy_index = 0,
     selected_action_index = 0,
+    selected_index = 0,
     dialog_texts = nil,
 
     attack = ImportFile("Battle.PlayerAttacks.stick"),
@@ -56,6 +57,19 @@ local function defaultEnteringState(old, new)
         local enemy = battle.game.enemies[battle.selected_enemy_index]
         local action = enemy.actions[battle.selected_action_index]
         battle.HandleActions(enemy, action)
+    elseif (old == "ITEMMENU" and new == "DIALOGUERESULT") then
+        local item = battle.game.items[battle.selected_index]
+        battle.HandleItems(item)
+
+        for i = #battle.game.items, 1, -1
+        do
+            local item_ = battle.game.items[i]
+            if (item_.id == item.id) then
+                if (not item_._destroy) then
+                    table.remove(battle.game.items, i)
+                end
+            end
+        end
     end
     if (new == "DEFENDING") then
         battle.Defending()

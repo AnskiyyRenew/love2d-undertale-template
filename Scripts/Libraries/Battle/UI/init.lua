@@ -92,7 +92,7 @@ function ui.newBounceText(text, pos)
     pos[2] = pos[2] - 60
     local t = Typers.InstText.New(text, pos, "TopAll")
     t.bondfont = {
-        engfont = {font = "DAMAGEBACK.ttf", size = 32},
+        engfont = {font = "DAMAGEBACK.TTF", size = 32},
         non_engfont = {font = "simsun.ttc", size = 13},
         engfunc = function()
             t.scale = 1
@@ -155,7 +155,7 @@ function ui.newMissText(text, pos)
     pos[2] = pos[2] - 60
     local t = Typers.InstText.New(text, pos, "TopAll")
     t.bondfont = {
-        engfont = {font = "DAMAGEBACK.ttf", size = 32},
+        engfont = {font = "DAMAGEBACK.TTF", size = 32},
         non_engfont = {font = "simsun.ttc", size = 13},
         engfunc = function()
             t.scale = 1
