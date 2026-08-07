@@ -17,6 +17,11 @@ Available tags:
   [font:name]           Switch typing font to name (e.g. determination_mono.ttf).
   [effect:name, int]    Set typing effect (e.g. shake, 3).
   [outline:r,g,b,a,w]   Set outline color (r,g,b), alpha (a), and width (w).
+  [portrait:frames|interval|mode]
+                        Create a talking portrait. frames = comma-separated image
+                        paths, interval = seconds per frame (default 0.1), mode =
+                        "looponce" (default; plays once, returns to first frame).
+  [portrait:remove]     Remove/hide the portrait.
   [skip]                Mark this sentence for auto-skip (no colon/value needed).
   [func:name]           Call function `name()` from _G (global scope).
   [func:name|a, b, c]   Call function `name(a, b, c)` with arguments separated by commas.
@@ -241,6 +246,7 @@ end
 -- Helper: process a single [tag] and apply it to the typer.
 -- Returns true if the tag was recognized and applied.
 local function applyTag(typer, tag_name, tag_value)
+    tag_name = tag_name:lower()
     if (tag_name == "wait" and tag_value) then
         local val = tonumber(tag_value)
         if (val) then
@@ -255,7 +261,7 @@ local function applyTag(typer, tag_name, tag_value)
             typer.interval = val
         end
         return true
-    elseif (tag_name == "colorRGB" and tag_value) then
+    elseif (tag_name == "colorrgb" and tag_value) then
         local r_str, g_str, b_str = tag_value:match("([%d%.]+),%s*([%d%.]+),%s*([%d%.]+)")
         if (r_str) then
             local r_num = tonumber(r_str)
@@ -268,7 +274,7 @@ local function applyTag(typer, tag_name, tag_value)
             end
         end
         return true
-    elseif (tag_name == "colorHEX" and tag_value) then
+    elseif (tag_name == "colorhex" and tag_value) then
         local hex = tag_value:gsub("#", "")
         if (#hex >= 6) then
             local r = tonumber(hex:sub(1, 2), 16) / 255
@@ -281,6 +287,7 @@ local function applyTag(typer, tag_name, tag_value)
         return true
     elseif (tag_name == "font" and tag_value) then
         typer.font = tag_value
+        print(tag_value)
         return true
     elseif (tag_name == "effect" and tag_value) then
         local name, intensity = tag_value:match("([^,]+),%s*(.+)")
@@ -314,6 +321,55 @@ local function applyTag(typer, tag_name, tag_value)
     elseif (tag_name == "hidebubble") then
         typer:HideBubble()
         return true
+    elseif (tag_name == "portrait") then
+        -- Format:
+        --   [portrait:frame1.png, frame2.png, ...]                 default interval/mode
+        --   [portrait:frame1.png, frame2.png, ...|0.05]            custom interval
+        --   [portrait:frame1.png, frame2.png, ...|0.05|looponce]   custom interval + mode
+        --   [portrait:remove] / [portrait:hide]                    hide the portrait
+        if (tag_value) then
+            local lower = tag_value:lower()
+            if (lower == "remove" or lower == "hide" or lower == "clear" or lower == "none") then
+                typer:RemovePortrait()
+            else
+                local frames_part = tag_value
+                local interval = nil
+                local mode = nil
+
+                local pipe_pos = tag_value:find("|", 1, true)
+                if (pipe_pos) then
+                    frames_part = tag_value:sub(1, pipe_pos - 1)
+                    local rest = tag_value:sub(pipe_pos + 1)
+                    local pipe_pos2 = rest:find("|", 1, true)
+                    if (pipe_pos2) then
+                        interval = tonumber(rest:sub(1, pipe_pos2 - 1))
+                        mode = rest:sub(pipe_pos2 + 1)
+                        if (mode == "") then mode = nil end
+                    else
+                        interval = tonumber(rest)
+                    end
+                end
+
+                local files = {}
+                if (frames_part) then
+                    for file in frames_part:gmatch("[^,]+") do
+                        local trimmed = file:match("^%s*(.-)%s*$")
+                        if (trimmed and trimmed ~= "") then
+                            table.insert(files, trimmed)
+                        end
+                    end
+                end
+
+                if (#files > 0) then
+                    typer.portrait.files = files
+                    typer.portrait.interval = interval or (1 / 30)
+                    typer.portrait.mode = mode or "looponce"
+                    typer:SetupPortrait()
+                end
+            end
+        end
+        return true
+        
     elseif (tag_name == "func" and tag_value) then
         -- Format: [func:funcName] or [func:funcName|arg1, arg2, ...]
         local pipe_pos = tag_value:find("|", 1, true)
@@ -417,6 +473,24 @@ function typers.New(text, position, layer, size, mode)
     typer.x = (position[1] or 320)
     typer.y = (position[2] or 240)
     typer.size = (size or {640, 0})
+    typer.portrait = {
+        image = nil,
+        files = {},
+        index = {},
+        interval = 1 / 10,
+        mode = "looponce",
+        scale = {2, 2},
+        active = false,
+        offset_applied = false
+    }
+    -- Create the portrait sprite eagerly (placeholder px.png) so `portrait.image`
+    -- is always valid and can be read/configured at any time. `active` tells
+    -- whether a real portrait is currently being shown.
+    typer.portrait.image = Sprites.CreateSprite("px.png", typer.layer)
+    if (typer.portrait.image and typer.portrait.image.animation) then
+        typer.portrait.image:MoveTo(typer.x, typer.y + 55)
+        typer.portrait.image.visible = false
+    end
 
     if (type(text) == "string") then
         text = {text}
@@ -538,10 +612,56 @@ function typers.New(text, position, layer, size, mode)
         typer.bondfont = config
     end
 
+    function typer:SetupPortrait()
+        local portrait = typer.portrait
+        if (not portrait or not portrait.image) then return end
+
+        if (#portrait.files == 0) then
+            -- No real portrait frames -> deactivate (do not destroy the sprite).
+            portrait.active = false
+            portrait.image.visible = false
+            if (portrait.offset_applied) then
+                typer.x = typer.x - 70
+                portrait.offset_applied = false
+            end
+            return
+        end
+
+        if (not portrait.offset_applied) then
+            typer.x = typer.x + 70
+            portrait.offset_applied = true
+        end
+
+        portrait.active = true
+        portrait.image:MoveTo(typer.x - 70, typer.y + 55)
+        portrait.image:Scale(portrait.scale[1], portrait.scale[2])
+        portrait.image:SetAnimation(portrait.files, portrait.interval, portrait.mode)
+        portrait.image:Set(portrait.files[1]) -- show first frame immediately
+        portrait.image.visible = true
+    end
+
+    function typer:RemovePortrait()
+        local portrait = typer.portrait
+        if (not portrait) then return end
+        portrait.active = false
+        portrait.files = {}
+        if (portrait.image) then
+            portrait.image.visible = false
+        end
+        if (portrait.offset_applied) then
+            typer.x = typer.x - 70
+            portrait.offset_applied = false
+        end
+    end
+
     function typer:Destroy()
         typer:Reset()
         removeBubble(typer.bubble)
         typer.bubble = nil
+        if (typer.portrait and typer.portrait.image) then
+            typer.portrait.image:Destroy()
+            typer.portrait.image = nil
+        end
         if (typer._onComplete and type(typer._onComplete) == "function") then
             typer._onComplete()
         end
@@ -643,6 +763,7 @@ function typers.New(text, position, layer, size, mode)
                 end
 
                 if (counter <= sentence_len and typer.cantype) then
+                    if (typer._onUpdate and type(typer._onUpdate) == "function") then typer._onUpdate() end
                     if (typer.voices and #typer.voices > 0 and not typer.skip.skipping) then
                         Audio.PlaySound("/Voices/" .. typer.voices[math.random(#typer.voices)])
                     end
@@ -698,6 +819,15 @@ function typers.New(text, position, layer, size, mode)
                     typer.pos.offset[1] = typer.pos.offset[1] + typer.letters[new_index].width * (typer.scale or 1)
                     typer.pos.offset[2] = typer.pos.offset[2]
                     typer.letter_count = typer.letter_count + 1
+                    -- Trigger the talking portrait animation once per typed character.
+                    if (typer.portrait and typer.portrait.active and typer.portrait.image) then
+                        local panim = typer.portrait.image.animation
+                        if (panim and #panim.textures > 0) then
+                            panim.time = 0
+                            panim.frame = 1
+                            panim.done = false
+                        end
+                    end
                     typer.counter = counter + char_length
                     typer.time = 0
                     if (not typer.skip.skipping) then

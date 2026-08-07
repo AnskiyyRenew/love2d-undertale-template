@@ -67,6 +67,8 @@ local startTime = SE.timer.getTime()
 
 local scene_
 Scenes.switchTo("Overworld.scene_ow_main_0")
+--Scenes.switchTo("TEST.scene_typers")
+--Scenes.switchTo("scene_end")
 
 ScreenScale = 1
 DrawX, DrawY = 0, 0
@@ -106,10 +108,10 @@ function love.update(dt)
     Audio.Update(dt)
     Debugger.Update()
     Gamejolt.update(dt)
-    Camera:Update(dt)
 
     scene_ = Scenes.current
     if (scene_.update and not scene_.pausing) then scene_.update(dt) end
+    Camera:Update(dt)
 
     -- Frame Rate Control
     frameTime = 1 / Global.GetVariable("FPS")

@@ -41,6 +41,7 @@ function scene.draw()
 end
 
 function scene.clear()
+    Audio.Clear()
     Layers.clear()
 end
 

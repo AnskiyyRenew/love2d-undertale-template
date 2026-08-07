@@ -453,6 +453,7 @@ end
 
 --- Clear all layers, objects, and external draws, resetting the system.
 function layers.clear()
+    Typers.ClearAll()
     for i = #layers.objects, 1, -1 do
         local o = layers.objects[i]
         if (o.Destroy) then o:Destroy() end

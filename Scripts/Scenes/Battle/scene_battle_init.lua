@@ -17,6 +17,7 @@ Layers.new_layer("TOP", 1000)
 
 -- Import battle module
 Battle = ImportFile("Battle")
+Battle.SetEndRoom("scene_end")
 Game = Battle.SetGame("Poseur")
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 
@@ -39,7 +40,7 @@ end
 local function HandleItems(item)
     print("Used " .. item.name)
     Battle.BattleDialogue({
-        "* Wow"
+        "* Wow."
     }, "ACTIONSELECT")
 end
 
@@ -57,7 +58,7 @@ local function EnteringState(oldstate, newstate)
 end
 
 local function OnHit(bullet)
-    Player.Hurt(3, 60)
+    Player.Hurt(3, 60, true)
 end
 
 -- Don't touch these.

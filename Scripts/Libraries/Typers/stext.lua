@@ -27,6 +27,12 @@ Builder API (available via `self` inside the builder function):
   self:setColorHEX(hex)         Set text color via hex string (e.g. "ff0000").
   self:setOutline(r,g,b,a,w)    Set outline color (r,g,b), alpha (a), and width (w).
   self:addSkipText(text)        Add text that types instantly during skip mode.
+  self:setPortrait(frames, interval, mode)
+                                Create a talking portrait. frames = list of image
+                                paths (or a single string), interval = seconds per
+                                frame (default 1/30), mode = "looponce" (default;
+                                plays once, returns to first frame each typed char).
+  self:removePortrait()         Remove/hide the portrait.
   self:nextSentence()           Pause and wait for player confirm. On confirm,
                                 all text is cleared and next sentence begins.
 
@@ -288,6 +294,24 @@ function typers.New(fn, position, layer, size, mode)
     typer.x = (position[1] or 320)
     typer.y = (position[2] or 240)
     typer.size = (size or {640, 0})
+    typer.portrait = {
+        image = nil,
+        files = {},
+        index = {},
+        interval = 1 / 10,
+        mode = "looponce",
+        scale = {2, 2},
+        active = false,
+        offset_applied = false
+    }
+    -- Create the portrait sprite eagerly (placeholder px.png) so `portrait.image`
+    -- is always valid and can be read/configured at any time. `active` tells
+    -- whether a real portrait is currently being shown.
+    typer.portrait.image = Sprites.CreateSprite("px.png", typer.layer)
+    if (typer.portrait.image and typer.portrait.image.animation) then
+        typer.portrait.image:MoveTo(typer.x, typer.y + 55)
+        typer.portrait.image.visible = false
+    end
 
     typer.time = 0
     typer.dint = 1 / 15
@@ -346,6 +370,48 @@ function typers.New(fn, position, layer, size, mode)
 
     function typer:HideBubble()
         hideBubble(typer.bubble)
+    end
+
+    function typer:SetupPortrait()
+        local portrait = typer.portrait
+        if (not portrait or not portrait.image) then return end
+
+        if (#portrait.files == 0) then
+            -- No real portrait frames -> deactivate (do not destroy the sprite).
+            portrait.active = false
+            portrait.image.visible = false
+            if (portrait.offset_applied) then
+                typer.x = typer.x - 70
+                portrait.offset_applied = false
+            end
+            return
+        end
+
+        if (not portrait.offset_applied) then
+            typer.x = typer.x + 70
+            portrait.offset_applied = true
+        end
+
+        portrait.active = true
+        portrait.image:MoveTo(typer.x - 70, typer.y + 55)
+        portrait.image:Scale(portrait.scale[1], portrait.scale[2])
+        portrait.image:SetAnimation(portrait.files, portrait.interval, portrait.mode)
+        portrait.image:Set(portrait.files[1]) -- show first frame immediately
+        portrait.image.visible = true
+    end
+
+    function typer:RemovePortrait()
+        local portrait = typer.portrait
+        if (not portrait) then return end
+        portrait.active = false
+        portrait.files = {}
+        if (portrait.image) then
+            portrait.image.visible = false
+        end
+        if (portrait.offset_applied) then
+            typer.x = typer.x - 70
+            portrait.offset_applied = false
+        end
     end
 
     -- Current style state for the builder
@@ -436,6 +502,20 @@ function typers.New(fn, position, layer, size, mode)
         style.outline = {r, g, b, a, w}
     end
 
+    function builder:setPortrait(frames, interval, mode)
+        if (frames) then
+            if (type(frames) == "string") then frames = {frames} end
+            typer.portrait.files = frames
+            typer.portrait.interval = interval or (1 / 30)
+            typer.portrait.mode = mode or "looponce"
+            typer:SetupPortrait()
+        end
+    end
+
+    function builder:removePortrait()
+        typer:RemovePortrait()
+    end
+
     function builder:nextSentence()
         table.insert(typer.queue, {type = "break"})
         -- Reset style state so next sentence starts clean
@@ -499,6 +579,10 @@ function typers.New(fn, position, layer, size, mode)
         typer:Reset()
         removeBubble(typer.bubble)
         typer.bubble = nil
+        if (typer.portrait and typer.portrait.image) then
+            typer.portrait.image:Destroy()
+            typer.portrait.image = nil
+        end
         if (typer._onComplete and type(typer._onComplete) == "function") then
             typer._onComplete()
         end
@@ -621,6 +705,16 @@ function typers.New(fn, position, layer, size, mode)
                         -- Advance position
                         typer.pos.offset[1] = typer.pos.offset[1] + typer.letters[new_index].width * (typer.scale or 1)
                         typer.letter_count = typer.letter_count + 1
+
+                        -- Trigger the talking portrait animation once per typed character.
+                        if (typer.portrait and typer.portrait.active and typer.portrait.image) then
+                            local panim = typer.portrait.image.animation
+                            if (panim and #panim.textures > 0) then
+                                panim.time = 0
+                                panim.frame = 1
+                                panim.done = false
+                            end
+                        end
 
                         typer.queue_index = typer.queue_index + 1
                         typer.time = 0

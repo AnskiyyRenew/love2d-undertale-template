@@ -360,7 +360,8 @@ function sprites.CreateSprite(path, layer)
         interval = 1 / 10,
         mode = "loop",
         time = 0,
-        frame = 1
+        frame = 1,
+        done = false
     }
 
     function sprite:Draw()
@@ -634,6 +635,18 @@ function sprites.CreateSprite(path, layer)
                         anim.textures = {}
                         sprite.visible = false
                     end
+                elseif (anim.mode == "looponce") then
+                    -- Play through the sequence once, then return to the first
+                    -- frame and hold there until it is triggered again.
+                    if (not anim.done) then
+                        sprite:Set(anim.textures[anim.frame])
+                        anim.frame = anim.frame + 1
+
+                        if (anim.frame > #anim.textures) then
+                            anim.frame = 1
+                            anim.done = true
+                        end
+                    end
                 end
                 anim.time = 0
             end
@@ -793,6 +806,34 @@ function sprites.CreateSprite(path, layer)
             self.width = self.image:getWidth()
             self.height = self.image:getHeight()
         end
+
+        -- Calling Set force-replaces any active SetAnimation: the sprite shows
+        -- the static image picked by Set and the animation is disabled so it can
+        -- no longer override this image ("listen to Set").
+        -- Internal frame-advance calls from the animation loop itself pass a
+        -- frame that is already in the current texture list, so those are left
+        -- alone to keep SetAnimation working.
+        local anim = sprite.animation
+        if (anim and #anim.textures > 0) then
+            local p_norm = normalizeSpritePath(p)
+            local is_anim_frame = false
+            for i = 1, #anim.textures do
+                if (normalizeSpritePath(anim.textures[i]) == p_norm) then
+                    is_anim_frame = true
+                    break
+                end
+            end
+            if (not is_anim_frame) then
+                sprite.animation = {
+                    textures = {},
+                    interval = 1 / 10,
+                    mode = "loop",
+                    time = 0,
+                    frame = 1,
+                    done = false
+                }
+            end
+        end
     end
 
     function sprite:SetAnimation(frames, interval, mode)
@@ -801,7 +842,8 @@ function sprites.CreateSprite(path, layer)
             interval = interval,
             mode = (mode or "loop"),
             time = 0,
-            frame = 1
+            frame = 1,
+            done = false
         }
     end
 

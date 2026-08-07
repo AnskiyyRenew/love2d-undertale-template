@@ -9,8 +9,8 @@ return {
   height = 20,
   tilewidth = 20,
   tileheight = 20,
-  nextlayerid = 8,
-  nextobjectid = 39,
+  nextlayerid = 9,
+  nextobjectid = 40,
   properties = {},
   tilesets = {
     {
@@ -215,7 +215,7 @@ return {
             0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -468,10 +468,10 @@ return {
           name = "",
           type = "",
           shape = "rectangle",
-          x = 160,
-          y = 40,
-          width = 40,
-          height = 20,
+          x = 144.5,
+          y = 60,
+          width = 70.25,
+          height = 39.75,
           rotation = 0,
           visible = true,
           properties = {
@@ -483,10 +483,10 @@ return {
           name = "",
           type = "",
           shape = "rectangle",
-          x = 240,
-          y = 40,
-          width = 40,
-          height = 20,
+          x = 224.5,
+          y = 60,
+          width = 69.75,
+          height = 38.75,
           rotation = 0,
           visible = true,
           properties = {
@@ -498,10 +498,10 @@ return {
           name = "",
           type = "",
           shape = "rectangle",
-          x = 320,
-          y = 40,
-          width = 40,
-          height = 20,
+          x = 304.5,
+          y = 60,
+          width = 70.25,
+          height = 39,
           rotation = 0,
           visible = true,
           properties = {
@@ -565,7 +565,7 @@ return {
           rotation = 0,
           visible = true,
           properties = {
-            ["id"] = 6
+            ["id"] = 7
           }
         },
         {
@@ -582,20 +582,36 @@ return {
           properties = {
             ["id"] = 5
           }
-        },
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "topdown",
+      id = 8,
+      name = "signs",
+      class = "",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      objects = {
         {
-          id = 38,
+          id = 39,
           name = "",
           type = "",
-          shape = "rectangle",
-          x = 579.455,
-          y = 99.2727,
-          width = 52,
-          height = 60.7273,
+          shape = "point",
+          x = 609.5,
+          y = 88.5,
+          width = 0,
+          height = 0,
           rotation = 0,
           visible = true,
           properties = {
-            ["id"] = 7
+            ["id"] = 1
           }
         }
       }
@@ -647,7 +663,7 @@ return {
           shape = "rectangle",
           x = 0,
           y = 160,
-          width = 640,
+          width = 680,
           height = 20,
           rotation = 0,
           visible = true,
@@ -714,32 +730,6 @@ return {
           y = 60,
           width = 20,
           height = 120,
-          rotation = 0,
-          visible = true,
-          properties = {}
-        },
-        {
-          id = 26,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 640,
-          y = 160,
-          width = 40,
-          height = 20,
-          rotation = 0,
-          visible = true,
-          properties = {}
-        },
-        {
-          id = 28,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 580,
-          y = 100,
-          width = 50.5,
-          height = 60,
           rotation = 0,
           visible = true,
           properties = {}

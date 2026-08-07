@@ -109,6 +109,10 @@ function battle.ChangeState(new_state)
     battle.EnteringState(old, new_state)
 end
 
+function battle.SetEndRoom(room)
+    battle.room_end = room
+end
+
 function battle.Win()
     battle.ChangeState("WIN")
     local texts = Localize.localizeText("Battle.WinTexts1", {Battle.EXP, Battle.GOLD})

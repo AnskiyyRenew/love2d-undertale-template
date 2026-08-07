@@ -32,6 +32,11 @@ Opts table can contain the following fields:
 - alpha: The alpha value to use for the text, in the range [0, 1].
 - outline: The outline color to use for the text, and the outline width will be set accordingly. in the format {r, g, b, a, width}.
 - scale: The scale to use for the text.
+- portrait: A talking portrait (head image that animates while typing). Can be:
+  - A table: {files = {"a.png", "b.png", ...}, interval = 0.05, mode = "looponce"}
+    (interval and mode are optional; mode defaults to "looponce").
+  - A plain list of image paths: {"a.png", "b.png"}.
+  - "remove" / "hide" to remove the portrait.
 
 ]]
 local typers = {
@@ -118,7 +123,8 @@ local reserved_option_keys = {
     wait = true,
     effect = true,
     voices = true,
-    skip = true
+    skip = true,
+    portrait = true
 }
 
 local function runOptionCallbacks(typer, opt)
@@ -300,6 +306,24 @@ function typers.New(text, position, layer, size, opts, mode)
     typer.x = (position[1] or 320)
     typer.y = (position[2] or 240)
     typer.size = (size or {640, 0})
+    typer.portrait = {
+        image = nil,
+        files = {},
+        index = {},
+        interval = 1 / 10,
+        mode = "looponce",
+        scale = {2, 2},
+        active = false,
+        offset_applied = false
+    }
+    -- Create the portrait sprite eagerly (placeholder px.png) so `portrait.image`
+    -- is always valid and can be read/configured at any time. `active` tells
+    -- whether a real portrait is currently being shown.
+    typer.portrait.image = Sprites.CreateSprite("px.png", typer.layer)
+    if (typer.portrait.image and typer.portrait.image.animation) then
+        typer.portrait.image:MoveTo(typer.x, typer.y + 55)
+        typer.portrait.image.visible = false
+    end
 
     if (type(text) == "string") then
         text = {text}
@@ -424,10 +448,56 @@ function typers.New(text, position, layer, size, opts, mode)
         typer.bondfont = config
     end
 
+    function typer:SetupPortrait()
+        local portrait = typer.portrait
+        if (not portrait or not portrait.image) then return end
+
+        if (#portrait.files == 0) then
+            -- No real portrait frames -> deactivate (do not destroy the sprite).
+            portrait.active = false
+            portrait.image.visible = false
+            if (portrait.offset_applied) then
+                typer.x = typer.x - 70
+                portrait.offset_applied = false
+            end
+            return
+        end
+
+        if (not portrait.offset_applied) then
+            typer.x = typer.x + 70
+            portrait.offset_applied = true
+        end
+
+        portrait.active = true
+        portrait.image:MoveTo(typer.x - 70, typer.y + 55)
+        portrait.image:Scale(portrait.scale[1], portrait.scale[2])
+        portrait.image:SetAnimation(portrait.files, portrait.interval, portrait.mode)
+        portrait.image:Set(portrait.files[1]) -- show first frame immediately
+        portrait.image.visible = true
+    end
+
+    function typer:RemovePortrait()
+        local portrait = typer.portrait
+        if (not portrait) then return end
+        portrait.active = false
+        portrait.files = {}
+        if (portrait.image) then
+            portrait.image.visible = false
+        end
+        if (portrait.offset_applied) then
+            typer.x = typer.x - 70
+            portrait.offset_applied = false
+        end
+    end
+
     function typer:Destroy()
         typer:Reset()
         removeBubble(typer.bubble)
         typer.bubble = nil
+        if (typer.portrait and typer.portrait.image) then
+            typer.portrait.image:Destroy()
+            typer.portrait.image = nil
+        end
         if (typer._onComplete and type(typer._onComplete) == "function") then
             typer._onComplete()
         end
@@ -501,6 +571,19 @@ function typers.New(text, position, layer, size, opts, mode)
                                         typer.skip[k] = v
                                     end
                                 end
+                                if (opt.portrait) then
+                                    local p = opt.portrait
+                                    if (p == "remove" or p == "hide" or p == "clear" or p == "none") then
+                                        typer:RemovePortrait()
+                                    else
+                                        local files = (type(p) == "table") and (p.files or p.frames or p) or {p}
+                                        if (type(files) == "string") then files = {files} end
+                                        typer.portrait.files = files
+                                        typer.portrait.interval = (type(p) == "table" and p.interval) or (1 / 30)
+                                        typer.portrait.mode = (type(p) == "table" and p.mode) or "looponce"
+                                        typer:SetupPortrait()
+                                    end
+                                end
                                 runOptionCallbacks(typer, opt)
                             end
                         end
@@ -555,6 +638,7 @@ function typers.New(text, position, layer, size, opts, mode)
                 end
 
                 if (counter <= sentence_len and typer.cantype) then
+                    if (typer._onUpdate and type(typer._onUpdate) == "function") then typer._onUpdate() end
                     if (typer.voices and #typer.voices > 0 and not typer.skip.skipping) then
                         Audio.PlaySound("/Voices/" .. typer.voices[math.random(#typer.voices)])
                     end
@@ -610,6 +694,15 @@ function typers.New(text, position, layer, size, opts, mode)
                     typer.pos.offset[1] = typer.pos.offset[1] + typer.letters[new_index].width * (typer.scale or 1)
                     typer.pos.offset[2] = typer.pos.offset[2]
                     typer.letter_count = typer.letter_count + 1
+                    -- Trigger the talking portrait animation once per typed character.
+                    if (typer.portrait and typer.portrait.active and typer.portrait.image) then
+                        local panim = typer.portrait.image.animation
+                        if (panim and #panim.textures > 0) then
+                            panim.time = 0
+                            panim.frame = 1
+                            panim.done = false
+                        end
+                    end
                     typer.counter = counter + char_length
                     typer.time = 0
                     if (not typer.skip.skipping) then
