@@ -14,8 +14,12 @@ local overworld = {
     interacts = {},
     ui_prefer = "down",
 
+    target_scene = "",
+    _leaving = false,
+
     debug = false,
 }
+DATA = require("Scripts.Game.Logics")
 
 -- One-frame lock: set when a dialog's typewriter finishes so that the same
 -- "confirm" press which closed the dialog cannot instantly re-trigger the
@@ -37,14 +41,26 @@ blacktop.color = {0, 0, 0}
 blacktop:MoveTo(Camera.x, Camera.y)
 blacktop._decay = true
 blacktop.Step = function (self)
+    self:MoveTo(Camera.x, Camera.y)
     if (self._decay) then
         self.alpha = self.alpha - 0.05
+        if (overworld._leaving) then
+            self._decay = false
+        end
         if (self.alpha <= 0) then
             self._decay = false
         end
     else
         if (self.alpha >= 1) then
             self._decay = true
+        end
+    end
+
+    if (overworld._leaving) then
+        self.alpha = self.alpha + 0.05
+
+        if (self.alpha >= 1) then
+            Scenes.switchTo(overworld.target_scene)
         end
     end
 end
@@ -250,6 +266,17 @@ function overworld.dialogNew(texts, position)
     return dialog
 end
 
+function overworld.ChangeScene(scene, mark)
+    if (not Char.controlling) then return end
+    Char.controlling = false
+
+    overworld._leaving = true
+    overworld.target_scene = scene
+
+    DATA.room = Scenes.name_current
+    DATA.marker = (mark or 1)
+end
+
 function overworld.Update(dt)
     -- Release the one-frame dialog lock at the start of a NEW frame. If the
     -- lock was just set this frame (dialog_lock_pending is true, because
@@ -268,6 +295,7 @@ end
 
 function overworld.Clear()
     Map.Destroy()
+    Camera:unBounds()
 
     local content = {"char", "map", "world", "stat", "init"}
     for i = 1, #content
@@ -275,6 +303,7 @@ function overworld.Clear()
         package.loaded["Scripts.Libraries.Overworld." .. content[i]] = nil
     end
 
+    Camera:reset()
     dialog_just_closed = false
 end
 

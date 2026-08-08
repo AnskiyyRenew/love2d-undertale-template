@@ -360,7 +360,9 @@ return {
           height = 19.125,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["id"] = 2
+          }
         },
         {
           id = 20,
@@ -373,7 +375,9 @@ return {
           height = 19.375,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["id"] = 3
+          }
         },
         {
           id = 21,
@@ -386,7 +390,9 @@ return {
           height = 18.75,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["id"] = 4
+          }
         },
         {
           id = 27,
@@ -399,7 +405,9 @@ return {
           height = 19,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["id"] = 5
+          }
         }
       }
     },

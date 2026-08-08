@@ -21,6 +21,8 @@ Builder API (available via `self` inside the builder function):
   self:addText(text)            Add text to be typed out character by character.
                                 Applies the current style (font, color, etc.).
   self:setFont(name)            Switch font for subsequent addText calls.
+                                Setting a font disables the bondfont feature until
+                                it is re-set via UseBondFont.
   self:setWaitTime(time)        Pause typing for `time` seconds.
   self:setSpeed(interval)       Set typing interval (seconds per character).
   self:setColor(r, g, b)        Set text color (values 0-1 or 0-255, auto-detected).
@@ -270,7 +272,7 @@ function typers.New(fn, position, layer, size, mode)
         queue_index = 1,  -- current position in queue
     }
 
-    -- Metatable to intercept `.layer` writes and automatically mark Layers as dirty
+    -- Metatable to intercept `.layer` and `.font` writes.
     setmetatable(typer, {
         __index = function(t, k)
             if k == "layer" then
@@ -282,6 +284,11 @@ function typers.New(fn, position, layer, size, mode)
             if k == "layer" then
                 rawset(t, "_layer_value", v)
                 Layers.mark_dirty()
+            elseif k == "font" then
+                rawset(t, k, v)
+                -- Directly setting the font (via setFont or t.font = ...)
+                -- disables the bondfont feature until it is re-set by UseBondFont.
+                t.use_bondfont = false
             else
                 rawset(t, k, v)
             end
@@ -355,6 +362,9 @@ function typers.New(fn, position, layer, size, mode)
             typer.pos.relative[2] = 4
         end
     }
+    -- Whether the bondfont feature is currently enabled. Set to false when a
+    -- font is directly set; re-enabled by UseBondFont.
+    typer.use_bondfont = true
 
     typer.mode = mode or "manual"
     typer.bubble = nil
@@ -466,6 +476,8 @@ function typers.New(fn, position, layer, size, mode)
 
     function builder:setFont(name)
         style.font = name
+        -- Directly setting the font disables the bondfont feature until re-set.
+        typer.use_bondfont = false
     end
 
     function builder:setWaitTime(time)
@@ -573,6 +585,8 @@ function typers.New(fn, position, layer, size, mode)
 
     function typer:UseBondFont(config)
         typer.bondfont = config
+        -- Re-setting bondfont re-enables the bondfont feature.
+        typer.use_bondfont = true
     end
 
     function typer:Destroy()
@@ -675,7 +689,7 @@ function typers.New(fn, position, layer, size, mode)
 
                         -- Get font for this letter
                         local letter_font = getFont(item.font, item.fontsize)
-                        if (typer.bondfont) then
+                        if (typer.bondfont and typer.use_bondfont) then
                             local byte = char:sub(1, 1)
                             letter_font = typers.BondFont(byte,
                                 typer.bondfont.engfont,

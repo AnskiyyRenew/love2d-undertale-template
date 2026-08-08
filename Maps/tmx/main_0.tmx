@@ -152,10 +152,26 @@
     <property name="id" type="int" value="1"/>
    </properties>
   </object>
-  <object id="19" x="380" y="60" width="40" height="19.125"/>
-  <object id="20" x="460" y="60" width="40" height="19.375"/>
-  <object id="21" x="540" y="60" width="40" height="18.75"/>
-  <object id="27" x="640" y="60" width="40" height="19"/>
+  <object id="19" x="380" y="60" width="40" height="19.125">
+   <properties>
+    <property name="id" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="20" x="460" y="60" width="40" height="19.375">
+   <properties>
+    <property name="id" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="21" x="540" y="60" width="40" height="18.75">
+   <properties>
+    <property name="id" type="int" value="4"/>
+   </properties>
+  </object>
+  <object id="27" x="640" y="60" width="40" height="19">
+   <properties>
+    <property name="id" type="int" value="5"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup color="#ffff00" id="7" name="saves">
   <object id="30" x="480" y="140">

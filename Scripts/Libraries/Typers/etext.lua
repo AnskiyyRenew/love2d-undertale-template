@@ -15,6 +15,8 @@ Available tags:
   [colorRGB:r, g, b]    Set text color using RGB values (0-255).
   [colorHEX:xxxxxx]     Set text color using hex string (e.g. ff0000 for red).
   [font:name]           Switch typing font to name (e.g. determination_mono.ttf).
+                        Setting a font directly disables the bondfont feature;
+                        bondfont stays off until it is re-set via UseBondFont.
   [effect:name, int]    Set typing effect (e.g. shake, 3).
   [outline:r,g,b,a,w]   Set outline color (r,g,b), alpha (a), and width (w).
   [portrait:frames|interval|mode]
@@ -286,8 +288,8 @@ local function applyTag(typer, tag_name, tag_value)
         end
         return true
     elseif (tag_name == "font" and tag_value) then
+        -- Writing .font automatically disables bondfont (see metatable).
         typer.font = tag_value
-        print(tag_value)
         return true
     elseif (tag_name == "effect" and tag_value) then
         local name, intensity = tag_value:match("([^,]+),%s*(.+)")
@@ -449,7 +451,7 @@ function typers.New(text, position, layer, size, mode)
         max_letters = 1000
     }
 
-    -- Metatable to intercept `.layer` writes and automatically mark Layers as dirty
+    -- Metatable to intercept `.layer` and `.font` writes.
     setmetatable(typer, {
         __index = function(t, k)
             if k == "layer" then
@@ -461,6 +463,11 @@ function typers.New(text, position, layer, size, mode)
             if k == "layer" then
                 rawset(t, "_layer_value", v)
                 Layers.mark_dirty()
+            elseif k == "font" then
+                rawset(t, k, v)
+                -- Directly setting the font (via [font:] tag or t.font = ...)
+                -- disables the bondfont feature until it is re-set by UseBondFont.
+                t.use_bondfont = false
             else
                 rawset(t, k, v)
             end
@@ -542,6 +549,9 @@ function typers.New(text, position, layer, size, mode)
             typer.pos.relative[2] = 4
         end
     }
+    -- Whether the bondfont feature is currently enabled. Set to false when a
+    -- font is directly set (e.g. [font:...]); re-enabled by UseBondFont.
+    typer.use_bondfont = true
 
     typer.mode = mode or "manual"
     typer.pending_next = false
@@ -610,6 +620,8 @@ function typers.New(text, position, layer, size, mode)
 
     function typer:UseBondFont(config)
         typer.bondfont = config
+        -- Re-setting bondfont re-enables the bondfont feature.
+        typer.use_bondfont = true
     end
 
     function typer:SetupPortrait()
@@ -774,7 +786,7 @@ function typers.New(text, position, layer, size, mode)
                         char = temp_char
                     else
                         byte = sentence:sub(counter, counter)
-                        if (typer.bondfont) then
+                        if (typer.bondfont and typer.use_bondfont) then
                             current_font = typers.BondFont(byte,
                                 typer.bondfont.engfont,
                                 typer.bondfont.non_engfont,

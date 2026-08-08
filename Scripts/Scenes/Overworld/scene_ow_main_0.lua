@@ -107,28 +107,8 @@ function scene.update(dt)
                 "[colorhex:9900ff]* Alphys[wait:0.4], how many times have I\n  warned you[wait:0.4], this board is NOT\n  for writing scary things on.",
                 "* Huh?[wait:0.4] I didn't write that.",
                 "[colorhex:9900ff]* Could it be...?",
-                "[font:Wingdings.ttf][func:setwingd]GOT YOU BOTH.\nSTILL DARING TO WRITE\nNONSENSE\nON THE BOARD."
+                "[font:Wingdings.ttf]GOT YOU BOTH.\nSTILL DARING TO WRITE\nNONSENSE\nON THE BOARD."
             })
-
-            function setwingd()
-                if (not d) then return end
-                d.text.bondfont = {
-                    engfont = {font = "Wingdings.ttf", size = 27},
-                    non_engfont = {font = "simsun.ttc", size = 13},
-                    engfunc = function()
-                        d.text.scale = 1
-                        d.text.pos.offset[1] = d.text.pos.offset[1] + 0
-                        d.text.pos.relative[1] = 4
-                        d.text.pos.relative[2] = 0
-                    end,
-                    non_engfunc = function()
-                        d.text.scale = 2
-                        d.text.pos.offset[1] = d.text.pos.offset[1] + 4
-                        d.text.pos.relative[1] = 4
-                        d.text.pos.relative[2] = 4
-                    end
-                }
-            end
         end
     elseif (ow.getInteractResult("trigger", 5)) then
         if (Keyboard.GetState("confirm") == 1) then
@@ -152,6 +132,12 @@ function scene.update(dt)
             })
         end
     end
+
+    if (ow.getInteractResult("warp", 1)) then
+        ow.ChangeScene("Overworld.Shops.scene_shop_0")
+    elseif (ow.getInteractResult("warp", 2)) then
+        ow.ChangeScene("Overworld.scene_sol")
+    end
 end
 
 function scene.draw()
@@ -160,6 +146,7 @@ end
 
 function scene.clear()
     ow.Clear()
+    package.loaded["Scripts.Libraries.Overworld"] = nil
     Layers.clear()
 end
 

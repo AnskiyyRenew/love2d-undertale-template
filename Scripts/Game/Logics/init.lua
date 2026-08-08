@@ -1,6 +1,6 @@
 local logic = {}
 
-logic.player_data = {
+logic = {
     time = 0,
     room_name = "--",
     room = "Overworld/scene_ow_new",

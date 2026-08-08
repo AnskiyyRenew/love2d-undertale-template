@@ -27,6 +27,7 @@ Every "^" in the text will be treated as an operation's end, and will use the de
 
 Opts table can contain the following fields:
 - font: The font to use for the text.
+  Setting a font disables the bondfont feature until it is re-set via UseBondFont.
 - size: The font size to use for the text.
 - color: The color to use for the text, in the format {r, g, b}.
 - alpha: The alpha value to use for the text, in the range [0, 1].
@@ -282,7 +283,7 @@ function typers.New(text, position, layer, size, opts, mode)
         max_letters = 1000
     }
 
-    -- Metatable to intercept `.layer` writes and automatically mark Layers as dirty
+    -- Metatable to intercept `.layer` and `.font` writes.
     setmetatable(typer, {
         __index = function(t, k)
             if k == "layer" then
@@ -294,6 +295,11 @@ function typers.New(text, position, layer, size, opts, mode)
             if k == "layer" then
                 rawset(t, "_layer_value", v)
                 Layers.mark_dirty()
+            elseif k == "font" then
+                rawset(t, k, v)
+                -- Directly setting the font (via opts or t.font = ...)
+                -- disables the bondfont feature until it is re-set by UseBondFont.
+                t.use_bondfont = false
             else
                 rawset(t, k, v)
             end
@@ -376,6 +382,9 @@ function typers.New(text, position, layer, size, opts, mode)
             typer.pos.relative[2] = 4
         end
     }
+    -- Whether the bondfont feature is currently enabled. Set to false when a
+    -- font is directly set; re-enabled by UseBondFont.
+    typer.use_bondfont = true
 
     typer.mode = mode or "manual"
     typer.next_sentence = true
@@ -446,6 +455,8 @@ function typers.New(text, position, layer, size, opts, mode)
 
     function typer:UseBondFont(config)
         typer.bondfont = config
+        -- Re-setting bondfont re-enables the bondfont feature.
+        typer.use_bondfont = true
     end
 
     function typer:SetupPortrait()
@@ -649,7 +660,7 @@ function typers.New(text, position, layer, size, opts, mode)
                         char = temp_char
                     else
                         byte = sentence:sub(counter, counter)
-                        if (typer.bondfont) then
+                        if (typer.bondfont and typer.use_bondfont) then
                             current_font = typers.BondFont(byte,
                                 typer.bondfont.engfont,
                                 typer.bondfont.non_engfont,

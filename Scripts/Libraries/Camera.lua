@@ -45,6 +45,13 @@ function camera:setBoundsBox(x, y, width, height)
     self.max_y = y + height * 0.5
 end
 
+function camera:unBounds()
+    self.min_x = -math.huge
+    self.max_X = math.huge
+    self.min_y = -math.huge
+    self.max_y = math.huge
+end
+
 function camera:setAngle(r)
     self.r = (r or 0)
 end

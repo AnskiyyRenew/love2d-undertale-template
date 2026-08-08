@@ -67,7 +67,7 @@ local startTime = SE.timer.getTime()
 
 local scene_
 Scenes.switchTo("Overworld.scene_ow_main_0")
---Scenes.switchTo("TEST.scene_typers")
+--Scenes.switchTo("TEST.scene_cc")
 --Scenes.switchTo("scene_end")
 
 ScreenScale = 1

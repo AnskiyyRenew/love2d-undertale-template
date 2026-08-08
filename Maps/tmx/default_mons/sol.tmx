@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="20" tileheight="20" infinite="1" nextlayerid="7" nextobjectid="15">
+ <editorsettings>
+  <export target="../../main_scene/sol.lua" format="lua"/>
+ </editorsettings>
+ <tileset firstgid="1" name="unnamed_288" tilewidth="20" tileheight="20" tilecount="16" columns="4">
+  <image source="../../images/Scene/Ruins/unnamed_288.png" width="80" height="80"/>
+ </tileset>
+ <layer id="1" name="图块层 1" width="30" height="20">
+  <data encoding="csv">
+   <chunk x="0" y="-32" width="16" height="16">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+   <chunk x="0" y="-16" width="16" height="16">
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+   <chunk x="0" y="0" width="16" height="16">
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+9,9,9,9,9,9,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,9,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+  </data>
+ </layer>
+ <objectgroup id="2" name="marks">
+  <object id="1" x="60" y="60">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="walls">
+  <object id="2" x="0" y="60" width="40" height="40"/>
+  <object id="3" x="80" y="60" width="40" height="40"/>
+  <object id="4" x="120" y="0" width="20" height="60"/>
+  <object id="5" x="-20" y="0" width="20" height="60"/>
+  <object id="6" x="0" y="-400" width="40" height="400"/>
+  <object id="7" x="80" y="-400" width="40" height="400"/>
+  <object id="8" x="-20" y="-520" width="20" height="120"/>
+  <object id="9" x="0" y="-540" width="120" height="20"/>
+  <object id="10" x="120" y="-520" width="20" height="120"/>
+  <object id="12" x="40" y="-480" width="40" height="40"/>
+ </objectgroup>
+ <objectgroup id="5" name="triggers">
+  <object id="13" x="39" y="-481" width="42" height="42"/>
+ </objectgroup>
+ <objectgroup id="6" name="signs">
+  <object id="14" x="20" y="2">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="warps">
+  <object id="11" x="40" y="100" width="40" height="20">
+   <properties>
+    <property name="id" type="int" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
