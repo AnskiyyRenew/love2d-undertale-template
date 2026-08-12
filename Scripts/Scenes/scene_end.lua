@@ -33,23 +33,23 @@ local time = 0
 function scene.update(dt)
     time = time + 1
 
+    local rain = Sprites.CreateSprite("px.png", 0)
+    rain.alpha = alpha
+    rain:MoveTo(math.random(20, 720), -10)
+    rain:Scale(1, math.random(10, 15))
+    rain.ypivot = 1
+    rain.rotation = 20
+    rain.Step = function (self)
+        self.alpha = alpha
+        self:Move(-math.sin(math.rad(self.rotation)) * 1 * self.yscale, math.cos(math.rad(self.rotation)) * 1 * self.yscale)
+        if (self.y > 500) then
+            self:Destroy()
+        end
+    end
+
     if (not leaving) then
         alpha = math.min(0.5, alpha + 0.002)
         t.alpha = t.alpha + 0.02
-
-        local rain = Sprites.CreateSprite("px.png", 0)
-        rain.alpha = alpha
-        rain:MoveTo(math.random(20, 720), -10)
-        rain:Scale(1, math.random(10, 15))
-        rain.ypivot = 1
-        rain.rotation = 20
-        rain.Step = function (self)
-            self.alpha = alpha
-            self:Move(-math.sin(math.rad(self.rotation)) * 1 * self.yscale, math.cos(math.rad(self.rotation)) * 1 * self.yscale)
-            if (self.y > 500) then
-                self:Destroy()
-            end
-        end
 
         if (time == 120) then
             Tween.CreateTween(function (v)
@@ -70,7 +70,7 @@ function scene.update(dt)
             time = 0
         end
     else
-        if (time <= 100) then
+        if (time <= 120) then
             black.alpha = black.alpha + 0.01
         else
             Scenes.switchTo("scene_logo")

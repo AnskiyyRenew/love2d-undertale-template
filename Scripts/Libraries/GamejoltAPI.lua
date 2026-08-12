@@ -1,4 +1,5 @@
 -- Documentation: https://gamejolt.com/game-api/doc
+-- Naming convention: functions are camelCase, variables are snake_case.
 
 local gamejolt = {}
 
@@ -17,13 +18,13 @@ gamejolt._session_auto = {
 }
 
 -- Generates a signature for the GameJolt API request by hashing the input with MD5.
-local function generate_signature(request_path)
+local function generateSignature(request_path)
     local input = gamejolt.base_url .. request_path .. gamejolt.private_key
     return md5.sumhexa(input)
 end
 
 -- Sends an HTTPS request to the GameJolt API and returns the response or error message.
-local function api_request(url)
+local function apiRequest(url)
     if (not https or type(https.request) ~= "function") then
         local platform = (love and love.system and love.system.getOS and love.system.getOS()) or "Unknown"
         local reason = https_error or "missing native https module"
@@ -49,7 +50,7 @@ local function api_request(url)
     return data.response
 end
 
-local function session_auto_tick(dt)
+local function sessionAutoTick(dt)
     local state = gamejolt._session_auto
     if (not state.enabled) then
         return
@@ -61,7 +62,7 @@ local function session_auto_tick(dt)
     end
 
     state.elapsed = 0
-    local result, err = gamejolt.session_ping(state.status)
+    local result, err = gamejolt.sessionPing(state.status)
     if (result == false) then
         state.last_error = err
     else
@@ -82,7 +83,7 @@ end
 
 ---Returns whether the native HTTPS dependency required by the GameJolt API is available.
 ---@return boolean, string|nil
-function gamejolt.is_available()
+function gamejolt.isAvailable()
     if (https and type(https.request) == "function") then
         return true
     end
@@ -91,7 +92,7 @@ function gamejolt.is_available()
     return false, "GameJolt API native HTTPS module is unavailable on "..tostring(platform)..": "..tostring(https_error or "missing native https module")
 end
 
-function gamejolt.is_loggedin()
+function gamejolt.isLoggedIn()
     return (gamejolt.user_token ~= nil and gamejolt.username ~= nil)
 end
 
@@ -100,30 +101,30 @@ end
 -- Syntax: /users/?game_id=xxxxx&user_id=12345
 ---@param user_id number|string|nil
 ---@param username string|nil
-function gamejolt.fetch_user(user_id, username)
+function gamejolt.fetchUser(user_id, username)
     local url = gamejolt.base_url .. "/users/?game_id=" .. gamejolt.app_id ..
                 (user_id and "&user_id=" .. user_id or "") ..
                 (username and "&username=" .. username or "") ..
-                "&signature=" .. generate_signature("/users/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/users/?game_id=" .. gamejolt.app_id ..
                                                   (user_id and "&user_id=" .. user_id or "") ..
                                                   (username and "&username=" .. username or ""))
 
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Authenticates a user with their username and token against the GameJolt API.
 -- Syntax: /users/?game_id=xxxxx&username=test&user_token=test
 ---@param username string
 ---@param user_token string
-function gamejolt.auth_user(username, user_token)
+function gamejolt.authUser(username, user_token)
     gamejolt.username = username
     gamejolt.user_token = user_token
     local url = gamejolt.base_url .. "/users/auth/?game_id=" .. gamejolt.app_id ..
                 "&username=" .. username .. "&user_token=" .. user_token ..
-                "&signature=" .. generate_signature("/users/auth/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/users/auth/?game_id=" .. gamejolt.app_id ..
                                                   "&username=" .. username .. "&user_token=" .. user_token)
 
-    local success, err = api_request(url)
+    local success, err = apiRequest(url)
     return success ~= false, err
 end
 
@@ -132,23 +133,23 @@ end
 -- Syntax: /trophies/?game_id=xxxxx&username=test&user_token=test&achieved=true
 ---@param achieved_only boolean|nil
 ---@return table|false, string|nil
-function gamejolt.fetch_achievements(achieved_only)
+function gamejolt.fetchAchievements(achieved_only)
     local url = gamejolt.base_url .. "/trophies/?game_id=" .. gamejolt.app_id ..
                 "&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token ..
                 (achieved_only and "&achieved=true" or "") ..
-                "&signature=" .. generate_signature("/trophies/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/trophies/?game_id=" .. gamejolt.app_id ..
                                                   "&username=" .. gamejolt.username ..
                                                   "&user_token=" .. gamejolt.user_token ..
                                                   (achieved_only and "&achieved=true" or ""))
 
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Unlocks an achievement (trophy) in the GameJolt API using the trophy ID.
 -- Syntax: /trophies/add-achieved/?game_id=xxxxx&username=myusername&user_token=mytoken&trophy_id=1047
 ---@param trophy_id number|string
 ---@return boolean|false, string|nil
-function gamejolt.unlock_achievement(trophy_id)
+function gamejolt.unlockAchievement(trophy_id)
     local endpoint = "/trophies/add-achieved/"
     local base_params = "?game_id=" .. gamejolt.app_id ..
                        "&username=" .. gamejolt.username ..
@@ -156,9 +157,9 @@ function gamejolt.unlock_achievement(trophy_id)
                        "&trophy_id=" .. trophy_id
 
     local url = gamejolt.base_url .. endpoint .. base_params ..
-                "&signature=" .. generate_signature(endpoint .. base_params)
+                "&signature=" .. generateSignature(endpoint .. base_params)
 
-    local result, err = api_request(url)
+    local result, err = apiRequest(url)
     if (result) then
         return true
     else
@@ -170,13 +171,13 @@ end
 ---Opens a session for the authenticated user in the GameJolt API.
 -- Syntax: /sessions/open/?game_id=xxxxx&username=myusername&user_token=mytoken
 ---@return table|false, string|nil
-function gamejolt.session_open()
+function gamejolt.sessionOpen()
     local url = gamejolt.base_url .. "/sessions/open/?game_id=" .. gamejolt.app_id ..
                 "&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token ..
-                "&signature=" .. generate_signature("/sessions/open/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/sessions/open/?game_id=" .. gamejolt.app_id ..
                                                   "&username=" .. gamejolt.username ..
                                                   "&user_token=" .. gamejolt.user_token)
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Automatically opens a session and periodically pings GameJolt to keep it alive.
@@ -184,14 +185,14 @@ end
 ---@param interval number|nil
 ---@param status string|nil
 ---@return boolean|false, string|nil
-function gamejolt.session_update(interval, status)
+function gamejolt.sessionUpdate(interval, status)
     local state = gamejolt._session_auto
     state.interval = math.max(1, tonumber(interval) or state.interval or 30)
     state.status = status or "active"
     state.elapsed = 0
     state.last_error = nil
 
-    local result, err = gamejolt.session_open()
+    local result, err = gamejolt.sessionOpen()
     if (result == false) then
         state.enabled = false
         return false, err
@@ -205,36 +206,36 @@ end
 ---Call this from your own love.update(dt) to keep the GameJolt session alive.
 ---@param dt number
 function gamejolt.update(dt)
-    session_auto_tick(dt)
+    sessionAutoTick(dt)
 end
 
 ---Pings the current session to keep it active or update its status.
 -- Syntax: /sessions/ping/?game_id=xxxxx&username=myusername&user_token=mytoken&status=active
 ---@param status string|nil
 ---@return table|false, string|nil
-function gamejolt.session_ping(status)
+function gamejolt.sessionPing(status)
     local url = gamejolt.base_url .. "/sessions/ping/?game_id=" .. gamejolt.app_id ..
                 "&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token ..
                 "&status=" .. (status or "active") ..
-                "&signature=" .. generate_signature("/sessions/ping/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/sessions/ping/?game_id=" .. gamejolt.app_id ..
                                                   "&username=" .. gamejolt.username ..
                                                   "&user_token=" .. gamejolt.user_token ..
                                                   "&status=" .. (status or "active"))
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Closes the current session for the authenticated user in the GameJolt API.
 -- Syntax: /sessions/close/?game_id=xxxxx&username=myusername&user_token=mytoken
 ---@return table|false, string|nil
-function gamejolt.session_close()
+function gamejolt.sessionClose()
     gamejolt._session_auto.enabled = false
     gamejolt._session_auto.elapsed = 0
     local url = gamejolt.base_url .. "/sessions/close/?game_id=" .. gamejolt.app_id ..
                 "&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token ..
-                "&signature=" .. generate_signature("/sessions/close/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/sessions/close/?game_id=" .. gamejolt.app_id ..
                                                   "&username=" .. gamejolt.username ..
                                                   "&user_token=" .. gamejolt.user_token)
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---------------------------------------------DATA STORE--------------------------------------------
@@ -244,15 +245,15 @@ end
 ---@param data string
 ---@param user_data boolean|nil
 ---@return table|false, string|nil
-function gamejolt.data_store(key, data, user_data)
+function gamejolt.dataStore(key, data, user_data)
     local url = gamejolt.base_url .. "/data-store/set/?game_id=" .. gamejolt.app_id ..
                 "&key=" .. key .. "&data=" .. data ..
                 (user_data and ("&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token) or "") ..
-                "&signature=" .. generate_signature("/data-store/set/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/data-store/set/?game_id=" .. gamejolt.app_id ..
                                                   "&key=" .. key .. "&data=" .. data ..
                                                   (user_data and ("&username=" .. gamejolt.username ..
                                                    "&user_token=" .. gamejolt.user_token) or ""))
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Fetches data from the GameJolt Data Store using the specified key.
@@ -260,28 +261,28 @@ end
 ---@param key string
 ---@param user_data boolean|nil
 ---@return table|false, string|nil
-function gamejolt.data_fetch(key, user_data)
+function gamejolt.dataFetch(key, user_data)
     local url = gamejolt.base_url .. "/data-store/?game_id=" .. gamejolt.app_id ..
                 "&key=" .. key ..
                 (user_data and ("&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token) or "") ..
-                "&signature=" .. generate_signature("/data-store/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/data-store/?game_id=" .. gamejolt.app_id ..
                                                   "&key=" .. key ..
                                                   (user_data and ("&username=" .. gamejolt.username ..
                                                    "&user_token=" .. gamejolt.user_token) or ""))
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Fetches all data from the GameJolt Data Store for the authenticated user.
 -- Syntax: /data-store/?game_id=xxxxx&username=myusername&user_token=mytoken
 ---@param user_data boolean|nil
 ---@return table|false, string|nil
-function gamejolt.data_fetch_all(user_data)
+function gamejolt.dataFetchAll(user_data)
     local url = gamejolt.base_url .. "/data-store/?game_id=" .. gamejolt.app_id ..
                 (user_data and ("&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token) or "") ..
-                "&signature=" .. generate_signature("/data-store/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/data-store/?game_id=" .. gamejolt.app_id ..
                                                   (user_data and ("&username=" .. gamejolt.username ..
                                                    "&user_token=" .. gamejolt.user_token) or ""))
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Deletes data from the GameJolt Data Store using the specified key.
@@ -289,28 +290,28 @@ end
 ---@param key string
 ---@param user_data boolean|nil
 ---@return table|false, string|nil
-function gamejolt.data_delete(key, user_data)
+function gamejolt.dataDelete(key, user_data)
     local url = gamejolt.base_url .. "/data-store/delete/?game_id=" .. gamejolt.app_id ..
                 "&key=" .. key ..
                 (user_data and ("&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token) or "") ..
-                "&signature=" .. generate_signature("/data-store/delete/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/data-store/delete/?game_id=" .. gamejolt.app_id ..
                                                   "&key=" .. key ..
                                                   (user_data and ("&username=" .. gamejolt.username ..
                                                    "&user_token=" .. gamejolt.user_token) or ""))
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Fetches the keys from the GameJolt Data Store for the authenticated user.
 -- Syntax: /data-store/get-keys/?game_id=xxxxx&username=myusername&user_token=mytoken
 ---@param user_data boolean|nil
 ---@return table|false, string|nil
-function gamejolt.data_get_keys(user_data)
+function gamejolt.dataGetKeys(user_data)
     local url = gamejolt.base_url .. "/data-store/get-keys/?game_id=" .. gamejolt.app_id ..
                 (user_data and ("&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token) or "") ..
-                "&signature=" .. generate_signature("/data-store/get-keys/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/data-store/get-keys/?game_id=" .. gamejolt.app_id ..
                                                   (user_data and ("&username=" .. gamejolt.username ..
                                                    "&user_token=" .. gamejolt.user_token) or ""))
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ------------------------------------------SCORES--------------------------------------------
@@ -318,27 +319,27 @@ end
 -- Syntax: /scores/?game_id=xxxxx&table_id=12345
 ---@param table_id number|string|nil
 ---@return table|false, string|nil
-function gamejolt.fetch_scores_local(table_id)
+function gamejolt.fetchScoresLocal(table_id)
     local url = gamejolt.base_url .. "/scores/?game_id=" .. gamejolt.app_id ..
                 (table_id and "&table_id=" .. table_id or "") ..
-                "&signature=" .. generate_signature("/scores/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/scores/?game_id=" .. gamejolt.app_id ..
                                                   (table_id and "&table_id=" .. table_id or ""))
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Fetches scores from the GameJolt API using the specified table ID and user data.
 -- Syntax: /scores/?game_id=xxxxx&table_id=12345&username=myusername&user_token=mytoken
 ---@param table_id number|string|nil
 ---@return table|false, string|nil
-function gamejolt.fetch_scores_global(table_id)
+function gamejolt.fetchScoresGlobal(table_id)
     local url = gamejolt.base_url .. "/scores/?game_id=" .. gamejolt.app_id ..
                 (table_id and "&table_id=" .. table_id or "") ..
                 "&username=" .. gamejolt.username .. "&user_token=" .. gamejolt.user_token ..
-                "&signature=" .. generate_signature("/scores/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/scores/?game_id=" .. gamejolt.app_id ..
                                                   (table_id and "&table_id=" .. table_id or "") ..
                                                   "&username=" .. gamejolt.username ..
                                                   "&user_token=" .. gamejolt.user_token)
-    return api_request(url)
+    return apiRequest(url)
 end
 
 ---Submits a score to the GameJolt API using the specified table ID and score value.
@@ -348,18 +349,18 @@ end
 ---@param sort string|nil
 ---@param extra_data string|nil
 ---@return boolean|false, string|nil
-function gamejolt.submit_score(score, table_id, sort, extra_data)
+function gamejolt.submitScore(score, table_id, sort, extra_data)
     local url = gamejolt.base_url .. "/scores/add/?game_id=" .. gamejolt.app_id ..
                 "&score=" .. score ..
                 (table_id and "&table_id=" .. table_id or "") ..
                 (sort and "&sort=" .. sort or "") ..
                 (extra_data and "&extra_data=" .. extra_data or "") ..
-                "&signature=" .. generate_signature("/scores/add/?game_id=" .. gamejolt.app_id ..
+                "&signature=" .. generateSignature("/scores/add/?game_id=" .. gamejolt.app_id ..
                                                   "&score=" .. score ..
                                                   (table_id and "&table_id=" .. table_id or "") ..
                                                   (sort and "&sort=" .. sort or "") ..
                                                   (extra_data and "&extra_data=" .. extra_data or ""))
-    local result, err = api_request(url)
+    local result, err = apiRequest(url)
     if (result) then
         return true
     else

@@ -5,6 +5,7 @@ local heart = Sprites.CreateSprite(_spr.path, 0)
 heart:MoveTo(_spr:GetPosition())
 heart.color = _spr.color
 local gameover = Sprites.CreateSprite("UI/Battle Screen/spr_gameoverbg_0.png", 5)
+gameover.color = Global.GetVariable("MainColor")
 gameover.y = 120
 gameover.alpha = 0
 

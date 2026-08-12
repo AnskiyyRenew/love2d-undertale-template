@@ -116,12 +116,18 @@ local function state_behaviours_drawer()
         local x, y = 90, 270
         for i = 1, #e.actions
         do
+            local action_ = e.actions[i]
             if (i % 2 == 0) then
                 x = 340
             else
                 x = 90
             end
             local t = Typers.InstText.New("* " .. e.actions[i].name, {x, y}, "UponArena")
+            if (action_._color) then
+                t.color = action_._color
+            else
+                t.color = Global.GetVariable("MainColor")
+            end
             table.insert(state.typers, t)
 
             if (i % 2 == 0) then
@@ -141,6 +147,8 @@ local function state_behaviours_drawer()
             local t = Typers.InstText.New("* " .. item_.name, {x, y}, "UponArena")
             if (item_._color) then
                 t.color = item_._color
+            else
+                t.color = Global.GetVariable("MainColor")
             end
             table.insert(state.typers, t)
 
@@ -152,6 +160,7 @@ local function state_behaviours_drawer()
         local canflee = game.can_flee
 
         local t = Typers.InstText.New("* " .. Localize.localizeText("Battle.Spare"), {90, 270}, "UponArena")
+        t.color = Global.GetVariable("MainColor")
         for _, e in ipairs(enemies)
         do
             if (e.canspare) then
@@ -163,6 +172,7 @@ local function state_behaviours_drawer()
 
         if (canflee) then
             local t = Typers.InstText.New("* " .. Localize.localizeText("Battle.Flee"), {90, 305}, "UponArena")
+            t.color = Global.GetVariable("MainColor")
             table.insert(state.typers, t)
         end
     elseif (s == "TRYINGFLEE") then

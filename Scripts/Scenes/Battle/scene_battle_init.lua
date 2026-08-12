@@ -40,7 +40,8 @@ end
 local function HandleItems(item)
     print("Used " .. item.name)
     Battle.BattleDialogue({
-        "* Wow."
+        "* You ate Chocolate.",
+        "* You recovered 99 HP!"
     }, "ACTIONSELECT")
 end
 

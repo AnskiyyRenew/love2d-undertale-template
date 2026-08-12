@@ -6,6 +6,15 @@
 
   "Battle.WinTexts1": "* You WON![wait:0.5]\n* You earned %s XP and %s Gold.\n",
   "Battle.WinTexts2": "* Your LOVE increased!",
+
+  "Battle.GameoverText": ["* Our fates rests\n  upon you...", "* %s![wait:0.5]\n  stay determined..."],
+
+  "Overworld.Shop.Action.Buy": "Buy",
+  "Overworld.Shop.Action.Sell": "Sell",
+  "Overworld.Shop.Action.Talk": "Talk",
+  "Overworld.Shop.Action.Exit": "Exit",
+
+
   
   "Battle.EnemiesName.Sol": "Sol",
   "Battle.EnemiesName.Sincera": "Sincera",
@@ -33,7 +42,8 @@
   "Battle.Actions.Texts.SPIDER.TALK": ["* You try to move closer to the\n  spider and speak to it...", "* Oh, I forgot to ask whether\n  you're afraid of spiders.[func:Jser]", "* Haha, was the prank fun?"],
   "Battle.Actions.Texts.SPIDER.KNOT": ["* You tied a bow around the\n  spider's silk thread...", "* Well, it tightened back into\n  a single line...", "* Looks like this silk\n  thread gave up halfway."],
 
-  "Battle.Actions.Texts.Poseur.Check": "* Poseur[wait:0.5] - 0 ATK 0 DEF[wait:0.5]\n* Not what I want.",
+  "Battle.Actions.Texts.Poseur.Check": ["* Poseur[wait:0.5] - 0 ATK 0 DEF[wait:0.5]\n* Not what I want.", "* A mascot from CYF."],
+  "Battle.Actions.Texts.Poseur.Pose": ["* "],
   
   "Items": {}
 }

@@ -105,6 +105,29 @@ function overworld.Init(lua_file)
     overworld.map.Init(lua_file)
 end
 
+function overworld.onConfirm(type_name, id, sub_key, func)
+    local key = nil
+    local callback = sub_key
+
+    if (func) then
+        key = sub_key
+        callback = func
+    end
+
+    if (type(callback) ~= "function") then
+        error("overworld.onConfirm: callback must be a function")
+    end
+
+    local can_interact = overworld.getInteractResult(type_name, id)
+    if (key) then
+        can_interact = can_interact and overworld.getInteractResult(type_name, id, key)
+    end
+
+    if (can_interact and Keyboard.GetState("confirm") == 1) then
+        callback()
+    end
+end
+
 function overworld.SetMusic(mpath)
     if (not Audio.FindMusic(mpath)) then
         local mus

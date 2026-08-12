@@ -27,48 +27,17 @@ Layers = ImportFile("Layers")
 Sprites = ImportFile("Sprites")
 Typers = ImportFile("Typers")
 Debugger = ImportFile("Engine.Debugger")
-Localize = ImportFile("Localize")
-Localize.setFile("zh_CN")
 Gamejolt = ImportFile("GamejoltAPI")
-
--- Limits
---[[
-    The following are foolproof design measures: 
-    if the number of images/typewriter entries/audio files you create exceeds this limit,
-    you will be automatically notified.
-    If it exceeds twice the limit, creation will begin to be blocked.
-
-    Under normal circumstances, we do not need this many resources,
-    so if you are blocked, please check whether the recycling function
-    has any vulnerabilities.
-]]
-Global.SetVariable("SE_MEMORY_SAFETY", true)    -- DANGEROUS
-Global.SetVariable("OPT_COUNT_SPRITES", 2000)
-Global.SetVariable("OPT_COUNT_TYPERS", 300)
-Global.SetVariable("OPT_MEMORY_MAXSIZE", 0.8)
-Global.SetVariable("OPT_LRU_SPRITES", {true, 180})      -- Unit: seconds. If this time is exceeded without using the texture, it will be removed from the cache according to the LRU algorithm to free up space.
-local guard = ImportFile("Engine.MemorySafety")
-
--- Initialize
-Global.SetVariable("UseRealTime(dt)", true)
---Global.SetVariable("MainColor", SE.tools.hexColor("#6B0684"))
-Global.SetVariable("MainColor", {1, 1, 1})
-Global.SetVariable("ScreenShaders", {})
-Global.SetVariable("FPS", 60)
-Global.SetVariable("F2Room", "scene_logo")
-Global.SetVariable("Volume", {
-    Master = 1,
-    Music  = 1,
-    Sounds = 1
-})
+Discord = ImportFile("DiscordRPC")
+ImportFile("Engine.PureConf")
+Localize = ImportFile("Localize")
+Localize.setFile(Global.GetVariable("Language"))
 
 local frameTime = 1 / Global.GetVariable("FPS")
 local startTime = SE.timer.getTime()
 
 local scene_
-Scenes.switchTo("Overworld.scene_ow_main_0")
---Scenes.switchTo("TEST.scene_cc")
---Scenes.switchTo("scene_end")
+Scenes.switchTo(Global.GetVariable("FirstRoom"))
 
 ScreenScale = 1
 DrawX, DrawY = 0, 0
@@ -96,11 +65,13 @@ function love.load()
     INTERMEDIATE_CANVAS:setFilter("nearest", "nearest")
 
     updateScreenScale()
+
+    Discord.init()
 end
 
 function love.update(dt)
     -- Libraries
-    guard.Update(dt)
+    Guard.Update(dt)
     Keyboard.Update()
     Tween.Update(dt)
     Sprites.Update(dt)
@@ -108,6 +79,7 @@ function love.update(dt)
     Audio.Update(dt)
     Debugger.Update()
     Gamejolt.update(dt)
+    Discord.update(dt)
 
     scene_ = Scenes.current
     if (scene_.update and not scene_.pausing) then scene_.update(dt) end
@@ -251,5 +223,6 @@ end
 
 function love.quit()
     print("quitting")
+    Discord.shutdown()
     if (scene_.quit) then scene_.quit() end
 end
