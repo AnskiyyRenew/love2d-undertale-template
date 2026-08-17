@@ -143,9 +143,9 @@ function Keyboard.TouchPressed(id, sx, sy)
     if Keyboard.touchToMouse then
         -- only map if no other simulated mouse1 currently from touch
         if not Keyboard.simulatedKeys["__touch_mouse1"] or not Keyboard.simulatedKeys["__touch_mouse1"].pressed then
-            Keyboard.simulatedKeys["mouse1"] = { pressed = true, wasPressed = false }
+            Keyboard.simulatedKeys["mouse1"] = { pressed = true, pressaux = false, state = 1 }
             -- mark special key so we can release later
-            Keyboard.simulatedKeys["__touch_mouse1"] = { pressed = true }
+            Keyboard.simulatedKeys["__touch_mouse1"] = { pressed = true, pressaux = false, state = 1 }
         end
     end
 end
@@ -184,7 +184,7 @@ function Keyboard.TouchReleased(id, sx, sy)
     if Keyboard.touchToMouse then
         -- release mouse1 simulated key if it was from touch
         if Keyboard.simulatedKeys["__touch_mouse1"] and Keyboard.simulatedKeys["__touch_mouse1"].pressed then
-            Keyboard.simulatedKeys["mouse1"] = { pressed = false, wasPressed = true }
+            Keyboard.simulatedKeys["mouse1"] = { pressed = false, pressaux = true, state = -1 }
             Keyboard.simulatedKeys["__touch_mouse1"].pressed = false
         end
     end
@@ -234,18 +234,27 @@ end
 
 
 
+--- Simulate a key being pressed (works exactly like a real press:
+--- returns 1 the next frame, then 2 while held). Call from touch / events.
+---@param key string
 function Keyboard.SimulatePress(key)
-    Keyboard.simulatedKeys[key] = {
-        pressed = true,
-        wasPressed = false
-    }
+    local simKey = Keyboard.simulatedKeys[key]
+    if (not simKey) then
+        simKey = { pressed = false, pressaux = false, state = 0 }
+        Keyboard.simulatedKeys[key] = simKey
+    end
+    simKey.pressed = true
 end
 
+--- Simulate a key being released (returns -1 for one frame, then 0).
+---@param key string
 function Keyboard.SimulateRelease(key)
-    Keyboard.simulatedKeys[key] = {
-        pressed = false,
-        wasPressed = true
-    }
+    local simKey = Keyboard.simulatedKeys[key]
+    if (not simKey) then
+        simKey = { pressed = false, pressaux = false, state = 0 }
+        Keyboard.simulatedKeys[key] = simKey
+    end
+    simKey.pressed = false
 end
 
 function Keyboard.SimulateTap(key)
@@ -261,16 +270,8 @@ end
 ---@return integer
 function Keyboard.GetState(key)
     if (Keyboard.simulatedKeys[key]) then
-        local simKey = Keyboard.simulatedKeys[key]
-        if (simKey.pressed and not simKey.wasPressed) then
-            return 1
-        elseif (simKey.pressed and simKey.wasPressed) then
-            return 2
-        elseif (not simKey.pressed and simKey.wasPressed) then
-            return -1
-        else
-            return 0
-        end
+        -- State is computed every frame in Keyboard.Update() (same edge logic as real keys)
+        return Keyboard.simulatedKeys[key].state or 0
     end
 
     if (Keyboard.allowInput) then
@@ -461,6 +462,38 @@ function Keyboard.Update()
             table.remove(Keyboard.progresses, i)
         end
         progress.timer = progress.timer + 1
+    end
+
+    -- Finalize simulated key states (same edge logic as the real keys above).
+    -- This makes simulated input feel identical to real input:
+    --   1 = just pressed, 2 = held, -1 = just released, 0 = released
+    -- It runs after the AutoPress loop so AutoPress presses register on the same frame.
+    local staleKeys = {}
+    for key, simKey in pairs(Keyboard.simulatedKeys) do
+        if (simKey.pressed ~= nil) then
+            if (simKey.pressed and simKey.pressed == simKey.pressaux) then
+                simKey.state = 2
+            elseif (not simKey.pressed and simKey.pressed == simKey.pressaux) then
+                simKey.state = 0
+            else
+                if (simKey.pressed and not simKey.pressaux) then
+                    simKey.state = 1
+                else
+                    simKey.state = -1
+                end
+                simKey.pressaux = simKey.pressed
+            end
+
+            -- A fully-released simulated key is dropped so it no longer shadows
+            -- real input for the same key name (e.g. after using the virtual
+            -- keyboard's "z", a real Z press works again).
+            if (not simKey.pressed and simKey.state == 0) then
+                table.insert(staleKeys, key)
+            end
+        end
+    end
+    for _, key in ipairs(staleKeys) do
+        Keyboard.simulatedKeys[key] = nil
     end
 end
 

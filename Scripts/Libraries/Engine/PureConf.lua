@@ -15,6 +15,14 @@ Global.SetVariable("Volume", {
     Sounds = 1
 })
 
+-- Controller / Input simulation (for testing on desktop without real hardware)
+--   virtualKeyboard = true  -> force-show the on-screen virtual keyboard (click with mouse to test)
+--   joystick        = true  -> pretend a gamepad is connected so you can simulate its buttons/axes
+Global.SetVariable("ControllerSimulation", {
+    virtualKeyboard = false,
+    joystick        = false,
+})
+
 -- Network things
 Global.SetVariable("GamejoltID", nil)
 Global.SetVariable("GamejoltPK", nil)

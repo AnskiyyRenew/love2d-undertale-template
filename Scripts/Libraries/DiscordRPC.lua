@@ -2,7 +2,6 @@
     DiscordRPC.lua
     ============================================================================
     Discord Rich Presence for LÖVE / Soul Engine, powered by the battle-tested
-    `discord-rpc` C library - the same one used by the Kristal engine.
 
         Resources/Libs/DiscordRPC/
             discord-rpc-x64.dll      (Windows 64-bit)
@@ -67,10 +66,6 @@ discord.JoinReply = { No = 0, Yes = 1, Ignore = 2 }
 function discord.timestamp(seconds)
     return os.time() + (tonumber(seconds) or 0)
 end
-
--- ============================================================================
--- FFI bindings for the discord-rpc C API (mirrors Kristal's implementation)
--- ============================================================================
 local ffi_ok, ffi = pcall(require, "ffi")
 
 if (ffi_ok) then
@@ -342,8 +337,7 @@ if (ffi_ok) then
         end
     end
     -- CRITICAL for LuaJIT: a JIT-compiled Lua function must not call into a C
-    -- function (Discord_RunCallbacks) that may call back into Lua. Force this
-    -- function to run in the interpreter only (same as Kristal).
+    local jit = nil
     if (jit and jit.off) then
         jit.off(discord.update)
     end

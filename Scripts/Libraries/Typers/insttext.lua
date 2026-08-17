@@ -311,6 +311,7 @@ function typers.New(text, position, layer, size)
         end
         typer.text = tostring(new_text or "")
         rebuildLetters()
+        --typer.letters = {}
     end
 
     function typer:Rebuild()

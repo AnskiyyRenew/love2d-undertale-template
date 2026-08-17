@@ -191,14 +191,18 @@ function ui.newMissText(text, pos)
     table.insert(ui._notbtexts, t)
 end
 
+function ui.barUpdate()
+    bar_maxhp.xscale = math.min(bar_maxlength, Player.maxhp * 1.21)
+    bar_hp.xscale = Player.hp / Player.maxhp * bar_maxhp.xscale
+    bar_kr.x = bar_hp.x + bar_hp.xscale
+end
+
 function ui.Update(dt)
     buttons.Update()
     ui.button_selecting = buttons.button_selecting
     state.Update()
 
-    bar_maxhp.xscale = math.min(bar_maxlength, Player.maxhp * 1.21)
-    bar_hp.xscale = Player.hp / Player.maxhp * bar_maxhp.xscale
-    bar_kr.x = bar_hp.x + bar_hp.xscale
+    ui.barUpdate()
 
     for i = #ui._bouncetexts, 1, -1
     do

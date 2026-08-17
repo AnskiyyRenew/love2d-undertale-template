@@ -1,3 +1,4 @@
+local path = (...):match("(.-)[^%.]+$")
 local logic = {}
 
 logic = {
@@ -34,7 +35,7 @@ logic = {
 }
 
 logic.flags = {}
-
+logic.item_db = require(path .. "Logics.items")
 logic.lv_data = {
     { lv = 1,  hp = 20,  at = 10,  df = 10, totalExp = 0      },
     { lv = 2,  hp = 24,  at = 12,  df = 10, totalExp = 10     },

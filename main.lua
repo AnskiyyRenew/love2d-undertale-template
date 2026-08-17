@@ -21,7 +21,10 @@ Tween = ImportFile("Tween")
 Masks = ImportFile("Masks")
 Camera = ImportFile("Camera"):New()
 Audio = ImportFile("Audio")
-Keyboard = ImportFile("Keyboard")
+Keyboard = ImportFile("Controller.Keyboard")
+Joystick = ImportFile("Controller.Joystick")
+VirtualKeyboard = ImportFile("Controller.VirtualKeyboard")
+Controller = ImportFile("Controller.Controller")
 Scenes = ImportFile("SceneManager")
 Layers = ImportFile("Layers")
 Sprites = ImportFile("Sprites")
@@ -32,6 +35,18 @@ Discord = ImportFile("DiscordRPC")
 ImportFile("Engine.PureConf")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
+
+-- Controller simulation (see Engine/PureConf.lua "ControllerSimulation").
+-- Lets you test the virtual keyboard / gamepad on desktop without real hardware.
+local _controllerSim = Global.GetVariable("ControllerSimulation")
+if (_controllerSim) then
+    if (_controllerSim.virtualKeyboard) then
+        VirtualKeyboard.SetEnabled(true)
+    end
+    if (_controllerSim.joystick) then
+        Joystick.SimulateConnection(true)
+    end
+end
 
 local frameTime = 1 / Global.GetVariable("FPS")
 local startTime = SE.timer.getTime()
@@ -72,7 +87,13 @@ end
 function love.update(dt)
     -- Libraries
     Guard.Update(dt)
+    -- Order matters: poll the gamepad, mirror it onto Keyboard's simulated
+    -- keys, then let Keyboard.Update() finalize all key states before the
+    -- scene reads them. This makes the gamepad act exactly like the keyboard.
+    Joystick.Update()
+    Controller.Update()
     Keyboard.Update()
+    VirtualKeyboard.Update()
     Tween.Update(dt)
     Sprites.Update(dt)
     Typers.Update(dt)
@@ -136,6 +157,9 @@ function love.draw()
     SE.graphics.pop()
 
     Debugger.Draw()
+
+    -- On-screen virtual keyboard overlay (drawn in screen space)
+    VirtualKeyboard.Draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -151,6 +175,8 @@ function love.keypressed(key, scancode, isrepeat)
         return
     elseif (key == "f2") then
         Localize.reload()
+        package.loaded["Scripts.Libraries.Engine.PureConf"] = nil
+        ImportFile("Engine.PureConf")
         Scenes.switchTo(Global.GetVariable("F2Room"))
     end
     if (not _RELEASED) then
@@ -166,6 +192,8 @@ function love.keypressed(key, scancode, isrepeat)
             print("Screen:", love.graphics.getDimensions())
             print("Scale:", ScreenScale)
             print("Scene:", Scenes.name_current)
+            local _dev = Controller.GetDevices()
+            print("Input: VK=" .. tostring(_dev.virtualKeyboard) .. " Gamepads=" .. tostring(_dev.joystickCount))
             print("Sprites:", #Sprites.images)
             print("Layers objects:", Layers.count())
             print("==================")
@@ -185,15 +213,59 @@ function love.textinput(text)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-    if (scene_.mousepressed and not scene_.pausing) then scene_.mousepressed(x, y, button, istouch, presses) end
+    local consumed = false
+    if (button == 1 and not istouch) then
+        -- Desktop simulation: clicking the virtual keyboard acts like touch
+        consumed = VirtualKeyboard.MousePressed(x, y)
+    end
+    if (not consumed and scene_.mousepressed and not scene_.pausing) then scene_.mousepressed(x, y, button, istouch, presses) end
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
-    if (scene_.mousereleased and not scene_.pausing) then scene_.mousereleased(x, y, button, istouch, presses) end
+    local consumed = false
+    if (button == 1 and not istouch) then
+        consumed = VirtualKeyboard.MouseReleased(x, y)
+    end
+    if (not consumed and scene_.mousereleased and not scene_.pausing) then scene_.mousereleased(x, y, button, istouch, presses) end
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
     if (scene_.mousemoved and not scene_.pausing) then scene_.mousemoved(x, y, dx, dy, istouch) end
+end
+
+-- Touchscreen input (mobile). Feed the Keyboard touch tracker and the virtual
+-- keyboard; also forward to the current scene if the virtual keyboard didn't consume it.
+function love.touchpressed(id, x, y, dx, dy, pressure)
+    Keyboard.TouchPressed(id, x, y)
+    local consumed = VirtualKeyboard.TouchPressed(id, x, y)
+    if (not consumed and scene_.touchpressed and not scene_.pausing) then
+        scene_.touchpressed(id, x, y, dx, dy, pressure)
+    end
+end
+
+function love.touchmoved(id, x, y, dx, dy, pressure)
+    Keyboard.TouchMoved(id, x, y)
+    VirtualKeyboard.TouchMoved(id, x, y)
+    if (scene_.touchmoved and not scene_.pausing) then
+        scene_.touchmoved(id, x, y, dx, dy, pressure)
+    end
+end
+
+function love.touchreleased(id, x, y, dx, dy, pressure)
+    Keyboard.TouchReleased(id, x, y)
+    local consumed = VirtualKeyboard.TouchReleased(id, x, y)
+    if (not consumed and scene_.touchreleased and not scene_.pausing) then
+        scene_.touchreleased(id, x, y, dx, dy, pressure)
+    end
+end
+
+-- External gamepad connection events
+function love.joystickadded(joystick)
+    Joystick.Connect(joystick)
+end
+
+function love.joystickremoved(joystick)
+    Joystick.Disconnect(joystick)
 end
 
 function love.wheelmoved(x, y)

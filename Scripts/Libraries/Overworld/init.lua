@@ -65,11 +65,11 @@ blacktop.Step = function (self)
     end
 end
 
-function GetRelativePos(x, y)
-    local function clamp(v, max, min)
-        return (math.max(math.min(max, v), min))
-    end
+local function clamp(v, max, min)
+    return (math.max(math.min(max, v), min))
+end
 
+function GetRelativePos(x, y)
     local rx = clamp(Camera.x, (Camera.max_x or math.huge), (Camera.min_x or -math.huge))
     local ry = clamp(Camera.y, (Camera.max_y or math.huge), (Camera.min_y or -math.huge))
     return rx - 320 + x, ry - 240 + y

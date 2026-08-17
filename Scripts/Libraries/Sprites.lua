@@ -837,12 +837,13 @@ function sprites.CreateSprite(path, layer)
     end
 
     function sprite:SetAnimation(frames, interval, mode)
+        sprite:Set(frames[1])
         sprite.animation = {
             textures = (frames or {}),
             interval = interval,
             mode = (mode or "loop"),
             time = 0,
-            frame = 1,
+            frame = 2,
             done = false
         }
     end

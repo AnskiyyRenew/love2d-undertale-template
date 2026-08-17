@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-field
+
 local path = (...):match("(.-)[^%.]+$")
 local battle = {
     player = require(path .. "Battle.Player"),
@@ -142,6 +144,7 @@ function battle.SetGame(file)
         if (player_data.lv) then Player.lv = player_data.lv end
         if (player_data.maxhp) then Player.maxhp = player_data.maxhp end
         if (player_data.hp) then Player.hp = player_data.hp end
+        UI.barUpdate()
 
         -- Attach game_apis methods to the encounter table via metatable.
         -- This allows encounter:AddItem(...), encounter:AddEnemy(...),
