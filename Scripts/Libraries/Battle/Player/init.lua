@@ -19,6 +19,7 @@ local Player = {
     souls = {},
 
     hurt_time = 0,
+    back_alpha = true,
 
     name = "Tester",
     lv = 19,
@@ -49,6 +50,25 @@ function Player.SetSoul(id, args, use_sound)
 
     if (use_sound) then
         Audio.PlaySound("snd_ding.wav")
+    end
+end
+
+function Player.AddParticle()
+    local shadow = Sprites.CreateSprite(Player.sprite.path, Player.sprite.layer)
+    shadow:MoveTo(Player.sprite:GetPosition())
+    shadow.color = Player.sprite.color
+    shadow.alpha = Player.sprite.alpha
+    shadow.Step = function (self)
+        self:MoveTo(Player.sprite:GetPosition())
+        self:Scale(
+            self.xscale + (2 - self.xscale) / 8,
+            self.yscale + (2 - self.yscale) / 8
+        )
+        self.alpha = self.alpha - 0.05
+
+        if (self.alpha <= 0) then
+            self:Destroy()
+        end
     end
 end
 
@@ -100,7 +120,7 @@ function Player.SetHitBox(width, height, soul)
 end
 
 function Player.Heal(amount, use_sound)
-    Player.hp = Player.hp + amount
+    Player.hp = math.min(Player.maxhp, Player.hp + amount)
 
     if (use_sound) then
         if (amount > 0) then
@@ -112,6 +132,7 @@ function Player.Heal(amount, use_sound)
 end
 
 function Player.Hurt(amount, time, use_sound)
+    Player.back_alpha = false
     Player.hp = math.max(0, Player.hp - amount)
     Player.hurt_time = (time or 60)
     Player.sprite.alpha = 0.4
@@ -137,7 +158,10 @@ function Player.Update(dt)
         end
         Player.hurt_time = Player.hurt_time - 1
     else
-        Player.sprite.alpha = 1
+        if (not Player.back_alpha) then
+            Player.sprite.alpha = 1
+            Player.back_alpha = true
+        end
 
         for _, b in ipairs(Sprites.images)
         do
@@ -156,6 +180,7 @@ function Player.Update(dt)
     end
 
     if (Battle.state ~= "DEFENDING") then return end
+    if (not Player.canMove) then return end
     Player.action.Update(dt)
     --print(true)
 

@@ -270,6 +270,8 @@ function sprites.CreateSprite(path, layer)
         __index = function(t, k)
             if k == "layer" then
                 return rawget(t, "_layer_value")
+            elseif k == "x" or k == "y" then
+                return rawget(t, "_" .. k)
             end
             return rawget(t, k)
         end,
@@ -277,6 +279,18 @@ function sprites.CreateSprite(path, layer)
             if k == "layer" then
                 rawset(t, "_layer_value", v)
                 Layers.mark_dirty()
+            elseif (k == "x" or k == "y") then
+                local prev = rawget(t, "_" .. k)
+                if (prev ~= v and t.speed) then
+                    local d = v - prev
+                    if (k == "x") then
+                        t.speed.x = t.speed.x + d
+                    else
+                        t.speed.y = t.speed.y + d
+                    end
+                    rawset(t, "is_moving", true)
+                end
+                rawset(t, "_" .. k, v)
             else
                 rawset(t, k, v)
             end
@@ -578,8 +592,10 @@ function sprites.CreateSprite(path, layer)
     end
 
     function sprite:Update(dt)
-        -- Record previous position for movement tracking
-        local prev_x, prev_y = self.x, self.y
+        -- Coordinate writes below are tracked by the metatable.
+        self.speed.x = 0
+        self.speed.y = 0
+        self.is_moving = false
 
         -- Apply parent-anchored position first (base position from parent)
         if self.parent and self.parent.image then
@@ -600,12 +616,6 @@ function sprites.CreateSprite(path, layer)
         self.x = self.x + self.velocity.x * self.move_speed
         self.y = self.y + self.velocity.y * self.move_speed
         self.rotation = self.rotation + self.velocity.r
-        -- Track actual movement: set is_moving and record actual pixel delta into speed
-        local dx = self.x - prev_x
-        local dy = self.y - prev_y
-        self.is_moving = (dx ~= 0 or dy ~= 0)
-        self.speed.x = dx
-        self.speed.y = dy
 
         if (self.Step) then
             self:Step(dt)
@@ -754,7 +764,6 @@ function sprites.CreateSprite(path, layer)
     end
 
     function sprite:Move(x, y)
-        local prev_x, prev_y = self.x, self.y
         self.x = self.x + x
         self.y = self.y + y
         -- Recalculate anchor_px so parent tracking stays correct
@@ -772,12 +781,6 @@ function sprites.CreateSprite(path, layer)
                 self.yanchor_px = dy
             end
         end
-        -- Update movement tracking immediately
-        local dx = self.x - prev_x
-        local dy = self.y - prev_y
-        self.is_moving = (dx ~= 0 or dy ~= 0)
-        self.speed.x = dx
-        self.speed.y = dy
     end
 
     function sprite:MoveTo(x, y)

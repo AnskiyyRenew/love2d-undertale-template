@@ -55,7 +55,7 @@ function MyMonster:Spare()
 end
 
 function MyMonster:Update(dt)
-    if (not self.running or not self.sprite) then
+    if (not self.running) then
         return
     end
 

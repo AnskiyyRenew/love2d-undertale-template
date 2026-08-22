@@ -13,8 +13,8 @@ function action.Update(dt)
 
     local can_move = action.can_move
     local sprite = action.sprite
-    local up, down, left, right = Keyboard.GetState("up"), Keyboard.GetState("down"), Keyboard.GetState("left"), Keyboard.GetState("right")
-    local cancel = Keyboard.GetState("cancel")
+    local up, down, left, right = Controller.GetState("up"), Controller.GetState("down"), Controller.GetState("left"), Controller.GetState("right")
+    local cancel = Controller.GetState("cancel")
 
     if (cancel > 0) then
         speed = 1

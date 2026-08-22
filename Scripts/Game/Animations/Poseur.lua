@@ -52,6 +52,10 @@ function PoseurAnim:Spare()
     self.poseur.alpha = 0.5
 end
 
+local function swing()
+    
+end
+
 function PoseurAnim:Update(dt)
     if (not self.running) then
         return

@@ -56,20 +56,23 @@ local function getTextCacheKey(font, char)
     return font_key .. "_" .. char
 end
 
---- Release a text object AND evict it from cache so a stale released object
---- is never returned by getTextObject on re-creation.
-local function releaseAndEvict(text_obj)
-    if (not text_obj or not text_obj.release) then return end
+--- Decrement a text object's reference count. Text objects are shared across
+--- all InstText instances (same font + char), so only release and evict from
+--- the cache once no instance references it anymore. This prevents the
+--- "Cannot use object after it has been released" error when one instance
+--- rebuilds while another still draws the same object.
+local function releaseTextObject(font, char)
+    local key = getTextCacheKey(font, char)
+    local cache_entry = text_cache[key]
+    if not cache_entry then return end
 
-    -- Scan cache for any entry holding this text_obj and remove it
-    for key, entry in pairs(text_cache) do
-        if (entry.text_obj == text_obj) then
-            text_cache[key] = nil
-            break
+    cache_entry.refs = cache_entry.refs - 1
+    if (cache_entry.refs <= 0) then
+        if (cache_entry.text_obj and cache_entry.text_obj.release) then
+            cache_entry.text_obj:release()
         end
+        text_cache[key] = nil
     end
-
-    text_obj:release()
 end
 
 local function getTextObject(font, char)
@@ -122,6 +125,31 @@ function typers.New(text, position, layer, size)
             if k == "layer" then
                 rawset(t, "_layer_value", v)
                 Layers.mark_dirty()
+            elseif k == "font" then
+                rawset(t, k, v)
+                -- Setting font directly applies it to both the English and
+                -- non-English bondfont entries, with empty funcs so the whole
+                -- text renders with this single font.
+                if (t.bondfont) then
+                    t.bondfont.engfont.font = v
+                    t.bondfont.non_engfont.font = v
+                    t.bondfont.engfunc = function() end
+                    t.bondfont.non_engfunc = function() end
+                end
+                -- InstText pre-renders letters, so re-render with the new font.
+                if (t.Rebuild) then t:Rebuild() end
+            elseif k == "fontsize" then
+                rawset(t, k, v)
+                -- Setting fontsize directly applies it to both bondfont sizes,
+                -- with empty funcs as well.
+                if (t.bondfont) then
+                    t.bondfont.engfont.size = v
+                    t.bondfont.non_engfont.size = v
+                    t.bondfont.engfunc = function() end
+                    t.bondfont.non_engfunc = function() end
+                end
+                -- InstText pre-renders letters, so re-render with the new size.
+                if (t.Rebuild) then t:Rebuild() end
             else
                 rawset(t, k, v)
             end
@@ -149,7 +177,7 @@ function typers.New(text, position, layer, size)
         end
     }
 
-    typer.color = {1, 1, 1}
+    typer.color = (Global.GetVariable("MainColor") or {1, 1, 1})
     typer.alpha = 1
     typer.scale = 1
     typer.outline = nil
@@ -161,8 +189,8 @@ function typers.New(text, position, layer, size)
         -- Release old text objects (evicts from cache to prevent reuse-after-free)
         if (typer.letters) then
             for _, letter in ipairs(typer.letters) do
-                if (letter.text_obj) then
-                    releaseAndEvict(letter.text_obj)
+                if (letter.font and letter.char) then
+                    releaseTextObject(letter.font, letter.char)
                 end
             end
         end
@@ -329,8 +357,8 @@ function typers.New(text, position, layer, size)
         end
         if (typer.letters) then
             for _, letter in ipairs(typer.letters) do
-                if (letter.text_obj) then
-                    releaseAndEvict(letter.text_obj)
+                if (letter.font and letter.char) then
+                    releaseTextObject(letter.font, letter.char)
                 end
             end
         end

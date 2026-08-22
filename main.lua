@@ -65,6 +65,9 @@ local function updateScreenScale()
 end
 
 function love.load()
+    -- Load the initial (deferred) scene synchronously so scene_ is set before
+    -- any love.* event (e.g. love.resize) can fire ahead of the first update.
+    Scenes.flushPendingSwitch()
     scene_ = Scenes.current
 
     MAIN_CANVAS = SE.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, nil, {
@@ -85,6 +88,10 @@ function love.load()
 end
 
 function love.update(dt)
+    -- Process any scene switch queued during the previous frame's callbacks
+    -- (prevents re-entrant switchTo from overflowing the stack).
+    Scenes.flushPendingSwitch()
+
     -- Libraries
     Guard.Update(dt)
     -- Order matters: poll the gamepad, mirror it onto Keyboard's simulated

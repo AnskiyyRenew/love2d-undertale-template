@@ -1,6 +1,7 @@
 local path = (...):match("(.-)[^%.]+$")
 local logic = {}
 
+Global.SetVariable("FUN", math.random(0, 100))
 logic = {
     time = 0,
     room_name = "--",

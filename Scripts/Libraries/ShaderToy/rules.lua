@@ -40,7 +40,6 @@ end
 
 rules.REPLACEMENT_RULES = {
     { pattern = "iChannelResolution%[(%d)%]", replacement = "iChannelResolution%1" },
-    { pattern = "fragColor%s*=",              replacement = "return " },
     { pattern = "texture%s*%(",               replacement = "Texel(" },
     { pattern = "gl_FragCoord",               replacement = "screen_coords" },
     { pattern = "precision%s+%w+%s+float%s*;", replacement = "" },

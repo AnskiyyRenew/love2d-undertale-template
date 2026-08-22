@@ -36,6 +36,7 @@ local char = {
     isMoving = false,
     -- Whether the player can move (input is read only while this is true).
     controlling = true,
+    mainstate = "",
     collision = {
         body = nil,
         shape = nil,
@@ -120,11 +121,11 @@ function char.Update(dt)
     if (char.controlling) then
         -- The first pressed direction is remembered until it is released,
         -- so reversing direction requires turning first.
-        if (Keyboard.GetState(first_direction) <= 0) then
+        if (Controller.GetState(first_direction) <= 0) then
             first_direction = ""
         end
 
-        if (Keyboard.GetState("left") > 0) then
+        if (Controller.GetState("left") > 0) then
             if (char.direction ~= "right") then velbodyx = -2 end
             if (first_direction == "" or not d_pressing) then
                 char.direction = "left"
@@ -132,7 +133,7 @@ function char.Update(dt)
                 d_pressing = true
             end
         end
-        if (Keyboard.GetState("right") > 0) then
+        if (Controller.GetState("right") > 0) then
             if (char.direction ~= "left") then velbodyx = 2 end
             if (first_direction == "" or not d_pressing) then
                 char.direction = "right"
@@ -140,7 +141,7 @@ function char.Update(dt)
                 d_pressing = true
             end
         end
-        if (Keyboard.GetState("up") > 0) then
+        if (Controller.GetState("up") > 0) then
             if (char.direction ~= "down") then velbodyy = -2 end
             if (first_direction == "" or not d_pressing) then
                 char.direction = "up"
@@ -148,7 +149,7 @@ function char.Update(dt)
                 d_pressing = true
             end
         end
-        if (Keyboard.GetState("down") > 0) then
+        if (Controller.GetState("down") > 0) then
             if (char.direction ~= "up") then velbodyy = 2 end
             if (first_direction == "" or not d_pressing) then
                 char.direction = "down"

@@ -10,6 +10,7 @@ Layers.new_layer("DEBUG", 200)
 local path = (...):match("(.-)[^%.]+$")
 local overworld = {
     map = require(path .. "Overworld.map"),
+    stat = require(path .. "Overworld.stat"),
     inst = {},
     interacts = {},
     ui_prefer = "down",
@@ -19,7 +20,7 @@ local overworld = {
 
     debug = false,
 }
-DATA = require("Scripts.Game.Logics")
+DATA = DATA or require("Scripts.Game.Logics")
 
 -- One-frame lock: set when a dialog's typewriter finishes so that the same
 -- "confirm" press which closed the dialog cannot instantly re-trigger the
@@ -34,6 +35,7 @@ Overworld = overworld
 Map = overworld.map
 World = overworld.map.world
 Char = overworld.map.char
+Stat = overworld.stat
 
 local blacktop = Sprites.CreateSprite("px.png", "TOP")
 blacktop:Scale(1000, 1000)
@@ -123,7 +125,7 @@ function overworld.onConfirm(type_name, id, sub_key, func)
         can_interact = can_interact and overworld.getInteractResult(type_name, id, key)
     end
 
-    if (can_interact and Keyboard.GetState("confirm") == 1) then
+    if (can_interact and Controller.GetState("confirm") == 1) then
         callback()
     end
 end
@@ -311,6 +313,7 @@ function overworld.Update(dt)
     dialog_lock_pending = false
 
     overworld.map.Update(dt)
+    overworld.stat.Update(dt)
 end
 
 function overworld.Draw()
@@ -320,11 +323,9 @@ function overworld.Clear()
     Map.Destroy()
     Camera:unBounds()
 
-    local content = {"char", "map", "world", "stat", "init"}
-    for i = 1, #content
-    do
-        package.loaded["Scripts.Libraries.Overworld." .. content[i]] = nil
-    end
+    -- Clear the entire Overworld library tree (char, map, world, stat, init,
+    -- encounter, shop, ...) so it re-executes fresh on next load.
+    ClearModuleTree("Scripts.Libraries.Overworld")
 
     Camera:reset()
     dialog_just_closed = false

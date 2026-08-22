@@ -17,100 +17,81 @@ Layers.new_layer("TOP", 1000)
 
 -- Import battle module
 Battle = ImportFile("Battle")
-Game = Battle.SetGame("TestMonster")
+Battle.SetEndRoom("scene_end")
+Game = Battle.SetGame("Poseur")
+Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 
--- Animations
-local sincera = require("Scripts.Game.Animations.Sincera")
-sincera.Init()
-local spyder = require("Scripts.Game.Animations.Spyder")
-spyder.Init()
-spyder.Line(520, 0)
-local sol = require("Scripts.Game.Animations.Sol")
-sol.Init()
-
--- Register each enemy animation so attack patterns can trigger its Hurt()
--- animation by the enemy's id. Safe even before those modules define Hurt().
-Battle.RegisterEnemyAnim("SINCERA", sincera)
-Battle.RegisterEnemyAnim("SPIDER", spyder)
-Battle.RegisterEnemyAnim("SOL", sol)
-
-function Jser()
-    spyder.JumpScare()
-end
+-- Give each enemy its own independent animation instance. The animation
+-- module is a factory, so every call to InitAnimation creates a fresh
+-- instance with its own sprite — enemy #1 and enemy #2 no longer share one.
+Game:InitAnimation(1, {320, 140})
+Game:InitAnimation(2, {120, 140})
+local enemies = Game.enemies
 
 -- Handlers
-local sincera_ = 0
 local function HandleActions(enemy, action)
-    if (enemy.id == "SOL") then
-        if (action.id == "CHECK") then
+    if (enemy.id == "Poseur") then
+        if (action.id == "Check") then
             Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        elseif (action.id == "TALK") then
-            sol.Bounce()
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        elseif (action.id == "STARE") then
-            sol.Zoom(sol.cube.z - 200, 60)
-            sol.RotateFaster()
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        elseif (action.id == "IGNORE") then
-            sol.Zoom(sol.cube.z + 200, 60)
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        end
-    elseif (enemy.id == "SINCERA") then
-        if (action.id == "CHECK") then
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        elseif (action.id == "APPRECIATE") then
-            sincera_ = sincera_ + 1
-            print(sincera_)
-            if (sincera_ == 1) then
-                Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts.SINCERA.APPRECIATE1"), "ACTIONSELECT")
-            else
-                Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts.SINCERA.APPRECIATE2"), "ACTIONSELECT")
-            end
-        end
-    elseif (enemy.id == "SPIDER") then
-        if (action.id == "CHECK") then
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        elseif (action.id == "TALK") then
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        elseif (action.id == "KNOT") then
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-            spyder.Bounce()
         end
     end
+end
+
+local function HandleItems(item)
+    print("Used " .. item.name)
+
+    Player.Heal(99, true)
+    Battle.BattleDialogue({
+        "* You ate " .. item.name .. ".",
+        "* You recovered 99 HP!"
+    }, "ACTIONSELECT")
 end
 
 local function HandleFlee()
-    local p = (math.random() <= 0.75)
-
-    if (p) then
-        Battle.ChangeState("FLEEING")
-    end
+    print("Flee")
 end
 
 local function FleeUpdate(dt)
-    
+    print("Fleeing")
 end
 
 local function EnteringState(oldstate, newstate)
     Battle.defaultEnteringState(oldstate, newstate)
+    print("[Battle] " .. oldstate .. " → " .. newstate)
 end
 
+local function OnHit(bullet)
+    Player.Hurt(3, 60, true)
+end
 
-
-
+-- Don't touch these.
 Battle.HandleActions = HandleActions
+Battle.HandleItems = HandleItems
 Battle.EnteringState = EnteringState
 Battle.HandleFlee = HandleFlee
 Battle.FleeUpdate = FleeUpdate
+Battle.OnHit = OnHit
 
 
 
-
+-- Scene backgrounds
+local shader = ImportFile("Gradiant", "shader")
+shader:send("topLeftColor", {1, 0, 0, 0.5})
+shader:send("bottomLeftColor", {1, 0, 1, 0.5})
+shader:send("topRightColor", {0, 1, 1, 0.5})
+shader:send("bottomRightColor", {0, 1, 1, 0.5})
+shader:send("angle", 20)
+local background = Sprites.CreateSprite("px.png", "Background")
+background:Scale(640, 480)
+--background.color = {0, 0, 0}
+--background:SetShaders({shader})
 
 function scene.update(dt)
     Battle.Update(dt)
-    sol.Update(dt)
-    spyder.Update(dt)
+
+    if (Keyboard.GetState("K") == 1) then
+        Player.Hurt(30, 60)
+    end
 end
 
 function scene.clear()

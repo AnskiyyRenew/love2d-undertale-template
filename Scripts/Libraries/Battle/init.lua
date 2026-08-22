@@ -20,6 +20,9 @@ local battle = {
     _wave = {},
     restoring_arena = false,
 
+    TIME_F = 0,
+    TIME_R = 0,
+
     EXP = 0,
     GOLD = 0,
     room_end = "scene_logo",
@@ -45,6 +48,13 @@ function battle.BattleDialogue(texts, final_state)
         Battle.ChangeState(final_state or "ACTIONSELECT")
         Battle.narration_text:SetText(battle.game.narration)
         UI.state.block_transition = true
+    end
+end
+
+function battle.FullDialogue(texts, call)
+    local t = Typers.EText.New(texts, {60, 270}, "UponArena", {0, 0}, "manual")
+    t._onComplete = function ()
+        call()
     end
 end
 
@@ -75,6 +85,7 @@ local function defaultEnteringState(old, new)
     end
     if (new == "DEFENDING") then
         battle.Defending()
+        UI.buttons.ResetButtons()
     elseif (old == "DEFENDING" and new == "ACTIONSELECT") then
         package.loaded["Scripts.Waves." .. Battle.wave] = nil
         if (Battle._wave) then
@@ -138,12 +149,17 @@ function battle.SetGame(file)
         local game_ = battle.game
         if (not game_) then return end
         local player_data = game_.player
-        narration_text:SetText(game_.narration or "")
 
         if (player_data.name) then Player.name = player_data.name end
         if (player_data.lv) then Player.lv = player_data.lv end
         if (player_data.maxhp) then Player.maxhp = player_data.maxhp end
         if (player_data.hp) then Player.hp = player_data.hp end
+        if (game_.wave) then Battle.wave = game_.wave end
+        Battle.ChangeState(game_.state or "ACTIONSELECT")
+        UI.buttons.ResetButtons()
+        if (Battle.state == "ACTIONSELECT") then
+            narration_text:SetText(game_.narration or "")
+        end
         UI.barUpdate()
 
         -- Attach game_apis methods to the encounter table via metatable.
@@ -211,6 +227,10 @@ function battle.Update(dt)
     Arenas.Update(dt)
     UI.Update(dt)
 
+    -- Timers
+    battle.TIME_F = battle.TIME_F + 1
+    battle.TIME_R = battle.TIME_R + dt
+
     -- Enemies Animation
     if (not battle.game) then return end
     for _, v in ipairs(battle.game.enemies)
@@ -234,7 +254,7 @@ function battle.UpdateRestore(dt)
     end
 
     local arena = battle.mainarena
-    if (Keyboard.GetState("confirm") == 1) then
+    if (Controller.GetState("confirm") == 1) then
         arena:Resize(565, 130, true)
     end
 
@@ -245,30 +265,33 @@ function battle.UpdateRestore(dt)
 end
 
 function battle.Clear()
-    -- Clear the game module so it re-queries Localize on next load
+    -- Clear the game module tree so it re-queries Localize on next load
     if battle.gameName then
-        package.loaded[battle.gameName] = nil
+        ClearModuleTree(battle.gameName)
     end
+
+    -- Clear all loaded attack pattern modules (Scripts.Libraries.Battle.PlayerAttacks.*)
     for i = #battle.attack_paths, 1, -1
     do
-        package.loaded[battle.attack_paths[i]] = nil
+        ClearModuleTree(battle.attack_paths[i])
     end
-    -- Clear the wave wrapper and reset the shared "Battle.Waves" state so a
-    -- future wave doesn't inherit a stale _end = true flag.
-    package.loaded["Scripts.Waves." .. Battle.wave] = nil
+
     if (Battle._wave) then
         Battle._wave._end = false
         Battle._wave.objects = {}
         Battle._wave._paths = {}
     end
     Battle._wave = {}
+    -- Clear the wave wrapper and reset the shared "Battle.Waves" state so a
+    -- future wave doesn't inherit a stale _end = true flag.
+    ClearModuleTree("Scripts.Waves." .. Battle.wave)
     battle.restoring_arena = false
     battle.enemy_anims = {}
-    package.loaded["Scripts.Libraries.Battle.UI"] = nil
-    package.loaded["Scripts.Libraries.Battle.UI.buttons"] = nil
-    package.loaded["Scripts.Libraries.Battle.Player"] = nil
-    package.loaded["Scripts.Libraries.Battle.Arenas"] = nil
-    package.loaded["Scripts.Libraries.Battle"] = nil
+
+    -- Clear the entire Battle library tree (UI, buttons, Player, Arenas,
+    -- game_apis, Waves, PlayerAttacks, Souls, etc.) in a single pass.
+    ClearModuleTree("Scripts.Libraries.Attacks")
+    ClearModuleTree("Scripts.Libraries.Battle")
 end
 
 return battle

@@ -43,8 +43,11 @@ function convert.wrapMainImage(code)
         return [[
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords)
     {
-        vec2 fragCoord = vec2(screen_coords.x, iResolution.y - screen_coords.y);
+        vec2 fragCoord = vec2(texture_coords.x * iResolution.x, iResolution.y - texture_coords.y * iResolution.y);
+        vec4 fragColor = vec4(0.0);
     ]] .. body .. [[
+        fragColor *= vec4(1.0, 1.0, 1.0, Texel(texture, texture_coords).a);
+        return fragColor;
     }
     ]]
     end)

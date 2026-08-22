@@ -297,9 +297,25 @@ function typers.New(text, position, layer, size, opts, mode)
                 Layers.mark_dirty()
             elseif k == "font" then
                 rawset(t, k, v)
-                -- Directly setting the font (via opts or t.font = ...)
-                -- disables the bondfont feature until it is re-set by UseBondFont.
-                t.use_bondfont = false
+                -- Setting font directly applies it to both the English and
+                -- non-English bondfont entries, with empty funcs so the whole
+                -- text renders with this single font.
+                if (t.bondfont) then
+                    t.bondfont.engfont.font = v
+                    t.bondfont.non_engfont.font = v
+                    t.bondfont.engfunc = function() end
+                    t.bondfont.non_engfunc = function() end
+                end
+            elseif k == "fontsize" then
+                rawset(t, k, v)
+                -- Setting fontsize directly applies it to both bondfont sizes,
+                -- with empty funcs as well.
+                if (t.bondfont) then
+                    t.bondfont.engfont.size = v
+                    t.bondfont.non_engfont.size = v
+                    t.bondfont.engfunc = function() end
+                    t.bondfont.non_engfunc = function() end
+                end
             else
                 rawset(t, k, v)
             end
@@ -509,16 +525,20 @@ function typers.New(text, position, layer, size, opts, mode)
             typer.portrait.image:Destroy()
             typer.portrait.image = nil
         end
-        if (typer._onComplete and type(typer._onComplete) == "function") then
-            typer._onComplete()
-        end
-        Layers.remove(typer)
 
+        -- Remove this typer from the registries BEFORE firing _onComplete. If
+        -- the callback triggers a scene switch (which clears all typers), the
+        -- same typer won't be destroyed a second time and recurse into itself.
+        Layers.remove(typer)
         for i = #typers.insts, 1, -1 do
             if (typers.insts[i] == typer) then
                 table.remove(typers.insts, i)
                 break
             end
+        end
+
+        if (typer._onComplete and type(typer._onComplete) == "function") then
+            typer._onComplete()
         end
     end
 
@@ -530,7 +550,7 @@ function typers.New(text, position, layer, size, opts, mode)
         typer.time = typer.time + dt
 
         -- Cancel key (manual mode only)
-        if (typer.mode ~= "none" and Keyboard.GetState("cancel") == 1 and typer.skip.canskip and typer.sentence_index <= #typer.texts) then
+        if (typer.mode ~= "none" and Controller.GetState("cancel") == 1 and typer.skip.canskip and typer.sentence_index <= #typer.texts) then
             typer.skip.skipping = true
         end
 
@@ -737,7 +757,7 @@ function typers.New(text, position, layer, size, opts, mode)
                         should_advance = true
                     end
                 else
-                    if (Keyboard.GetState("confirm") == 1) then
+                    if (Controller.GetState("confirm") == 1) then
                         should_advance = true
                     end
                 end
@@ -796,7 +816,9 @@ function typers.Update(dt)
     local insts = typers.insts
     for i = #insts, 1, -1 do
         local typer = insts[i]
-        if (typer.Update) then
+        -- typer can be nil here if one typer's Update triggered a scene switch
+        -- that cleared/destroyed the rest of the list mid-iteration.
+        if (typer and typer.Update) then
             typer:Update(dt)
         end
     end

@@ -156,6 +156,8 @@ local function state_behaviours_drawer()
                 y = y + 33
             end
         end
+
+        local t = Typers.InstText.New("PAGE 1", {400, 340}, "UponArena")
     elseif (s == "MERCYMENU") then
         local canflee = game.can_flee
 
@@ -202,10 +204,10 @@ local function state_behaviours_updater(dt)
     local enemies = game.enemies
 
     if (s == "FIGHTMENU" or s == "ACTMENU") then
-        if (Keyboard.GetState("down") == 1) then
+        if (Controller.GetState("down") == 1) then
             choosing_enemy = math.min(choosing_enemy + 1, #enemies)
             Audio.PlaySound("snd_menu_0.wav")
-        elseif (Keyboard.GetState("up") == 1) then
+        elseif (Controller.GetState("up") == 1) then
             choosing_enemy = math.max(choosing_enemy - 1, 1)
             Audio.PlaySound("snd_menu_0.wav")
         end
@@ -255,22 +257,22 @@ local function state_behaviours_updater(dt)
     elseif (s == "ACTIONMENU") then
         local actions = enemies[choosing_enemy].actions
 
-        if (Keyboard.GetState("right") == 1) then
+        if (Controller.GetState("right") == 1) then
             if (actions[choosing_action + 1]) then
                 choosing_action = math.min(#actions, choosing_action + 1)
                 Audio.PlaySound("snd_menu_0.wav")
             end
-        elseif (Keyboard.GetState("left") == 1) then
+        elseif (Controller.GetState("left") == 1) then
             if (actions[choosing_action - 1]) then
                 choosing_action = math.max(1, choosing_action - 1)
                 Audio.PlaySound("snd_menu_0.wav")
             end
-        elseif (Keyboard.GetState("up") == 1) then
+        elseif (Controller.GetState("up") == 1) then
             if (actions[choosing_action - 2]) then
                 choosing_action = math.max(1, choosing_action - 2)
                 Audio.PlaySound("snd_menu_0.wav")
             end
-        elseif (Keyboard.GetState("down") == 1) then
+        elseif (Controller.GetState("down") == 1) then
             if (actions[choosing_action + 2]) then
                 choosing_action = math.min(#actions, choosing_action + 2)
                 Audio.PlaySound("snd_menu_0.wav")
@@ -284,17 +286,17 @@ local function state_behaviours_updater(dt)
     elseif (s == "ITEMMENU") then
         local items = game.items
 
-        if (Keyboard.GetState("right") == 1) then
+        if (Controller.GetState("right") == 1) then
             if (items[choosing + 1]) then
                 choosing = math.min(#items, choosing + 1)
                 Audio.PlaySound("snd_menu_0.wav")
             end
-        elseif (Keyboard.GetState("left") == 1) then
+        elseif (Controller.GetState("left") == 1) then
             if (items[choosing - 1]) then
                 choosing = math.max(1, choosing - 1)
                 Audio.PlaySound("snd_menu_0.wav")
             end
-        elseif (Keyboard.GetState("up") == 1) then
+        elseif (Controller.GetState("up") == 1) then
             if (items[choosing - 2]) then
                 choosing = math.max(1, choosing - 2)
                 Audio.PlaySound("snd_menu_0.wav")
@@ -302,7 +304,7 @@ local function state_behaviours_updater(dt)
                 choosing = math.max(1, choosing - 1)
                 Audio.PlaySound("snd_menu_0.wav")
             end
-        elseif (Keyboard.GetState("down") == 1) then
+        elseif (Controller.GetState("down") == 1) then
             if (items[choosing + 2]) then
                 choosing = math.min(#items, choosing + 2)
                 Audio.PlaySound("snd_menu_0.wav")
@@ -317,10 +319,10 @@ local function state_behaviours_updater(dt)
             state.typers[choosing].y + 18
         )
     elseif (s == "MERCYMENU") then
-        if (Keyboard.GetState("down") == 1) then
+        if (Controller.GetState("down") == 1) then
             choosing = math.min(choosing + 1, #state.typers)
             Audio.PlaySound("snd_menu_0.wav")
-        elseif (Keyboard.GetState("up") == 1) then
+        elseif (Controller.GetState("up") == 1) then
             choosing = math.max(choosing - 1, 1)
             Audio.PlaySound("snd_menu_0.wav")
         end
@@ -330,7 +332,7 @@ local function state_behaviours_updater(dt)
             state.typers[choosing].y + 18
         )
 
-        if (not skip_mercy_updater and Keyboard.GetState("confirm") == 1) then
+        if (not skip_mercy_updater and Controller.GetState("confirm") == 1) then
             destroy_elements()
             if (choosing == 1) then
                 for i = #enemies, 1, -1
@@ -394,7 +396,7 @@ function state.Update(dt)
             local inbutton = rule[4]  -- nil if not provided
 
             -- Check if key is pressed
-            local key_pressed = (Keyboard.GetState(key_action) == 1)
+            local key_pressed = (Controller.GetState(key_action) == 1)
 
             -- Check if current state matches source state
             local state_matches = (current_state == source_state)

@@ -1,5 +1,5 @@
 local encounter = {
-    narration = "* Poseur strikes a pose!",
+    narration = Localize.localizeText("Battle.Narration.Default"),
     can_flee = true,
     flee_percent = 0.75,
     enemy_id = 1,
@@ -57,6 +57,9 @@ local encounter = {
             }
         },
     },
+
+    state = "ACTIONSELECT",
+    wave = "arena",
 
     player = {
         name = "anskiy",

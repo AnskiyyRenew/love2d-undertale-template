@@ -137,3 +137,26 @@ function ImportFile(path, type)
 
     return result
 end
+
+---Escape Lua pattern magic characters so a plain string can be embedded into a
+---pattern safely (dots, dashes, parens, etc. won't be interpreted as pattern).
+local function escape_pattern(path)
+    return (path:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1"))
+end
+
+---Remove a module and all of its loaded sub-modules from package.loaded.
+---This is more reliable than enumerating .lua files on disk: it only touches
+---modules that were actually loaded (via require or ImportFile) and clears the
+---whole tree in one pass, without needing to know the file layout in advance.
+---@param module_name string Dot-notation module name, e.g. "Scripts.Libraries.Battle"
+function ClearModuleTree(module_name)
+    if (not module_name or module_name == "") then
+        return
+    end
+    local child_pattern = "^" .. escape_pattern(module_name) .. "%."
+    for key in pairs(package.loaded) do
+        if (type(key) == "string" and (key == module_name or key:match(child_pattern))) then
+            package.loaded[key] = nil
+        end
+    end
+end

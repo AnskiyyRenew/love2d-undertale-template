@@ -249,7 +249,7 @@ function buttons.Update()
         if (type(trigger) == "function") then
             should_trigger = trigger()
         elseif (type(trigger) == "string") then
-            should_trigger = (Keyboard.GetState(trigger) == 1)
+            should_trigger = (Controller.GetState(trigger) == 1)
         end
 
         if (current_value == current and should_trigger) then

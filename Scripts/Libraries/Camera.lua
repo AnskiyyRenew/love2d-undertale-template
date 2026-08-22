@@ -13,6 +13,17 @@ function camera:New(x, y, width, height, angle)
     cam.xscale = 1
     cam.yscale = 1
 
+    cam.shaker = {
+        _start = 0,
+        _time = 0,
+        mag = 0,
+        duration = 0,
+        decay = true,
+
+        x = 0,
+        y = 0,
+    }
+
     return cam
 end
 
@@ -56,11 +67,34 @@ function camera:setAngle(r)
     self.r = (r or 0)
 end
 
+function camera:shake(mag, duration, decay)
+    self.shaker = {
+        mag = (mag or 3),
+        duration = (duration or 10),
+        decay = (decay ~= false)
+    }
+
+    self.shaker._start = self.shaker.mag
+    self.shaker._time = self.shaker.duration
+end
+
 function camera:Update(dt)
     self.w = self.xscale * CANVAS_WIDTH
     self.h = self.yscale * CANVAS_HEIGHT
     self.x = math.max(self.min_x or -math.huge, math.min(self.x, self.max_x or math.huge))
     self.y = math.max(self.min_y or -math.huge, math.min(self.y, self.max_y or math.huge))
+
+    -- shaker
+    local _s = self.shaker
+    if (_s._time > 0) then
+        _s._time = _s._time - 1
+        if (_s.decay) then
+            _s.mag = _s.mag - (_s._start / _s.duration)
+        end
+
+        _s.x = _s.mag * math.random(-1, 1)
+        _s.y = _s.mag * math.random(-1, 1)
+    end
 end
 
 function camera:apply()
@@ -68,7 +102,7 @@ function camera:apply()
     SE.graphics.translate(CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.5)
     SE.graphics.rotate(math.rad(self.r))
     SE.graphics.scale(1 / self.xscale, 1 / self.yscale)
-    SE.graphics.translate(-self.x, -self.y)
+    SE.graphics.translate(-self.x - self.shaker.x, -self.y - self.shaker.y)
 end
 
 function camera:unload()

@@ -187,6 +187,7 @@ function arenas.New(mode, shape, x, y, width, height, angle)
     local arena = {
         mode = (mode or "plus"),
         shape = (shape or "rectangle"),
+        thickness = 5,
 
         x = _x,
         y = _y,
@@ -197,7 +198,8 @@ function arenas.New(mode, shape, x, y, width, height, angle)
         is_active = true,
         is_containing = false,
 
-        move_player = false
+        move_player = true,
+        followers = {}
     }
     local _target = {
         x = _x,
@@ -207,6 +209,13 @@ function arenas.New(mode, shape, x, y, width, height, angle)
         rotation = arena.rotation
     }
     arena.target = _target
+    arena.speeds = {
+        x = 7.5,
+        y = 7.5,
+        width = 15,
+        height = 15,
+        rotation = 15
+    }
 
     if (arena.shape == "rectangle") then
         local white = Sprites.CreateSprite("px.png", "ArenasExtraW")
@@ -225,24 +234,7 @@ function arenas.New(mode, shape, x, y, width, height, angle)
             table.insert(arenas.stencils, mask)
         end
 
-        white:Scale(arena.width + 10, arena.height + 10)
-        black:Scale(arena.width, arena.height)
-
-        white:MoveTo(_x, _y)
-        black:MoveTo(_x, _y)
-
-        white.rotation = arena.rotation
-        black.rotation = arena.rotation
-
-        arena.white = white
-        arena.black = black
-    elseif (arena.shape == "ellipse" or arena.shape == "circle") then
-        local white = Sprites.CreateSprite("Shapes/circle.png", "ArenasExtraW")
-        local black = Sprites.CreateSprite("Shapes/circle.png", "ArenasExtraB")
-        white.color = Global.GetVariable("MainColor")
-        black.color = {0, 0, 0}
-
-        white:Scale(arena.width + 10, arena.height + 10)
+        white:Scale(arena.width + arena.thickness * 2, arena.height + arena.thickness * 2)
         black:Scale(arena.width, arena.height)
 
         white:MoveTo(_x, _y)
@@ -268,6 +260,158 @@ function arenas.New(mode, shape, x, y, width, height, angle)
         end
     end
 
+    function arena:ResizeWithSpeed(w, h, speedw, speedh)
+        local _w = (w > 16 and w or 16)
+        local _h = (h > 16 and h or 16)
+
+        arena.target.width = _w
+        arena.target.height = _h
+        arena.speeds.width = (speedw or 15)
+        arena.speeds.height = (speedh or 15)
+    end
+
+    function arena:ResizeWithTime(w, h, timew, timeh)
+        local _w = (w > 16 and w or 16)
+        local _h = (h > 16 and h or 16)
+
+        arena.target.width = _w
+        arena.target.height = _h
+
+        local dw = math.abs(arena.target.width - arena.width)
+        local dh = math.abs(arena.target.height - arena.height)
+        arena.speeds.width = (math.floor(dw / timew) or 15)
+        arena.speeds.height = (math.floor(dh / timeh) or 15)
+    end
+
+    function arena:ResetSpeed()
+        arena.speeds = {
+            x = 7.5,
+            y = 7.5,
+            width = 15,
+            height = 15,
+            rotation = 15
+        }
+    end
+
+    function arena:MoveTo(target_x, target_y, imm)
+        arena.target.x = target_x
+        arena.target.y = target_y
+
+        if (imm) then
+            arena.x = target_x
+            arena.y = target_y
+        end
+    end
+
+    function arena:SetThickness(t)
+        arena.thickness = (t or 5)
+    end
+
+    function arena:OuterColor(color)
+        arena.white.color = (color or {1, 1, 1})
+    end
+    function arena:InnerColor(color)
+        arena.black.color = (color or {0, 0, 0})
+    end
+
+    function arena:UpSide(value)
+        local w = arena.target.height + value
+        if (w < 16) then w = 16 end
+
+        arena.speeds.y = arena.speeds.height / 2
+        arena.target.y = arena.target.y - (w - arena.target.height) / 2
+        arena.target.height = w
+    end
+
+    function arena:DownSide(value)
+        local w = arena.target.height + value
+        if (w < 16) then w = 16 end
+
+        arena.speeds.y = arena.speeds.height / 2
+        arena.target.y = arena.target.y + (w - arena.target.height) / 2
+        arena.target.height = w
+    end
+
+    function arena:LeftSide(value)
+        local w = arena.target.width + value
+        if (w < 16) then w = 16 end
+
+        arena.speeds.x = arena.speeds.width / 2
+        arena.target.x = arena.target.x - (w - arena.target.width) / 2
+        arena.target.width = w
+    end
+
+    function arena:RightSide(value)
+        local w = arena.target.width + value
+        if (w < 16) then w = 16 end
+
+        arena.speeds.x = arena.speeds.width / 2
+        arena.target.x = arena.target.x + (w - arena.target.width) / 2
+        arena.target.width = w
+    end
+
+    function arena:GetCenterPos(side)
+        local res = {0, 0}
+        local w_2 = arena.width / 2
+        local h_2 = arena.height / 2
+        local length = 0
+        local sin, cos = math.sin(math.rad(arena.rotation)), math.cos(math.rad(arena.rotation))
+
+        if (side == "up") then
+            length = (h_2 + arena.thickness / 2)
+            res = {
+                arena.x + length * sin,
+                arena.y - length * cos
+            }
+        elseif (side == "down") then
+            length = -(h_2 + arena.thickness / 2)
+            res = {
+                arena.x + length * sin,
+                arena.y - length * cos
+            }
+        elseif (side == "left") then
+            length = (w_2 + arena.thickness / 2)
+            res = {
+                arena.x - length * cos,
+                arena.y - length * sin
+            }
+        elseif (side == "right") then
+            length = -(w_2 + arena.thickness / 2)
+            res = {
+                arena.x - length * cos,
+                arena.y - length * sin
+            }
+        end
+
+        return res[1], res[2]
+    end
+
+    function arena:GetCornerPos(corner)
+        local res = {0, 0}
+        local corner_x = arena.width / 2 + arena.thickness / 2
+        local corner_y = arena.height / 2 + arena.thickness / 2
+        local sin, cos = math.sin(math.rad(arena.rotation)), math.cos(math.rad(arena.rotation))
+        if (corner == "ul") then
+            corner_x = -arena.width / 2 - arena.thickness / 2
+            corner_y = -arena.height / 2 - arena.thickness / 2
+        elseif (corner == "ur") then
+            corner_y = -arena.height / 2 - arena.thickness / 2
+        elseif (corner == "dl") then
+            corner_x = -arena.width / 2 - arena.thickness / 2
+        end
+
+        res[1] = arena.x + corner_x * cos - corner_y * sin
+        res[2] = arena.y + corner_x * sin + corner_y * cos
+        return res[1], res[2]
+    end
+
+    function arena:AddFollower(sprite, position)
+        table.insert(arena.followers, {
+            sprite = sprite,
+            position = position
+        })
+    end
+
     table.insert(arenas.insts, arena)
     return arena
 end
@@ -277,21 +421,37 @@ function arenas.Update(dt)
 
     for _, arena in ipairs(arenas.insts)
     do
-        -- Target
-        arena.x = smooth_value(arena.x, arena.target.x, 15)
-        arena.y = smooth_value(arena.y, arena.target.y, 15)
-        arena.width = smooth_value(arena.width, arena.target.width, 15)
-        arena.height = smooth_value(arena.height, arena.target.height, 15)
+        -- To target
+        arena.x = smooth_value(arena.x, arena.target.x, arena.speeds.x)
+        arena.y = smooth_value(arena.y, arena.target.y, arena.speeds.y)
+        arena.width = smooth_value(arena.width, arena.target.width, arena.speeds.width)
+        arena.height = smooth_value(arena.height, arena.target.height, arena.speeds.height)
 
         -- Sprite things
         arena.white:MoveTo(arena.x, arena.y)
         arena.black:MoveTo(arena.x, arena.y)
         arena.black:Scale(arena.width, arena.height)
-        arena.white:Scale(arena.width + 10, arena.height + 10)
+        arena.white:Scale(arena.width + arena.thickness * 2, arena.height + arena.thickness * 2)
         arena.white.rotation = arena.rotation
         arena.black.rotation = arena.rotation
         if (arena.mask) then
             arena.mask:Follow(arena.white)
+        end
+
+        for _, follower in ipairs(arena.followers)
+        do
+            local x, y
+            local position = follower.position
+            if (position == "ul" or position == "ur" or position == "dl" or position == "dr") then
+                x, y = arena:GetCornerPos(position)
+            else
+                x, y = arena:GetCenterPos(position)
+            end
+            follower.sprite:MoveTo(x, y)
+        end
+
+        if (arena.move_player) then
+            p:Move(arena.black.speed.x, arena.black.speed.y)
         end
 
         -- Collision
@@ -345,8 +505,8 @@ function arenas.Update(dt)
                 local ly = dy * cos - dx * sin
 
                 -- Expanded forbidden zone: minus rectangle + 8px on each side (player is 16x16)
-                local min_lx, max_lx = -(w + 10) / 2 - 8, (w + 10) / 2 + 8
-                local min_ly, max_ly = -(h + 10) / 2 - 8, (h + 10) / 2 + 8
+                local min_lx, max_lx = -(w + arena.thickness * 2) / 2 - 8, (w + arena.thickness * 2) / 2 + 8
+                local min_ly, max_ly = -(h + arena.thickness * 2) / 2 - 8, (h + arena.thickness * 2) / 2 + 8
 
                 -- Check if the player's centre is inside the forbidden zone
                 if (lx >= min_lx and lx <= max_lx and ly >= min_ly and ly <= max_ly) then

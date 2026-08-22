@@ -15,7 +15,7 @@ local rules = require(path .. "rules")
 ---@field source table
 ---@field data table
 ---@field imageData table
----@field image table
+---@field image table?
 ---@field id integer
 
 ---@class ShaderToyShader
@@ -27,6 +27,8 @@ local rules = require(path .. "rules")
 ---@field audio ShaderToyAudio?
 ---@field time number
 ---@field frame integer
+---@field _time number?
+---@field _frame integer?
 ---@field shader table
 
 ---@class ShaderToyPass
@@ -131,7 +133,8 @@ end
 ---@param code string ShaderToy GLSL code for this pass.
 function shadertoy.project:addPass(name, code)
     local shaderObj = shadertoy.convert(code)
-    local w, h = SE.graphics.getDimensions()
+    local w = CANVAS_WIDTH or SE.graphics.getWidth()
+    local h = CANVAS_HEIGHT or SE.graphics.getHeight()
 
     local pass = {
         name = name,
@@ -174,7 +177,7 @@ function shadertoy.project:draw()
         end
 
         pass.shaderObj:apply()
-        SE.graphics.rectangle("fill", 0, 0, SE.graphics.getWidth(), SE.graphics.getHeight())
+        SE.graphics.rectangle("fill", 0, 0, CANVAS_WIDTH or SE.graphics.getWidth(), CANVAS_HEIGHT or SE.graphics.getHeight())
         pass.shaderObj:clear()
         SE.graphics.setCanvas()
         pass.ping = not pass.ping
@@ -257,7 +260,8 @@ function shadertoy.functions:update(dt)
     end
 
     if self.runtimeFlags.iResolution then
-        local w, h = SE.graphics.getDimensions()
+        local w = CANVAS_WIDTH or SE.graphics.getWidth()
+        local h = CANVAS_HEIGHT or SE.graphics.getHeight()
         self.shader:send("iResolution", {w, h, 1})
     end
 
@@ -267,7 +271,7 @@ function shadertoy.functions:update(dt)
     end
 
     if self.runtimeFlags.iMouse then
-        local mx, my = keyboard.GetMousePosition()
+        local mx, my = Keyboard.GetMousePosition()
         self.shader:send("iMouse", {mx, my, 0, 0})
     end
 
@@ -326,7 +330,6 @@ function shadertoy.functions:apply()
 end
 
 --- Apply the shader (alias for apply).
----@param self ShaderToyShader
 shadertoy.functions.use = shadertoy.functions.apply
 
 --- Clear the shader (deactivate it for the current draw operations).

@@ -1,7 +1,7 @@
 return {
   version = "1.10",
   luaversion = "5.1",
-  tiledversion = "1.11.2",
+  tiledversion = "1.12.2",
   class = "",
   orientation = "orthogonal",
   renderorder = "right-down",
@@ -252,6 +252,7 @@ return {
           width = 0,
           height = 0,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["direction"] = "down",
@@ -268,6 +269,7 @@ return {
           width = 0,
           height = 0,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 2
@@ -283,6 +285,7 @@ return {
           width = 0,
           height = 0,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 3
@@ -298,6 +301,7 @@ return {
           width = 0,
           height = 0,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 4
@@ -313,6 +317,7 @@ return {
           width = 0,
           height = 0,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 5
@@ -344,6 +349,7 @@ return {
           width = 40,
           height = 19,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 1
@@ -359,6 +365,7 @@ return {
           width = 40,
           height = 19.125,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 2
@@ -374,6 +381,7 @@ return {
           width = 40,
           height = 19.375,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 3
@@ -389,6 +397,7 @@ return {
           width = 40,
           height = 18.75,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 4
@@ -404,6 +413,7 @@ return {
           width = 40,
           height = 19,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 5
@@ -430,11 +440,12 @@ return {
           name = "",
           type = "",
           shape = "point",
-          x = 480,
-          y = 140,
+          x = 259.5,
+          y = 127.5,
           width = 0,
           height = 0,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 1
@@ -466,6 +477,7 @@ return {
           width = 20,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 1
@@ -481,6 +493,7 @@ return {
           width = 70.25,
           height = 39.75,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["rr"] = 1
@@ -496,6 +509,7 @@ return {
           width = 69.75,
           height = 38.75,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["rr"] = 2
@@ -511,6 +525,7 @@ return {
           width = 70.25,
           height = 39,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["rr"] = 3
@@ -526,6 +541,7 @@ return {
           width = 40,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 2
@@ -541,6 +557,7 @@ return {
           width = 40,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 3
@@ -556,6 +573,7 @@ return {
           width = 40,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 4
@@ -571,6 +589,7 @@ return {
           width = 20,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 7
@@ -586,6 +605,7 @@ return {
           width = 30,
           height = 20.375,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 5
@@ -617,6 +637,7 @@ return {
           width = 0,
           height = 0,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {
             ["id"] = 1
@@ -648,6 +669,7 @@ return {
           width = 20,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -661,6 +683,7 @@ return {
           width = 300,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -674,6 +697,7 @@ return {
           width = 680,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -687,6 +711,7 @@ return {
           width = 40,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -700,6 +725,7 @@ return {
           width = 40,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -713,6 +739,7 @@ return {
           width = 20,
           height = 100,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -726,6 +753,7 @@ return {
           width = 60,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -739,6 +767,7 @@ return {
           width = 20,
           height = 120,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         },
@@ -752,6 +781,7 @@ return {
           width = 29.0145,
           height = 20,
           rotation = 0,
+          opacity = 1,
           visible = true,
           properties = {}
         }

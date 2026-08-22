@@ -30,23 +30,38 @@ local enemies = Game.enemies
 
 -- Handlers
 local function HandleActions(enemy, action)
-    if (enemy.id == "Poseur") then
-        if (action.id == "Check") then
-            Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
-        end
-    end
+    Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
 end
 
 local function HandleItems(item)
     print("Used " .. item.name)
+
+    Player.Heal(99, true)
     Battle.BattleDialogue({
-        "* You ate Chocolate.",
+        "* You ate " .. item.name .. ".",
         "* You recovered 99 HP!"
     }, "ACTIONSELECT")
 end
 
 local function HandleFlee()
-    print("Flee")
+    Audio.PlaySound("snd_flee.wav")
+    local legs_ = Sprites.CreateSprite("Soul Library Sprites/spr_heartgtfo_0.png", Player.sprite.layer)
+    legs_.color = Player.sprite.color
+    legs_:MoveTo(Player.sprite:GetPosition())
+    legs_.y = legs_.y + 6
+    legs_.velocity.x = -1
+    legs_:SetAnimation({
+        "Soul Library Sprites/spr_heartgtfo_1.png",
+        "Soul Library Sprites/spr_heartgtfo_0.png"
+    }, 0.1)
+
+    Player.sprite.y = Player.sprite.y - 6
+    Player.sprite.velocity.x = -1
+    Battle.FullDialogue({
+        "* 我跑路了."
+    }, function ()
+        Scenes.switchTo("scene_logo")
+    end)
 end
 
 local function FleeUpdate(dt)
@@ -55,7 +70,7 @@ end
 
 local function EnteringState(oldstate, newstate)
     Battle.defaultEnteringState(oldstate, newstate)
-    --print("[Battle] " .. oldstate .. " → " .. newstate)
+    print("[Battle] " .. oldstate .. " → " .. newstate)
 end
 
 local function OnHit(bullet)
@@ -86,10 +101,6 @@ background:SetShaders({shader})
 
 function scene.update(dt)
     Battle.Update(dt)
-
-    if (Keyboard.GetState("K") == 1) then
-        Player.Hurt(30, 60)
-    end
 end
 
 function scene.clear()

@@ -185,7 +185,7 @@ function shop.RemoveGoods(index)
 end
 
 function shop.Update(dt)
-    if (Keyboard.GetState("confirm") == 1) then
+    if (Controller.GetState("confirm") == 1) then
         shop.SetMainText("")
         if (choosing_page == "IDLE") then
             if (choosing_b <= 3) then
@@ -206,23 +206,23 @@ function shop.Update(dt)
     end
 
     if (choosing_page == "IDLE") then
-        if (Keyboard.GetState("down") == 1) then
+        if (Controller.GetState("down") == 1) then
             Audio.PlaySound("snd_menu_0.wav")
             choosing_b = math.min(choosing_b + 1, 4)
-        elseif (Keyboard.GetState("up") == 1) then
+        elseif (Controller.GetState("up") == 1) then
             Audio.PlaySound("snd_menu_0.wav")
             choosing_b = math.max(choosing_b - 1, 1)
         end
         shop.player:MoveTo(465, 278 + (choosing_b - 1) * 40)
     elseif (choosing_page == "BUY") then
-        if (Keyboard.GetState("down") == 1) then
+        if (Controller.GetState("down") == 1) then
             if (choosing_a == 4 and #goods > 4) then
                 goods_startpos = math.min(#goods - 4, goods_startpos + 1)
                 downScroll(goods, goods_startpos)
             end
             Audio.PlaySound("snd_menu_0.wav")
             choosing_a = math.min(choosing_a + 1, #goods - goods_startpos)
-        elseif (Keyboard.GetState("up") == 1) then
+        elseif (Controller.GetState("up") == 1) then
             Audio.PlaySound("snd_menu_0.wav")
             choosing_a = math.max(choosing_a - 1, 1)
         end
@@ -231,7 +231,9 @@ function shop.Update(dt)
 end
 
 function shop.Clear()
-    
+    -- Unload the shop module so reopening a shop re-executes it fresh,
+    -- avoiding stale state / duplicated sprites from a previous visit.
+    ClearModuleTree("Scripts.Libraries.Overworld.shop")
 end
 
 return shop
