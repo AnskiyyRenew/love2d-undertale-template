@@ -5,15 +5,11 @@
   "Battle.Flee": "Flee",
   "Battle.HP.NotFull": "* You recovered %s hp!",
   "Battle.HP.Full": "* Your HP was maxed out!",
+  "Battle.Items.Page": "PAGE %s",
   "Battle.WinTexts1": "* You WON![wait:0.5]\n* You earned %s XP and %s Gold.\n",
   "Battle.WinTexts2": "* Your LOVE increased!",
 
   "Battle.GameoverText": ["* Our fates rests\n  upon you...", "* %s![wait:0.5]\n  stay determined..."],
-
-  "Overworld.Shop.Action.Buy": "Buy",
-  "Overworld.Shop.Action.Sell": "Sell",
-  "Overworld.Shop.Action.Talk": "Talk",
-  "Overworld.Shop.Action.Exit": "Exit",
 
   "Battle.EnemiesName.Poseur": "Poseur",
   
@@ -23,5 +19,12 @@
   "Battle.Actions.Texts.Poseur.Check": ["* Poseur[wait:0.5] - 0 ATK 0 DEF[wait:0.5]\n* Not what I want.", "* A mascot from CYF."],
   "Battle.Actions.Texts.Poseur.Pose": ["* "],
   
-  "Items": {}
+  "Items": {},
+
+  "Overworld.Menu.Buttons": ["ITEM", "STAT", "CELL"],
+  "Overworld.Menu.Stat": "\"%s\"\n\nLV %s\nHP %s/%s\n\nAT %s(%s)\nDF %s(%s)\n\nWeapon: %s\nArmor: %s\nGold: %s",
+  "Overworld.Shop.Action.Buy": "Buy",
+  "Overworld.Shop.Action.Sell": "Sell",
+  "Overworld.Shop.Action.Talk": "Talk",
+  "Overworld.Shop.Action.Exit": "Exit"
 }

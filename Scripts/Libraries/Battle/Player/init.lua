@@ -24,7 +24,8 @@ local Player = {
     name = "Tester",
     lv = 19,
     maxhp = 92,
-    hp = 92
+    hp = 92,
+    kr = 0
 }
 
 Player.sprite = Sprites.CreateSprite(Player._spr_default, "Player")
@@ -43,6 +44,9 @@ function Player.SetSoul(id, args, use_sound)
     if (_id == 1) then
         _id = "red"
         spr.color = {1, 0, 0}
+    elseif (_id == 2) then
+        _id = "orange"
+        spr.color = {1, 0.5, 0}
     end
     Player.action = require(path .. "Player.Souls." .. _id)
     Player.action.sprite = Player.sprite
@@ -144,14 +148,27 @@ function Player.Hurt(amount, time, use_sound)
             Audio.PlaySound("snd_phurt.wav")
         end
     end
+end
 
-    if (Player.hp <= 0) then
-        Global.SetVariable("PlayerFinalThings", Player.sprite)
-        Scenes.switchTo("scene_gameover")
+function Player.AddKR(kramount)
+    if (not UI.GetKRStarted()) then return end
+    if (Player.hp > 1) then
+        Player.kr = Player.kr + kramount
+        Player.hp = math.max(1, Player.hp - kramount)
+    else
+        if (Player.kr == 0) then
+            Player.hp = math.max(0, Player.hp - kramount)
+        end
+        Player.kr = math.max(0, Player.kr - kramount)
     end
 end
 
 function Player.Update(dt)
+    if (Player.hp + Player.kr <= 0) then
+        Global.SetVariable("PlayerFinalThings", Player.sprite)
+        Scenes.switchTo("scene_gameover")
+    end
+
     if (Player.hurt_time > 0) then
         if (Player.hurt_time % 5 == 0) then
             Player.sprite.alpha = 1 + 0.4 - Player.sprite.alpha

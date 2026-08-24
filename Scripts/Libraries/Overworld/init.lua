@@ -6,9 +6,11 @@ Layers.new_layer("UponPlayer", 51)
 Layers.new_layer("GUI", 80)
 Layers.new_layer("TOP", 100)
 Layers.new_layer("DEBUG", 200)
+DATA = DATA or require("Scripts.Game.Logics")
 
 local path = (...):match("(.-)[^%.]+$")
 local overworld = {
+    _alpha = 0,
     map = require(path .. "Overworld.map"),
     stat = require(path .. "Overworld.stat"),
     inst = {},
@@ -20,7 +22,6 @@ local overworld = {
 
     debug = false,
 }
-DATA = DATA or require("Scripts.Game.Logics")
 
 -- One-frame lock: set when a dialog's typewriter finishes so that the same
 -- "confirm" press which closed the dialog cannot instantly re-trigger the
@@ -36,36 +37,6 @@ Map = overworld.map
 World = overworld.map.world
 Char = overworld.map.char
 Stat = overworld.stat
-
-local blacktop = Sprites.CreateSprite("px.png", "TOP")
-blacktop:Scale(1000, 1000)
-blacktop.color = {0, 0, 0}
-blacktop:MoveTo(Camera.x, Camera.y)
-blacktop._decay = true
-blacktop.Step = function (self)
-    self:MoveTo(Camera.x, Camera.y)
-    if (self._decay) then
-        self.alpha = self.alpha - 0.05
-        if (overworld._leaving) then
-            self._decay = false
-        end
-        if (self.alpha <= 0) then
-            self._decay = false
-        end
-    else
-        if (self.alpha >= 1) then
-            self._decay = true
-        end
-    end
-
-    if (overworld._leaving) then
-        self.alpha = self.alpha + 0.05
-
-        if (self.alpha >= 1) then
-            Scenes.switchTo(overworld.target_scene)
-        end
-    end
-end
 
 local function clamp(v, max, min)
     return (math.max(math.min(max, v), min))
@@ -105,6 +76,11 @@ end
 
 function overworld.Init(lua_file)
     overworld.map.Init(lua_file)
+end
+
+function overworld.CalcNextEXP()
+    local next_total = DATA.lv_data[DATA.player.lv + 1].totalExp
+    return next_total - DATA.player.exp
 end
 
 function overworld.onConfirm(type_name, id, sub_key, func)
@@ -266,14 +242,19 @@ end
 function overworld.dialogNew(texts, position)
     if (not Char.controlling) then return end
     Char.controlling = false
+    -- Stop the player immediately so the camera stays put for this frame. If
+    -- this is called before map.Update (e.g. from a sprite Step), zeroing the
+    -- velocity before the physics step prevents the one-frame slide that would
+    -- otherwise make GetRelativePos anchor the dialog one frame behind.
+    if (Char.collision.body) then
+        Char.collision.body:setLinearVelocity(0, 0)
+    end
     dialog_just_closed = false -- a new dialog clears any stale frame lock
     dialog_lock_pending = false
     local pos = (position or overworld.ui_prefer)
     local y = (pos == "down" and 400 or 80)
 
     local _x, _y = GetRelativePos(320, y)
-    print(_x, _y)
-
     local dialog = {
         block = SpawnBlock(_x, _y, 590, 140, 5)
     }
@@ -291,7 +272,7 @@ function overworld.dialogNew(texts, position)
     return dialog
 end
 
-function overworld.ChangeScene(scene, mark)
+function overworld.ChangeScene(scene, mark, direction)
     if (not Char.controlling) then return end
     Char.controlling = false
 
@@ -300,6 +281,27 @@ function overworld.ChangeScene(scene, mark)
 
     DATA.room = Scenes.name_current
     DATA.marker = (mark or 1)
+    DATA.direction = (direction or "down")
+    DATA.savedpos = false
+end
+
+function overworld.SaveInteract(texts, location, position, direction)
+    local dialog = overworld.dialogNew(texts)
+    if (not dialog) then return end
+
+    dialog.text._onComplete = function ()
+        dialog.block.Destroy()
+        dialog_just_closed = true
+        dialog_lock_pending = true
+    end
+
+    -- Save room temporary
+    DATA.room_name = (location or "Unknown place")
+    DATA.position = position
+    DATA.direction = direction
+    DATA.savedpos = true
+
+    Global.SetSaveVariable("Overworld", DATA)
 end
 
 function overworld.Update(dt)
@@ -312,8 +314,45 @@ function overworld.Update(dt)
     end
     dialog_lock_pending = false
 
-    overworld.map.Update(dt)
+    -- stat runs BEFORE map on purpose: it opens the menu and zeroes the
+    -- player's velocity before the physics step inside map.Update, so the body
+    -- (and camera) does not slide forward one frame while the menu is being
+    -- positioned. map.Update then moves the player and makes the camera follow;
+    -- GetRelativePos (used by dialogs, which are created after this update)
+    -- reads the freshly-followed camera, keeping stat and dialogs on the same
+    -- frame.
     overworld.stat.Update(dt)
+    overworld.map.Update(dt)
+end
+
+local blacktop = Sprites.CreateSprite("px.png", "TOP")
+blacktop:Scale(2000, 2000)
+blacktop.color = {0, 0, 0}
+blacktop:MoveTo(DATA.position[1], DATA.position[2])
+blacktop._decay = true
+blacktop.Step = function (self)
+    self:MoveTo(Char.currentSprite.x, Char.currentSprite.y)
+    if (self._decay) then
+        self.alpha = self.alpha - 0.05
+        if (overworld._leaving) then
+            self._decay = false
+        end
+        if (self.alpha <= 0) then
+            self._decay = false
+        end
+    else
+        if (self.alpha >= 1) then
+            self._decay = true
+        end
+    end
+
+    if (overworld._leaving) then
+        self.alpha = self.alpha + 0.05
+
+        if (self.alpha >= 1) then
+            Scenes.switchTo(overworld.target_scene)
+        end
+    end
 end
 
 function overworld.Draw()

@@ -65,7 +65,7 @@ function scene.update(dt)
         end
 
         if (Keyboard.GetState("confirm") == 1) then
-            ins:VolumeTransition(1, 0, 3)
+            ins:VolumeTransition(1, 0, 2)
             leaving = true
             time = 0
         end

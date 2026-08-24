@@ -192,6 +192,7 @@ function love.keypressed(key, scancode, isrepeat)
             local sceneName = Scenes.name_current
             package.loaded["Scripts.Scenes." .. sceneName] = nil
             Scenes.switchTo(sceneName)
+            --Scenes.switchTo("scene_logo")
             return
         elseif (key == "f6") then
             print("=== Debug Info ===")

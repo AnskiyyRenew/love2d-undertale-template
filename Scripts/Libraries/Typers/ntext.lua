@@ -635,7 +635,7 @@ function typers.New(text, position, layer, size, opts, mode)
                         counter = counter + 1
                         if (temp_char == "\n") then
                             typer.pos.offset[1] = 0
-                            typer.pos.offset[2] = typer.pos.offset[2] + current_font:getHeight()
+                            typer.pos.offset[2] = typer.pos.offset[2] + current_font:getHeight() + 4
                         elseif (temp_char == "\t") then
                             typer.pos.offset[1] = typer.pos.offset[1] + current_font:getWidth("    ")
                         else

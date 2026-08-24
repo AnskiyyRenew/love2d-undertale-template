@@ -9,7 +9,7 @@ local function is_supported_value(value)
 end
 
 local function warn(message)
-    print("[WARNING] " .. message)
+    print("[Global WARNING] " .. message)
 end
 
 local function get_save_path()
@@ -29,7 +29,9 @@ local function load_save_data()
     local contents
 
     if love and love.filesystem and love.filesystem.read then
-        contents = love.filesystem.read(path)
+        -- love.filesystem uses paths relative to the save directory,
+        -- so we must NOT pass the absolute OS path here.
+        contents = love.filesystem.read(save_file_name)
     elseif io then
         local file = io.open(path, "r")
         if file then
@@ -74,7 +76,9 @@ local function save_save_data()
     end
 
     if (love and love.filesystem and love.filesystem.write) then
-        local ok = love.filesystem.write(path, encoded)
+        -- love.filesystem uses paths relative to the save directory,
+        -- so we must NOT pass the absolute OS path here.
+        local ok = love.filesystem.write(save_file_name, encoded)
         if ok then
             return true
         end
@@ -127,6 +131,19 @@ function global.SetSaveVariable(name, value)
     save_save_data()
     return true
 end
+
+function global.DeleteSaveVariable(name)
+    if type(name) ~= "string" or name == "" then
+        warn("DeleteSaveVariable requires a non-empty name.")
+        return false
+    end
+
+    global._saveData[name] = nil
+    global[name] = nil
+    return save_save_data()
+end
+
+global.DeleteSaveVariablle = global.DeleteSaveVariable
 
 function global.GetSaveVariable(name)
     if global._saveData and global._saveData[name] ~= nil then

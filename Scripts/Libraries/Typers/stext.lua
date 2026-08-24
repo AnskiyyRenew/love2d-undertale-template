@@ -699,7 +699,7 @@ function typers.New(fn, position, layer, size, mode)
                         local space_font = getFont(item.font, item.fontsize)
                         if (char == "\n") then
                             typer.pos.offset[1] = 0
-                            typer.pos.offset[2] = typer.pos.offset[2] + space_font:getHeight()
+                            typer.pos.offset[2] = typer.pos.offset[2] + space_font:getHeight() + 4
                         elseif (char == "\t") then
                             typer.pos.offset[1] = typer.pos.offset[1] + space_font:getWidth("    ")
                         else

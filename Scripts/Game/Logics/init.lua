@@ -7,7 +7,7 @@ logic = {
     room_name = "--",
     room = "Overworld/scene_ow_new",
     marker = 2,
-    position = {0, 0},
+    position = nil,
     direction = "down",
     savedpos = false,
 
@@ -28,7 +28,7 @@ logic = {
         armor = "bandage",
 
         items = {},
-        getcell = true,
+        getcell = false,
         cells = {
             "Toriel"
         }
@@ -59,5 +59,10 @@ logic.lv_data = {
     { lv = 19, hp = 92,  at = 46,  df = 14, totalExp = 50000  },
     { lv = 20, hp = 99,  at = 48,  df = 14, totalExp = 99999  }
 }
+
+--Global.DeleteSaveVariable("Overworld")
+if (Global.GetSaveVariable("Overworld")) then
+    logic = Global.GetSaveVariable("Overworld")
+end
 
 return logic

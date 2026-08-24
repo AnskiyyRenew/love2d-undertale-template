@@ -15,7 +15,7 @@ local setup_hpbar = {
     use_stencil = false
 }
 local kr_configuration = true
-
+local time_kr = 0
 local bar_maxhp = Sprites.CreateSprite("px.png", "UI")
 bar_maxhp:MoveTo(245 + 30, 410)
 bar_maxhp.xpivot = 0
@@ -55,6 +55,7 @@ ui.drawOutlinedText = drawOutlinedText
 local pos_ = {
     hpname = 245
 }
+local kr_color = {1, 0, 1}
 
 -- UI Texts
 local name = Layers.add_external(function ()
@@ -76,7 +77,11 @@ local hptext = Layers.add_external(function ()
     if (not kr_configuration) then
         drawOutlinedText(ui_font, Global.GetVariable("MainColor"), Player.hp .. " / " .. Player.maxhp, bar_maxhp.x + bar_maxhp.xscale + 10, 400, 2)
     else
-        drawOutlinedText(ui_font, Global.GetVariable("MainColor"), Player.hp .. " / " .. Player.maxhp, bar_maxhp.x + bar_maxhp.xscale + 45, 400, 2)
+        local color_ = Global.GetVariable("MainColor")
+        if (Player.kr > 0) then
+            color_ = kr_color
+        end
+        drawOutlinedText(ui_font, color_, Player.hp + Player.kr .. " / " .. Player.maxhp, bar_maxhp.x + bar_maxhp.xscale + 45, 400, 2)
     end
 end, "UI")
 
@@ -86,6 +91,14 @@ function ui.setBarMaxLength(length)
         return
     end
     bar_maxlength = length
+end
+
+function ui.ToggleKR(bool)
+    kr_configuration = (bool or not kr_configuration)
+end
+
+function ui.GetKRStarted()
+    return kr_configuration
 end
 
 function ui.newBounceText(text, pos)
@@ -194,7 +207,29 @@ end
 function ui.barUpdate()
     bar_maxhp.xscale = math.min(bar_maxlength, Player.maxhp * 1.21)
     bar_hp.xscale = Player.hp / Player.maxhp * bar_maxhp.xscale
+
+    if (Player.kr + Player.hp > Player.maxhp) then
+        Player.kr = Player.maxhp - Player.hp
+    end
+
+    if (Player.kr > 0) then
+        if (Player.hp <= 0) then Player.hp = 1 end
+        time_kr = time_kr + 1
+        if (Player.kr > 20) then
+            if (time_kr >= 15) then Player.kr = math.max(math.floor(Player.kr - 1), 0); time_kr = 0 end
+        elseif (Player.kr > 10) then
+            if (time_kr >= 30) then Player.kr = math.max(math.floor(Player.kr - 1), 0); time_kr = 0 end
+        elseif (Player.kr > 0) then
+            if (time_kr >= 40) then Player.kr = math.max(math.floor(Player.kr - 1), 0); time_kr = 0 end
+        else
+            Player.kr = 0
+        end
+    else
+        Player.kr = 0
+    end
+
     bar_kr.x = bar_hp.x + bar_hp.xscale
+    bar_kr.xscale = Player.kr / Player.maxhp * bar_maxhp.xscale
 end
 
 function ui.Update(dt)

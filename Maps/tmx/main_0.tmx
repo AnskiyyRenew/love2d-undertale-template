@@ -116,7 +116,6 @@
  <objectgroup color="#00aaff" id="3" name="marks">
   <object id="3" x="60" y="100">
    <properties>
-    <property name="direction" value="down"/>
     <property name="id" type="int" value="1"/>
    </properties>
    <point/>
@@ -174,7 +173,7 @@
   </object>
  </objectgroup>
  <objectgroup color="#ffff00" id="7" name="saves">
-  <object id="30" x="259.5" y="127.5">
+  <object id="30" x="260" y="140">
    <properties>
     <property name="id" type="int" value="1"/>
    </properties>

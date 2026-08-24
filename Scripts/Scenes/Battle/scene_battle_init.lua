@@ -20,6 +20,8 @@ Battle = ImportFile("Battle")
 Battle.SetEndRoom("scene_end")
 Game = Battle.SetGame("Poseur")
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
+Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
+Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 
 -- Give each enemy its own independent animation instance. The animation
 -- module is a factory, so every call to InitAnimation creates a fresh
@@ -70,11 +72,11 @@ end
 
 local function EnteringState(oldstate, newstate)
     Battle.defaultEnteringState(oldstate, newstate)
-    print("[Battle] " .. oldstate .. " → " .. newstate)
+    --print("[Battle] " .. oldstate .. " → " .. newstate)
 end
 
 local function OnHit(bullet)
-    Player.Hurt(3, 60, true)
+    Player.AddKR(2)
 end
 
 -- Don't touch these.

@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-field
+
 local skip_attack_updater = false
 local skip_mercy_updater = false
 
@@ -27,13 +29,16 @@ local state = {
     },
 
     typers = {},
-    sprites = {}
+    sprites = {},
+
+    item_slot = 1
 }
 
 local choosing_enemy = 1
 local choosing_action = 1
 local choosing = 1
 local dialog_result_texts = {}
+local items_page = 1
 
 local function destroy_elements()
     for i = #state.typers, 1, -1 do
@@ -135,8 +140,9 @@ local function state_behaviours_drawer()
             end
         end
     elseif (s == "ITEMMENU") then
+        items_page = 1
         local x, y = 90, 270
-        for i = 1, #game.items
+        for i = 1, math.min(4, #game.items)
         do
             local item_ = game.items[i]
             if (i % 2 == 0) then
@@ -157,7 +163,8 @@ local function state_behaviours_drawer()
             end
         end
 
-        local t = Typers.InstText.New("PAGE 1", {400, 340}, "UponArena")
+        local t = Typers.InstText.New(Localize.localizeText("Battle.Items.Page", {items_page}), {400, 340}, "UponArena")
+        table.insert(state.typers, t)
     elseif (s == "MERCYMENU") then
         local canflee = game.can_flee
 
@@ -286,15 +293,70 @@ local function state_behaviours_updater(dt)
     elseif (s == "ITEMMENU") then
         local items = game.items
 
+        -- 1, 2 | 5, 6 | 9, 10
+        -- 3, 4 | 7, 8 | 11, 12
+
         if (Controller.GetState("right") == 1) then
-            if (items[choosing + 1]) then
-                choosing = math.min(#items, choosing + 1)
-                Audio.PlaySound("snd_menu_0.wav")
+            if (choosing % 2 == 0) then
+                items_page = math.min(items_page + 1, math.ceil(#items / 4))
+                state.typers[#state.typers]:SetText(Localize.localizeText("Battle.Items.Page", {items_page}))
+                for i = 1, 4
+                do
+                    local t = state.typers[i]
+                    print(i, items[(items_page - 1) * 4 + i])
+                    if (items[(items_page - 1) * 4 + i]) then
+                        local _item = items[(items_page - 1) * 4 + i]
+                        t:SetText("* " .. _item.name)
+
+                        if (_item._color) then
+                            t.color = _item._color
+                        else
+                            t.color = Global.GetVariable("MainColor")
+                        end
+                    else
+                        t:SetText("")
+                    end
+                end
+                if (items[choosing + 3]) then
+                    choosing = math.min(#items, choosing + 3)
+                else
+                    choosing = math.min(#items, choosing + 1)
+                end
+            else
+                if (items[choosing + 1]) then
+                    choosing = math.min(#items, choosing + 1)
+                end
             end
         elseif (Controller.GetState("left") == 1) then
-            if (items[choosing - 1]) then
-                choosing = math.max(1, choosing - 1)
-                Audio.PlaySound("snd_menu_0.wav")
+            if (choosing % 2 == 1) then
+                items_page = math.max(items_page - 1, 1)
+                state.typers[#state.typers]:SetText(Localize.localizeText("Battle.Items.Page", {items_page}))
+
+                for i = 1, 4
+                do
+                    local t = state.typers[i]
+                    if (items[(items_page - 1) * 4 + i]) then
+                        local _item = items[(items_page - 1) * 4 + i]
+                        t:SetText("* " .. _item.name)
+
+                        if (_item._color) then
+                            t.color = _item._color
+                        else
+                            t.color = Global.GetVariable("MainColor")
+                        end
+                    else
+                        t:SetText("")
+                    end
+                end
+                if (items[choosing - 3]) then
+                    choosing = math.max(1, choosing - 3)
+                else
+                    choosing = 1
+                end
+            else
+                if (items[choosing - 1]) then
+                    choosing = math.max(1, choosing - 1)
+                end
             end
         elseif (Controller.GetState("up") == 1) then
             if (items[choosing - 2]) then
@@ -313,10 +375,13 @@ local function state_behaviours_updater(dt)
                 Audio.PlaySound("snd_menu_0.wav")
             end
         end
+        state.item_slot = choosing
 
+        local item_ptr = (choosing % 4)
+        if (item_ptr == 0) then item_ptr = 4 end
         Player.sprite:MoveTo(
-            state.typers[choosing].x - 20,
-            state.typers[choosing].y + 18
+            state.typers[item_ptr].x - 20,
+            state.typers[item_ptr].y + 18
         )
     elseif (s == "MERCYMENU") then
         if (Controller.GetState("down") == 1) then

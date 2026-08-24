@@ -49,7 +49,7 @@ function layerHandlers.triggers(layer)
     local objects = map.objects.triggers
 
     for _, obj in ipairs(layer.objects) do
-        local id = obj.properties.id or (#objects + 1)
+        local id = obj.properties.id
 
         local body = SE.physics.newBody(
             world.physics_world,
@@ -87,7 +87,7 @@ function layerHandlers.marks(layer)
     local objects = map.objects.marks
 
     for _, obj in ipairs(layer.objects) do
-        local id = obj.properties.id or (#objects + 1)
+        local id = obj.properties.id
 
         table.insert(objects, {
             x = (obj.x) * 2,
@@ -111,7 +111,7 @@ function layerHandlers.chests(layer)
         sprite:Scale(2, 2)
         table.insert(obj_sprites, sprite)
 
-        local id = obj.properties.id or (#objects + 1)
+        local id = obj.properties.id
         local body = SE.physics.newBody(world.physics_world,
             (obj.x + obj.width / 2 ) * 2,
             (obj.y + obj.height / 2) * 2 + 10,
@@ -201,7 +201,7 @@ function layerHandlers.walls(layer)
                 y = (obj.y) * 2,
                 width = obj.width * 2,
                 height = obj.height * 2,
-                id = obj.properties.id or (#objects + 1),
+                id = obj.properties.id,
                 properties = obj.properties,
                 body = body,
                 fixture = shape,
@@ -229,7 +229,7 @@ function layerHandlers.walls(layer)
                 y = (obj.y) * 2,
                 width = w * 2,
                 height = h * 2,
-                id = obj.properties.id or (#objects + 1),
+                id = obj.properties.id,
                 properties = obj.properties,
                 body = body,
                 fixture = shape,
@@ -254,7 +254,7 @@ function layerHandlers.walls(layer)
                 y = (obj.y) * 2,
                 width = w * 2,
                 height = h * 2,
-                id = obj.properties.id or (#objects + 1),
+                id = obj.properties.id,
                 properties = obj.properties,
                 body = body,
                 fixture = shape,
@@ -494,8 +494,18 @@ function map.Init(lua_file)
     -- Place the player at the first mark.
     local startMark = map.objects.marks[1]
     if (startMark) then
-        char.SetPosition(startMark.x, startMark.y, startMark.direction)
+        char.SetPosition(startMark.x, startMark.y, (startMark.direction or DATA.direction))
     end
+
+    local realMark = Overworld.FindObject("mark", DATA.marker)
+    if (realMark) then
+        char.SetPosition(realMark.x, realMark.y, (realMark.direction or DATA.direction))
+    end
+
+    if (DATA.savedpos) then
+        char.SetPosition(DATA.position[1], DATA.position[2], DATA.direction)
+    end
+
     char.Init()
 end
 
@@ -519,6 +529,7 @@ function map.Update(dt)
     end
 
     map._debug = Overworld.debug
+    if (not map._debug) then return end
     debug_keyboards(dt)
     debug_drawer()
 end

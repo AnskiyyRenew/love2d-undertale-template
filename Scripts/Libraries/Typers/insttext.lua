@@ -248,10 +248,9 @@ function typers.New(text, position, layer, size)
                     typer.bondfont.non_engfunc()
                 end
                 local font = getFont(typer.bondfont.non_engfont.font, typer.bondfont.non_engfont.size)
-                -- Extra CJK X spacing (matches ntext non_engfunc's offset[1] += 4)
-                offset_x = offset_x + 4
-                relative_x = (i == 1 and 0 or 4)
+                relative_x = 0
                 relative_y = 4  -- +4 y-offset for CJK
+                offset_x = offset_x + 2
                 local w = font:getWidth(char) * typer.scale
                 table.insert(typer.letters, {
                     char = char,
@@ -267,7 +266,7 @@ function typers.New(text, position, layer, size)
                     effect = typer.effect,
                     line_width = 0,  -- filled after line ends
                 })
-                offset_x = offset_x + w
+                offset_x = offset_x + w + 2
                 i = i + len
             end
         end

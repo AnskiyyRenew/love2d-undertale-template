@@ -30,7 +30,7 @@ local char = {
         },
     },
     currentSprite = nil,
-    direction = "right",
+    direction = DATA.direction,
     animationFrame = 1,
     animationTime = 0,
     isMoving = false,
@@ -81,9 +81,11 @@ function char.Init()
     char.Destroy()
 
     -- Create the player sprite.
+    char.direction = DATA.direction
     char.currentSprite = Sprites.CreateSprite(char.sprites[char.direction][1], "Player")
     char.currentSprite:Scale(2, 2)
     char.currentSprite:MoveTo(char.x, char.y)
+    print(char.currentSprite:GetPosition())
 
     -- Player collision setup.
     char.collision.body = SE.physics.newBody(world.physics_world, char.x, char.y, "dynamic")
@@ -169,7 +171,7 @@ function char.Update(dt)
     if (velbodyx ~= 0 or velbodyy ~= 0) then
         -- Walk animation.
         char.animationTime = char.animationTime + dt
-        if char.animationTime >= 0.16 then
+        if char.animationTime >= 0.18 then
             char.animationFrame = char.animationFrame % #char.sprites[char.direction] + 1
             char.animationTime = 0
         end

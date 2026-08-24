@@ -5,15 +5,11 @@
   "Battle.Flee": "逃跑",
   "Battle.HP.NotFull": "* 你回复了%sHP!",
   "Battle.HP.Full": "* 你的HP已满。",
+  "Battle.Items.Page": "第 %s 页",
   "Battle.WinTexts1": "* 你赢了！[wait:0.5]\n* 你获得了 %s XP 和 %s 金钱。\n",
   "Battle.WinTexts2": "* 你的LOVE提升了！",
 
   "Battle.GameoverText": ["* 我们的命运都\n  寄托于你...", "* %s![wait:0.5]\n  保持你的决心..."],
-
-  "Overworld.Shop.Action.Buy": "购买",
-  "Overworld.Shop.Action.Sell": "出售",
-  "Overworld.Shop.Action.Talk": "交谈",
-  "Overworld.Shop.Action.Exit": "离开",
 
   "Battle.EnemiesName.Poseur": "颇似儿",
   
@@ -23,5 +19,12 @@
   "Battle.Actions.Texts.Poseur.Check": ["* 颇似儿[wait:0.5] - 0 攻击 0 防御[wait:0.5]\n* 并不是我想要的。", "* 一个来自于CYF的吉祥物。"],
   "Battle.Actions.Texts.Poseur.Pose": ["* 你和颇似儿一起摆姿势...[wait:0.5]\n* 时间似乎静止在了这一刻。"],
   
-  "Items": {}
+  "Items": {},
+
+  "Overworld.Menu.Buttons": ["物品", "状态", "电话"],
+  "Overworld.Menu.Stat": "\"%s\"\n\n等级 %s\n血量 %s/%s\n\n攻 %s(%s)\n防 %s(%s)\n\n武器: %s\n防具: %s\n金钱: %s",
+  "Overworld.Shop.Action.Buy": "购买",
+  "Overworld.Shop.Action.Sell": "出售",
+  "Overworld.Shop.Action.Talk": "交谈",
+  "Overworld.Shop.Action.Exit": "离开"
 }

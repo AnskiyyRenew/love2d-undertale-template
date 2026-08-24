@@ -99,8 +99,8 @@ function scene.update(dt)
             })
         end
     elseif (ow.getInteractResult("trigger", 4)) then
+        print(true)
         if (Keyboard.GetState("confirm") == 1) then
-            print("triggering")
             local d = ow.dialogNew({
                 "Entry Number 03: ",
                 "[colorhex:ff0000]* Determination.",
@@ -136,7 +136,11 @@ function scene.update(dt)
     if (ow.getInteractResult("warp", 1)) then
         ow.ChangeScene("Overworld.Shops.scene_shop_0")
     elseif (ow.getInteractResult("warp", 2)) then
-        ow.ChangeScene("Overworld.scene_sol")
+        ow.ChangeScene("Overworld.scene_sol", 1, "up")
+    end
+
+    if (Keyboard.GetState("s") == 1) then
+        ow.SaveInteract({"no"}, "idk where yeah", {Char.currentSprite.x, Char.currentSprite.y + 20}, "left")
     end
 end
 

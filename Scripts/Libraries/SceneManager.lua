@@ -27,6 +27,7 @@ local function doSwitch(sceneName, reset, ...)
         persistent = scenes.current.PERSISTENT
 
         scenes.current.clear()
+        print("cleared")
         if (isHotReload) then
             scenes.current.clear()
         else
@@ -108,8 +109,9 @@ function scenes.flushPendingSwitch()
     if (scenes._pending_switch) then
         local p = scenes._pending_switch
         scenes._pending_switch = nil
+        doSwitch(p[1], p[2], unpack(p[3]))
         if (p[1] ~= scenes.name_current) then
-            doSwitch(p[1], p[2], unpack(p[3]))
+            --doSwitch(p[1], p[2], unpack(p[3]))
         end
     end
 end

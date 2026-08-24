@@ -25,9 +25,24 @@ local battle = {
 
     EXP = 0,
     GOLD = 0,
-    room_end = "scene_logo",
-    _end = false
+    room_end = "scene_end",
+    _end = false,
+    _end_time = 0
 }
+
+local blacktop = Sprites.CreateSprite("px.png", "TOP")
+blacktop:Scale(1000, 1000)
+blacktop.alpha = 0
+blacktop.color = {0, 0, 0}
+blacktop.Step = function (self)
+    if (battle._end) then
+        self.alpha = self.alpha + 0.05
+
+        if (self.alpha >= 1) then
+            Scenes.switchTo(battle.room_end)
+        end
+    end
+end
 
 -- Load battle method APIs for attaching to encounter tables via metatable
 local game_apis = require(path .. "Battle.game_apis")
@@ -76,9 +91,9 @@ local function defaultEnteringState(old, new)
         for i = #battle.game.items, 1, -1
         do
             local item_ = battle.game.items[i]
-            if (item_.id == item.id) then
-                if (not item_._destroy) then
-                    table.remove(battle.game.items, i)
+            if (i == UI.state.item_slot) then
+                if (not item_._cantdestroy) then
+                    table.remove(battle.game.items, UI.state.item_slot)
                 end
             end
         end
@@ -241,7 +256,7 @@ function battle.Update(dt)
     end
 
     if (battle._end) then
-        Scenes.switchTo(battle.room_end)
+        battle._end_time = battle._end_time + 1
     end
 end
 

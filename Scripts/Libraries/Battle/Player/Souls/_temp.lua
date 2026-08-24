@@ -17,6 +17,12 @@ function action.Update(dt)
     local up, down, left, right = Controller.GetState("up"), Controller.GetState("down"), Controller.GetState("left"), Controller.GetState("right")
     local cancel = Controller.GetState("cancel")
 
+    if (cancel > 0) then
+        speed = 1
+    else
+        speed = 2
+    end
+
     if (not can_move) then return end
     if (sprite) then
         if (Global.GetVariable("UseRealTime(dt)")) then

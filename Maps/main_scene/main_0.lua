@@ -255,7 +255,6 @@ return {
           opacity = 1,
           visible = true,
           properties = {
-            ["direction"] = "down",
             ["id"] = 1
           }
         },
@@ -440,8 +439,8 @@ return {
           name = "",
           type = "",
           shape = "point",
-          x = 259.5,
-          y = 127.5,
+          x = 260,
+          y = 140,
           width = 0,
           height = 0,
           rotation = 0,
