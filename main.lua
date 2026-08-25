@@ -35,6 +35,7 @@ Discord = ImportFile("DiscordRPC")
 ImportFile("Engine.PureConf")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
+math.randomseed()
 
 -- Controller simulation (see Engine/PureConf.lua "ControllerSimulation").
 -- Lets you test the virtual keyboard / gamepad on desktop without real hardware.

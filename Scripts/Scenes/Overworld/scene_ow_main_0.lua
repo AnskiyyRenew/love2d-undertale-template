@@ -2,6 +2,7 @@ local scene = {}
 local ow = ImportFile("Overworld")
 ow.Init("Maps/main_scene/main_0.lua")
 ow.SetMusic("Start.ogg")
+ow.InitEncounter(0, 80, 40, 10)
 Camera:setBounds(320, 210, 1080, 210)
 
 -- 180, 50
@@ -139,8 +140,13 @@ function scene.update(dt)
         ow.ChangeScene("Overworld.scene_sol", 1, "up")
     end
 
-    if (Keyboard.GetState("s") == 1) then
-        ow.SaveInteract({"no"}, "idk where yeah", {Char.currentSprite.x, Char.currentSprite.y + 20}, "left")
+    ow.onConfirm("save", 1, nil, function ()
+        local _s = ow.FindObject("save", 1)
+        ow.SaveInteract({"* Bakabaka.\n* 笨蛋笨蛋。", "* 听见有人喊你笨蛋，这\n  使你充满了决心。"}, "真实验室 - 地下1层", {_s.x, _s.y - 20}, "down")
+    end)
+
+    if (Controller.GetState("i") == 1) then
+        ow.ChestInteract("chest")
     end
 end
 

@@ -7,10 +7,17 @@ Layers.new_layer("GUI", 80)
 Layers.new_layer("TOP", 100)
 Layers.new_layer("DEBUG", 200)
 DATA = DATA or require("Scripts.Game.Logics")
+FLAG = DATA.flags
+CHEST = DATA.chests
+ITEMS = require("Scripts.Game.Logics.items")
 
 local path = (...):match("(.-)[^%.]+$")
 local overworld = {
     _alpha = 0,
+    _pages = {
+        save = require(path .. "Overworld.Pages.save"),
+        chest = require(path .. "Overworld.Pages.chest")
+    },
     map = require(path .. "Overworld.map"),
     stat = require(path .. "Overworld.stat"),
     inst = {},
@@ -31,12 +38,20 @@ local dialog_just_closed = false
 -- overworld.Update keeps it for the rest of this frame and only clears it at
 -- the start of the next frame.
 local dialog_lock_pending = false
+function overworld.JustOnDialog()
+    dialog_just_closed = true
+    dialog_lock_pending = true
+end
+
 
 Overworld = overworld
 Map = overworld.map
 World = overworld.map.world
 Char = overworld.map.char
 Stat = overworld.stat
+Save = overworld._pages.save
+Chest = overworld._pages.chest
+Step = require(path .. "Overworld.encounter")
 
 local function clamp(v, max, min)
     return (math.max(math.min(max, v), min))
@@ -65,7 +80,7 @@ function SpawnBlock(x, y, width, height, thickness)
     black:Scale(block.w, block.h)
     black:MoveTo(block.x, block.y)
 
-    block.Destroy = function ()
+    block.Destroy = function (self)
         white:Destroy()
         black:Destroy()
         block = nil
@@ -261,7 +276,7 @@ function overworld.dialogNew(texts, position)
     local _text = Typers.EText.New(texts, {GetRelativePos(50, y - 55)}, "GUI")
     _text._onComplete = function ()
         Char.controlling = true
-        dialog.block.Destroy()
+        dialog.block:Destroy()
         -- Lock every interaction for the rest of this frame so the confirm
         -- press that closed the dialog can't re-trigger any of them.
         dialog_just_closed = true
@@ -286,25 +301,47 @@ function overworld.ChangeScene(scene, mark, direction)
 end
 
 function overworld.SaveInteract(texts, location, position, direction)
+    DATA.player.hp = DATA.player.hp + DATA.player.maxhp
+    Audio.PlaySound("snd_heal.wav")
     local dialog = overworld.dialogNew(texts)
     if (not dialog) then return end
 
     dialog.text._onComplete = function ()
-        dialog.block.Destroy()
+        dialog.block:Destroy()
         dialog_just_closed = true
         dialog_lock_pending = true
+        Save.Show()
     end
 
-    -- Save room temporary
+    -- Save
+    DATA.room = Scenes.name_current
     DATA.room_name = (location or "Unknown place")
     DATA.position = position
     DATA.direction = direction
     DATA.savedpos = true
+end
 
-    Global.SetSaveVariable("Overworld", DATA)
+function overworld.ChestInteract(chest)
+    local _chest = chest
+    if (chest == nil or chest == "") then
+        _chest = "chest"
+    end
+
+    Chest.Show(_chest)
+end
+
+function overworld.InitEncounter(flag, start, range, amount)
+    Step.Init(flag, start, range, amount)
+end
+
+function overworld.Encounter(scene, flag)
+    Char.controlling = false
 end
 
 function overworld.Update(dt)
+    -- Time
+    DATA.time = DATA.time + dt
+
     -- Release the one-frame dialog lock at the start of a NEW frame. If the
     -- lock was just set this frame (dialog_lock_pending is true, because
     -- _onComplete ran before this update), keep it active for the rest of the
@@ -323,6 +360,10 @@ function overworld.Update(dt)
     -- frame.
     overworld.stat.Update(dt)
     overworld.map.Update(dt)
+
+    Save.Update()
+    Chest.Update()
+    Step.Update()
 end
 
 local blacktop = Sprites.CreateSprite("px.png", "TOP")

@@ -7,7 +7,7 @@ logic = {
     room_name = "--",
     room = "Overworld/scene_ow_new",
     marker = 2,
-    position = nil,
+    position = {0, 0},
     direction = "down",
     savedpos = false,
 
@@ -27,7 +27,10 @@ logic = {
         weapon = "stick",
         armor = "bandage",
 
-        items = {},
+        items = {
+            "ButterscotchPie",
+            "PunchCard"
+        },
         getcell = false,
         cells = {
             "Toriel"
@@ -36,7 +39,12 @@ logic = {
 }
 
 logic.flags = {}
-logic.item_db = require(path .. "Logics.items")
+logic.chests = {
+    chest = {
+        "Spider"
+    },
+    chest1 = {}
+}
 logic.lv_data = {
     { lv = 1,  hp = 20,  at = 10,  df = 10, totalExp = 0      },
     { lv = 2,  hp = 24,  at = 12,  df = 10, totalExp = 10     },

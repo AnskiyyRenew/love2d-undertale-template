@@ -63,6 +63,8 @@ heart.color = {1, 0, 0}
 
 -- Vars
 local in_menu = 1
+local in_item = 1
+local in_item_menu = 1
 
 function stat.Update(dt)
     if (Char.controlling) then
@@ -141,19 +143,33 @@ function stat.Update(dt)
         if (Controller.GetState("confirm") == 1) then
             if (stat._page == "idle") then
                 if (in_menu == 1) then
+                    in_item = 1
+                    in_item_menu = 1
                     stat._page = "item"
 
                     local _x, _y = get_relative_pos(360, 230)
                     spawn_block(_x, _y, 335, 350, 5, temp_elements)
 
+                    local _x, _y = get_relative_pos(215, 87)
+                    heart:MoveTo(_x, _y)
+
                     for i = 1, 8
                     do
+                        local _x, _y = get_relative_pos(230, 70 + (i - 1) * 32)
                         local _item = DATA.player.items[i]
+                        local t = Typers.InstText.New((_item and ITEMS.FindItemByID(DATA.player.items[i]).name or "1"), {_x, _y}, "GUI")
+                        table.insert(temp_elements, t)
                         if (_item) then
-                            local t = Typers.InstText.New(DATA.player.items[i].name, {_x, _y}, "GUI")
-                            table.insert(temp_elements, t)
+                            local _it = ITEMS.FindItemByID(_item)
+                            if (_it._color) then
+                                t.color = _it._color
+                            end
                         end
                     end
+
+                    local _x, _y = get_relative_pos(230, 360)
+                    local t = Typers.InstText.New(Localize.localizeText("Overworld.Menu.Item"), {_x, _y}, "GUI")
+                    table.insert(temp_elements, t)
                 elseif (in_menu == 2) then
                     stat._page = "stat"
                     heart.alpha = 0
@@ -187,6 +203,8 @@ function stat.Update(dt)
                 elseif (in_menu == 3) then
                     stat._page = "cell"
                 end
+            elseif (stat._page == "item") then
+                stat._page = "item2"
             end
         elseif (Controller.GetState("cancel") == 1) then
             if (stat._page == "idle") then
@@ -218,7 +236,26 @@ function stat.Update(dt)
             elseif (Controller.GetState("up") == 1) then
                 in_menu = math.max(1, in_menu - 1)
             end
+            heart.x = get_rx(65)
             heart.y = get_ry(205 + (in_menu - 1) * 35)
+        elseif (stat._page == "item") then
+            if (Controller.GetState("down") == 1) then
+                in_item = math.min(#DATA.player.items, in_item + 1)
+            elseif (Controller.GetState("up") == 1) then
+                in_item = math.max(1, in_item - 1)
+            end
+            local _x, _y = get_relative_pos(215, 87 + (in_item - 1) * 32)
+            heart:MoveTo(_x, _y)
+        elseif (stat._page == "item2") then
+            if (Controller.GetState("right") == 1) then
+                in_item_menu = math.min(3, in_item_menu + 1)
+            elseif (Controller.GetState("left") == 1) then
+                in_item_menu = math.max(1, in_item_menu - 1)
+            end
+
+            local _i18nx = tonumber(Localize.localizeText("Overworld.Menu.Interval")[in_item_menu])
+            local _x, _y = get_relative_pos(_i18nx, 378)
+            heart:MoveTo(_x, _y)
         end
     end
 end

@@ -1,5 +1,5 @@
 local wave = {
-    _end = false,
+    ENDED = false,
     _paths = {},
     objects = {}
 }
@@ -17,7 +17,7 @@ function wave.EndWave()
         local p = wave._paths[i]
         package.loaded["Scripts.Libraries." .. p] = nil
     end
-    wave._end = true
+    wave.ENDED = true
 end
 
 function wave.Import(path)

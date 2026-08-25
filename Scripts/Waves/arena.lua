@@ -18,8 +18,8 @@ function wave.Update(dt)
     --print(Player.sprite.speed.x, Player.sprite.speed.y, Player.sprite.is_moving)
 
     time = time + 1
-    if (time == 680) then
-        -- EndWave()
+    if (time == 120) then
+        EndWave()
     end
 end
 

@@ -249,6 +249,7 @@ function ui.Update(dt)
             t._time = t._time + 1
             if (t._time >= 38) then
                 t:Destroy()
+                table.remove(ui._bouncetexts, i)
             end
         end
     end
@@ -259,6 +260,7 @@ function ui.Update(dt)
         t._time = t._time + 1
         if (t._time >= 30) then
             t:Destroy()
+            table.remove(ui._notbtexts, i)
         end
     end
 end

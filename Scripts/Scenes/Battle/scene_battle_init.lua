@@ -62,7 +62,7 @@ local function HandleFlee()
     Battle.FullDialogue({
         "* 我跑路了."
     }, function ()
-        Scenes.switchTo("scene_logo")
+        Battle._end = true
     end)
 end
 

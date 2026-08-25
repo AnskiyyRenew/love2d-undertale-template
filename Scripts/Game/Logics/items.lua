@@ -1,5 +1,6 @@
-return {
+local db = {
     {id = "Test", name = " "},
+    {id = "Spider", name = "Spider", _color = {0.5, 1, 0}},
     {id = "MonsterCandy", name = "Monster Candy"},
     {id = "CroquetRoll", name = "Croquet Roll"},
     {id = "Stick", name = "Stick"},
@@ -10,7 +11,7 @@ return {
     {id = "StoicOnion", name = "Stoic Onion"},
     {id = "GhostFruit", name = "Ghost Fruit"},
     {id = "SpiderCider", name = "Spider Cider"},
-    {id = "ButterscotchPie", name = "Butterscotch Pie"},
+    {id = "ButterscotchPie", name = "Pie"},
     {id = "FadedRibbon", name = "Faded Ribbon"},
     {id = "ToyKnife", name = "Toy Knife"},
     {id = "ToughGlove", name = "Tough Glove"},
@@ -65,3 +66,16 @@ return {
     {id = "SnailPie", name = "Snail Pie"},
     {id = "temyarmor", name = "temy armor"},
 }
+
+function db.FindItemByID(id)
+    for _, v in ipairs(db)
+    do
+        if (type(v) == "table") then
+            if (v.id == id) then
+                return v
+            end
+        end
+    end
+end
+
+return db

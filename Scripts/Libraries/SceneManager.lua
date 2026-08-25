@@ -27,7 +27,6 @@ local function doSwitch(sceneName, reset, ...)
         persistent = scenes.current.PERSISTENT
 
         scenes.current.clear()
-        print("cleared")
         if (isHotReload) then
             scenes.current.clear()
         else

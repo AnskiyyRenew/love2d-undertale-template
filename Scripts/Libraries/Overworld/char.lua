@@ -179,15 +179,21 @@ function char.Update(dt)
             char_prevX = char.currentSprite.x
             char_prevY = char.currentSprite.y
             char.isMoving = true
+            Step.UpdateTime()
         else
             char.isMoving = false
         end
     else
-        char.animationFrame = 1
         char.isMoving = false
     end
 
-    char.currentSprite:Set(char.sprites[char.direction][char.animationFrame])
+    -- Only swap the texture while moving; otherwise stand idle on frame 1.
+    if (char.isMoving) then
+        char.currentSprite:Set(char.sprites[char.direction][char.animationFrame])
+    elseif (char.animationFrame ~= 1) then
+        char.animationFrame = 1
+        char.currentSprite:Set(char.sprites[char.direction][1])
+    end
 end
 
 return char

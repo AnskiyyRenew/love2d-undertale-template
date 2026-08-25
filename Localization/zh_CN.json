@@ -22,7 +22,13 @@
   "Items": {},
 
   "Overworld.Menu.Buttons": ["物品", "状态", "电话"],
+  "Overworld.Menu.Item": "使用   查看   丢弃",
+  "Overworld.Menu.Interval": [215, 322, 430],
   "Overworld.Menu.Stat": "\"%s\"\n\n等级 %s\n血量 %s/%s\n\n攻 %s(%s)\n防 %s(%s)\n\n武器: %s\n防具: %s\n金钱: %s",
+  "Overworld.Save.Buttons": "保存       取消",
+  "Overworld.Save.Success": "保存成功",
+  "Overworld.Chest.Title": " 物品栏              箱子",
+  "Overworld.Chest.Tip": "按下 [X] 关闭页面",
   "Overworld.Shop.Action.Buy": "购买",
   "Overworld.Shop.Action.Sell": "出售",
   "Overworld.Shop.Action.Talk": "交谈",

@@ -298,6 +298,7 @@ function typers.New(text, position, layer, size)
 
     -- Register the instant draw function
     typer.draw_func = function()
+        if (not typer.letters) then return end
         for _, letter in ipairs(typer.letters) do
             local eff_x, eff_y = 0, 0
 
@@ -350,6 +351,15 @@ function typers.New(text, position, layer, size)
     end
 
     function typer:Destroy()
+        -- Idempotent destroy: guard against being called a second time on the
+        -- same instance (e.g. an Update loop that still holds a stale reference
+        -- to an already-destroyed typer). Re-running the release below would
+        -- decrement refs again, and since a newer InstText may have re-created
+        -- the same font+char cache entry, it could release an object that is
+        -- still being drawn -> "Cannot use object after it has been released".
+        if (typer._destroyed) then return end
+        typer._destroyed = true
+
         if (typer.external_entry) then
             Layers.remove_external(typer.external_entry)
             typer.external_entry = nil
@@ -360,6 +370,8 @@ function typers.New(text, position, layer, size)
                     releaseTextObject(letter.font, letter.char)
                 end
             end
+            -- Clear letters so a repeated Destroy call cannot re-release them.
+            typer.letters = nil
         end
         for i = #typers.insts, 1, -1 do
             if (typers.insts[i] == typer) then

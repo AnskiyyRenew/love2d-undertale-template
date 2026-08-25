@@ -22,7 +22,13 @@
   "Items": {},
 
   "Overworld.Menu.Buttons": ["ITEM", "STAT", "CELL"],
+  "Overworld.Menu.Item": "USE   INFO   DROP",
+  "Overworld.Menu.Interval": [215, 312, 425],
   "Overworld.Menu.Stat": "\"%s\"\n\nLV %s\nHP %s/%s\n\nAT %s(%s)\nDF %s(%s)\n\nWeapon: %s\nArmor: %s\nGold: %s",
+  "Overworld.Save.Buttons": "Save       Cancel",
+  "Overworld.Save.Success": "Saved successfully",
+  "Overworld.Chest.Title": "Inventory            Box",
+  "Overworld.Chest.Tip": "Press [X] to close",
   "Overworld.Shop.Action.Buy": "Buy",
   "Overworld.Shop.Action.Sell": "Sell",
   "Overworld.Shop.Action.Talk": "Talk",

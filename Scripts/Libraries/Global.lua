@@ -143,14 +143,9 @@ function global.DeleteSaveVariable(name)
     return save_save_data()
 end
 
-global.DeleteSaveVariablle = global.DeleteSaveVariable
-
 function global.GetSaveVariable(name)
-    if global._saveData and global._saveData[name] ~= nil then
-        return global._saveData[name]
-    end
-
-    return global[name]
+    local save_data = load_save_data()
+    return save_data[name]
 end
 
 function global.EnsureSaveVariable(name, value)
