@@ -1,6 +1,7 @@
 local arenas = {
     insts = {},
     stencils = {},
+    _onground = false,
 
     refollow = false
 }
@@ -173,6 +174,63 @@ local function find_nearest_valid(px, py)
 
     -- Fallback: return original position if nothing found
     return px, py
+end
+
+function arenas.PlayerOnGround(player)
+    local px, py = player.x, player.y
+    local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
+
+    -- The player is a 16x16 square, so from its centre to the foot is 8px.
+    -- That point usually sits inside the box, so we extend the detection by
+    -- one extra grid (9px) along the "down" direction to cover a ~45° range.
+    local foot_x = px - psin * 9
+    local foot_y = py + pcos * 9
+
+    for _, a in ipairs(arenas.insts)
+    do
+        if (a.is_active) then
+            local dx, dy = foot_x - a.x, foot_y - a.y
+            local cos, sin = math.cos(math.rad(a.rotation)), math.sin(math.rad(a.rotation))
+            local lx = dx * cos + dy * sin
+            local ly = dy * cos - dx * sin
+            local w, h = a.width, a.height
+
+            if (a.mode == "plus") then
+                -- Grounded when the foot goes one extra grid beyond the range.
+                if (a.shape == "rectangle") then
+                    if (lx >= -w / 2 and lx <= w / 2 and ly >= h / 2) then
+                        return true
+                    end
+                elseif (a.shape == "circle" or a.shape == "ellipse") then
+                    local a_axis, b_axis = w / 2, h / 2
+                    if (ly >= 0 and (lx * lx) / (a_axis * a_axis) + (ly * ly) / (b_axis * b_axis) >= 1) then
+                        return true
+                    end
+                end
+            elseif (a.mode == "minus") then
+                -- Grounded when the foot enters the range.
+                -- NOTE: the collision in Arenas.Update keeps the player's centre out of the
+                -- expanded forbidden zone (thickness*2 + 8 per side), so after the first frame
+                -- the foot can never reach the raw [-w/2, w/2] x [-h/2, h/2] range. Expand the
+                -- detection zone by the player's half-size (8px) only - not by the arena's visual
+                -- thickness - so the foot poking 9px past the centre still counts as entering it.
+                local half_w = w / 2 + 5
+                local half_h = h / 2 + 5
+
+                if (a.shape == "rectangle") then
+                    if (lx >= -half_w and lx <= half_w and ly >= -half_h and ly <= half_h) then
+                        return true
+                    end
+                elseif (a.shape == "circle" or a.shape == "ellipse") then
+                    if ((lx * lx) / (half_w * half_w) + (ly * ly) / (half_h * half_h) <= 1) then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+
+    return false
 end
 
 function arenas.New(mode, shape, x, y, width, height, angle)
@@ -426,6 +484,7 @@ function arenas.Update(dt)
         arena.y = smooth_value(arena.y, arena.target.y, arena.speeds.y)
         arena.width = smooth_value(arena.width, arena.target.width, arena.speeds.width)
         arena.height = smooth_value(arena.height, arena.target.height, arena.speeds.height)
+        arena.rotation = smooth_value(arena.rotation, arena.target.rotation, arena.speeds.rotation)
 
         -- Sprite things
         arena.white:MoveTo(arena.x, arena.y)

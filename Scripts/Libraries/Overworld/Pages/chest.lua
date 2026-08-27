@@ -79,9 +79,9 @@ local total_sect = 1
 function page.Show(chest)
     in_section = 1
     in_channel = 1
-    total_sect = 1
-    left_max = 0
-    right_max = 0
+    left_max = #DATA.player.items
+    right_max = #CHEST[chest]
+    total_sect = math.max(1, left_max)
     current_chest = chest
     Char.controlling = false
     page._active = true
@@ -115,7 +115,6 @@ function page.Show(chest)
             if (ITEMS.FindItemByID(_item)._color) then
                 t.color = ITEMS.FindItemByID(_item)._color
             end
-            left_max = left_max + 1
         end
     end
     for i = 1, 10
@@ -129,7 +128,6 @@ function page.Show(chest)
             if (ITEMS.FindItemByID(_item)._color) then
                 t.color = ITEMS.FindItemByID(_item)._color
             end
-            right_max = right_max + 1
         end
     end
 end
@@ -182,31 +180,39 @@ function page.Update()
     end
 
     if (Controller.GetState("up") == 1) then
-        in_channel = math.max(1, in_channel - 1)
-        local _, _y = GetRelativePos(0, 97 + (in_channel - 1) * 30)
-        heart.y = _y
+        if (in_channel > 1) then
+            in_channel = in_channel - 1
+        end
     elseif (Controller.GetState("down") == 1) then
-        in_channel = math.min(total_sect, in_channel + 1)
-        local _, _y = GetRelativePos(0, 97 + (in_channel - 1) * 30)
-        heart.y = _y
+        if (in_channel < total_sect) then
+            in_channel = in_channel + 1
+        end
     end
+
+    -- Clamp the cursor to the active section's range (corrects stale values
+    -- left behind by section switches or item swaps) and keep the heart in sync
+    in_channel = math.max(1, math.min(in_channel, total_sect))
+    local _, _y = GetRelativePos(0, 97 + (in_channel - 1) * 30)
+    heart.y = _y
 
     if (Controller.GetState("confirm") == 1) then
         -- Swapper
         if (in_section == 1) then
-            if (right_max >= 10) then return end
+            if (left_max <= 0 or right_max >= 10) then return end
             table.insert(CHEST[current_chest], DATA.player.items[in_channel])
             table.remove(DATA.player.items, in_channel)
-            left_max = left_max - 1
-            right_max = right_max + 1
+            left_max  = #DATA.player.items
+            right_max = #CHEST[current_chest]
+            total_sect = (left_max < 1 and 1 or left_max)
 
             refreshItems()
         else
             if (left_max >= 8 or right_max <= 0) then return end
-            left_max = left_max + 1
-            right_max = right_max - 1
             table.insert(DATA.player.items, CHEST[current_chest][in_channel])
             table.remove(CHEST[current_chest], in_channel)
+            left_max  = #DATA.player.items
+            right_max = #CHEST[current_chest]
+            total_sect = (right_max < 1 and 1 or right_max)
 
             refreshItems()
         end

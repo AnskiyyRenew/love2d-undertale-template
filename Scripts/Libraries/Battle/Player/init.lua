@@ -47,6 +47,9 @@ function Player.SetSoul(id, args, use_sound)
     elseif (_id == 2) then
         _id = "orange"
         spr.color = {1, 0.5, 0}
+    elseif (_id == 6) then
+        _id = "blue"
+        spr.color = {0, 0, 1}
     end
     Player.action = require(path .. "Player.Souls." .. _id)
     Player.action.sprite = Player.sprite

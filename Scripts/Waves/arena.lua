@@ -1,16 +1,12 @@
 local wave = ImportFile("Battle.Waves")
 local EndWave = wave.EndWave
 local Arena = Battle.mainarena
+Arena.target.rotation = 0
 Player.canMove = true
-Player.SetSoul(2)
+Player.SetSoul(6)
 
+Arenas.New("minus", "rectangle", 320, 420, 50, 150, 0)
 local mask = Masks.New("rectangle", 320, 320, 155, 130, 0, 0)
-local bullet = Sprites.CreateSprite("bullet.png", "Bullets")
-bullet:Scale(4, 4)
-bullet:MoveTo(320, 320)
-bullet:SetStencils({mask})
-bullet.isBullet = true
-table.insert(wave.objects, bullet)
 
 local time = 0
 function wave.Update(dt)
@@ -19,7 +15,7 @@ function wave.Update(dt)
 
     time = time + 1
     if (time == 120) then
-        EndWave()
+        --EndWave()
     end
 end
 

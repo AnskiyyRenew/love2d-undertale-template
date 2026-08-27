@@ -504,6 +504,7 @@ function map.Init(lua_file)
 
     if (DATA.savedpos) then
         char.SetPosition(DATA.position[1], DATA.position[2], DATA.direction)
+        DATA.savedpos = false
     end
 
     char.Init()

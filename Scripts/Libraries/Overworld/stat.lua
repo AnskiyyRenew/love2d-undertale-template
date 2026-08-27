@@ -240,7 +240,7 @@ function stat.Update(dt)
             heart.y = get_ry(205 + (in_menu - 1) * 35)
         elseif (stat._page == "item") then
             if (Controller.GetState("down") == 1) then
-                in_item = math.min(#DATA.player.items, in_item + 1)
+                in_item = math.min(math.max(1, #DATA.player.items), in_item + 1)
             elseif (Controller.GetState("up") == 1) then
                 in_item = math.max(1, in_item - 1)
             end

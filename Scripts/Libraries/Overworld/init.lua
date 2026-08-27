@@ -24,6 +24,11 @@ local overworld = {
     interacts = {},
     ui_prefer = "down",
 
+    _enc = {
+        _type = "default",
+        _init = false,
+        time = 0,
+    },
     target_scene = "",
     _leaving = false,
 
@@ -334,8 +339,11 @@ function overworld.InitEncounter(flag, start, range, amount)
     Step.Init(flag, start, range, amount)
 end
 
-function overworld.Encounter(scene, flag)
+function overworld.Encounter(scene, flag, type)
     Char.controlling = false
+    overworld._enc._init = true
+    overworld._enc._type = (type or "default")
+    Audio.PlaySound("snd_encounter.wav")
 end
 
 function overworld.Update(dt)
@@ -364,6 +372,64 @@ function overworld.Update(dt)
     Save.Update()
     Chest.Update()
     Step.Update()
+
+    -- encounter
+    if (overworld._enc._init) then
+        if (overworld._enc._type == "default") then
+            if (overworld._enc.time == 0) then
+                local exc = Sprites.CreateSprite("Overworld/spr_exc.png", "GUI")
+                exc:MoveTo(Char.currentSprite.x, Char.currentSprite.y - 40)
+                exc:Scale(2, 2)
+                if (DATA.player.lv >= 10) then
+                    exc:Set("Overworld/spr_exc_f.png")
+                end
+
+                local blink_out = Sprites.CreateSprite("px.png", "TOP")
+                blink_out:Scale(1500, 1500)
+                blink_out.color = {0, 0, 0}
+                blink_out.alpha = 0
+
+                local heart = Sprites.CreateSprite("Soul Library Sprites/spr_default_heart.png", "TOP")
+                heart.alpha = 0
+                heart.color = {1, 0, 0}
+                heart.Step = function (self)
+                    local time = overworld._enc.time
+                    if (time >= 60 and time % 5 == 0 and time <= 90) then
+                        exc.alpha = 0
+                        blink_out.alpha = 1 - blink_out.alpha
+                        heart.alpha = 1 - heart.alpha
+                        heart:MoveTo(Char.currentSprite:GetPosition())
+                        Audio.PlaySound("snd_tong.wav")
+                    end
+                    if (time == 90) then
+                        Audio.PlaySound("snd_encounter_fall.wav")
+                        Tween.CreateTween(
+                            function (value)
+                                self.x = value
+                            end,
+                            "Linear", "", self.x, Camera.x - 320 + 87 - 39, 30
+                        )
+                        Tween.CreateTween(
+                            function (value)
+                                self.y = value
+                            end,
+                            "Linear", "", self.y, Camera.y - 240 + 453, 30
+                        )
+                    elseif (time == 130) then
+                        DATA.savedpos = true
+                        DATA.position = {
+                            Char.currentSprite.x,
+                            Char.currentSprite.y + 20,
+                        }
+                        DATA.direction = Char.direction
+                        Scenes.switchTo("Battle.scene_battle_ow")
+                    end
+                end
+            end
+        end
+
+        overworld._enc.time = overworld._enc.time + 1
+    end
 end
 
 local blacktop = Sprites.CreateSprite("px.png", "TOP")

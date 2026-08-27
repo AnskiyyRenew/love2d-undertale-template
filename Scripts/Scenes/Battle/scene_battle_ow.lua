@@ -17,7 +17,7 @@ Layers.new_layer("TOP", 1000)
 
 -- Import battle module
 Battle = ImportFile("Battle")
-Battle.SetEndRoom("scene_end")
+Battle.SetEndRoom(DATA.room)
 Game = Battle.SetGame("Poseur")
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
@@ -29,9 +29,6 @@ Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:InitAnimation(1, {320, 140})
 Game:InitAnimation(2, {120, 140})
 local enemies = Game.enemies
-
-local function DefenseEnding()
-end
 
 -- Handlers
 local function HandleActions(enemy, action)
@@ -83,7 +80,6 @@ local function OnHit(bullet)
 end
 
 -- Don't touch these.
-Battle.DefenseEnding = DefenseEnding
 Battle.HandleActions = HandleActions
 Battle.HandleItems = HandleItems
 Battle.EnteringState = EnteringState

@@ -73,6 +73,7 @@ function battle.FullDialogue(texts, call)
     end
 end
 
+function battle.DefenseEnding() end
 function battle.HandleActions(enemy, action) end
 function battle.HandleItems(item) end
 function battle.HandleFlee() end
@@ -109,6 +110,7 @@ local function defaultEnteringState(old, new)
             Battle._wave._paths = {}
         end
         Battle._wave = {}
+        battle.DefenseEnding()
         battle.mainarena:Resize(565, 130)
         battle.mainarena.is_active = false
         -- Defer the narration text until the arena finishes restoring to full

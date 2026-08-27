@@ -59,7 +59,7 @@ local encounter = {
     },
 
     state = "ACTIONSELECT",
-    wave = "arena",
+    wave = "wave",
 
     player = {
         name = "end",

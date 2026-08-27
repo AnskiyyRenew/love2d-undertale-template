@@ -1,9 +1,9 @@
 -- Initialize
 Global.SetVariable("FirstRoom", "Overworld.scene_ow_main_0")
---Global.SetVariable("FirstRoom", "TEST.scene_shader")
---Global.SetVariable("FirstRoom", "scene_logo")
+--Global.SetVariable("FirstRoom", "TEST.gb")
+Global.SetVariable("FirstRoom", "scene_logo")
 Global.SetVariable("MainColor", {1, 1, 1})
---Global.SetVariable("MainColor", SE.tools.hexColor("#A50808"))
+--Global.SetVariable("MainColor", SE.tools.hexColor("#6E14FF"))
 
 Global.SetVariable("Language", "en")
 Global.SetVariable("Language", "zh_CN")
