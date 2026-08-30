@@ -24,7 +24,7 @@ local Controller = {
     mirror = { "up", "down", "left", "right", "confirm", "cancel", "menu", "shift" },
     mirrorPressed = {},      -- name -> boolean (whether we currently mirror it)
     enableMirror = true,     -- set false to disable the mirror bridge
-    deadzone = 0.15,         -- analog deadzone (for GetVector)
+    deadzone = 0.15,         -- analog deadzone (kept in sync with Joystick; filtering happens in Joystick.GetAxis)
 }
 
 --- Release any keyboard keys we previously mirrored (used when the gamepad
@@ -116,10 +116,10 @@ end
 function Controller.GetVector()
     local x, y = 0, 0
     if (Joystick and Joystick.GetAxis) then
-        local ax = Joystick.GetAxis("leftx")
-        local ay = Joystick.GetAxis("lefty")
-        if (math.abs(ax) > Controller.deadzone) then x = ax end
-        if (math.abs(ay) > Controller.deadzone) then y = ay end
+        -- Joystick.GetAxis already applies the dead-zone + re-scaling: a
+        -- centered stick reads 0, anything past the dead-zone is a smooth 0..1.
+        x = Joystick.GetAxis("leftx")
+        y = Joystick.GetAxis("lefty")
     end
     if (x == 0) then
         if (Controller.IsDown("right")) then x = 1
@@ -132,10 +132,13 @@ function Controller.GetVector()
     return x, y
 end
 
---- Set the analog dead-zone used by GetVector (default 0.15).
+--- Set the analog dead-zone (default 0.15). Forwards to Joystick so filtering
+--- is centralized (applied inside Joystick.GetAxis); keeps Controller.deadzone
+--- in sync for anyone reading it directly.
 ---@param v number
 function Controller.SetDeadzone(v)
-    Controller.deadzone = v or Controller.deadzone
+    if (v ~= nil) then Controller.deadzone = v end
+    if (Joystick and Joystick.SetDeadzone) then Joystick.SetDeadzone(v) end
 end
 
 --- Enable / disable the gamepad -> keyboard mirror bridge (default on).

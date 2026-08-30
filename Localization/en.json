@@ -32,5 +32,6 @@
   "Overworld.Shop.Action.Buy": "Buy",
   "Overworld.Shop.Action.Sell": "Sell",
   "Overworld.Shop.Action.Talk": "Talk",
-  "Overworld.Shop.Action.Exit": "Exit"
+  "Overworld.Shop.Action.Exit": "Exit",
+  "Overworld.Text.NobodyCame": "* But nobody came."
 }

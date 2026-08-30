@@ -230,23 +230,35 @@ if (ffi_ok) then
     end
 
     -- Callback proxies (registered with the C library once, at init).
+    -- These are invoked from C (via Discord_RunCallbacks), so a Lua error raised
+    -- inside them cannot be caught by an ordinary pcall in the caller; it would
+    -- surface as "unprotected error in call to Lua API". Wrap every user callback
+    -- in pcall so a bad handler can never take down the whole game.
+    local function safeCallback(cb, ...)
+        if (not cb) then return end
+        local ok, err = pcall(cb, ...)
+        if (not ok) then
+            print("[DiscordRPC] callback error: " .. tostring(err))
+        end
+        return ok
+    end
     local ready_proxy = keepCallback(ffi.cast("DiscordReadyPtr", function(request)
-        if (events.ready) then events.ready(unpackDiscordUser(request)) end
+        safeCallback(events.ready, unpackDiscordUser(request))
     end))
     local disconnected_proxy = keepCallback(ffi.cast("DiscordDisconnectedPtr", function(errorCode, message)
-        if (events.disconnected) then events.disconnected(errorCode, cstr(message)) end
+        safeCallback(events.disconnected, errorCode, cstr(message))
     end))
     local errored_proxy = keepCallback(ffi.cast("DiscordErroredPtr", function(errorCode, message)
-        if (events.errored) then events.errored(errorCode, cstr(message)) end
+        safeCallback(events.errored, errorCode, cstr(message))
     end))
     local join_game_proxy = keepCallback(ffi.cast("DiscordJoinGamePtr", function(joinSecret)
-        if (events.joinGame) then events.joinGame(cstr(joinSecret)) end
+        safeCallback(events.joinGame, cstr(joinSecret))
     end))
     local spectate_game_proxy = keepCallback(ffi.cast("DiscordSpectateGamePtr", function(spectateSecret)
-        if (events.spectateGame) then events.spectateGame(cstr(spectateSecret)) end
+        safeCallback(events.spectateGame, cstr(spectateSecret))
     end))
     local join_request_proxy = keepCallback(ffi.cast("DiscordJoinRequestPtr", function(request)
-        if (events.joinRequest) then events.joinRequest(unpackDiscordUser(request)) end
+        safeCallback(events.joinRequest, unpackDiscordUser(request))
     end))
 
     local function buildHandlers()
@@ -336,9 +348,15 @@ if (ffi_ok) then
             discord._lib.Discord_RunCallbacks()
         end
     end
-    -- CRITICAL for LuaJIT: a JIT-compiled Lua function must not call into a C
-    local jit = nil
-    if (jit and jit.off) then
+    -- CRITICAL for LuaJIT: `discord.update` calls Discord_RunCallbacks, which
+    -- re-enters Lua through the FFI callback trampolines above. Calling into a C
+    -- function that re-enters Lua from JIT-compiled code makes LuaJIT raise
+    -- "unprotected error in call to Lua API" once Discord connects (~2s) and the
+    -- ready event fires. Disable JIT for this function so it always runs in the
+    -- interpreter. NOTE: `jit` is a LuaJIT builtin that must be loaded explicitly;
+    -- the previous `local jit = nil` shadowed the global and silently broke this.
+    local ok_jit, jit = pcall(require, "jit")
+    if (ok_jit and jit and jit.off) then
         jit.off(discord.update)
     end
 

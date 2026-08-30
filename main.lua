@@ -49,6 +49,12 @@ if (_controllerSim) then
     end
 end
 
+-- Apply the analog stick dead-zone (see Engine/PureConf.lua "ControllerDeadzone").
+local _deadzone = Global.GetVariable("ControllerDeadzone")
+if (_deadzone ~= nil) then
+    Controller.SetDeadzone(_deadzone)
+end
+
 local frameTime = 1 / Global.GetVariable("FPS")
 local startTime = SE.timer.getTime()
 
@@ -85,7 +91,16 @@ function love.load()
 
     updateScreenScale()
 
+    Discord.application_id = Global.GetVariable("DiscordAppID")
     Discord.init()
+
+    Discord.setActivity({
+        details     = "Fighting Sans",
+        state       = "Route: Genocide",
+        large_image = "qq20250220-225345",
+        large_text  = "It's a bad time.",
+        start       = Discord.timestamp(),   -- elapsed timer
+    })
 end
 
 function love.update(dt)

@@ -19,7 +19,7 @@
 local Joystick = {
     joysticks = {},          -- array of connected LÖVE joystick objects
     enabled = true,          -- master switch (AllowPlayerInput)
-    deadzone = 0.15,         -- analog deadzone (0..1)
+    deadzone = 0.15,         -- analog deadzone (0..1); 0.10 sensitive | 0.15 default | 0.20 tolerant
     axisThreshold = 0.5,     -- value a trigger must exceed to count as a button press
 
     -- logical button name -> { pressed, pressaux, state }
@@ -59,6 +59,20 @@ local axisButtonMaps = {
     { axis = "triggerleft",  trigger = "triggerleft" },
     { axis = "triggerright", trigger = "triggerright" },
 }
+
+--- Apply the dead-zone to a raw axis value, then re-scale the usable range
+--- (deadzone..1) back to 0..1 so movement starts smoothly from 0 instead of
+--- jumping when the stick crosses the threshold. Returns 0 inside the dead-zone.
+---@param v number
+---@return number
+local function applyDeadzone(v)
+    local dz = Joystick.deadzone or 0
+    if (dz <= 0) then return v end
+    local abs = math.abs(v)
+    if (abs <= dz) then return 0 end
+    local scaled = (abs - dz) / (1 - dz)
+    return v > 0 and scaled or -scaled
+end
 
 --- Get (creating if needed) the state table for a logical button.
 local function ensureButton(name)
@@ -153,10 +167,12 @@ function Joystick.IsConnected()
     return #Joystick.joysticks > 0 or Joystick.simulatedConnection
 end
 
---- Set the analog dead-zone (default 0.15).
+--- Set the analog dead-zone (0..1), clamped to [0, 0.95].
+--- Recommended: 0.10 (sensitive) .. 0.20 (tolerant); 0.15 is a good default.
 ---@param v number
 function Joystick.SetDeadzone(v)
-    Joystick.deadzone = v or Joystick.deadzone
+    if (v == nil) then return end
+    Joystick.deadzone = math.max(0, math.min(v, 0.95))
 end
 
 --- Set the threshold used to turn triggers/sticks into button presses (default 0.5).
@@ -339,14 +355,19 @@ function Joystick.IsDown(name)
     return Joystick.GetState(name) >= 1
 end
 
---- Return the analog value of an axis (-1..1). Works for sticks & triggers.
+--- Return the analog value of an axis (-1..1) with the dead-zone applied and
+--- the usable range re-scaled to 0..1 (0 inside the dead-zone). Works for
+--- sticks & triggers. Simulated axes go through the same filtering.
 ---@param name string
 ---@return number
 function Joystick.GetAxis(name)
+    local v
     if (Joystick.simulatedAxes[name] ~= nil) then
-        return Joystick.simulatedAxes[name]
+        v = Joystick.simulatedAxes[name]
+    else
+        v = Joystick.axes[name] or 0
     end
-    return Joystick.axes[name] or 0
+    return applyDeadzone(v)
 end
 
 --- Enable / disable all joystick input.

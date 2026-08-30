@@ -2,6 +2,8 @@ local scene = {}
 local shop = ImportFile("Overworld.shop")
 shop.SetMainText("* 哇咔咔咔。\n* 补牙补牙补牙。")
 shop.SetGoods({"CrabApple", "HotCat", "CrabApple", "HotCat", "CrabApple", "HotCat"})
+shop.SetPrice("CrabApple", 7)
+shop.SetPrice("HotCat", 18)
 
 local bg = shop.GetBackground()
 bg:Scale(2, 2)

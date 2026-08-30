@@ -32,5 +32,6 @@
   "Overworld.Shop.Action.Buy": "购买",
   "Overworld.Shop.Action.Sell": "出售",
   "Overworld.Shop.Action.Talk": "交谈",
-  "Overworld.Shop.Action.Exit": "离开"
+  "Overworld.Shop.Action.Exit": "离开",
+  "Overworld.Text.NobodyCame": "* 但是谁也没有来。"
 }

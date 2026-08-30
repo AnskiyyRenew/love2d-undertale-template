@@ -5,7 +5,7 @@ Global.SetVariable("FUN", math.random(0, 100))
 logic = {
     time = 0,
     room_name = "--",
-    room = "Overworld/scene_ow_new",
+    room = "Overworld",
     marker = 2,
     position = {0, 0},
     direction = "down",
@@ -38,7 +38,9 @@ logic = {
     },
 }
 
-logic.flags = {}
+logic.flags = {
+    test_killed = 0
+}
 logic.chests = {
     chest = {
         "Spider"

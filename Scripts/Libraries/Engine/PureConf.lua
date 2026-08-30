@@ -1,10 +1,10 @@
 -- Initialize
 Global.SetVariable("FirstRoom", "Overworld.scene_ow_main_0")
 --Global.SetVariable("FirstRoom", "TEST.gb")
-Global.SetVariable("FirstRoom", "scene_logo")
+--Global.SetVariable("FirstRoom", "scene_logo")
 Global.SetVariable("MainColor", {1, 1, 1})
 --Global.SetVariable("MainColor", SE.tools.hexColor("#6E14FF"))
-
+Global.SetVariable("EnableFriskDance", true)
 Global.SetVariable("Language", "en")
 Global.SetVariable("Language", "zh_CN")
 Global.SetVariable("UseRealTime(dt)", false)
@@ -25,10 +25,15 @@ Global.SetVariable("ControllerSimulation", {
     joystick        = false,
 })
 
+-- Analog stick dead-zone (0..1): how far the stick must travel from center
+-- before it produces input. Higher tolerates more drift but loses precision.
+--   sensitive = 0.10 | default = 0.15 | tolerant = 0.20
+Global.SetVariable("ControllerDeadzone", 0.15)
+
 -- Network things
 Global.SetVariable("GamejoltID", nil)
 Global.SetVariable("GamejoltPK", nil)
-Global.SetVariable("DiscordAppID", 1342517648348680202) -- Default app.(yeah you can change it)
+Global.SetVariable("DiscordAppID", "1342517648348680202") -- Default app.(yeah you can change it)
 
 -- Limits
 --[[

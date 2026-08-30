@@ -31,7 +31,8 @@ local state = {
     typers = {},
     sprites = {},
 
-    item_slot = 1
+    item_slot = 1,
+    page_typer = nil
 }
 
 local choosing_enemy = 1
@@ -164,6 +165,7 @@ local function state_behaviours_drawer()
         end
 
         local t = Typers.InstText.New(Localize.localizeText("Battle.Items.Page", {items_page}), {400, 340}, "UponArena")
+        state.page_typer = t
         table.insert(state.typers, t)
     elseif (s == "MERCYMENU") then
         local canflee = game.can_flee
@@ -197,6 +199,33 @@ local function state_behaviours_drawer()
             Battle.ChangeState("ACTIONSELECT")
             Battle.narration_text:SetText(game.narration)
             state.block_transition = true
+        end
+    end
+end
+
+local function refresh_items_page_display(items, page)
+    if (not state.page_typer) then
+        return
+    end
+
+    state.page_typer:SetText(Localize.localizeText("Battle.Items.Page", {page}))
+
+    for i = 1, math.min(4, #items)
+    do
+        local t = state.typers[i]
+        if (t) then
+            local _item = items[(page - 1) * 4 + i]
+            if (_item) then
+                t:SetText("* " .. _item.name)
+
+                if (_item._color) then
+                    t.color = _item._color
+                else
+                    t.color = Global.GetVariable("MainColor")
+                end
+            else
+                t:SetText("")
+            end
         end
     end
 end
@@ -294,86 +323,83 @@ local function state_behaviours_updater(dt)
         )
     elseif (s == "ITEMMENU") then
         local items = game.items
+        local total_pages = math.max(1, math.ceil(#items / 4))
 
         -- 1, 2 | 5, 6 | 9, 10
         -- 3, 4 | 7, 8 | 11, 12
 
         if (Controller.GetState("right") == 1) then
             if (choosing % 2 == 0) then
-                items_page = math.min(items_page + 1, math.ceil(#items / 4))
-                state.typers[#state.typers]:SetText(Localize.localizeText("Battle.Items.Page", {items_page}))
-                for i = 1, 4
-                do
-                    local t = state.typers[i]
-                    print(i, items[(items_page - 1) * 4 + i])
-                    if (items[(items_page - 1) * 4 + i]) then
-                        local _item = items[(items_page - 1) * 4 + i]
-                        t:SetText("* " .. _item.name)
+                if (items_page < total_pages) then
+                    items_page = items_page + 1
+                    refresh_items_page_display(items, items_page)
 
-                        if (_item._color) then
-                            t.color = _item._color
-                        else
-                            t.color = Global.GetVariable("MainColor")
-                        end
+                    if (items[choosing + 3]) then
+                        choosing = math.min(#items, choosing + 3)
                     else
-                        t:SetText("")
+                        choosing = math.min(#items, choosing + 1)
                     end
-                end
-                if (items[choosing + 3]) then
-                    choosing = math.min(#items, choosing + 3)
-                else
-                    choosing = math.min(#items, choosing + 1)
+                    Audio.PlaySound("snd_menu_0.wav")
                 end
             else
                 if (items[choosing + 1]) then
                     choosing = math.min(#items, choosing + 1)
+                    Audio.PlaySound("snd_menu_0.wav")
                 end
             end
         elseif (Controller.GetState("left") == 1) then
             if (choosing % 2 == 1) then
-                items_page = math.max(items_page - 1, 1)
-                state.typers[#state.typers]:SetText(Localize.localizeText("Battle.Items.Page", {items_page}))
+                if (items_page > 1) then
+                    items_page = items_page - 1
+                    refresh_items_page_display(items, items_page)
 
-                for i = 1, 4
-                do
-                    local t = state.typers[i]
-                    if (items[(items_page - 1) * 4 + i]) then
-                        local _item = items[(items_page - 1) * 4 + i]
-                        t:SetText("* " .. _item.name)
-
-                        if (_item._color) then
-                            t.color = _item._color
-                        else
-                            t.color = Global.GetVariable("MainColor")
-                        end
+                    if (items[choosing - 3]) then
+                        choosing = math.max(1, choosing - 3)
                     else
-                        t:SetText("")
+                        choosing = 1
                     end
-                end
-                if (items[choosing - 3]) then
-                    choosing = math.max(1, choosing - 3)
-                else
-                    choosing = 1
+                    Audio.PlaySound("snd_menu_0.wav")
                 end
             else
                 if (items[choosing - 1]) then
                     choosing = math.max(1, choosing - 1)
+                    Audio.PlaySound("snd_menu_0.wav")
                 end
             end
         elseif (Controller.GetState("up") == 1) then
+            local target
             if (items[choosing - 2]) then
-                choosing = math.max(1, choosing - 2)
-                Audio.PlaySound("snd_menu_0.wav")
+                target = choosing - 2
             elseif (items[choosing - 1]) then
-                choosing = math.max(1, choosing - 1)
+                target = choosing - 1
+            end
+
+            if (target) then
+                choosing = math.max(1, target)
+
+                local new_page = math.max(1, math.ceil(choosing / 4))
+                if (new_page ~= items_page) then
+                    items_page = new_page
+                    refresh_items_page_display(items, items_page)
+                end
                 Audio.PlaySound("snd_menu_0.wav")
             end
         elseif (Controller.GetState("down") == 1) then
+            local target
             if (items[choosing + 2]) then
-                choosing = math.min(#items, choosing + 2)
-                Audio.PlaySound("snd_menu_0.wav")
+                target = choosing + 2
             elseif (items[choosing + 1]) then
-                choosing = math.min(#items, choosing + 1)
+                target = choosing + 1
+            end
+
+            if (target) then
+                choosing = math.min(#items, target)
+
+                local new_page = math.max(1, math.ceil(choosing / 4))
+                if (new_page ~= items_page) then
+                    items_page = new_page
+                    refresh_items_page_display(items, items_page)
+                end
                 Audio.PlaySound("snd_menu_0.wav")
             end
         end

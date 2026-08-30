@@ -159,9 +159,6 @@ function Player.AddKR(kramount)
         Player.kr = Player.kr + kramount
         Player.hp = math.max(1, Player.hp - kramount)
     else
-        if (Player.kr == 0) then
-            Player.hp = math.max(0, Player.hp - kramount)
-        end
         Player.kr = math.max(0, Player.kr - kramount)
     end
 end

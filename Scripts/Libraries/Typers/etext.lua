@@ -783,10 +783,14 @@ function typers.New(text, position, layer, size, mode)
                                     typer.pos.offset[1] = wrap_indent
                                     typer.pos.offset[2] = typer.pos.offset[2] + current_font:getHeight() * typer.scale
                                 else
-                                    typer.pos.offset[1] = typer.pos.offset[1] + current_font:getWidth(" ")
+                                    local _width = current_font:getWidth(" ")
+                                    if (typer.scale <= 1) then _width = _width * typer.scale end
+                                    typer.pos.offset[1] = typer.pos.offset[1] + _width
                                 end
                             else
-                                typer.pos.offset[1] = typer.pos.offset[1] + current_font:getWidth(" ")
+                                local _width = current_font:getWidth(" ")
+                                if (typer.scale <= 1) then _width = _width * typer.scale end
+                                typer.pos.offset[1] = typer.pos.offset[1] + _width
                             end
                         end
                     else

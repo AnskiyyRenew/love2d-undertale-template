@@ -782,12 +782,14 @@ function typers.New(text, position, layer, size, opts, mode)
 
             local eff_x, eff_y = 0, 0
 
-            if (effect.name == "shake") then
-                local int = (effect.intensity or 1)
-                eff_x = math.random(-int, int)
-                eff_y = math.random(-int, int)
-            elseif (effect.name == "rotate") then
-                local int = (effect.intensity or 1)
+            if (effect) then
+                if (effect.name == "shake") then
+                    local int = (effect.intensity or 1)
+                    eff_x = math.random(-int, int)
+                    eff_y = math.random(-int, int)
+                elseif (effect.name == "rotate") then
+                    local int = (effect.intensity or 1)
+                end
             end
 
             local main_x = typer.x + letter.x + eff_x

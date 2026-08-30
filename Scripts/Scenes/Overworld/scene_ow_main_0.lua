@@ -2,7 +2,8 @@ local scene = {}
 local ow = ImportFile("Overworld")
 ow.Init("Maps/main_scene/main_0.lua")
 ow.SetMusic("Start.ogg")
-ow.InitEncounter(0, 80, 40, 10)
+--ow.InitEncounter("test_killed", 80, 40, 3)
+ow.SetBattleScene("Battle.scene_battle_ow", "Poseur")
 Camera:setBounds(320, 210, 1080, 210)
 
 -- 180, 50

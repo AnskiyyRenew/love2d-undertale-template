@@ -79,6 +79,11 @@ function PoseurAnim:Destroy()
         return
     end
 
+    local _flag = Global.GetVariable("FLAG_KILLING_COUNTER")
+    if (_flag) then
+        FLAG[_flag] = FLAG[_flag] + 1
+    end
+
     self.poseur:Dust(true, true)
     for i = #self.elements, 1, -1
     do

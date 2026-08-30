@@ -92,7 +92,7 @@ function page.Show()
         _data = {
             time = 0,
             room_name = "--",
-            room = "Overworld/scene_ow_new",
+            room = "Overworld",
             marker = 2,
             position = {0, 0},
             direction = "down",

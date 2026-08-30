@@ -10,6 +10,7 @@ DATA = DATA or require("Scripts.Game.Logics")
 FLAG = DATA.flags
 CHEST = DATA.chests
 ITEMS = require("Scripts.Game.Logics.items")
+DATA.room = Scenes.name_current
 
 local path = (...):match("(.-)[^%.]+$")
 local overworld = {
@@ -28,7 +29,11 @@ local overworld = {
         _type = "default",
         _init = false,
         time = 0,
+
+        _scene = "",
+        _game  = ""
     },
+    _friskdance = Global.GetVariable("EnableFriskDance"),
     target_scene = "",
     _leaving = false,
 
@@ -53,6 +58,9 @@ Overworld = overworld
 Map = overworld.map
 World = overworld.map.world
 Char = overworld.map.char
+-- Drive the Frisk Dance ("屠杀之舞") toggle through the dedicated
+-- overworld._friskdance variable (read from the "EnableFriskDance" flag).
+Char.friskdance = overworld._friskdance
 Stat = overworld.stat
 Save = overworld._pages.save
 Chest = overworld._pages.chest
@@ -303,10 +311,11 @@ function overworld.ChangeScene(scene, mark, direction)
     DATA.marker = (mark or 1)
     DATA.direction = (direction or "down")
     DATA.savedpos = false
+    Global.SetVariable("OVERWORLD_NOBODYCAME", false)
 end
 
 function overworld.SaveInteract(texts, location, position, direction)
-    DATA.player.hp = DATA.player.hp + DATA.player.maxhp
+    DATA.player.hp = math.max(DATA.player.hp, DATA.player.maxhp)
     Audio.PlaySound("snd_heal.wav")
     local dialog = overworld.dialogNew(texts)
     if (not dialog) then return end
@@ -337,9 +346,14 @@ end
 
 function overworld.InitEncounter(flag, start, range, amount)
     Step.Init(flag, start, range, amount)
+    Global.SetVariable("FLAG_KILLING_COUNTER", flag)
 end
 
-function overworld.Encounter(scene, flag, type)
+function overworld.SetBattleScene(scene, game)
+    Global.SetVariable("OVERWORLD_ENCOUNTER_BATTLE", {scene, game})
+end
+
+function overworld.Encounter(type)
     Char.controlling = false
     overworld._enc._init = true
     overworld._enc._type = (type or "default")
@@ -386,6 +400,7 @@ function overworld.Update(dt)
 
                 local blink_out = Sprites.CreateSprite("px.png", "TOP")
                 blink_out:Scale(1500, 1500)
+                blink_out:MoveTo(Char.currentSprite:GetPosition())
                 blink_out.color = {0, 0, 0}
                 blink_out.alpha = 0
 
@@ -422,7 +437,9 @@ function overworld.Update(dt)
                             Char.currentSprite.y + 20,
                         }
                         DATA.direction = Char.direction
-                        Scenes.switchTo("Battle.scene_battle_ow")
+
+                        local _bdata = Global.GetVariable("OVERWORLD_ENCOUNTER_BATTLE")[1]
+                        Scenes.switchTo(_bdata)
                     end
                 end
             end

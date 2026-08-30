@@ -20,6 +20,18 @@ A GUI (tkinter) tool to package a Love2D (LÖVE) project into several formats.
 python build_tool.py
 ```
 
+统计项目中所有 Lua 文件的行数、大小并列出最大的十个文件：
+
+```bash
+python count_lua_files.py
+```
+
+也可以传入要统计的目录：
+
+```bash
+python count_lua_files.py "D:\path\to\project"
+```
+
 Windows 下也可以直接双击 [`run.bat`](run.bat)（优先使用 `pythonw`，无黑窗口）。
 
 ## 依赖 / Requirements
@@ -58,6 +70,7 @@ itself and the output directory are always excluded.
 ```
 Packager/
   build_tool.py    # 主程序（GUI + 打包逻辑）
+  count_lua_files.py # Lua 文件统计脚本
   run.bat          # Windows 启动脚本
   README.md        # 本说明
 ```

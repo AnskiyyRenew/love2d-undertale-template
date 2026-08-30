@@ -66,8 +66,7 @@ function atk.Update(dt)
             bar.alpha = 0
             attacked = true
             missed = true
-        end
-        if (Keyboard.GetState("confirm") == 1) then
+        elseif (Keyboard.GetState("confirm") == 1) then
             -- Calculate
             bar.velocity.x = 0
             local bonus_factor = math.abs(bar.x - tar.x)
