@@ -23,7 +23,7 @@ FILL_SCREEN = true
 
 -- Enable error handler to show custom error screen
 -- If you don't know which error crashed the game. Then you need to set it to false.
-USE_ERRHANDLER = false
+USE_ERRHANDLER = true
 
 function love.conf(t)
     t.identity = nil                    -- 保存目录的名称（字符串）

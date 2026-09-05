@@ -228,6 +228,8 @@ if is_windows then
         void SDL_DelEventWatch(SDL_EventFilter filter, void* userdata);
         int SDL_PushEvent(const void* event);
         const char* SDL_GetKeyName(int key);
+        unsigned int SDL_GetModState(void);
+        int SDL_SetWindowKeyboardFocus(SDL_Window* window);
         void* SDL_GetWindowProperties(SDL_Window* window);
         void* SDL_GetPointerProperty(void* props, const char* name, void* default_value);
 
@@ -237,6 +239,78 @@ if is_windows then
         static const int SDL_EVENT_WINDOW_CLOSE_REQUESTED = 0x20F;
         static const int SDL_EVENT_KEY_DOWN = 0x301;
         static const int SDL_EVENT_KEY_UP = 0x302;
+
+        // SDL3 mouse events (for child-window mouse capture in the DevTool)
+        static const int SDL_EVENT_MOUSE_MOTION = 0x400;
+        static const int SDL_EVENT_MOUSE_BUTTON_DOWN = 0x401;
+        static const int SDL_EVENT_MOUSE_BUTTON_UP = 0x402;
+        static const int SDL_EVENT_MOUSE_WHEEL = 0x403;
+
+        // Note: these structs intentionally use plain "unsigned int" placeholders for
+        // the common {type, reserved, timestamp} head so that the field offsets match
+        // the real SDL3 layout (timestamp@8 is 8 bytes, windowID@16, ...).
+        typedef struct SDL_MouseMotionEvent {
+            unsigned int type;
+            unsigned int reserved;
+            unsigned int ts0;
+            unsigned int ts1;
+            unsigned int windowID;
+            unsigned int which;
+            unsigned int state;
+            float x;
+            float y;
+            float xrel;
+            float yrel;
+        } SDL_MouseMotionEvent;
+
+        typedef struct SDL_MouseButtonEvent {
+            unsigned int type;
+            unsigned int reserved;
+            unsigned int ts0;
+            unsigned int ts1;
+            unsigned int windowID;
+            unsigned int which;
+            unsigned char button;
+            unsigned char down;
+            unsigned char clicks;
+            unsigned char padding;
+            float x;
+            float y;
+        } SDL_MouseButtonEvent;
+
+        typedef struct SDL_MouseWheelEvent {
+            unsigned int type;
+            unsigned int reserved;
+            unsigned int ts0;
+            unsigned int ts1;
+            unsigned int windowID;
+            unsigned int which;
+            float x;
+            float y;
+            unsigned int direction;
+            float mouseX;
+            float mouseY;
+        } SDL_MouseWheelEvent;
+
+        // SDL3 keyboard events (parsed via struct to guarantee correct field offsets)
+        typedef struct SDL_KeyboardEvent {
+            unsigned int type;
+            unsigned int reserved;
+            unsigned int ts0;
+            unsigned int ts1;
+            unsigned int windowID;
+            unsigned int which;
+            unsigned int scancode;
+            int key;
+            unsigned int mod;
+            unsigned short raw;
+            unsigned char down;
+            unsigned char repeat_;
+        } SDL_KeyboardEvent;
+
+        // Window keyboard-focus events (SDL3 numbering: FOCUS_GAINED=0x20D, FOCUS_LOST=0x20E)
+        static const int SDL_EVENT_WINDOW_FOCUS_GAINED = 0x20D;
+        static const int SDL_EVENT_WINDOW_FOCUS_LOST = 0x20E;
     ]]
 end
 
@@ -247,7 +321,9 @@ window.windowClassRegistered = false
 window._created = {}          -- hwnd -> { unicode=bool, className, title, titleW, titleLenW }
 window._sdlWindows = {}       -- SDL_Window* -> { renderer, title, color, canvasTex, ... }
 window._sdlClosePending = {}  -- SDL_Window* -> true (child window requested close, pending destroy)
-window._sdlKeyCallbacks = {}  -- SDL_Window* -> fun(key, scancode, isDown, isRepeat) (fires only when that window has focus)
+window._sdlKeyCallbacks = {}   -- SDL_Window* -> fun(key, scancode, isDown, isRepeat) (fires only when that window has focus)
+window._sdlMouseCallbacks = {} -- SDL_Window* -> { motion=fun(x,y,xrel,yrel), button=fun(button,x,y,down,clicks), wheel=fun(x,y) }
+window._sdlHover = nil         -- the managed child window the mouse is hovering over (key-forwarding fallback)
 local sdlEventWatchRef = nil  -- event-watch callback, kept alive to avoid GC
 
 -- helper: convert a UTF-8 Lua string to a wchar_t buffer (caller must keep the returned buffer alive if needed)
@@ -577,19 +653,58 @@ local function sdlEventWatch(userdata, event)
                     break
                 end
             end
-        elseif etype == ffi.C.SDL_EVENT_KEY_DOWN or etype == ffi.C.SDL_EVENT_KEY_UP then
-            -- SDL_KeyboardEvent layout (uint32 indices):
-            --   [0]=type [4]=windowID(off16) [6]=scancode(off24) [7]=key(off28)
-            --   byte36=down byte37=repeat
+        elseif etype == ffi.C.SDL_EVENT_WINDOW_FOCUS_GAINED or etype == ffi.C.SDL_EVENT_WINDOW_FOCUS_LOST then
+            -- SDL_WindowEvent layout: windowID at offset 16 (u[4])
             local wid = u[4]
-            local key = u[7]
-            local scancode = u[6]
-            local down = ffi.cast("uint8_t*", event)[36] ~= 0
-            local repeat_ = ffi.cast("uint8_t*", event)[37] ~= 0
-            -- Dispatch to the callback registered for the focused child window (if any)
-            for win, cb in pairs(window._sdlKeyCallbacks) do
+            for win, info in pairs(window._sdlWindows) do
                 if sdl.SDL_GetWindowID(win) == wid then
+                    info.focused = (etype == ffi.C.SDL_EVENT_WINDOW_FOCUS_GAINED)
+                    break
+                end
+            end
+        elseif etype == ffi.C.SDL_EVENT_KEY_DOWN or etype == ffi.C.SDL_EVENT_KEY_UP then
+            -- Parse with the real SDL_KeyboardEvent struct so field offsets are always correct
+            local kev = ffi.cast("SDL_KeyboardEvent*", event)
+            local wid = kev.windowID
+            local key = kev.key
+            local scancode = kev.scancode
+            local down = kev.down ~= 0
+            local repeat_ = kev.repeat_ ~= 0
+            -- Forward keys when: ① the child window has keyboard focus, OR
+            -- ② the mouse is hovering this child window (fallback if OS focus was never granted).
+            local hoverWin = window._sdlHover
+            for win, cb in pairs(window._sdlKeyCallbacks) do
+                if sdl.SDL_GetWindowID(win) == wid or (hoverWin ~= nil and win == hoverWin) then
                     cb(key, scancode, down, repeat_)
+                end
+            end
+        elseif etype == ffi.C.SDL_EVENT_MOUSE_MOTION then
+            local mev = ffi.cast("SDL_MouseMotionEvent*", event)
+            local hovered = false
+            for win, cb2 in pairs(window._sdlMouseCallbacks) do
+                if cb2.motion and sdl.SDL_GetWindowID(win) == mev.windowID then
+                    pcall(cb2.motion, mev.x, mev.y, mev.xrel, mev.yrel)
+                    window._sdlHover = win
+                    hovered = true
+                    break
+                end
+            end
+            -- Clear hover when the cursor leaves the managed windows (e.g. back over the main window)
+            if not hovered then
+                window._sdlHover = nil
+            end
+        elseif etype == ffi.C.SDL_EVENT_MOUSE_BUTTON_DOWN or etype == ffi.C.SDL_EVENT_MOUSE_BUTTON_UP then
+            local bev = ffi.cast("SDL_MouseButtonEvent*", event)
+            for win, cb2 in pairs(window._sdlMouseCallbacks) do
+                if cb2.button and sdl.SDL_GetWindowID(win) == bev.windowID then
+                    pcall(cb2.button, bev.button, bev.x, bev.y, bev.down ~= 0, bev.clicks)
+                end
+            end
+        elseif etype == ffi.C.SDL_EVENT_MOUSE_WHEEL then
+            local wev = ffi.cast("SDL_MouseWheelEvent*", event)
+            for win, cb2 in pairs(window._sdlMouseCallbacks) do
+                if cb2.wheel and sdl.SDL_GetWindowID(win) == wev.windowID then
+                    pcall(cb2.wheel, wev.x, wev.y)
                 end
             end
         end
@@ -691,6 +806,7 @@ end
 ---@param canvas userdata A readable LÖVE Canvas. The SDL texture is reused and only rebuilt when the size changes.
 ---@return boolean ok true on success
 ---@note Every-frame calls incur a GPU->CPU readback cost; suitable for UI/preview. Reduce frequency for very large frames.
+---@note LÖVE 12 canvases are NOT readable by default: create the canvas with { readable = true } (see DevTool).
 function window.SDLPresentCanvas(win, canvas)
     local info = window._sdlWindows and window._sdlWindows[win]
     if not info or not info.renderer then return false end
@@ -751,6 +867,7 @@ function window.DestroyWindowSDL(win)
     if window._sdlWindows then window._sdlWindows[win] = nil end
     if window._sdlClosePending then window._sdlClosePending[win] = nil end
     if window._sdlKeyCallbacks then window._sdlKeyCallbacks[win] = nil end
+    if window._sdlMouseCallbacks then window._sdlMouseCallbacks[win] = nil end
     return true
 end
 
@@ -803,6 +920,72 @@ function window.SDLSetKeyCallback(win, callback)
         window._sdlKeyCallbacks[win] = nil
     end
     return true
+end
+
+---Register mouse / wheel callbacks for a specific SDL child window.
+---Callbacks only fire while that window is hovered / focused (like keys, this is
+---per-window, NOT global). Coordinates are in the window's client (pixel) space,
+---which maps 1:1 to the LÖVE canvas passed to SDLPresentCanvas when sizes match.
+---@param win userdata The SDL_Window* handle
+---@param callbacks? table|nil Callbacks table { motion, button, wheel } or nil to remove:
+---  motion: fun(x:number, y:number, xrel:number, yrel:number)
+---  button: fun(button:integer, x:number, y:number, down:boolean, clicks:integer)
+---  wheel:  fun(x:number, y:number)  (y>0 = scroll up)
+---@return boolean ok true if registered (or removed)
+function window.SDLSetMouseCallback(win, callbacks)
+    if not sdl or not win then return false end
+    ensureSdlEventWatch()
+    if callbacks == nil then
+        window._sdlMouseCallbacks[win] = nil
+    else
+        window._sdlMouseCallbacks[win] = callbacks
+    end
+    return true
+end
+
+---Whether the child window has requested to close (X clicked). The DevTool polls
+---this in its update; when true it should destroy the window (no auto-destroy here,
+---to avoid re-entrancy inside the SDL event context).
+---@param win userdata The SDL_Window* handle
+---@return boolean pending true if a close request is pending
+function window.SDLIsClosePending(win)
+    if not sdl or not win then return false end
+    return window._sdlClosePending[win] == true
+end
+
+---Get the current SDL keyboard modifier state (for shift-aware text input in child windows).
+---@return integer modState SDL key modifier bitmask (0x0001=LSHIFT, 0x0002=RSHIFT)
+function window.SDLGetModState()
+    if not sdl then return 0 end
+    local ok, mods = pcall(sdl.SDL_GetModState)
+    if ok and mods then return tonumber(mods) or 0 end
+    return 0
+end
+
+---Whether a child window currently has keyboard focus (tracked from SDL focus events).
+---@param win userdata The SDL_Window* handle
+---@return boolean focused true if this window has keyboard focus
+function window.SDLIsWindowFocused(win)
+    if not sdl or not win then return false end
+    local info = window._sdlWindows and window._sdlWindows[win]
+    return (info and info.focused) or false
+end
+
+---Request OS keyboard focus for a child window (called when the user clicks inside it).
+---@param win userdata The SDL_Window* handle
+---@return boolean ok true if the call was made
+function window.SDLSetKeyboardFocus(win)
+    if not sdl or not win then return false end
+    local ok, res = pcall(sdl.SDL_SetWindowKeyboardFocus, win)
+    return (ok and res ~= nil and res ~= false)
+end
+
+---Which managed child window the mouse is currently hovering over (used to decide
+---whether main-window key presses should be forwarded to that child as a fallback).
+---@return userdata|nil win The hovered SDL_Window* handle, or nil
+function window.SDLHoveredWin()
+    if not sdl then return nil end
+    return window._sdlHover
 end
 
 ---Get the readable name of an SDL keycode (e.g. "C", "Escape", "Space").

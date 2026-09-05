@@ -4,7 +4,7 @@ local stat = {
     _page = "idle",
     _menus = 2
 }
-
+DATA.player.getcell = true
 -- Camera-relative positioning is delegated to the single shared GetRelativePos
 -- defined in init.lua, so the stat menu and the overworld dialogs always read
 -- the camera through the same code path (no duplicated math that could drift
@@ -157,7 +157,7 @@ function stat.Update(dt)
                     do
                         local _x, _y = get_relative_pos(230, 70 + (i - 1) * 32)
                         local _item = DATA.player.items[i]
-                        local t = Typers.InstText.New((_item and ITEMS.FindItemByID(DATA.player.items[i]).name or "1"), {_x, _y}, "GUI")
+                        local t = Typers.InstText.New((_item and ITEMS.FindItemByID(DATA.player.items[i]).name or ""), {_x, _y}, "GUI")
                         table.insert(temp_elements, t)
                         if (_item) then
                             local _it = ITEMS.FindItemByID(_item)
@@ -202,6 +202,25 @@ function stat.Update(dt)
 
                 elseif (in_menu == 3) then
                     stat._page = "cell"
+
+                    local _x, _y = get_relative_pos(360, 230)
+                    spawn_block(_x, _y, 345, 350, 5, temp_elements)
+
+                    local _x, _y = get_relative_pos(215, 87)
+                    heart:MoveTo(_x, _y)
+
+                    for i = 1, 10
+                    do
+                        local _x, _y = get_relative_pos(230, 70 + (i - 1) * 32)
+                        local _item = DATA.player.cells[i]
+                        local t = Typers.InstText.New((_item and _item.name or "-"), {_x, _y}, "GUI")
+                        table.insert(temp_elements, t)
+                        if (_item) then
+                            if (_item._color) then
+                                t.color = _item._color
+                            end
+                        end
+                    end
                 end
             elseif (stat._page == "item") then
                 stat._page = "item2"
@@ -228,6 +247,18 @@ function stat.Update(dt)
                         e:Destroy()
                     end
                 end
+            elseif (stat._page == "cell") then
+                stat._page = "idle"
+                heart.alpha = 1
+                for i = #temp_elements, 1, -1
+                do
+                    local e = temp_elements[i]
+                    if (e.Destroy) then
+                        e:Destroy()
+                    end
+                end
+            elseif (stat._page == "item2") then
+                stat._page = "item"
             end
         end
         if (stat._page == "idle") then
@@ -256,6 +287,12 @@ function stat.Update(dt)
             local _i18nx = tonumber(Localize.localizeText("Overworld.Menu.Interval")[in_item_menu])
             local _x, _y = get_relative_pos(_i18nx, 378)
             heart:MoveTo(_x, _y)
+
+            if (Controller.GetState("confirm") == 1) then
+                stat.Destroy()
+                Char.controlling = false
+                Overworld.dialogNew(ITEMS.GetActionByID())
+            end
         end
     end
 end

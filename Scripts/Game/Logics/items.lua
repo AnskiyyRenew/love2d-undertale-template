@@ -67,12 +67,32 @@ local db = {
     {id = "temyarmor", name = "temy armor"},
 }
 
+db._actions = {
+    {
+        id = "Spider",
+        use = {"* You ate the Spider...", "* I CAN'T UNDERSTAND."},
+        info = {"* A spider."},
+        drop = {"* You dropped the Spider...\n* But nothing happened."}
+    }
+}
+
 function db.FindItemByID(id)
     for _, v in ipairs(db)
     do
         if (type(v) == "table") then
             if (v.id == id) then
                 return v
+            end
+        end
+    end
+end
+
+function db.GetActionByID(id, action)
+    for _, v in ipairs(db._actions)
+    do
+        if (type(v) == "table") then
+            if (v.id == id) then
+                return v[action]
             end
         end
     end

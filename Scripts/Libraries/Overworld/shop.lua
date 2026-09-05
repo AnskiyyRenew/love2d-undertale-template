@@ -1,9 +1,10 @@
 local shop = {
     data = DATA.player,
     main = Typers.EText.New("", {40, 260}, 5, {0, 0}, "none"),
+    main_text = {"11"},
     background = Sprites.CreateSprite("px.png", 0),
     player = Sprites.CreateSprite("Soul Library Sprites/spr_default_heart.png", 2),
-    textend = "* cya.",
+    end_text = "* cya.",
 
     _leavekey = false,
 }
@@ -78,9 +79,12 @@ do
     table.insert(goods_buttons, t)
 end
 
+local opinion_text = Typers.EText.New("", {460, 280}, 1)
+
 -- V
 local goods = {}
-local prices = {}
+local prices = {buy = {}, sell = {}}
+local opinions = {buy = {}, sell = {}}
 local states = {"BUY", "SELL", "TALK"}
 local choosing_page = "IDLE"
 local choosing_b = 1
@@ -104,6 +108,22 @@ end
 
 local function createElements(state)
     if (state == "IDLE") then
+        for i = 1, #buttons
+        do
+            buttons[i].alpha = 1
+        end
+        line.alpha = 1
+        shop.player.alpha = 1
+        t_gold.alpha = 1
+        t_inv.alpha = 1
+        text_pointer.alpha = 0
+
+        for i = 1, goods_per_page
+        do
+            local t = goods_buttons[i]
+            t.alpha = 0
+        end
+        shop.main:SetText(shop.main_text)
     elseif (state == "BUY") then
         text_pointer.alpha = 1
         updateTextPointer()
@@ -160,6 +180,13 @@ local function upScroll(data, pos)
     updateButtons(data, pos)
 end
 
+local function findItem(id)
+    local db = ITEMS
+    if (db) then
+        return db.FindItemByID(id)
+    end
+end
+
 function shop.GetPlayer()
     return shop.player
 end
@@ -169,14 +196,12 @@ function shop.GetBackground()
 end
 
 function shop.SetMainText(text)
+    shop.main_text = text
     shop.main:SetText(text)
 end
 
-local function findItem(id)
-    local db = ITEMS
-    if (db) then
-        return db.FindItemByID(id)
-    end
+function shop.SetEndText(text)
+    shop.end_text = text
 end
 
 function shop.SetGoods(g)
@@ -202,17 +227,41 @@ function shop.RemoveGoods(index)
     table.remove(goods, index)
 end
 
-function shop.SetPrice(id, price)
-    prices[id] = price
+function shop.SetBuyPrice(id, price)
+    prices.buy[id] = price
 end
 
-function shop.GetPrice(id)
-    return prices[id]
+function shop.GetBuyPrice(id)
+    return (prices.buy[id] or 0)
+end
+
+function shop.SetBuyOpinion(id, opinion)
+    opinions.buy[id] = opinion
+end
+
+function shop.GetBuyOpinion(id)
+    return (opinions.buy[id] or "undefined")
+end
+
+function shop.SetSellPrice(id, price)
+    prices.sell[id] = price
+end
+
+function shop.GetSellPrice(id)
+    return (prices.sell[id] or 0)
+end
+
+function shop.SetSellOpinion(id, opinion)
+    opinions.buy[id] = opinion
+end
+
+function shop.GetSellOpinion(id)
+    return (opinions.buy[id] or "undefined")
 end
 
 function shop.Update(dt)
     if (Controller.GetState("confirm") == 1) then
-        shop.SetMainText("")
+        shop.main:SetText("")
         if (choosing_page == "IDLE") then
             if (choosing_b <= 3) then
                 choosing_page = states[choosing_b]
@@ -220,16 +269,23 @@ function shop.Update(dt)
                     choosing_a = 1
                     goods_startpos = 0
                     createElements("BUY")
+                    opinion_text:SetText(shop.GetBuyOpinion(goods[1].id))
+                    print(shop.GetBuyOpinion(goods[1].id))
                 end
             else
                 choosing_page = "EXITING"
                 hideElements()
-                shop.SetMainText(shop.textend)
+                shop.SetMainText(shop.end_text)
                 shop.main.mode = "manual"
                 shop.main._onComplete = function ()
                     shop._leaving = true
                 end
             end
+        end
+    elseif (Controller.GetState("cancel") == 1) then
+        if (choosing_page == "BUY") then
+            choosing_page = "IDLE"
+            createElements("IDLE")
         end
     end
 

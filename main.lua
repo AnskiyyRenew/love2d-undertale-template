@@ -30,6 +30,11 @@ Layers = ImportFile("Layers")
 Sprites = ImportFile("Sprites")
 Typers = ImportFile("Typers")
 Debugger = ImportFile("Engine.Debugger")
+if (not _RELEASED) then
+    DevTool = ImportFile("Engine.DevTool")
+else
+    DevTool = nil
+end
 Gamejolt = ImportFile("GamejoltAPI")
 Discord = ImportFile("DiscordRPC")
 ImportFile("Engine.PureConf")
@@ -122,6 +127,7 @@ function love.update(dt)
     Typers.Update(dt)
     Audio.Update(dt)
     Debugger.Update()
+    if (DevTool and DevTool.Update) then DevTool.Update(dt) end
     Gamejolt.update(dt)
     Discord.update(dt)
 
@@ -181,6 +187,9 @@ function love.draw()
 
     Debugger.Draw()
 
+    -- Developer tool: renders its own canvas and pushes it into the SDL child window
+    if (DevTool and DevTool.Draw) then DevTool.Draw() end
+
     -- On-screen virtual keyboard overlay (drawn in screen space)
     VirtualKeyboard.Draw()
 end
@@ -203,7 +212,10 @@ function love.keypressed(key, scancode, isrepeat)
         Scenes.switchTo(Global.GetVariable("F2Room"))
     end
     if (not _RELEASED) then
-        if (key == "f5") then
+        if (DevTool and DevTool.Toggle and key == "f8") then
+            DevTool.Toggle()
+            return
+        elseif (key == "f5") then
             Localize.reload()
             local sceneName = Scenes.name_current
             package.loaded["Scripts.Scenes." .. sceneName] = nil
@@ -223,6 +235,14 @@ function love.keypressed(key, scancode, isrepeat)
             print("==================")
             return
         end
+    end
+
+    -- DevTool: SDL child-window keyboard events are unreliable in this build, so keys
+    -- are forwarded from the main window to the tool (only while the tool has keyboard
+    -- focus or the mouse hovers it); the game scene still receives the keys as usual.
+    if (not _RELEASED) and DevTool and DevTool.HandleKey and DevTool.WantsKeys then
+        local _devShift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+        DevTool.HandleKey(key, isrepeat, _devShift)
     end
 
     if (scene_.keypressed and not scene_.pausing) then scene_.keypressed(key, scancode, isrepeat) end

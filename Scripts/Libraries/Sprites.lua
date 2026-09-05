@@ -253,6 +253,177 @@ function sprites.MultiDust(sprs, sound, remove, time)
     end
 end
 
+--- Make a sprite shake in place for a short time.
+--- The offset is applied ONLY at draw time, so the stored x / y (and therefore
+--- movement via Move / MoveTo / velocity / parents) is never disturbed.
+---@param sprite   table          The sprite instance to shake.
+---@param magnitude number|table  Max offset in pixels. A plain number shakes BOTH
+---                               axes. To shake only one axis (or use different
+---                               amounts per axis) pass a table {x = .., y = ..}
+---                               (or {.., ..}); any axis that is omitted / 0 stays
+---                               still, e.g. {x = 3} shakes only x, {y = 3} only y.
+---@param duration number|nil     How long the shake lasts, in seconds. Default 0.5.
+---@param speed    number|nil     How long the shake keeps near-full strength before
+---                               settling down: 1 fades out across the whole duration,
+---                               higher values rattle at full strength longer then
+---                               stop quickly. Default 1.
+function sprites.ShakeSprite(sprite, magnitude, duration, speed)
+    if ((not sprite) or (not sprite.image)) then return end
+
+    local mx, my
+    if (type(magnitude) == "table") then
+        mx = math.abs(magnitude.x or magnitude[1] or 0)
+        my = math.abs(magnitude.y or magnitude[2] or 0)
+    else
+        mx = math.abs(magnitude or 0)
+        my = mx
+    end
+
+    if (mx <= 0 and my <= 0) then return end
+
+    local shake = sprite._shake
+    if (not shake) then shake = {}; sprite._shake = shake end
+
+    shake.use = true
+    shake.duration = duration or 0.5
+    shake.time = shake.duration
+    shake.magnitude = {mx, my}
+    shake.speed = speed or 1
+    shake.dx = 0
+    shake.dy = 0
+end
+
+--- Spawn a fading "shadow" copy of a sprite (like Player.AddParticle).
+--- The shadow is a brand-new sprite that starts right on top of the source,
+--- follows its position every frame while it lives, exponentially grows toward
+--- `target_scale`, fades out over `duration` seconds, then destroys itself.
+---@param sprite       table        The sprite to copy.
+---@param target_scale number|nil   Scale the shadow grows toward (both axes). Default 2.
+---@param duration     number|nil   Lifetime of the shadow, in seconds. Default 0.5.
+---@param speed        number|nil   How fast the shadow grows/settles (higher = faster).
+---                                 Default 8 (keeps a similar feel to AddParticle).
+---@return table|nil The spawned shadow sprite (nil if it could not be created).
+function sprites.ShadowSprite(sprite, target_scale, duration, speed)
+    if ((not sprite) or (not sprite.image)) then return nil end
+
+    -- Draw just behind the source when possible (only numeric layers can be offset).
+    local layer = sprite.layer
+    if (type(layer) == "number") then layer = layer - 0.1 end
+    local shadow = sprites.CreateSprite(sprite.path, layer)
+    if ((not shadow) or (not shadow.image)) then return nil end
+
+    shadow:MoveTo(sprite:GetPosition())
+    shadow.color = {sprite.color[1], sprite.color[2], sprite.color[3]}
+    shadow.alpha = sprite.alpha or 1
+    shadow.xscale = sprite.xscale or 1
+    shadow.yscale = sprite.yscale or 1
+    shadow.rotation = sprite.rotation or 0
+
+    local life = duration or 0.5
+    shadow._shadow = {
+        use = true,
+        source = sprite,
+        target_scale = target_scale or 2,
+        duration = life,
+        time = life,
+        speed = speed or 8,
+        base_alpha = shadow.alpha
+    }
+
+    shadow.Step = function (self, dt)
+        local st = self._shadow
+        if ((not st) or (not st.use)) then return end
+
+        -- Follow the source so a moving sprite leaves a smooth trail behind it.
+        if (st.source and st.source.image) then
+            self:MoveTo(st.source:GetPosition())
+        end
+
+        -- Grow toward the target scale (dt-safe exponential smoothing).
+        local factor = math.min(1, (dt or 0) * st.speed)
+        self:Scale(
+            self.xscale + (st.target_scale - self.xscale) * factor,
+            self.yscale + (st.target_scale - self.yscale) * factor
+        )
+
+        -- Fade out over the lifetime, then remove the shadow.
+        st.time = st.time - (dt or 0)
+        if (st.time <= 0) then
+            st.use = false
+            self:Destroy()
+        else
+            self.alpha = st.base_alpha * (st.time / st.duration)
+        end
+    end
+
+    return shadow
+end
+
+--- A Sprite instance created by sprites.CreateSprite / sprites.CreateSpriteQuad.
+--- The heavy methods are shared behind a prototype table and exposed through each
+--- instance's metatable, so this class annotation keeps editor autocomplete and
+--- type checks working as if the methods lived directly on the instance.
+---@class Sprite
+---@field type string
+---@field path string
+---@field image userdata|nil
+---@field quad table|nil
+---@field width number
+---@field height number
+---@field x number
+---@field y number
+---@field xscale number
+---@field yscale number
+---@field rotation number
+---@field move_speed number
+---@field color table
+---@field alpha number
+---@field visible boolean
+---@field layer number|string
+---@field parent Sprite|nil
+---@field children Sprite[]
+---@field Step? fun(self:Sprite, dt:number)
+---@field velocity {x:number, y:number, r:number}
+---@field speed {x:number, y:number}
+---@field Draw fun(self:Sprite)
+---@field Update fun(self:Sprite, dt:number)
+---@field GetPivotOffset fun(self:Sprite):number, number
+---@field GetFilter fun(self:Sprite):string, string
+---@field Dust fun(self:Sprite, sound:boolean?, remove:boolean?, time:number?)
+---@field OutLine fun(self:Sprite, r:number?, g:number?, b:number?, a:number?, t:number?)
+---@field SetFourPointMode fun(self:Sprite, enabled:boolean)
+---@field SetFourPoint fun(self:Sprite, p1x:number, p1y:number, p2x:number, p2y:number, p3x:number, p3y:number, p4x:number, p4y:number)
+---@field SetFourPointP fun(self:Sprite, index:integer, x:number, y:number)
+---@field Move fun(self:Sprite, x:number, y:number)
+---@field MoveTo fun(self:Sprite, x:number, y:number)
+---@field Set fun(self:Sprite, p:string)
+---@field SetAnimation fun(self:Sprite, frames:table?, interval:number?, mode:string?)
+---@field Scale fun(self:Sprite, x:number, y:number)
+---@field Pivot fun(self:Sprite, x:number, y:number)
+---@field PivotPixel fun(self:Sprite, x:number, y:number)
+---@field Anchor fun(self:Sprite, x:number, y:number)
+---@field AnchorPixel fun(self:Sprite, x:number, y:number)
+---@field SetParent fun(self:Sprite, spr:Sprite?)
+---@field SetChildren fun(self:Sprite, children:Sprite[])
+---@field AddChild fun(self:Sprite, child:Sprite)
+---@field RemoveChild fun(self:Sprite, child:Sprite):boolean
+---@field GetPosition fun(self:Sprite):number, number
+---@field GetPositionParent fun(self:Sprite):number, number
+---@field SetStencils fun(self:Sprite, stencils:table?)
+---@field SetShaders fun(self:Sprite, shaders:table?)
+---@field GetShaders fun(self:Sprite):table
+---@field ClearShaders fun(self:Sprite)
+---@field AddShader fun(self:Sprite, shader:userdata)
+---@field InsertShader fun(self:Sprite, index:integer, shader:userdata)
+---@field RemoveShader fun(self:Sprite, shader:userdata):boolean
+---@field Destroy fun(self:Sprite)
+---@field Remove fun(self:Sprite)
+local sprite_methods = {}
+local sprite_methods_ready = false
+
+---@param path string Sprite path, relative to Resources/Sprites/ (no prefix).
+---@param layer number|string|nil Layer to place the sprite on.
+---@return Sprite
 function sprites.CreateSprite(path, layer)
     if (Global.GetVariable("SE_MEMORY_SAFETY")) then
         if (#sprites.images >= 2 * Global.GetVariable("OPT_COUNT_SPRITES")) then
@@ -263,6 +434,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
+    ---@type Sprite
     local sprite = {}
 
     -- Metatable to intercept `.layer` writes and automatically mark Layers as dirty
@@ -273,7 +445,10 @@ function sprites.CreateSprite(path, layer)
             elseif k == "x" or k == "y" then
                 return rawget(t, "_" .. k)
             end
-            return rawget(t, k)
+            local v = rawget(t, k)
+            if (v ~= nil) then return v end
+            -- Shared sprite methods (see the Sprite class annotation above).
+            return sprite_methods[k]
         end,
         __newindex = function(t, k, v)
             if k == "layer" then
@@ -361,6 +536,18 @@ function sprites.CreateSprite(path, layer)
         remove = false
     }
 
+    -- Shake effect state (see sprites.ShakeSprite). Visual only: the offset is
+    -- applied at draw time and never written into x / y.
+    sprite._shake = {
+        use = false,
+        time = 0,
+        duration = 0,
+        speed = 1,
+        magnitude = {0, 0},
+        dx = 0,
+        dy = 0
+    }
+
     sprite._four_point = {
         enabled = false,
         p1 = {0, 0},  -- top-left
@@ -377,6 +564,17 @@ function sprites.CreateSprite(path, layer)
         frame = 1,
         done = false
     }
+
+    -- Shared sprite methods: instead of re-creating ~37 closures for EVERY sprite,
+    -- they are defined ONCE (on the very first CreateSprite call) into the
+    -- module-level `sprite_methods` table, then resolved by every instance through
+    -- the metatable __index fallback above. `sprite` is temporarily rebound to the
+    -- shared table so the `function sprite:...` blocks below populate it instead of
+    -- this instance; the method bodies only use `self`, so they are safe to share.
+    if (not sprite_methods_ready) then
+        sprite_methods_ready = true
+        local _instance = sprite
+        sprite = sprite_methods
 
     function sprite:Draw()
         if not self.visible then return end
@@ -418,6 +616,21 @@ function sprites.CreateSprite(path, layer)
             return
         end
 
+        -- Shake effect (visual only): temporarily shift the draw position by the
+        -- per-frame shake offset. Uses rawset on the underlying "_x"/"_y" storage
+        -- (the metatable maps x -> _x, y -> _y) to bypass the coordinate-tracking
+        -- hooks, then restores the values below so the stored position (and any
+        -- Move / MoveTo / velocity logic) is never modified.
+        local shake_dx, shake_dy = 0, 0
+        if (self._shake and self._shake.use) then
+            shake_dx = self._shake.dx or 0
+            shake_dy = self._shake.dy or 0
+            if (shake_dx ~= 0 or shake_dy ~= 0) then
+                rawset(self, "_x", self.x + shake_dx)
+                rawset(self, "_y", self.y + shake_dy)
+            end
+        end
+
         -- Draw 4-directional outline (up/down/left/right) behind the sprite
         if self.outline and not self._four_point.enabled then
             self:_drawOutline(ox, oy)
@@ -438,6 +651,12 @@ function sprites.CreateSprite(path, layer)
         end
 
         if stencil_active then Masks.Clear() end
+
+        -- Restore the base position after the shaken draw.
+        if (shake_dx ~= 0 or shake_dy ~= 0) then
+            rawset(self, "_x", self.x - shake_dx)
+            rawset(self, "_y", self.y - shake_dy)
+        end
     end
 
     function sprite:_drawImage(ox, oy)
@@ -621,15 +840,15 @@ function sprites.CreateSprite(path, layer)
             self:Step(dt)
         end
 
-        local anim = sprite.animation
+        local anim = self.animation
         if (#anim.textures > 0) then
             anim.time = anim.time + dt
             if (anim.time >= anim.interval) then
                 if (anim.mode == "loop") then
-                    sprite:Set(anim.textures[anim.frame])
+                    self:Set(anim.textures[anim.frame])
                     anim.frame = anim.frame % #anim.textures + 1
                 elseif (anim.mode == "oneshot") then
-                    sprite:Set(anim.textures[anim.frame])
+                    self:Set(anim.textures[anim.frame])
                     anim.frame = anim.frame + 1
 
                     if (anim.frame > #anim.textures) then
@@ -637,19 +856,19 @@ function sprites.CreateSprite(path, layer)
                     end
                 elseif (anim.mode == "oneshot-empty" or anim.mode == "empty") then
                     if (anim.textures[anim.frame]) then
-                        sprite:Set(anim.textures[anim.frame])
+                        self:Set(anim.textures[anim.frame])
                     end
                     anim.frame = anim.frame + 1
 
                     if (anim.frame > #anim.textures + 1) then
                         anim.textures = {}
-                        sprite.visible = false
+                        self.visible = false
                     end
                 elseif (anim.mode == "looponce") then
                     -- Play through the sequence once, then return to the first
                     -- frame and hold there until it is triggered again.
                     if (not anim.done) then
-                        sprite:Set(anim.textures[anim.frame])
+                        self:Set(anim.textures[anim.frame])
                         anim.frame = anim.frame + 1
 
                         if (anim.frame > #anim.textures) then
@@ -662,14 +881,34 @@ function sprites.CreateSprite(path, layer)
             end
         end
 
-        if (sprite._dust.use) then
-            sprite._dust.time = sprite._dust.time - dt
-            if sprite._dust.time <= 0 then
-                sprite._dust.use = false
-                sprite._dust.canvas = nil
-                if sprite._dust.remove then
-                    sprite:Destroy()
+        if (self._dust.use) then
+            self._dust.time = self._dust.time - dt
+            if self._dust.time <= 0 then
+                self._dust.use = false
+                self._dust.canvas = nil
+                if self._dust.remove then
+                    self:Destroy()
                 end
+            end
+        end
+
+        -- Shake effect (visual only): tick the timer and refresh the random
+        -- draw offset. Draw() consumes it, so x / y are never touched.
+        if (self._shake and self._shake.use) then
+            local shake = self._shake
+            shake.time = shake.time - dt
+            if (shake.time <= 0) then
+                shake.use = false
+                shake.dx = 0
+                shake.dy = 0
+            else
+                -- Amplitude eases out over the shake's life; "speed" keeps it at
+                -- near-full strength longer (higher) or ramps down the whole time (1).
+                local life = math.max(0, shake.time / shake.duration)
+                local amp_x = shake.magnitude[1] * math.min(1, life * shake.speed)
+                local amp_y = shake.magnitude[2] * math.min(1, life * shake.speed)
+                shake.dx = (amp_x > 0) and ((math.random() * 2 - 1) * amp_x) or 0
+                shake.dy = (amp_y > 0) and ((math.random() * 2 - 1) * amp_y) or 0
             end
         end
     end
@@ -702,11 +941,11 @@ function sprites.CreateSprite(path, layer)
         if (sound) then
             Audio.PlaySound("snd_dust.wav")
         end
-        sprite._dust.canvas = dust_canvas
-        sprite._dust.use = true
-        sprite._dust.remove = remove or false
-        sprite._dust.time = (time or 1)
-        sprite._dust.duration = sprite._dust.time
+        self._dust.canvas = dust_canvas
+        self._dust.use = true
+        self._dust.remove = remove or false
+        self._dust.time = (time or 1)
+        self._dust.duration = self._dust.time
     end
 
     --- Add or remove a 4-directional outline on the sprite.
@@ -816,7 +1055,7 @@ function sprites.CreateSprite(path, layer)
         -- Internal frame-advance calls from the animation loop itself pass a
         -- frame that is already in the current texture list, so those are left
         -- alone to keep SetAnimation working.
-        local anim = sprite.animation
+        local anim = self.animation
         if (anim and #anim.textures > 0) then
             local p_norm = normalizeSpritePath(p)
             local is_anim_frame = false
@@ -827,7 +1066,7 @@ function sprites.CreateSprite(path, layer)
                 end
             end
             if (not is_anim_frame) then
-                sprite.animation = {
+                self.animation = {
                     textures = {},
                     interval = 1 / 10,
                     mode = "loop",
@@ -840,8 +1079,8 @@ function sprites.CreateSprite(path, layer)
     end
 
     function sprite:SetAnimation(frames, interval, mode)
-        sprite:Set(frames[1])
-        sprite.animation = {
+        self:Set(frames[1])
+        self.animation = {
             textures = (frames or {}),
             interval = interval,
             mode = (mode or "loop"),
@@ -982,9 +1221,9 @@ function sprites.CreateSprite(path, layer)
     end
 
     function sprite:Destroy()
-        Layers.remove(sprite)
+        Layers.remove(self)
         for i = #sprites.images, 1, -1 do
-            if (sprites.images[i] == sprite) then
+            if (sprites.images[i] == self) then
                 table.remove(sprites.images, i)
                 break
             end
@@ -995,8 +1234,83 @@ function sprites.CreateSprite(path, layer)
         self:Destroy()
     end
 
+        sprite = _instance
+    end
+
     Layers.add(sprite)
     table.insert(sprites.images, sprite)
+    return sprite
+end
+
+--- Create a sprite that shows only a rectangular region ("quad") of a sprite sheet.
+--- The requested region is baked into its own cropped image (cached per region), so
+--- every existing sprite feature — pivot, outline, dust, scaling, four-point, etc. —
+--- works using the region's own width & height, with no draw-time changes required.
+---@param path  string              Sprite sheet path (same format as CreateSprite, i.e.
+---                                 without the "Resources/Sprites/" prefix).
+---@param quad  table               Region to show: {x = .., y = .., width = .., height = ..}
+---@param layer number|string|nil   Layer for the sprite (same as CreateSprite).
+---@return Sprite The new sprite (an empty table {} when it could not be created).
+function sprites.CreateSpriteQuad(path, quad, layer)
+    if ((not path) or (not quad)) then return {} end
+
+    local qx = math.floor(quad.x or 0)
+    local qy = math.floor(quad.y or 0)
+    local qw = math.floor(quad.width or 0)
+    local qh = math.floor(quad.height or 0)
+    if (qw <= 0 or qh <= 0) then return {} end
+
+    -- Build the sprite with the exact same logic as CreateSprite...
+    ---@type Sprite
+    local sprite = sprites.CreateSprite(path, layer)
+    if ((not sprite) or (not sprite.image)) then return sprite end
+
+    -- ...then swap in a cropped copy of the sheet, so the sprite's width / height
+    -- (and therefore pivot / outline / dust handling) match the requested region
+    -- instead of the whole sheet.
+    local full_path = "Resources/Sprites/" .. path
+    local sheet_w = sprite.image:getWidth()
+    local sheet_h = sprite.image:getHeight()
+
+    -- Clamp the region to the real sheet bounds (also handles the 1x1 fallback image).
+    if (qx + qw > sheet_w) then qw = sheet_w - qx end
+    if (qy + qh > sheet_h) then qh = sheet_h - qy end
+    if (qw <= 0 or qh <= 0) then return sprite end
+
+    -- Cache the cropped image per region so multiple sprites can share the same crop.
+    local crop_key = full_path .. "#" .. qx .. "," .. qy .. "," .. qw .. "," .. qh
+    local entry = sprites.cache[crop_key]
+    if (not entry) then
+        local ok, crop_img, crop_data = pcall(function()
+            local data = SE.image.newImageData(qw, qh)
+            local source_entry = sprites.cache[full_path]
+            local src_data = (source_entry and source_entry.imageData) or sprite.image:getImageData()
+            if (src_data) then
+                data:paste(src_data, 0, 0, qx, qy, qw, qh)
+            end
+            local img = SE.graphics.newImage(data)
+            img:setFilter("nearest", "nearest")
+            return img, data
+        end)
+        if (ok and crop_img) then
+            entry = {
+                img = crop_img,
+                imageData = crop_data,
+                loaded = true,
+                last_used = os.time()
+            }
+            sprites.cache[crop_key] = entry
+        end
+    end
+
+    if (entry) then
+        sprite.image = entry.img
+        sprite.width = qw
+        sprite.height = qh
+        sprite.quad = {x = qx, y = qy, width = qw, height = qh}
+    end
+    -- On any crop failure the sprite keeps the full sheet image, so it still works.
+
     return sprite
 end
 
