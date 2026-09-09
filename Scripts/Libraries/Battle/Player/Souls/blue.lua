@@ -12,10 +12,28 @@ local float = 1
 local can_jump = false
 local jumping = false
 local first_jumped = true
+local slamming = false
+local slam_hp = 0
+local slam_inv = 0
 local current_speed = 0
 local dir = "down"
 local man_dir = "down"
 local speed_limit = 10
+
+function action.Angle(angle)
+    if (not action.sprite) then return end
+    action.sprite.rotation = angle
+end
+
+function action.Slam(angle, hp, inv)
+    if (not action.sprite) then return end
+    slamming = true
+    current_speed = 15
+    action.sprite.rotation = angle
+
+    slam_hp = (hp or 0)
+    slam_inv = (inv or 0)
+end
 
 ---Controls the player's movement and behaviour.
 ---@param dt number|nil
@@ -38,7 +56,6 @@ function action.Update(dt)
         if (Global.GetVariable("UseRealTime(dt)")) then
             -- Put your dt logic here.
         else
-            print(first_jumped, can_jump)
             local cos, sin = math.cos(math.rad(sprite.rotation)), math.sin(math.rad(sprite.rotation))
 
             if (Arenas.PlayerOnGround(sprite)) then
@@ -46,6 +63,13 @@ function action.Update(dt)
                 jumping = false
                 current_speed = 0
                 first_jumped = false
+
+                if (slamming) then
+                    Audio.PlaySound("snd_slam.wav")
+                    Audio.PlaySound("snd_phurt.wav")
+                    slamming = false
+                    Player.Hurt(slam_hp, slam_inv)
+                end
             else
                 can_jump = false
                 first_jumped = false

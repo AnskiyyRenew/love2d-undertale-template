@@ -290,6 +290,9 @@ local function applyTag(typer, tag_name, tag_value)
     elseif (tag_name == "font" and tag_value) then
         -- Writing .font automatically disables bondfont (see metatable).
         typer.font = tag_value
+        -- An explicitly-set font must win over the eng/non-eng bondfont split,
+        -- so every following character (ASCII and non-ASCII) uses this font.
+        typer.use_bondfont = false
         return true
     elseif (tag_name == "effect" and tag_value) then
         local name, intensity = tag_value:match("([^,]+),%s*(.+)")
@@ -474,6 +477,8 @@ function typers.New(text, position, layer, size, mode)
                     t.bondfont.engfunc = function() end
                     t.bondfont.non_engfunc = function() end
                 end
+                -- A directly-set font wins over the eng/non-eng bondfont split.
+                t.use_bondfont = false
             elseif k == "fontsize" then
                 rawset(t, k, v)
                 -- Setting fontsize directly applies it to both bondfont sizes,

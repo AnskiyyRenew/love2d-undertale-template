@@ -1,7 +1,9 @@
 -- Initialize
 Global.SetVariable("FirstRoom", "Overworld.scene_ow_main_0")
 --Global.SetVariable("FirstRoom", "TEST.gb")
---Global.SetVariable("FirstRoom", "scene_logo")
+--Global.SetVariable("FirstRoom", "TEST.scene_wingdings")   -- Wingdings visual check
+Global.SetVariable("FirstRoom", "scene_logo")
+Global.SetVariable("FirstRoom", "Battle.scene_battle_init")
 Global.SetVariable("MainColor", {1, 1, 1})
 --Global.SetVariable("MainColor", SE.tools.hexColor("#6E14FF"))
 Global.SetVariable("EnableFriskDance", true)

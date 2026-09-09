@@ -132,6 +132,79 @@ local function findSpriteFromCache(path)
     return img, loaded
 end
 
+-- --------------------------------------------------------------------- --
+-- Optional solidity (Box2D).
+--
+-- Every sprite can opt into a real static collision box via Sprite:Solid(...).
+-- All solid fixtures share ONE Box2D world that is created lazily on first use
+-- and stepped once per frame at the end of sprites.Update. The reference for
+-- the physics feel is Scripts/Libraries/Overworld/char.lua (same body/shape
+-- style, and "the shape is the fixture" as used across the overworld).
+local solid_world = nil
+
+-- preSolve: enforce "axis" solidity for solid-sprite fixtures.
+--   "y" -> one-way platform: collides only when a mover comes from above.
+--   "x" -> one-way wall:     collides only horizontally (movers can jump
+--                            over / pass under it).
+--   "xy" (default)           collides in every direction.
+local function solidPreSolve(fixtureA, fixtureB, contact)
+    local dataA = fixtureA:getUserData() or {}
+    local dataB = fixtureB:getUserData() or {}
+
+    local solid, other
+    if (dataA.type == "sprite.solid") then
+        solid, other = dataA, fixtureB
+    elseif (dataB.type == "sprite.solid") then
+        solid, other = dataB, fixtureA
+    else
+        return
+    end
+
+    local axis = solid.axis or "xy"
+    if (axis ~= "x" and axis ~= "y") then
+        contact:setEnabled(true)
+        return
+    end
+
+    if (not solid.body or solid.body:isDestroyed()) then return end
+    local otherBody = (other and other.getBody) and other:getBody() or nil
+    if (not otherBody or otherBody:isDestroyed()) then return end
+
+    local sx, sy = solid.body:getPosition()
+    local ox, oy = otherBody:getPosition()
+    local _, ovy = otherBody:getLinearVelocity()
+    local halfH = (solid.h or 0) * 0.5
+    local halfW = (solid.w or 0) * 0.5
+
+    local enabled = true
+    if (axis == "y") then
+        -- Collide only while the mover is above the top face and moving down
+        -- (or resting on it); jumping up from below passes right through.
+        enabled = (oy <= sy - halfH + 1) and (ovy >= 0)
+    elseif (axis == "x") then
+        -- Collide only while the mover is beside the wall's vertical band, so
+        -- it can be jumped over or walked under.
+        enabled = (math.abs(oy - sy) <= halfH + 4)
+    end
+    contact:setEnabled(enabled)
+end
+
+--- Get (and lazily create) the single Box2D world shared by solid sprites.
+--- You normally never need to call this yourself - Sprite:Solid does it.
+---@return userdata The Box2D world.
+function sprites.GetSolidWorld()
+    if (not solid_world or solid_world:isDestroyed()) then
+        solid_world = SE.physics.newWorld(0, 0, true)
+        solid_world:setCallbacks(
+            function() end,  -- beginContact
+            function() end,  -- endContact
+            solidPreSolve,   -- preSolve (axis-aware solidity)
+            function() end   -- postSolve
+        )
+    end
+    return solid_world
+end
+
 function sprites.MultiDust(sprs, sound, remove, time)
     if not sprs or #sprs == 0 then return end
     time = time or 1.5
@@ -360,13 +433,18 @@ function sprites.ShadowSprite(sprite, target_scale, duration, speed)
 end
 
 --- A Sprite instance created by sprites.CreateSprite / sprites.CreateSpriteQuad.
---- The heavy methods are shared behind a prototype table and exposed through each
---- instance's metatable, so this class annotation keeps editor autocomplete and
---- type checks working as if the methods lived directly on the instance.
+---
+--- All methods are defined on the shared prototype table `sprite_methods` just below
+--- and are reached by every instance through its metatable __index, so the language
+--- server treats them as real Sprite methods (autocomplete + signature help work).
+---
+--- Instances are loose tables: the `[string] any` indexer below lets code attach any
+--- extra gameplay field (e.g. `_hitbox`, `damage`, `isBullet`, ...) without warnings.
 ---@class Sprite
+---@field [string] any
 ---@field type string
 ---@field path string
----@field image userdata|nil
+---@field image any|nil
 ---@field quad table|nil
 ---@field width number
 ---@field height number
@@ -381,202 +459,13 @@ end
 ---@field visible boolean
 ---@field layer number|string
 ---@field parent Sprite|nil
----@field children Sprite[]
----@field Step? fun(self:Sprite, dt:number)
----@field velocity {x:number, y:number, r:number}
----@field speed {x:number, y:number}
----@field Draw fun(self:Sprite)
----@field Update fun(self:Sprite, dt:number)
----@field GetPivotOffset fun(self:Sprite):number, number
----@field GetFilter fun(self:Sprite):string, string
----@field Dust fun(self:Sprite, sound:boolean?, remove:boolean?, time:number?)
----@field OutLine fun(self:Sprite, r:number?, g:number?, b:number?, a:number?, t:number?)
----@field SetFourPointMode fun(self:Sprite, enabled:boolean)
----@field SetFourPoint fun(self:Sprite, p1x:number, p1y:number, p2x:number, p2y:number, p3x:number, p3y:number, p4x:number, p4y:number)
----@field SetFourPointP fun(self:Sprite, index:integer, x:number, y:number)
----@field Move fun(self:Sprite, x:number, y:number)
----@field MoveTo fun(self:Sprite, x:number, y:number)
----@field Set fun(self:Sprite, p:string)
----@field SetAnimation fun(self:Sprite, frames:table?, interval:number?, mode:string?)
----@field Scale fun(self:Sprite, x:number, y:number)
----@field Pivot fun(self:Sprite, x:number, y:number)
----@field PivotPixel fun(self:Sprite, x:number, y:number)
----@field Anchor fun(self:Sprite, x:number, y:number)
----@field AnchorPixel fun(self:Sprite, x:number, y:number)
----@field SetParent fun(self:Sprite, spr:Sprite?)
----@field SetChildren fun(self:Sprite, children:Sprite[])
----@field AddChild fun(self:Sprite, child:Sprite)
----@field RemoveChild fun(self:Sprite, child:Sprite):boolean
----@field GetPosition fun(self:Sprite):number, number
----@field GetPositionParent fun(self:Sprite):number, number
----@field SetStencils fun(self:Sprite, stencils:table?)
----@field SetShaders fun(self:Sprite, shaders:table?)
----@field GetShaders fun(self:Sprite):table
----@field ClearShaders fun(self:Sprite)
----@field AddShader fun(self:Sprite, shader:userdata)
----@field InsertShader fun(self:Sprite, index:integer, shader:userdata)
----@field RemoveShader fun(self:Sprite, shader:userdata):boolean
----@field Destroy fun(self:Sprite)
----@field Remove fun(self:Sprite)
+---@field children table
+---@field Step? function
+---@field velocity table
+---@field speed table
 local sprite_methods = {}
-local sprite_methods_ready = false
 
----@param path string Sprite path, relative to Resources/Sprites/ (no prefix).
----@param layer number|string|nil Layer to place the sprite on.
----@return Sprite
-function sprites.CreateSprite(path, layer)
-    if (Global.GetVariable("SE_MEMORY_SAFETY")) then
-        if (#sprites.images >= 2 * Global.GetVariable("OPT_COUNT_SPRITES")) then
-            print("[Too many sprites warning] The number of sprite instances has reached 4000. Further generation has been disabled. To continue generating, set the SE_MEMORY_SAFETY variable to false, or increase the OPT_COUNT_SPRITES value.")
-            return {}
-        elseif (#sprites.images >= Global.GetVariable("OPT_COUNT_SPRITES")) then
-            print("[Too many sprites warning] The number of sprite instances has reached 2000. Please check for any uncleared sprites.")
-        end
-    end
-
-    ---@type Sprite
-    local sprite = {}
-
-    -- Metatable to intercept `.layer` writes and automatically mark Layers as dirty
-    setmetatable(sprite, {
-        __index = function(t, k)
-            if k == "layer" then
-                return rawget(t, "_layer_value")
-            elseif k == "x" or k == "y" then
-                return rawget(t, "_" .. k)
-            end
-            local v = rawget(t, k)
-            if (v ~= nil) then return v end
-            -- Shared sprite methods (see the Sprite class annotation above).
-            return sprite_methods[k]
-        end,
-        __newindex = function(t, k, v)
-            if k == "layer" then
-                rawset(t, "_layer_value", v)
-                Layers.mark_dirty()
-            elseif (k == "x" or k == "y") then
-                local prev = rawget(t, "_" .. k)
-                if (prev ~= v and t.speed) then
-                    local d = v - prev
-                    if (k == "x") then
-                        t.speed.x = t.speed.x + d
-                    else
-                        t.speed.y = t.speed.y + d
-                    end
-                    rawset(t, "is_moving", true)
-                end
-                rawset(t, "_" .. k, v)
-            else
-                rawset(t, k, v)
-            end
-        end
-    })
-
-    sprite.type = "object"
-    sprite._id = nil
-    sprite._layer_id = nil
-    sprite._layer_value = layer or 0
-    sprite.is_moving = false
-    sprite.path = path
-    sprite.pixel_smooth = false
-    local full_path = "Resources/Sprites/" .. path
-    sprite.image, sprite._loaded = findSpriteFromCache(full_path)
-
-    sprite.width = sprite.image:getWidth()
-    sprite.height = sprite.image:getHeight()
-
-    sprite.x = 320
-    sprite.y = 240
-    sprite.xscale = 1
-    sprite.yscale = 1
-    sprite.rotation = 0
-    sprite.move_speed = 1
-
-    sprite.velocity = {
-        x = 0,
-        y = 0,
-        r = 0
-    }
-
-    sprite.speed = {
-        x = 0,
-        y = 0
-    }
-
-    sprite.xpivot = 0.5
-    sprite.ypivot = 0.5
-    sprite.xpivot_px = 0
-    sprite.ypivot_px = 0
-    sprite.xanchor = 0
-    sprite.yanchor = 0
-    sprite.xanchor_px = 0
-    sprite.yanchor_px = 0
-
-    sprite.color = {1, 1, 1}
-    sprite.alpha = 1
-    sprite.visible = true
-    -- Optional outline: {r, g, b, a, thickness} drawn from the four
-    -- cardinal directions (up/down/left/right). Set to nil to remove.
-    sprite.outline = nil
-
-    sprite.parent = nil
-    sprite.children = {}
-    sprite.follow_mode = "position"
-
-    sprite._has_move_to = false
-    sprite._move_to_x = 0
-    sprite._move_to_y = 0
-
-    sprite._shaders = {}
-    sprite._stencils = {}
-    sprite._dust = {
-        use = false,
-        time = 0,
-        duration = 0,
-        remove = false
-    }
-
-    -- Shake effect state (see sprites.ShakeSprite). Visual only: the offset is
-    -- applied at draw time and never written into x / y.
-    sprite._shake = {
-        use = false,
-        time = 0,
-        duration = 0,
-        speed = 1,
-        magnitude = {0, 0},
-        dx = 0,
-        dy = 0
-    }
-
-    sprite._four_point = {
-        enabled = false,
-        p1 = {0, 0},  -- top-left
-        p2 = {0, 0},  -- top-right
-        p3 = {0, 0},  -- bottom-left
-        p4 = {0, 0},  -- bottom-right
-    }
-
-    sprite.animation = {
-        textures = {},
-        interval = 1 / 10,
-        mode = "loop",
-        time = 0,
-        frame = 1,
-        done = false
-    }
-
-    -- Shared sprite methods: instead of re-creating ~37 closures for EVERY sprite,
-    -- they are defined ONCE (on the very first CreateSprite call) into the
-    -- module-level `sprite_methods` table, then resolved by every instance through
-    -- the metatable __index fallback above. `sprite` is temporarily rebound to the
-    -- shared table so the `function sprite:...` blocks below populate it instead of
-    -- this instance; the method bodies only use `self`, so they are safe to share.
-    if (not sprite_methods_ready) then
-        sprite_methods_ready = true
-        local _instance = sprite
-        sprite = sprite_methods
-
-    function sprite:Draw()
+    function sprite_methods:Draw()
         if not self.visible then return end
         if not self.image then return end
 
@@ -659,7 +548,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:_drawImage(ox, oy)
+    function sprite_methods:_drawImage(ox, oy)
         -- Four-point mode: draw with a mesh using the four corner positions
         if self._four_point.enabled then
             self.image:setFilter("nearest", "nearest")
@@ -709,7 +598,7 @@ function sprites.CreateSprite(path, layer)
     --- Only the four cardinal directions are drawn (no diagonal corners).
     --- The outline is unshaded and always rendered with nearest-neighbor
     --- filtering so it stays crisp regardless of rotation/pixel_smooth mode.
-    function sprite:_drawOutline(ox, oy)
+    function sprite_methods:_drawOutline(ox, oy)
         local outline = self.outline
         if not outline then return end
 
@@ -734,7 +623,7 @@ function sprites.CreateSprite(path, layer)
     --- Internal: draw the sprite using a four-point deformation shader.
     --- The texture is stretched so that its four corners align with
     --- the user-defined points (p1=top-left, p2=top-right, p3=bottom-left, p4=bottom-right).
-    function sprite:_drawFourPointImage()
+    function sprite_methods:_drawFourPointImage()
         local fp = self._four_point
 
         -- Cache the shader
@@ -775,7 +664,7 @@ function sprites.CreateSprite(path, layer)
         SE.graphics.setColor(1, 1, 1, 1)
     end
 
-    function sprite:_drawWithShaderChain(ox, oy, shaders)
+    function sprite_methods:_drawWithShaderChain(ox, oy, shaders)
         local prev_canvas = SE.graphics.getCanvas()
         local canvas1 = getTempCanvas(self.width, self.height)
         local canvas2 = getTempCanvas(self.width, self.height)
@@ -810,7 +699,7 @@ function sprites.CreateSprite(path, layer)
         SE.graphics.setColor(1, 1, 1, 1)
     end
 
-    function sprite:Update(dt)
+    function sprite_methods:Update(dt)
         -- Coordinate writes below are tracked by the metatable.
         self.speed.x = 0
         self.speed.y = 0
@@ -911,9 +800,15 @@ function sprites.CreateSprite(path, layer)
                 shake.dy = (amp_y > 0) and ((math.random() * 2 - 1) * amp_y) or 0
             end
         end
+
+        -- Solid collision body: keep the static fixture glued to the sprite's
+        -- current centre, so moving the sprite also moves its collider.
+        if (self._solid and self._solid.body and not self._solid.body:isDestroyed()) then
+            self._solid.body:setPosition(self.x, self.y)
+        end
     end
 
-    function sprite:GetPivotOffset()
+    function sprite_methods:GetPivotOffset()
         if (self.xpivot_px ~= 0 or self.ypivot_px ~= 0) then
             return self.xpivot_px, self.ypivot_px
         else
@@ -921,11 +816,11 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:GetFilter()
+    function sprite_methods:GetFilter()
         return self.image:getFilter()
     end
 
-    function sprite:Dust(sound, remove, time)
+    function sprite_methods:Dust(sound, remove, time)
         -- Bake current image onto a canvas so dust shader works in local UV space
         -- regardless of sprite rotation, and also captures any animation frame
         local w = self.width
@@ -956,7 +851,7 @@ function sprites.CreateSprite(path, layer)
     ---@param b number Blue (0-1)
     ---@param a number Alpha (0-1)
     ---@param t number Thickness in pixels
-    function sprite:OutLine(r, g, b, a, t)
+    function sprite_methods:OutLine(r, g, b, a, t)
         if r == nil or g == nil or b == nil then
             self.outline = nil
             return
@@ -969,7 +864,7 @@ function sprites.CreateSprite(path, layer)
     --- are drawn at the positions defined by SetFourPoint / SetFourPointP.
     --- The sprite's x, y, rotation, xscale, yscale are NOT used in this mode.
     ---@param enabled boolean
-    function sprite:SetFourPointMode(enabled)
+    function sprite_methods:SetFourPointMode(enabled)
         self._four_point.enabled = enabled
     end
 
@@ -983,7 +878,7 @@ function sprites.CreateSprite(path, layer)
     ---@param p3y number Bottom-left Y
     ---@param p4x number Bottom-right X
     ---@param p4y number Bottom-right Y
-    function sprite:SetFourPoint(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y)
+    function sprite_methods:SetFourPoint(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y)
         self._four_point.p1 = {p1x, p1y}
         self._four_point.p2 = {p2x, p2y}
         self._four_point.p3 = {p3x, p3y}
@@ -994,7 +889,7 @@ function sprites.CreateSprite(path, layer)
     ---@param index integer Point index (1=top-left, 2=top-right, 3=bottom-left, 4=bottom-right)
     ---@param x     number X coordinate
     ---@param y     number Y coordinate
-    function sprite:SetFourPointP(index, x, y)
+    function sprite_methods:SetFourPointP(index, x, y)
         local key = "p" .. index
         if self._four_point[key] then
             self._four_point[key][1] = x
@@ -1002,7 +897,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:Move(x, y)
+    function sprite_methods:Move(x, y)
         self.x = self.x + x
         self.y = self.y + y
         -- Recalculate anchor_px so parent tracking stays correct
@@ -1022,7 +917,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:MoveTo(x, y)
+    function sprite_methods:MoveTo(x, y)
         self.x = x
         self.y = y
         -- Recalculate anchor_px so parent tracking stays correct
@@ -1042,7 +937,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:Set(p)
+    function sprite_methods:Set(p)
         self.image = findSpriteFromCache(p)
         if self.image then
             self.width = self.image:getWidth()
@@ -1078,7 +973,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:SetAnimation(frames, interval, mode)
+    function sprite_methods:SetAnimation(frames, interval, mode)
         self:Set(frames[1])
         self.animation = {
             textures = (frames or {}),
@@ -1090,22 +985,22 @@ function sprites.CreateSprite(path, layer)
         }
     end
 
-    function sprite:Scale(x, y)
+    function sprite_methods:Scale(x, y)
         self.xscale = x
         self.yscale = y
     end
 
-    function sprite:Pivot(x, y)
+    function sprite_methods:Pivot(x, y)
         self.xpivot = x
         self.ypivot = y
     end
 
-    function sprite:PivotPixel(x, y)
+    function sprite_methods:PivotPixel(x, y)
         self.xpivot_px = x
         self.ypivot_px = y
     end
 
-    function sprite:Anchor(x, y)
+    function sprite_methods:Anchor(x, y)
         self.xanchor = x
         self.yanchor = y
         -- Convert proportional anchor to pixel offset using parent dimensions
@@ -1115,25 +1010,25 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:AnchorPixel(x, y)
+    function sprite_methods:AnchorPixel(x, y)
         self.xanchor_px = x
         self.yanchor_px = y
     end
 
-    function sprite:SetParent(spr)
+    function sprite_methods:SetParent(spr)
         self.parent = spr
     end
 
-    function sprite:SetChildren(children)
+    function sprite_methods:SetChildren(children)
         self.children = children
     end
 
-    function sprite:AddChild(child)
+    function sprite_methods:AddChild(child)
         table.insert(self.children, child)
         child.parent = self
     end
 
-    function sprite:RemoveChild(child)
+    function sprite_methods:RemoveChild(child)
         for i = #self.children, 1, -1 do
             if (self.children[i] == child) then
                 table.remove(self.children, i)
@@ -1144,11 +1039,11 @@ function sprites.CreateSprite(path, layer)
         return false
     end
 
-    function sprite:GetPosition()
+    function sprite_methods:GetPosition()
         return self.x, self.y
     end
 
-    function sprite:GetPositionParent()
+    function sprite_methods:GetPositionParent()
         if self.parent and self.parent.image then
             return self.xanchor_px, self.yanchor_px
         else
@@ -1156,7 +1051,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:SetStencils(stencils)
+    function sprite_methods:SetStencils(stencils)
         self._stencils = {}
 
         if not stencils then
@@ -1174,7 +1069,7 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:SetShaders(shaders)
+    function sprite_methods:SetShaders(shaders)
         self._shaders = {}
 
         if not shaders then
@@ -1192,25 +1087,25 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:GetShaders()
+    function sprite_methods:GetShaders()
         return self._shaders
     end
 
-    function sprite:ClearShaders()
+    function sprite_methods:ClearShaders()
         self._shaders = {}
     end
 
-    function sprite:AddShader(shader)
+    function sprite_methods:AddShader(shader)
         if (not shader) then return end
         table.insert(self._shaders, shader)
     end
 
-    function sprite:InsertShader(index, shader)
+    function sprite_methods:InsertShader(index, shader)
         if (not shader) then return end
         table.insert(self._shaders, index, shader)
     end
 
-    function sprite:RemoveShader(shader)
+    function sprite_methods:RemoveShader(shader)
         for i = #self._shaders, 1, -1 do
             if (self._shaders[i] == shader) then
                 table.remove(self._shaders, i)
@@ -1220,7 +1115,9 @@ function sprites.CreateSprite(path, layer)
         return false
     end
 
-    function sprite:Destroy()
+    function sprite_methods:Destroy()
+        -- Drop any solid collision body before removing the sprite.
+        self:UnSolid()
         Layers.remove(self)
         for i = #sprites.images, 1, -1 do
             if (sprites.images[i] == self) then
@@ -1230,12 +1127,225 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    function sprite:Remove()
+    function sprite_methods:Remove()
         self:Destroy()
     end
 
-        sprite = _instance
+    --- Turn this sprite into a solid obstacle backed by a real Box2D static body.
+    --- The collision box is a rectangle centred on the sprite (its x/y) and is
+    --- kept in sync with the sprite position every frame. All solid sprites share
+    --- a single physics world (see sprites.GetSolidWorld).
+    ---@param axis string|nil "x" = solid horizontally only (one-way wall, can be
+    ---                        jumped over / walked under); "y" = solid vertically
+    ---                        only from the top (one-way platform); "xy" / nil =
+    ---                        fully solid in every direction.
+    ---@param box table|nil Optional collision box {width = .., height = ..},
+    ---                      centred on the sprite. Defaults to the sprite image size.
+    function sprite_methods:Solid(axis, box)
+        -- Also accept Sprite:Solid({width = .., height = ..}).
+        if (type(axis) == "table") then
+            box = axis
+            axis = nil
+        end
+        if (type(axis) == "boolean") then
+            axis = axis and "xy" or nil
+        end
+        axis = axis or "xy"
+        if (axis ~= "x" and axis ~= "y") then axis = "xy" end
+
+        -- Re-calling Solid replaces any previous collider.
+        self:UnSolid()
+
+        local w = (box and box.width) or self.width or 1
+        local h = (box and box.height) or self.height or 1
+        if (w <= 0) then w = 1 end
+        if (h <= 0) then h = 1 end
+
+        local world = sprites.GetSolidWorld()
+        local body = SE.physics.newBody(world, self.x, self.y, "static")
+        body:setFixedRotation(true)
+        local shape = SE.physics.newRectangleShape(body, w, h)
+        shape:setDensity(1)
+        shape:setRestitution(0)
+        shape:setFriction(0.1)
+        shape:setUserData({
+            type = "sprite.solid",
+            sprite = self,
+            body = body,
+            axis = axis,
+            w = w,
+            h = h
+        })
+
+        self._solid = { body = body, shape = shape, axis = axis, w = w, h = h }
+        return self
     end
+
+    --- Remove the solid collision body from this sprite (if any).
+    function sprite_methods:UnSolid()
+        local solid = self._solid
+        if (solid and solid.body and not solid.body:isDestroyed()) then
+            solid.body:destroy()
+        end
+        self._solid = nil
+        return self
+    end
+
+    --- Query whether this sprite is currently solid.
+    ---@return string|false The active axis ("x", "y" or "xy"), or false when not solid.
+    function sprite_methods:IsSolid()
+        local solid = self._solid
+        if (solid and solid.body and not solid.body:isDestroyed()) then
+            return solid.axis or "xy"
+        end
+        return false
+    end
+
+---@param path string Sprite path, relative to Resources/Sprites/ (no prefix).
+---@param layer number|string|nil Layer to place the sprite on.
+---@return Sprite
+function sprites.CreateSprite(path, layer)
+    if (Global.GetVariable("SE_MEMORY_SAFETY")) then
+        if (#sprites.images >= 2 * Global.GetVariable("OPT_COUNT_SPRITES")) then
+            print("[Too many sprites warning] The number of sprite instances has reached 4000. Further generation has been disabled. To continue generating, set the SE_MEMORY_SAFETY variable to false, or increase the OPT_COUNT_SPRITES value.")
+            return {}
+        elseif (#sprites.images >= Global.GetVariable("OPT_COUNT_SPRITES")) then
+            print("[Too many sprites warning] The number of sprite instances has reached 2000. Please check for any uncleared sprites.")
+        end
+    end
+
+    ---@type Sprite
+    local sprite = {}
+
+    -- Metatable to intercept `.layer` writes and automatically mark Layers as dirty
+    setmetatable(sprite, {
+        __index = function(t, k)
+            if k == "layer" then
+                return rawget(t, "_layer_value")
+            elseif k == "x" or k == "y" then
+                return rawget(t, "_" .. k)
+            end
+            local v = rawget(t, k)
+            if (v ~= nil) then return v end
+            -- Shared sprite methods (see the Sprite class annotation above).
+            return sprite_methods[k]
+        end,
+        __newindex = function(t, k, v)
+            if k == "layer" then
+                rawset(t, "_layer_value", v)
+                Layers.mark_dirty()
+            elseif (k == "x" or k == "y") then
+                local prev = rawget(t, "_" .. k)
+                if (prev ~= v and t.speed) then
+                    local d = v - prev
+                    if (k == "x") then
+                        t.speed.x = t.speed.x + d
+                    else
+                        t.speed.y = t.speed.y + d
+                    end
+                    rawset(t, "is_moving", true)
+                end
+                rawset(t, "_" .. k, v)
+            else
+                rawset(t, k, v)
+            end
+        end
+    })
+
+    sprite.type = "object"
+    sprite.HurtMode = "normal"
+    sprite._id = nil
+    sprite._layer_id = nil
+    sprite._layer_value = layer or 0
+    sprite.is_moving = false
+    sprite.path = path
+    sprite.pixel_smooth = false
+    local full_path = "Resources/Sprites/" .. path
+    sprite.image, sprite._loaded = findSpriteFromCache(full_path)
+
+    sprite.width = sprite.image:getWidth()
+    sprite.height = sprite.image:getHeight()
+
+    sprite.x = 320
+    sprite.y = 240
+    sprite.xscale = 1
+    sprite.yscale = 1
+    sprite.rotation = 0
+    sprite.move_speed = 1
+
+    sprite.velocity = {
+        x = 0,
+        y = 0,
+        r = 0
+    }
+
+    sprite.speed = {
+        x = 0,
+        y = 0
+    }
+
+    sprite.xpivot = 0.5
+    sprite.ypivot = 0.5
+    sprite.xpivot_px = 0
+    sprite.ypivot_px = 0
+    sprite.xanchor = 0
+    sprite.yanchor = 0
+    sprite.xanchor_px = 0
+    sprite.yanchor_px = 0
+
+    sprite.color = {1, 1, 1}
+    sprite.alpha = 1
+    sprite.visible = true
+    -- Optional outline: {r, g, b, a, thickness} drawn from the four
+    -- cardinal directions (up/down/left/right). Set to nil to remove.
+    sprite.outline = nil
+
+    sprite.parent = nil
+    sprite.children = {}
+    sprite.follow_mode = "position"
+
+    sprite._has_move_to = false
+    sprite._move_to_x = 0
+    sprite._move_to_y = 0
+
+    sprite._shaders = {}
+    sprite._stencils = {}
+    sprite._dust = {
+        use = false,
+        time = 0,
+        duration = 0,
+        remove = false
+    }
+
+    -- Shake effect state (see sprites.ShakeSprite). Visual only: the offset is
+    -- applied at draw time and never written into x / y.
+    sprite._shake = {
+        use = false,
+        time = 0,
+        duration = 0,
+        speed = 1,
+        magnitude = {0, 0},
+        dx = 0,
+        dy = 0
+    }
+
+    sprite._four_point = {
+        enabled = false,
+        p1 = {0, 0},  -- top-left
+        p2 = {0, 0},  -- top-right
+        p3 = {0, 0},  -- bottom-left
+        p4 = {0, 0},  -- bottom-right
+    }
+
+    sprite.animation = {
+        textures = {},
+        interval = 1 / 10,
+        mode = "loop",
+        time = 0,
+        frame = 1,
+        done = false
+    }
+
 
     Layers.add(sprite)
     table.insert(sprites.images, sprite)
@@ -1360,6 +1470,12 @@ function sprites.Update(dt)
         if sprite then
             sprite:Update(dt)
         end
+    end
+
+    -- Step the shared solidity world once per frame. Sprites already synced their
+    -- solid bodies above; any dynamic body added by the user is resolved here.
+    if (solid_world and not solid_world:isDestroyed()) then
+        solid_world:update(dt)
     end
 end
 

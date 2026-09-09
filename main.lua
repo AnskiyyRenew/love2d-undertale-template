@@ -1,5 +1,6 @@
 -- Init
 love = require("love")
+love.keyboard.setTextInput(false)
 if (not _RELEASED) then
     if (love.system.getOS() == "Windows") then
         local handle = io.popen("chcp 65001", "r")
@@ -40,6 +41,8 @@ Discord = ImportFile("DiscordRPC")
 ImportFile("Engine.PureConf")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
+Border = ImportFile("Utils.Border")
+Border.SetEnabled(true)
 math.randomseed()
 
 -- Controller simulation (see Engine/PureConf.lua "ControllerSimulation").
@@ -71,7 +74,11 @@ DrawX, DrawY = 0, 0
 local MAIN_CANVAS, INTERMEDIATE_CANVAS
 local function updateScreenScale()
     local screen_w, screen_h = SE.graphics.getDimensions()
-    ScreenScale = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
+    if (FILL_SCREEN and SE.window.getFullscreen()) then
+        ScreenScale = math.min(screen_w / LOGICAL_WIDTH, screen_h / LOGICAL_HEIGHT)
+    else
+        ScreenScale = 1
+    end
     DrawX = math.floor((screen_w - CANVAS_WIDTH * ScreenScale) * 0.5 + 0.5)
     DrawY = math.floor((screen_h - CANVAS_HEIGHT * ScreenScale) * 0.5 + 0.5)
 end
@@ -79,6 +86,12 @@ end
 function love.load()
     -- Load the initial (deferred) scene synchronously so scene_ is set before
     -- any love.* event (e.g. love.resize) can fire ahead of the first update.
+
+    -- Border library: pick the default frame image (lazy-loaded on first use).
+    -- Scenes can switch images or fade in/out via Border.SetImage / FadeIn /
+    -- FadeOut whenever they need to.
+    Border.SetImage("ruins")
+
     Scenes.flushPendingSwitch()
     scene_ = Scenes.current
 
@@ -114,6 +127,7 @@ function love.update(dt)
     Scenes.flushPendingSwitch()
 
     -- Libraries
+    Border.Update(dt)   -- advance border fade in/out
     Guard.Update(dt)
     -- Order matters: poll the gamepad, mirror it onto Keyboard's simulated
     -- keys, then let Keyboard.Update() finalize all key states before the
@@ -148,6 +162,7 @@ function love.update(dt)
 end
 
 function love.draw()
+
     SE.graphics.setCanvas({MAIN_CANVAS, stencil = true})
     SE.graphics.clear(0, 0, 0, 1)
 
@@ -175,6 +190,7 @@ function love.draw()
 
     SE.graphics.setCanvas()
     SE.graphics.clear(0, 0, 0, 1)
+    Border.Draw()
 
     SE.graphics.push()
     SE.graphics.translate(DrawX, DrawY)
@@ -182,9 +198,17 @@ function love.draw()
 
     SE.graphics.setColor(1, 1, 1, 1)
     SE.graphics.draw(source)
-
+    local prevLineStyle = SE.graphics.getLineStyle()
+    SE.graphics.setLineStyle("rough")
+    SE.graphics.setLineWidth(1)
+    SE.graphics.setColor(1, 1, 1)
+    SE.graphics.rectangle("line", -1, -1, CANVAS_WIDTH + 2, CANVAS_HEIGHT + 2)
+    SE.graphics.setColor(1, 1, 1, 1)
+    SE.graphics.setLineStyle(prevLineStyle)
     SE.graphics.pop()
 
+    -- Window border frame: drawn by the Border library at screen (0,0), on top
+    -- of the gameplay canvas. Enable / pick image / fade via Border.* APIs.
     Debugger.Draw()
 
     -- Developer tool: renders its own canvas and pushes it into the SDL child window

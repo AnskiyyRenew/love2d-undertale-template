@@ -34,6 +34,61 @@ python count_lua_files.py "D:\path\to\project"
 
 Windows 下也可以直接双击 [`run.bat`](run.bat)（优先使用 `pythonw`，无黑窗口）。
 
+## Lua 跨平台兼容检查 / Lua compatibility check
+
+手动运行的独立检查器：按不同"严格程度"静态检查项目里的 Lua 文件是否能跑通。
+它只读不改，不需要与项目代码建立任何连接。
+
+```bash
+# 默认严格度 3（love.js，最严格），自动检查项目根目录
+python check_compat.py
+
+# 也可以传入要检查的目录，或指定严格度
+python check_compat.py --strict 1
+python check_compat.py --strict 2
+python check_compat.py D:/path/to/other/game --strict 1
+
+# 三种严格度一次性对比 / 输出 JSON 供其它工具接入
+python check_compat.py --all
+python check_compat.py --json
+```
+
+Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（默认按严格度 3 检查）。
+
+### 三级严格度（对应三种目标平台）
+
+| 严格度 | 目标平台 | 说明 |
+| ------ | -------- | ---- |
+| `1` | Windows 开发端 | 最宽松。NTFS 大小写不敏感，`require` 大小写写错也能命中；LÖVE 12 / Lua 5.4 的新语法（`goto`、位运算等）都能用 |
+| `2` | exe 发布 / Linux 等 | 较严格。`.love` 一旦在区分大小写的文件系统上解包，`require` / `ImportFile` 引用的大小写必须与磁盘一致 |
+| `3` | love.js (Web) | 最严格。love.js 是 LuaJIT / Lua 5.1 语义：`goto`、`::label::`、`// << >> & \| ~`、`0b` 字面量会编译失败；虚拟文件系统也大小写敏感 |
+
+### 能检查出什么（按严重性分级：error / warning / info）
+
+- **error（该严格度下会阻断运行）**：
+  - UTF-8 BOM、非 UTF-8 编码
+  - 字符串 / 长注释未闭合、括号不配对等基础语法问题
+  - `require` / `ImportFile` 目标模块文件不存在
+  - 大小写与磁盘不一致（严格度 2/3 时）
+  - `goto` / `::label::` 等 Lua 5.2+ 语法（严格度 3 时）
+- **warning（可能踩雷）**：
+  - `loadstring` / `setfenv` / `getfenv` 等 Lua 5.1 专属 API（LÖVE 12 换成 Lua 5.4 后已移除）
+  - 动态 `require`（运行时变量拼路径，静态无法确认；严格度 2/3 上升为警告）
+- **info（仅供参考）**：
+  - `require` 到 `love` / `ffi` / `bit` 等运行时模块（注意 `ffi` 仅 LuaJIT/5.1 有）
+  - `io.popen` / `os.execute`（love.js 中不可用）
+  - 大小写不一致（严格度 1 时，Windows 大小写不敏感，不阻断）
+
+### 特殊处理
+
+- 兼容项目自己的 [`ImportFile`](../Scripts/Libraries/Engine/PathDefiner.lua) 加载器：默认按
+  `Scripts.Libraries.<路径>` 解析，shader / dll 类型也会单独检查。
+- 能解开 `local path = (...):match(...)`、`local cwd = (...):gsub(...) .. "."` 这类
+  `init.lua` 相对 require 惯用法，并校验展开后的大小写与存在性。
+
+> 注意：这是**静态检查**，不可能 100% 替代真实运行；它专注在可可靠判定的
+> 跨平台雷区（大小写、Lua 版本语法差异、模块缺失、基础语法）。
+
 ## 依赖 / Requirements
 
 - **Python 3**（仅使用标准库，官方 Windows 安装包自带 tkinter，无需额外安装）
@@ -69,10 +124,12 @@ itself and the output directory are always excluded.
 
 ```
 Packager/
-  build_tool.py    # 主程序（GUI + 打包逻辑）
-  count_lua_files.py # Lua 文件统计脚本
-  run.bat          # Windows 启动脚本
-  README.md        # 本说明
+  build_tool.py       # 主程序（GUI + 打包逻辑）
+  count_lua_files.py  # Lua 文件统计脚本
+  check_compat.py     # Lua 跨平台兼容检查器（三级严格度）
+  check_compat.bat    # 检查器 Windows 启动脚本
+  run.bat             # Windows 启动脚本
+  README.md           # 本说明
 ```
 
 ## 导出示例输出 / Example outputs

@@ -104,21 +104,22 @@ function bones.New2D(whose, length, position, angle, velocity)
         _vel = {0, 0}
     end
 
-    bone.whose = _whose
-    bone.length = _len
+    bone.whose = _whose:lower()
+    bone.length = math.abs(_len)
     bone.x = _pos[1]
     bone.y = _pos[2]
     bone.rotation = _angle
     bone.velocity = _vel
     bone.concat = true
     bone.layer = "Bullets"
+    bone.isBullet = true
 
     bone.xpivot = 0.5
     bone.ypivot = 0.5
     -- Head/tail width (px), used as the xpivot side-offset scale.
     bone.width = (_whose == "sans") and 10 or 13
 
-    if (_whose == "sans") then
+    if (bone.whose == "sans") then
         bone._head = Sprites.CreateSprite("Attacks/Sans/spr_s_bonebul_top_0.png", "Bullets")
         bone._body = Sprites.CreateSprite("px.png", "Bullets")
         bone._tail = Sprites.CreateSprite("Attacks/Sans/spr_s_bonebul_bottom_0.png", "Bullets")
@@ -130,7 +131,7 @@ function bones.New2D(whose, length, position, angle, velocity)
         bone._head.ypivot = 1
         bone._tail.ypivot = 0
         bone._body.xscale = 6
-    elseif (_whose == "papyrus") then
+    elseif (bone.whose == "papyrus") then
         bone._head = Sprites.CreateSprite("Attacks/Papyrus/spr_bonetop_0.png", "Bullets")
         bone._body = Sprites.CreateSprite("px.png", "Bullets")
         bone._tail = Sprites.CreateSprite("Attacks/Papyrus/spr_bonebottom_0.png", "Bullets")
@@ -163,6 +164,58 @@ function bones.New2D(whose, length, position, angle, velocity)
     function bone:SetPivot(xp, yp)
         if (type(xp) == "number") then self.xpivot = xp end
         if (type(yp) == "number") then self.ypivot = yp end
+    end
+
+    function bone:SetStencils(stencils)
+        if self._head then self._head:SetStencils(stencils) end
+        if self._body then self._body:SetStencils(stencils) end
+        if self._tail then self._tail:SetStencils(stencils) end
+    end
+
+
+    function bone:ToDown(arena)
+        self.y = arena.y + arena.height / 2 - (self.length + 12) / 2
+    end
+
+    function bone:ToUp(arena)
+        self.y = arena.y - arena.height / 2 + (self.length + 12) / 2
+    end
+
+    function bone:ToLeft(arena)
+        self.x = arena.x - arena.width / 2 + (self.length + 12) / 2
+    end
+
+    function bone:ToRight(arena)
+        self.x = arena.x + arena.width / 2 - (self.length + 12) / 2
+    end
+
+    function bone:SetMode(mode, color)
+        if (self._head) then
+            self._head.color = (color or Global.GetVariable("MainColor"))
+            self._head["HurtMode"] = (mode or "normal")
+        end
+        if (self._body) then
+            self._body.color = (color or Global.GetVariable("MainColor"))
+            self._body["HurtMode"] = (mode or "normal")
+        end
+        if (self._tail) then
+            self._tail.color = (color or Global.GetVariable("MainColor"))
+            self._tail["HurtMode"] = (mode or "normal")
+        end
+    end
+
+    function bone:Destroy()
+        self._head:Destroy()
+        self._body:Destroy()
+        self._tail:Destroy()
+
+        for i = #bones._2D, 1, -1
+        do
+            local b = bones._2D[i]
+            if (b == self) then
+                table.remove(bones._2D, i)
+            end
+        end
     end
 
     table.insert(bones._2D, bone)
@@ -408,14 +461,20 @@ function bones.Update(dt)
             local by = b.y - offL * c + offS * s
 
             body:MoveTo(bx, by)
+            local abs_length = math.abs(b.length)
             head:MoveTo(
-                bx + b.length / 2 * s,
-                by - b.length / 2 * c
+                bx + abs_length / 2 * s,
+                by - abs_length / 2 * c
             )
             tail:MoveTo(
-                bx - b.length / 2 * s,
-                by + b.length / 2 * c
+                bx - abs_length / 2 * s,
+                by + abs_length / 2 * c
             )
+        end
+
+        -- Step
+        if (b.Step) then
+            b:Step()
         end
     end
 
@@ -503,6 +562,11 @@ function bones.Update(dt)
                 link.length = dist * link._3d_percent
                 link.rotation = angle
             end
+        end
+
+        -- Step
+        if (b.Step) then
+            b:Step()
         end
     end
 end

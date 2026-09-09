@@ -79,7 +79,7 @@ do
     table.insert(goods_buttons, t)
 end
 
-local opinion_text = Typers.EText.New("", {460, 280}, 1)
+local opinion_text = Typers.EText.New("", {460, 260}, 2, {0, 0}, "none")
 
 -- V
 local goods = {}

@@ -166,6 +166,10 @@ end
 function layerHandlers.walls(layer)
     local objects = map.objects.walls
     local scale = 2
+    -- Wall friction. Box2D mixes the two contact frictions with sqrt(f1 * f2),
+    -- so walls only slide smoothly when BOTH this value and the player's own
+    -- friction (char.lua) are low. Tune this single spot to adjust wall grip.
+    local wall_friction = 0.01
 
     local function rotatePoint(px, py, angle)
         local ca = math.cos(angle)
@@ -191,9 +195,13 @@ function layerHandlers.walls(layer)
                 table.insert(verts, (p.y - first.y) * scale)
             end
 
-            local ok, shape_or_err = pcall(function() return SE.physics.newPolygonShape(verts) end)
-            local shape = shape_or_err
+            -- LÖVE 12.0: attach the polygon directly to the body (the same as the
+            -- rectangle/circle branches below). The body-less variant is deprecated
+            -- and yields a detached shape, on which setDensity/setUserData throw
+            -- "Shape must be active in the physics World to use this method."
+            local shape = SE.physics.newPolygonShape(body, verts)
             shape:setDensity(1)
+            shape:setFriction(wall_friction)
             shape:setUserData({ type = "wall", object = obj })
 
             table.insert(objects, {
@@ -222,6 +230,7 @@ function layerHandlers.walls(layer)
 
             shape = SE.physics.newCircleShape(body, radius * scale)
             shape:setDensity(1)
+            shape:setFriction(wall_friction)
             shape:setUserData({ type = "wall", object = obj })
 
             table.insert(objects, {
@@ -247,6 +256,7 @@ function layerHandlers.walls(layer)
 
             shape = SE.physics.newRectangleShape(body, w * scale, h * scale)
             shape:setDensity(1)
+            shape:setFriction(wall_friction)
             shape:setUserData({ type = "wall", object = obj })
 
             table.insert(objects, {
@@ -511,13 +521,26 @@ function map.Init(lua_file)
 end
 
 function map.Update(dt)
+    -- Advance STI tile animations (Tiled animated tiles). Without this call the
+    -- animated tiles stay frozen on their first frame, because their frames are
+    -- only advanced inside STI's Map:update and swapped into the sprite batch.
+    if (map._map and map._map.update) then
+        map._map:update(dt)
+    end
+
     world.Update(dt)
     char.Update(dt)
 
-    -- Make the camera follow the player (bounds are applied by Camera:Update).
-    if (char.currentSprite) then
+    -- Auto-follow the player only while Overworld.follow_player is enabled
+    -- (bounds are applied by Camera:Update). When disabled, the camera stays
+    -- put and must be moved by code (Camera:setPosition / Camera.x / Camera.y).
+    if (char.currentSprite and Overworld.follow_player) then
         Camera:setPosition(char.currentSprite.x, char.currentSprite.y)
+    end
 
+    -- Object layer sorting (UponPlayer/BelowPlayer) always depends on the
+    -- player's position, regardless of whether the camera is following.
+    if (char.currentSprite) then
         for i = #obj_sprites, 1, -1
         do
             local s = obj_sprites[i]

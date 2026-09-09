@@ -44,6 +44,7 @@ import locale
 import queue
 import zipfile
 import threading
+import struct
 import subprocess
 
 import tkinter as tk
@@ -82,7 +83,7 @@ STRINGS = {
         "section_exports": "导出参数",
         "love_dir": "LÖVE 安装目录（含 love.exe）:",
         "rcedit": "rcedit 路径（可选，用于嵌入图标）:",
-        "icon_file": "exe 图标 (.ico)（可选）:",
+        "icon_file": "exe 图标 (.ico/.png)（可选）:",
         "android_template": "love-android 模板目录:",
         "lovejs_cmd": "love.js 命令（可选，如 npx love.js）:",
         "section_excludes": "排除设置（防止循环打包）",
@@ -124,6 +125,9 @@ STRINGS = {
         "msg_icon_embedded": "已嵌入图标: {path}",
         "msg_icon_skipped": "未找到 rcedit，跳过图标嵌入（不影响运行）。",
         "err_rcedit": "rcedit 执行失败: {err}",
+        "msg_icon_png_convert": "已将 PNG 转换为多尺寸 ICO: {path}",
+        "msg_icon_png_no_pillow": "未安装 Pillow，无法自动把 PNG 转成 ICO。请安装 Pillow（pip install Pillow）或改用 .ico 图标。",
+        "msg_icon_warn_small": "图标只有 {sizes}，尺寸过小，资源管理器大图标会模糊。建议使用含 16/32/48/256 的 .ico。",
         "msg_start": "===== 开始打包: {name} =====",
         "msg_err": "错误: {err}",
         "help_title": "帮助",
@@ -167,7 +171,7 @@ STRINGS = {
         "section_exports": "Export Options",
         "love_dir": "LÖVE installation directory (contains love.exe):",
         "rcedit": "rcedit path (optional, to embed icon):",
-        "icon_file": "exe icon (.ico) (optional):",
+        "icon_file": "exe icon (.ico/.png) (optional):",
         "android_template": "love-android template directory:",
         "lovejs_cmd": "love.js command (optional, e.g. npx love.js):",
         "section_excludes": "Exclusions (prevent recursive packing)",
@@ -209,6 +213,9 @@ STRINGS = {
         "msg_icon_embedded": "Icon embedded: {path}",
         "msg_icon_skipped": "rcedit not found; skipped icon embedding (does not affect running).",
         "err_rcedit": "rcedit failed: {err}",
+        "msg_icon_png_convert": "Converted PNG to multi-size ICO: {path}",
+        "msg_icon_png_no_pillow": "Pillow is not installed; cannot auto-convert PNG to ICO. Install it (pip install Pillow) or use an .ico file.",
+        "msg_icon_warn_small": "Icon only has {sizes} - too small; Explorer large icons will look blurry. Use an .ico containing 16/32/48/256 sizes.",
         "msg_start": "===== Build started: {name} =====",
         "msg_err": "Error: {err}",
         "help_title": "Help",
@@ -371,13 +378,38 @@ def create_zip(project_dir, zip_path, exclude_dirs, exclude_exts, exclude_paths)
     return count
 
 
-def merge_love_exe(love_exe, love_file, out_exe):
-    """Concatenate love.exe + game.love into a standalone executable."""
-    with open(love_exe, "rb") as src, \
-            open(love_file, "rb") as love, \
-            open(out_exe, "wb") as dst:
-        shutil.copyfileobj(src, dst, 1024 * 1024)
-        shutil.copyfileobj(love, dst, 1024 * 1024)
+def png_to_ico(png_path, ico_path):
+    """Convert a PNG into a multi-size ICO via Pillow (best effort).
+
+    Windows Explorer/desktop wants a rich set of sizes (16/24/32/48/64/128/256);
+    an .ico with only tiny frames makes large icons look terrible.
+    """
+    try:
+        from PIL import Image
+        img = Image.open(png_path).convert("RGBA")
+        img.save(ico_path, format="ICO",
+                 sizes=[(16, 16), (24, 24), (32, 32), (48, 48),
+                        (64, 64), (128, 128), (256, 256)])
+        return True
+    except Exception:
+        return False
+
+
+def ico_sizes(ico_path):
+    """Return [(width, height), ...] of an .ico file ([] when invalid/unreadable)."""
+    try:
+        with open(ico_path, "rb") as f:
+            data = f.read()
+        if len(data) < 6 or data[:4] != b"\x00\x00\x01\x00":
+            return []
+        count = struct.unpack("<H", data[4:6])[0]
+        out = []
+        for i in range(count):
+            w, h = data[6 + i * 16], data[6 + i * 16 + 1]
+            out.append(((w or 256), (h or 256)))
+        return out
+    except Exception:
+        return []
 
 
 # ---------------------------------------------------------------------------
@@ -551,8 +583,16 @@ class PackagerApp:
         self.var_lovejs = tk.StringVar()
 
         self.entry_love_dir = self._opt_row(f3, 0, "love_dir", self.var_love_dir, True)
-        self.entry_rcedit = self._opt_row(f3, 1, "rcedit", self.var_rcedit, True)
-        self.entry_icon = self._opt_row(f3, 2, "icon_file", self.var_icon, True)
+        self.entry_rcedit = self._opt_row(f3, 1, "rcedit", self.var_rcedit, True,
+                                          picker="file",
+                                          filetypes=[("rcedit", "rcedit*.exe"),
+                                                     ("Executable", "*.exe"),
+                                                     ("All files", "*.*")])
+        self.entry_icon = self._opt_row(f3, 2, "icon_file", self.var_icon, True,
+                                        picker="file",
+                                        filetypes=[("Image (*.ico)", "*.ico"),
+                                                   ("Image (*.png)", "*.png"),
+                                                   ("All files", "*.*")])
         self.entry_android_template = self._opt_row(f3, 3, "android_template",
                                                     self.var_android_template, True)
         self.entry_lovejs = self._opt_row(f3, 4, "lovejs_cmd", self.var_lovejs, False)
@@ -621,15 +661,20 @@ class PackagerApp:
                                                   state="disabled", font=("Consolas", 9))
         self.log_text.pack(fill="both", expand=True)
 
-    def _opt_row(self, parent, row, label_key, var, with_browse):
+    def _opt_row(self, parent, row, label_key, var, with_browse,
+                 picker="dir", filetypes=None):
         lbl = ttk.Label(parent, text="")
         self.add_lang(lbl, label_key)
         lbl.grid(row=row, column=0, sticky="w", padx=4, pady=4)
         entry = ttk.Entry(parent, textvariable=var)
         entry.grid(row=row, column=1, sticky="ew", padx=4, pady=4)
         if with_browse:
-            btn = ttk.Button(parent, text="", width=10,
-                             command=lambda v=var: self._pick_dir(v))
+            if picker == "file":
+                btn = ttk.Button(parent, text="", width=10,
+                                 command=lambda v=var, ft=filetypes: self._pick_file(v, ft))
+            else:
+                btn = ttk.Button(parent, text="", width=10,
+                                 command=lambda v=var: self._pick_dir(v))
             self.add_lang(btn, "browse")
             btn.grid(row=row, column=2, padx=4, pady=4)
         return entry
@@ -662,9 +707,13 @@ class PackagerApp:
             self.var_proj.set(cwd)
             self.var_out.set(os.path.join(cwd, "Export"))
             self.var_name.set(os.path.basename(cwd))
-            ico = os.path.join(cwd, "icon.ico")
-            if os.path.isfile(ico):
-                self.var_icon.set(ico)
+            # Prefer icon.png: it is converted to a multi-size .ico at build
+            # time (the old icon.ico only carried a 16x16 frame).
+            for icon_name in ("icon.png", "icon.ico"):
+                ico = os.path.join(cwd, icon_name)
+                if os.path.isfile(ico):
+                    self.var_icon.set(ico)
+                    break
         self.var_excluded_exts.set(DEFAULT_EXCLUDED_EXTS)
         if not self.var_love_dir.get():
             love = find_love_dir()
@@ -687,6 +736,12 @@ class PackagerApp:
             if on_pick:
                 on_pick()
 
+    def _pick_file(self, var, filetypes=None):
+        p = filedialog.askopenfilename(
+            filetypes=filetypes or [("All files", "*.*")])
+        if p:
+            var.set(p)
+
     def _on_project_picked(self):
         p = self.var_proj.get().strip()
         if not p:
@@ -696,9 +751,11 @@ class PackagerApp:
         if not self.var_name.get().strip():
             self.var_name.set(os.path.basename(os.path.normpath(p)))
         if not self.var_icon.get().strip():
-            ico = os.path.join(p, "icon.ico")
-            if os.path.isfile(ico):
-                self.var_icon.set(ico)
+            for icon_name in ("icon.png", "icon.ico"):
+                ico = os.path.join(p, icon_name)
+                if os.path.isfile(ico):
+                    self.var_icon.set(ico)
+                    break
 
     # ---- build flow -------------------------------------------------------
     def on_build(self):
@@ -808,13 +865,37 @@ class PackagerApp:
             exe_dir = os.path.join(output_dir, name + "-win")
             os.makedirs(exe_dir, exist_ok=True)
             exe_path = os.path.join(exe_dir, name + ".exe")
-            merge_love_exe(love_exe, love_path, exe_path)
+
+            # Accept an .ico directly, or a .png that is auto-converted into a
+            # multi-size .ico (same behaviour as the reference packager).
+            icon_eff = None
+            icon_src = self.var_icon.get().strip()
+            if icon_src and os.path.isfile(icon_src):
+                if icon_src.lower().endswith(".png"):
+                    ico_tmp = os.path.join(exe_dir, name + "_icon.ico")
+                    if png_to_ico(icon_src, ico_tmp):
+                        self._emit("msg_icon_png_convert", path=ico_tmp)
+                        icon_eff = ico_tmp
+                    else:
+                        self._emit("msg_icon_png_no_pillow")
+                else:
+                    icon_eff = icon_src
+
+            # IMPORTANT ORDER: rcedit rewrites the whole PE and would STRIP the
+            # .love payload appended during fusing (verified against love 11.5 /
+            # 12.0: an exe fused first and then edited by rcedit cannot run the
+            # game any more). Therefore embed the icon on a plain copy of
+            # love.exe FIRST - at that point it has no trailing payload - and
+            # only then append the .love bytes.
+            shutil.copy2(love_exe, exe_path)
+            self._embed_icon(exe_path, icon_eff)
+            with open(exe_path, "ab") as dst, open(love_path, "rb") as src:
+                shutil.copyfileobj(src, dst, 1024 * 1024)
             self._emit("msg_exe_created", path=exe_path)
             for f in sorted(os.listdir(love_dir)):
                 if f.lower().endswith(".dll"):
                     shutil.copy2(os.path.join(love_dir, f), os.path.join(exe_dir, f))
                     self._emit("msg_dll_copied", name=f)
-            self._embed_icon(exe_path)
 
         # ---- Android preparation ----
         if self.var_android.get():
@@ -863,20 +944,37 @@ class PackagerApp:
                                exclude_exts, exclude_paths)
             self._emit("msg_source_created", path=zip_path)
 
-    def _embed_icon(self, exe_path):
-        icon = self.var_icon.get().strip()
+    def _embed_icon(self, exe_path, icon_path=None):
+        """Embed icon_path (or the UI-selected icon) into exe_path via rcedit.
+
+        Returns True when the icon was actually embedded; never raises.
+        Logs the rcedit binary used and surfaces rcedit's stderr on failure.
+        """
+        icon = (icon_path or self.var_icon.get() or "").strip()
         if not icon or not os.path.isfile(icon):
-            return
+            return False
         rcedit = self.var_rcedit.get().strip() or (find_rcedit() or "")
         if not rcedit:
             self._emit("msg_icon_skipped")
-            return
+            return False
+        self._emit_raw("rcedit: %s" % rcedit)
         try:
             subprocess.run([rcedit, exe_path, "--set-icon", icon],
-                           check=True, capture_output=True)
-            self._emit("msg_icon_embedded", path=icon)
+                           check=True, capture_output=True,
+                           text=True, errors="replace")
+        except subprocess.CalledProcessError as exc:
+            detail = (exc.stderr or exc.stdout or "").strip()
+            self._emit("err_rcedit", err=detail or str(exc))
+            return False
         except Exception as exc:
             self._emit("err_rcedit", err=exc)
+            return False
+        self._emit("msg_icon_embedded", path=icon)
+        sizes = ico_sizes(icon)
+        if sizes and max(h for _, h in sizes) < 48:
+            self._emit("msg_icon_warn_small",
+                       sizes=", ".join("%dx%d" % (w, h) for w, h in sizes))
+        return True
 
     def _write_web_readme(self, target, name):
         text = (

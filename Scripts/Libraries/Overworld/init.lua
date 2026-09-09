@@ -38,6 +38,11 @@ local overworld = {
     _leaving = false,
 
     debug = false,
+    -- Whether the overworld camera auto-follows the player every frame.
+    -- When false, the camera is NOT moved automatically; drive it manually
+    -- via Camera:setPosition(x, y) or Camera.x / Camera.y (e.g. scripted
+    -- cutscenes or fixed views). Exposed as Overworld.follow_player.
+    follow_player = true,
 }
 
 -- One-frame lock: set when a dialog's typewriter finishes so that the same
@@ -88,6 +93,7 @@ function SpawnBlock(x, y, width, height, thickness)
     local white = Sprites.CreateSprite("px.png", "GUI")
     white:Scale(block.w + thickness * 2, block.h + thickness * 2)
     white:MoveTo(block.x, block.y)
+    white.color = Global.GetVariable("MainColor")
     local black = Sprites.CreateSprite("px.png", "GUI")
     black.color = {0, 0, 0}
     black:Scale(block.w, block.h)
@@ -102,8 +108,136 @@ function SpawnBlock(x, y, width, height, thickness)
     return block
 end
 
+-- Automatically restrict the camera to the loaded map's ACTUAL tile coverage.
+--
+-- Why not just map.width * tilewidth? Because the tiles are not guaranteed to
+-- start at pixel (0,0):
+--   * A tile layer carries its own draw origin. STI bakes that into
+--     layer.x / layer.y (layer.x = layer.x + layer.offsetx + map.offsetx),
+--     so a layer can be offset from the map origin.
+--   * Infinite ("chunk") maps place every chunk at an ABSOLUTE tile position,
+--     which may be NEGATIVE (e.g. chunk.x = -16). STI draws those chunks at
+--     (0,0) with the negative offset already inside the tile coordinates.
+-- So we walk every visible tile layer and union the actual pixel rectangle of
+-- its non-empty tiles (their real x/y, including layer/chunk offsets).
+--
+-- Coordinate notes (matching map.lua's drawing / physics):
+--   * STI map units are Tiled pixels (1 tile = tilewidth x tileheight px).
+--   * The map is drawn at 2x scale / every object is *2, so the OVERWORLD
+--     (camera/world) unit is 2 Tiled pixels; a 20x20 tile spans 40x40 units.
+--   * Camera.x/y is the WORLD POINT shown at the screen CENTER, and
+--     Camera:Update clamps that center inside [min..max] (Camera:setBounds).
+--   * The center may not come within half a viewport of a covered edge:
+--         min_x = covered_left  + view_w/2
+--         max_x = covered_right - view_w/2
+--     When the covered area is smaller than the viewport it is centered/locked.
+--
+-- Exposed as overworld.AutoCameraBounds() so scenes can re-run / override it
+-- (e.g. adding a custom margin after the call).
+function overworld.AutoCameraBounds()
+    local m = overworld.map._map
+    if (not m) then return end
+
+    local tw = m.tilewidth
+    local th = m.tileheight
+
+    -- Covered pixel rectangle (min/max), built from the non-empty tiles.
+    local min_px_x, min_px_y, max_px_x, max_px_y
+    local function union(x0, y0, x1, y1)
+        if (not min_px_x) then
+            min_px_x, min_px_y, max_px_x, max_px_y = x0, y0, x1, y1
+        else
+            min_px_x = math.min(min_px_x, x0)
+            min_px_y = math.min(min_px_y, y0)
+            max_px_x = math.max(max_px_x, x1)
+            max_px_y = math.max(max_px_y, y1)
+        end
+    end
+
+    for _, layer in ipairs(m.layers) do
+        if (layer.type == "tilelayer" and layer.visible ~= false) then
+            if (layer.chunks) then
+                -- Infinite map: each chunk sits at an absolute (maybe negative)
+                -- tile coordinate; its own data grid is 1..width x 1..height.
+                for _, chunk in ipairs(layer.chunks) do
+                    if (chunk.data) then
+                        for cy = 1, chunk.height do
+                            for cx = 1, chunk.width do
+                                local tile = chunk.data[cy] and chunk.data[cy][cx]
+                                if (tile) then
+                                    union(
+                                        (chunk.x + cx - 1) * tw,
+                                        (chunk.y + cy - 1) * th,
+                                        (chunk.x + cx)     * tw,
+                                        (chunk.y + cy)     * th
+                                    )
+                                end
+                            end
+                        end
+                    end
+                end
+            else
+                -- Regular map: tile (x, y) renders at layer.x/y + (x-1)*tile.
+                local ox = layer.x or 0
+                local oy = layer.y or 0
+                for ly = 1, layer.height do
+                    for lx = 1, layer.width do
+                        local tile = layer.data and layer.data[ly] and layer.data[ly][lx]
+                        if (tile) then
+                            union(
+                                ox + (lx - 1) * tw,
+                                oy + (ly - 1) * th,
+                                ox + lx * tw,
+                                oy + ly * th
+                            )
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if (not min_px_x) then return end
+
+    -- Convert the covered pixel rectangle into overworld units (*2).
+    local sx_l = min_px_x * 2
+    local sx_r = max_px_x * 2
+    local sy_t = min_px_y * 2
+    local sy_b = max_px_y * 2
+
+    -- The visible world area equals the internal canvas (1:1 camera zoom).
+    local view_w = CANVAS_WIDTH
+    local view_h = CANVAS_HEIGHT
+    local hw = view_w * 0.5
+    local hh = view_h * 0.5
+
+    local min_x, max_x
+    if ((sx_r - sx_l) >= view_w) then
+        min_x = sx_l + hw
+        max_x = sx_r - hw
+    else
+        min_x = (sx_l + sx_r) * 0.5
+        max_x = min_x
+    end
+
+    local min_y, max_y
+    if ((sy_b - sy_t) >= view_h) then
+        min_y = sy_t + hh
+        max_y = sy_b - hh
+    else
+        min_y = (sy_t + sy_b) * 0.5
+        max_y = min_y
+    end
+
+    Camera:setBounds(min_x, min_y, max_x, max_y)
+end
+
 function overworld.Init(lua_file)
     overworld.map.Init(lua_file)
+    -- Restrict the camera to the map's tile bounds right after the map loads,
+    -- so scenes no longer need a manual Camera:setBounds (a later explicit
+    -- call still overrides this).
+    overworld.AutoCameraBounds()
 end
 
 function overworld.CalcNextEXP()
@@ -150,8 +284,9 @@ end
 ---@param obj_type string
 ---@param id number | string | nil
 ---@param extra_key string | number | nil
+---@param require_facing boolean | nil Defaults to true, except for warps.
 ---@return boolean | any
-function overworld.getInteractResult(obj_type, id, extra_key)
+function overworld.getInteractResult(obj_type, id, extra_key, require_facing)
     -- If a dialog just finished this frame, swallow EVERY interaction result for
     -- the rest of the frame so the same confirm press that completed the
     -- typewriter can't re-trigger any of them (this applies to every call made
@@ -170,6 +305,33 @@ function overworld.getInteractResult(obj_type, id, extra_key)
 
     local final_type = interactions.current_object
     if (final_type ~= obj_type) then return false end
+
+    if (require_facing == nil) then
+        require_facing = (obj_type ~= "warp")
+    end
+
+    if (require_facing) then
+        local obj = interactions.current_obj
+        local body = Char.collision and Char.collision.body
+        if (not obj or not body or body:isDestroyed() or not Char.direction) then
+            return false
+        end
+
+        local player_x, player_y = body:getX(), body:getY()
+        local object_x = ((obj.x or 0) + (obj.width or 0) / 2) * 2
+        local object_y = ((obj.y or 0) + (obj.height or 0) / 2) * 2
+        local dx, dy = object_x - player_x, object_y - player_y
+
+        if (math.abs(dx) >= math.abs(dy)) then
+            if ((dx >= 0 and Char.direction ~= "right") or
+                (dx < 0 and Char.direction ~= "left")) then
+                return false
+            end
+        elseif ((dy >= 0 and Char.direction ~= "down") or
+                (dy < 0 and Char.direction ~= "up")) then
+            return false
+        end
+    end
 
     -- id not given: only require the object type to match.
     if (id == nil) then
@@ -455,7 +617,14 @@ blacktop.color = {0, 0, 0}
 blacktop:MoveTo(DATA.position[1], DATA.position[2])
 blacktop._decay = true
 blacktop.Step = function (self)
-    self:MoveTo(Char.currentSprite.x, Char.currentSprite.y)
+    -- The player (Char.currentSprite) may not exist yet during the very first
+    -- frames after a scene switch / hot-reload, or may already have been
+    -- destroyed by the previous session's cleanup. Guard the follow (mirrors
+    -- char.Update / map.Update) so the fade sprite never crashes the global
+    -- sprite update.
+    if (Char.currentSprite) then
+        self:MoveTo(Char.currentSprite.x, Char.currentSprite.y)
+    end
     if (self._decay) then
         self.alpha = self.alpha - 0.05
         if (overworld._leaving) then

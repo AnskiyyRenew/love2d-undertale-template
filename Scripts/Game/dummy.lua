@@ -7,7 +7,7 @@ local encounter = {
         {
             id = "Poseur",
             name = Localize.localizeText("Battle.EnemiesName.Poseur"),
-            animation = require("Scripts.Game.Animations.Poseur"),
+            animation = require("Scripts.Game.Animations.dummy"),
 
             maxdamage = 400,
             dmg_float = 2,  -- Some random stuff......I hate them
@@ -25,32 +25,6 @@ local encounter = {
             killable = true,
 
             position = {320, 140},
-            actions = {
-                {id = "Check", name = Localize.localizeText("Battle.Actions.Names.Check")},
-                {id = "Pose",  name = Localize.localizeText("Battle.Actions.Names.Pose")},
-            }
-        },
-        {
-            id = "Poseur",
-            name = Localize.localizeText("Battle.EnemiesName.Poseur"),
-            animation = require("Scripts.Game.Animations.Poseur"),
-
-            maxdamage = 400,
-            dmg_float = 2,  -- Some random stuff......I hate them
-
-            show_hpbar = true, -- Sans... stop hiding your hp bar.
-            maxhp = 100,
-            hp = 100,
-            gold = 1,
-            exp = 1,
-
-            defensetext = "MISS",
-            misstext = "MISS",
-
-            canspare = true,
-            killable = true,
-
-            position = {120, 140},
             actions = {
                 {id = "Check", name = Localize.localizeText("Battle.Actions.Names.Check")},
                 {id = "Pose",  name = Localize.localizeText("Battle.Actions.Names.Pose")},

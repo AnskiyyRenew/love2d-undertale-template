@@ -6,10 +6,11 @@
       Windows.lua (Scripts/Libraries/Utils/Windows.lua); requires LÖVE 12 (ships with SDL3).
 
     Usage (main.lua):
-      DevTool = ImportFile("Engine.DevTool")        -- requiring it enables the tool
+      DevTool = ImportFile("Engine.DevTool")        -- requiring it only registers the hooks
       -- in love.update:  DevTool.Update(dt)
       -- in love.draw:    DevTool.Draw()
-      -- F8 toggles the window (or call DevTool.Toggle() directly)
+      -- F8 opens/closes the window (dev builds only; call DevTool.Toggle() to do the same)
+      -- The window stays closed until F8 is pressed once.
 
     [Tree] variable browser
       - Top-level roots: Player / Battle / Overworld / Scenes.current / Global(config) / _G(all)
@@ -99,7 +100,7 @@ local rootDefs = {
 -- ============================================================
 -- State
 -- ============================================================
-DevTool.enabled     = true
+DevTool.enabled     = false   -- start closed; the first F8 press opens the window
 DevTool.win         = nil
 DevTool.canvas      = nil
 DevTool.font        = nil

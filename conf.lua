@@ -15,7 +15,7 @@ _INFO = {
 }
 
 -- This is your window size. Change these values to set your desired resolution.
-LOGICAL_WIDTH, LOGICAL_HEIGHT = 640, 480
+LOGICAL_WIDTH, LOGICAL_HEIGHT = 960, 540
 CANVAS_WIDTH, CANVAS_HEIGHT = 640, 480
 
 -- Set to true to make the game fill the entire screen while maintaining aspect ratio

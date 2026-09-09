@@ -127,7 +127,7 @@ function scene.update(dt)
         end
     end
 
-    if (ow.getInteractResult("sign", 1)) then
+    if (ow.getInteractResult("sign", 1, nil, true)) then
         if (Keyboard.GetState("confirm") == 1) then
             ow.dialogNew({
                 "* SOL, SINCERA and SPYDER"
@@ -143,7 +143,7 @@ function scene.update(dt)
 
     ow.onConfirm("save", 1, nil, function ()
         local _s = ow.FindObject("save", 1)
-        ow.SaveInteract({"* Bakabaka.\n* 笨蛋笨蛋。", "* 听见有人喊你笨蛋，这\n  使你充满了决心。"}, "真实验室 - 地下1层", {_s.x, _s.y - 20}, "down")
+        ow.SaveInteract({"* 测试存档。", "* 看到这是个测试存档点，这\n  使你充满了决心。"}, "真实验室 - 地下1层", {_s.x, _s.y - 20}, "down")
     end)
 
     if (Controller.GetState("i") == 1) then

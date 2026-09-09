@@ -74,7 +74,7 @@ logic.lv_data = {
     { lv = 20, hp = 99,  at = 48,  df = 14, totalExp = 99999  }
 }
 
-Global.DeleteSaveVariable("Overworld")
+--Global.DeleteSaveVariable("Overworld")
 if (Global.GetSaveVariable("Overworld")) then
     logic = Global.GetSaveVariable("Overworld")
 end

@@ -112,6 +112,7 @@ local function defaultEnteringState(old, new)
         Battle._wave = {}
         battle.DefenseEnding()
         battle.mainarena:Resize(565, 130)
+        battle.mainarena:RotateTo(0)
         battle.mainarena.is_active = false
         -- Defer the narration text until the arena finishes restoring to full
         -- size (handled in battle.UpdateRestore), so the box visibly scales
@@ -252,6 +253,7 @@ function battle.Update(dt)
     if (not battle.game) then return end
     for _, v in ipairs(battle.game.enemies)
     do
+        v.animation.canspare = v.canspare
         if (v.animation and v.animation.Update) then
             v.animation:Update(dt)
         end

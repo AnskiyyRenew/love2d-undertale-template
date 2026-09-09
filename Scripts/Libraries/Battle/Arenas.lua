@@ -183,8 +183,8 @@ function arenas.PlayerOnGround(player)
     -- The player is a 16x16 square, so from its centre to the foot is 8px.
     -- That point usually sits inside the box, so we extend the detection by
     -- one extra grid (9px) along the "down" direction to cover a ~45° range.
-    local foot_x = px - psin * 9
-    local foot_y = py + pcos * 9
+    local foot_x = px - psin * 10
+    local foot_y = py + pcos * 10
 
     for _, a in ipairs(arenas.insts)
     do
@@ -214,8 +214,8 @@ function arenas.PlayerOnGround(player)
                 -- the foot can never reach the raw [-w/2, w/2] x [-h/2, h/2] range. Expand the
                 -- detection zone by the player's half-size (8px) only - not by the arena's visual
                 -- thickness - so the foot poking 9px past the centre still counts as entering it.
-                local half_w = w / 2 + 5
-                local half_h = h / 2 + 5
+                local half_w = w / 2 + 4
+                local half_h = h / 2 + 4
 
                 if (a.shape == "rectangle") then
                     if (lx >= -half_w and lx <= half_w and ly >= -half_h and ly <= half_h) then
@@ -339,6 +339,11 @@ function arenas.New(mode, shape, x, y, width, height, angle)
         local dh = math.abs(arena.target.height - arena.height)
         arena.speeds.width = (math.floor(dw / timew) or 15)
         arena.speeds.height = (math.floor(dh / timeh) or 15)
+    end
+
+    function arena:RotateTo(rotation)
+        local _r = (rotation or 0)
+        arena.target.rotation = _r
     end
 
     function arena:ResetSpeed()
@@ -470,6 +475,12 @@ function arenas.New(mode, shape, x, y, width, height, angle)
         })
     end
 
+    function arena:Destroy()
+        LuaEX.rmVarTable(arenas.insts, arena)
+        arena.white:Destroy()
+        arena.black:Destroy()
+    end
+
     table.insert(arenas.insts, arena)
     return arena
 end
@@ -599,6 +610,10 @@ function arenas.Update(dt)
             end
         end
     end
+end
+
+function arenas.Clear()
+    
 end
 
 return arenas

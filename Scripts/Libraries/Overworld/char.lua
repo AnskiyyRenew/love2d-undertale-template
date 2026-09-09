@@ -27,7 +27,7 @@ local char = {
             "Overworld/Frisk/spr_f_maincharar_1.png",
             "Overworld/Frisk/spr_f_maincharar_0.png",
             "Overworld/Frisk/spr_f_maincharar_1.png",
-        },
+        }
     },
     currentSprite = nil,
     direction = DATA.direction,
@@ -90,7 +90,6 @@ function char.Init()
     char.Destroy()
 
     -- Create the player sprite.
-    char.direction = DATA.direction
     char.currentSprite = Sprites.CreateSprite(char.sprites[char.direction][1], "Player")
     char.currentSprite:Scale(2, 2)
     char.currentSprite:MoveTo(char.x, char.y)
@@ -101,7 +100,11 @@ function char.Init()
     char.collision.shape = SE.physics.newRectangleShape(char.collision.body, 38, 20)
     char.collision.shape:setDensity(1)
     char.collision.shape:setRestitution(0)
-    char.collision.shape:setFriction(0.1)
+    -- Low friction so the player slides smoothly along sloped / diagonal walls
+    -- (movement is velocity-driven, so lowering it does not affect normal
+    -- walking or stopping). The effective contact friction between the player
+    -- and the walls is sqrt(player_friction * wall_friction).
+    char.collision.shape:setFriction(0.01)
     char.collision.shape:setUserData({type = "oworld.char"})
     char.collision.fixture = char.collision.shape
     char.collision.body:setFixedRotation(true)

@@ -18,16 +18,17 @@ Layers.new_layer("TOP", 1000)
 -- Import battle module
 Battle = ImportFile("Battle")
 Battle.SetEndRoom("scene_end")
-Game = Battle.SetGame("Poseur")
+Game = Battle.SetGame("dummy")
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
+Blasters = ImportFile("Attacks.Blasters")
 
 -- Give each enemy its own independent animation instance. The animation
 -- module is a factory, so every call to InitAnimation creates a fresh
 -- instance with its own sprite — enemy #1 and enemy #2 no longer share one.
-Game:InitAnimation(1, {320, 140})
-Game:InitAnimation(2, {120, 140})
+Game:InitAnimation(1)
+--Game:InitAnimation(2, {120, 140})
 local enemies = Game.enemies
 
 local function DefenseEnding()
@@ -79,7 +80,21 @@ local function EnteringState(oldstate, newstate)
 end
 
 local function OnHit(bullet)
-    Player.AddKR(2)
+    local damage = 1
+    local color = (bullet["HurtMode"] or "normal")
+    color = color:lower()
+
+    if (color == "normal") then
+        Player.Hurt(damage)
+    elseif (color == "blue" or color == "cyan") then
+        if (Controller.GetState("arrows") > 0) then
+            Player.Hurt(damage)
+        end
+    elseif (color == "orange") then
+        if (Controller.GetState("arrows") <= 0) then
+            Player.Hurt(damage)
+        end
+    end
 end
 
 -- Don't touch these.
@@ -102,11 +117,12 @@ shader:send("bottomRightColor", {0, 1, 1, 0.5})
 shader:send("angle", 20)
 local background = Sprites.CreateSprite("px.png", "Background")
 background:Scale(640, 480)
---background.color = {0, 0, 0}
+background.color = {0, 0, 0}
 background:SetShaders({shader})
 
 function scene.update(dt)
     Battle.Update(dt)
+    Blasters.Update(dt)
 end
 
 function scene.clear()
