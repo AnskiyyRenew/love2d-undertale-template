@@ -11,7 +11,17 @@
 --    * :Init(pos)    → builds the sprites (called by New).
 --    * :Update(dt)   → per-frame logic, called by Battle.Update.
 --    * :Hurt()       → hit reaction, called by attack patterns.
+--    * :Spare()      → plays the spare reaction (called on MERCY → Spare).
 --    * :Destroy()    → cleans up sprites, called when the enemy dies.
+--
+--  ENGINE-PROVIDED FIELDS (refreshed on every instance each frame)
+--    * self.enemy    → the enemy table from the encounter (id, name, hp, maxhp,
+--                      canspare, killable, actions, and any custom fields).
+--    * self.canspare → shortcut for self.enemy.canspare
+--    * self.killable → shortcut for self.enemy.killable
+--    * self.hp / self.maxhp
+--    * self.dead     → true once HP reached 0 AND the enemy is killable.
+--                      Use this in :Update to switch to a death animation.
 --
 --  IMPORTANT
 --    * Lua's `require` returns this module ONCE (it is cached). Two enemies of
@@ -59,8 +69,6 @@ function MyMonster:Spare()
     self.sprite.alpha = 0.5
 end
 
-LuaEX.printTable(MyMonster)
-
 local time = 0
 function MyMonster:Update(dt)
     if (not self.running) then
@@ -69,6 +77,12 @@ function MyMonster:Update(dt)
 
     -- ====================>
     -- TODO: put your monster's animation code here.
+    --
+    -- Example: react to engine-provided state
+    --   if (self.canspare) then ... end            -- spareable?
+    --   if (self.dead) then                        -- HP hit 0 and killable
+    --       self.sprite:SetAnimation({"death_0.png", "death_1.png"}, 0.1)
+    --   end
     time = time + 1
     if (time == 10) then
         self.sprite:Set("Characters/Ruins/spr_migosp_0.png")

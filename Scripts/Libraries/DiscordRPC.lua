@@ -135,13 +135,13 @@ if (ffi_ok) then
         local candidates = {}
         local base = nil
         local ok_base, b = pcall(function()
-            return love.filesystem.getSourceBaseDirectory()
+            return SE.filesystem.getSourceBaseDirectory()
         end)
         if (ok_base and type(b) == "string" and b ~= "") then
             base = b:gsub("\\", "/")
         end
 
-        local os_name = love.system.getOS()
+        local os_name = SE.system.getOS()
         local arch = ffi.arch -- e.g. "x64" / "x86"
 
         local names = {}

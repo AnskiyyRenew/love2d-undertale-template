@@ -5,7 +5,9 @@
     "Lua.diagnostics.disable": [
         "deprecated",
         "undefined-doc-name",
-        "need-check-nil"
+        "need-check-nil",
+        "param-type-mismatch",
+        "missing-fields"
     ],
     "Lua.completion.autoRequire": false,
     "Lua.runtime.special": {

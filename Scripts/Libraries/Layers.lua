@@ -467,6 +467,7 @@ function layers.clear()
     layers.next_id = 1
     mark_dirty()
 end
+layers.Clear = layers.clear
 
 --- Return the total number of managed objects.
 ---@return integer

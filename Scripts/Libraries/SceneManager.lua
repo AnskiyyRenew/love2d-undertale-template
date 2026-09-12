@@ -54,32 +54,10 @@ local function doSwitch(sceneName, reset, ...)
         scenes.current.AllowHot = false
 
         if (scenes.current.load) then
-            scenes.current.load(reset, ...)
+            scenes.current.load(...)
         end
 
         print("[Scenes] Scene loaded: " .. sceneName)
-    else
-        local err = loaded or "(unknown error)"
-        local trace = debug and debug.traceback and debug.traceback(err, 2) or tostring(err)
-        print("[Scenes] scene load failed: " .. sceneName)
-        print(trace)
-
-        -- store last error for external inspection
-        scenes.last_load_error = trace
-        scenes.last_failed_scene = sceneName
-
-        -- ensure the locked/error scene is reloaded and receives the error info
-        package.loaded["Scripts.Scenes.scene_locked"] = nil
-        local ok2, locked = pcall(require, "Scripts.Scenes.scene_locked")
-        if ok2 and locked then
-            scenes.current = locked
-            scenes.current.pausing = false
-            scenes.current._load_error = trace
-            scenes.current._failed_scene = sceneName
-        else
-            print("[CRITICAL] could not load scene_locked: " .. tostring(locked))
-            scenes.current = {}
-        end
     end
 
     if (isHotReload) then
@@ -90,15 +68,14 @@ end
 
 --- Switch to a different scene by name. This function will unload the current scene and load the new one.
 ---@param sceneName string The name of the scene to switch to.
----@param reset any|nil (optional) Whether to reset the scene.
 ---@param ... any|nil (optional) Additional arguments to pass to the new scene's load function.
-function scenes.switchTo(sceneName, reset, ...)
+function scenes.switchTo(sceneName, ...)
     -- The switch is intentionally deferred to the start of the next frame (see
     -- flushPendingSwitch). This offsets the scene change by one frame from the
     -- input that triggered it (e.g. the confirm press that finished a dialogue),
     -- so the new scene never receives that leftover keypress. It also makes
     -- switchTo safe to call from any callback without recursion.
-    scenes._pending_switch = {sceneName, reset, {...}}
+    scenes._pending_switch = {sceneName, {...}}
 end
 
 --- Perform the switch that was requested in the previous frame. Called by main
@@ -108,7 +85,7 @@ function scenes.flushPendingSwitch()
     if (scenes._pending_switch) then
         local p = scenes._pending_switch
         scenes._pending_switch = nil
-        doSwitch(p[1], p[2], unpack(p[3]))
+        doSwitch(p[1], unpack(p[2]))
         if (p[1] ~= scenes.name_current) then
             --doSwitch(p[1], p[2], unpack(p[3]))
         end

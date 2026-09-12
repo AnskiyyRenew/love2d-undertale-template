@@ -19,7 +19,7 @@ function scene.update(dt)
         alpha = 1 - alpha
     end
 
-    if (Keyboard.GetState("confirm") == 1) then
+    if (Controller.GetState("confirm") == 1) then
         Scenes.switchTo("Battle.scene_battle_init")
     end
 end

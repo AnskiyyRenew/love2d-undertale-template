@@ -38,7 +38,7 @@ else
 end
 Gamejolt = ImportFile("GamejoltAPI")
 Discord = ImportFile("DiscordRPC")
-ImportFile("Engine.PureConf")
+require("conf_pure")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
 Border = ImportFile("Utils.Border")
@@ -122,6 +122,8 @@ function love.load()
 end
 
 function love.update(dt)
+    dt = math.min(dt, 1 / 20)
+
     -- Process any scene switch queued during the previous frame's callbacks
     -- (prevents re-entrant switchTo from overflowing the stack).
     Scenes.flushPendingSwitch()
@@ -155,14 +157,18 @@ function love.update(dt)
     local elapsedTime = endTime - startTime
     if (elapsedTime < frameTime) then
         local sleepTime = frameTime - elapsedTime
-        SE.timer.sleep(sleepTime - 0.001)
+        if (sleepTime > 2) then
+            print(debug.traceback())
+            SE.timer.sleep(sleepTime - 0.001)
+        else
+            SE.timer.sleep(sleepTime - 0.001)
+        end
         while (SE.timer.getTime() - startTime < frameTime) do end
     end
     startTime = SE.timer.getTime()
 end
 
 function love.draw()
-
     SE.graphics.setCanvas({MAIN_CANVAS, stencil = true})
     SE.graphics.clear(0, 0, 0, 1)
 
@@ -232,7 +238,7 @@ function love.keypressed(key, scancode, isrepeat)
     elseif (key == "f2") then
         Localize.reload()
         package.loaded["Scripts.Libraries.Engine.PureConf"] = nil
-        ImportFile("Engine.PureConf")
+        require("conf_pure")
         Scenes.switchTo(Global.GetVariable("F2Room"))
     end
     if (not _RELEASED) then

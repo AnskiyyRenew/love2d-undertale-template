@@ -613,7 +613,12 @@ function arenas.Update(dt)
 end
 
 function arenas.Clear()
-    
+    for i = #arenas.insts, 1, -1 do
+        local a = arenas.insts[i]
+        if (i ~= 1) then
+            a:Destroy()
+        end
+    end
 end
 
 return arenas

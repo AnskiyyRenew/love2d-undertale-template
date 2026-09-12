@@ -21,7 +21,7 @@ bar_maxhp:MoveTo(245 + 30, 410)
 bar_maxhp.xpivot = 0
 bar_maxhp.yscale = 20
 bar_maxhp.color = {1, 0, 0}
-bar_maxhp:OutLine(0, 0, 0, 1, 2)
+bar_maxhp:Outline(0, 0, 0, 1, 2)
 local bar_hp = Sprites.CreateSprite("px.png", "UI")
 bar_hp.color = {1, 1, 0}
 bar_hp:MoveTo(245 + 30, 410)

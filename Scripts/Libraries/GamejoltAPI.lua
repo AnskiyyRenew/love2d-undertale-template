@@ -26,7 +26,7 @@ end
 -- Sends an HTTPS request to the GameJolt API and returns the response or error message.
 local function apiRequest(url)
     if (not https or type(https.request) ~= "function") then
-        local platform = (love and love.system and love.system.getOS and love.system.getOS()) or "Unknown"
+        local platform = (SE and SE.system and SE.system.getOS and SE.system.getOS()) or "Unknown"
         local reason = https_error or "missing native https module"
         return false, "GameJolt API unavailable on "..tostring(platform)..": "..reason
     end
@@ -88,7 +88,7 @@ function gamejolt.isAvailable()
         return true
     end
 
-    local platform = (love and love.system and love.system.getOS and love.system.getOS()) or "Unknown"
+    local platform = (SE and SE.system and SE.system.getOS and SE.system.getOS()) or "Unknown"
     return false, "GameJolt API native HTTPS module is unavailable on "..tostring(platform)..": "..tostring(https_error or "missing native https module")
 end
 

@@ -130,10 +130,12 @@ function battle_methods.InitAnimation(self, index, ...)
         return  -- already an independent instance → nothing to do
     end
 
+    local created_instance = false
     local ok, err = pcall(function (...)
         -- Factory module → produce a fresh, independent instance per enemy.
         if (module.New) then
             enemy.animation = module.New(...)
+            created_instance = true
         -- Legacy module with an in-place Init() (single shared instance).
         elseif (module.Init) then
             module.Init(...)
@@ -142,6 +144,13 @@ function battle_methods.InitAnimation(self, index, ...)
 
     if (not ok) then
         print("[Game - Animation] Error: " .. err)
+    end
+
+    -- Expose the owning enemy table to the animation instance, so monster code
+    -- can read enemy data (e.g. `self.enemy.canspare`, `self.enemy.killable`).
+    -- Battle.Update also refreshes a few shortcut fields on it every frame.
+    if (ok and created_instance and enemy.animation and type(enemy.animation) == "table") then
+        enemy.animation.enemy = enemy
     end
 end
 

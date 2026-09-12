@@ -13,8 +13,8 @@ local function warn(message)
 end
 
 local function get_save_path()
-    if love and love.filesystem and love.filesystem.getSaveDirectory then
-        local dir = love.filesystem.getSaveDirectory()
+    if SE and SE.filesystem and SE.filesystem.getSaveDirectory then
+        local dir = SE.filesystem.getSaveDirectory()
         if dir and dir ~= "" then
             return dir .. "/" .. save_file_name
         end
@@ -28,10 +28,10 @@ local function load_save_data()
     local path = get_save_path()
     local contents
 
-    if love and love.filesystem and love.filesystem.read then
-        -- love.filesystem uses paths relative to the save directory,
+    if SE and SE.filesystem and SE.filesystem.read then
+        -- SE.filesystem uses paths relative to the save directory,
         -- so we must NOT pass the absolute OS path here.
-        contents = love.filesystem.read(save_file_name)
+        contents = SE.filesystem.read(save_file_name)
     elseif io then
         local file = io.open(path, "r")
         if file then
@@ -75,10 +75,10 @@ local function save_save_data()
         return false
     end
 
-    if (love and love.filesystem and love.filesystem.write) then
-        -- love.filesystem uses paths relative to the save directory,
+    if (SE and SE.filesystem and SE.filesystem.write) then
+        -- SE.filesystem uses paths relative to the save directory,
         -- so we must NOT pass the absolute OS path here.
-        local ok = love.filesystem.write(save_file_name, encoded)
+        local ok = SE.filesystem.write(save_file_name, encoded)
         if ok then
             return true
         end

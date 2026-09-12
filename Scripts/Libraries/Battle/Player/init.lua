@@ -163,6 +163,20 @@ function Player.AddKR(kramount)
     end
 end
 
+function Player.BluePlatform(x, y, width)
+    local platform = {
+        mode = "none"
+    }
+
+    local spr = Sprites.CreateSprite("Soul Library Sprites/platform.png", "BelowBullets")
+    spr.color = {1, 0.3, 1}
+    spr:MoveTo(x, y)
+    spr.xscale = (width or 50) / spr.width
+    platform.image = spr
+
+    return platform
+end
+
 function Player.Update(dt)
     if (Player.hp + Player.kr <= 0) then
         Global.SetVariable("PlayerFinalThings", Player.sprite)

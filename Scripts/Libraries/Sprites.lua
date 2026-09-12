@@ -851,7 +851,7 @@ local sprite_methods = {}
     ---@param b number Blue (0-1)
     ---@param a number Alpha (0-1)
     ---@param t number Thickness in pixels
-    function sprite_methods:OutLine(r, g, b, a, t)
+    function sprite_methods:Outline(r, g, b, a, t)
         if r == nil or g == nil or b == nil then
             self.outline = nil
             return

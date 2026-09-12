@@ -203,6 +203,7 @@ function bones.New2D(whose, length, position, angle, velocity)
             self._tail["HurtMode"] = (mode or "normal")
         end
     end
+    bone:SetMode("normal")
 
     function bone:Destroy()
         self._head:Destroy()

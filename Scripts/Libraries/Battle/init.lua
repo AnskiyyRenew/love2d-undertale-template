@@ -111,6 +111,7 @@ local function defaultEnteringState(old, new)
         end
         Battle._wave = {}
         battle.DefenseEnding()
+        Arenas.Clear()
         battle.mainarena:Resize(565, 130)
         battle.mainarena:RotateTo(0)
         battle.mainarena.is_active = false
@@ -253,9 +254,21 @@ function battle.Update(dt)
     if (not battle.game) then return end
     for _, v in ipairs(battle.game.enemies)
     do
-        v.animation.canspare = v.canspare
-        if (v.animation and v.animation.Update) then
-            v.animation:Update(dt)
+        local anim = v.animation
+        if (anim) then
+            -- Expose the enemy table plus the fields monsters commonly need, so
+            -- animation code can read them straight off `self`.
+            anim.enemy    = v
+            anim.canspare = v.canspare
+            anim.killable = v.killable
+            anim.hp       = v.hp
+            anim.maxhp    = v.maxhp
+            -- Convenience signal: HP has reached 0 and the enemy is killable.
+            anim.dead     = (v.hp ~= nil and v.hp <= 0 and v.killable == true)
+
+            if (anim.Update) then
+                anim:Update(dt)
+            end
         end
     end
 
