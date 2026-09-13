@@ -145,6 +145,39 @@ function action.Reset()
     set_direction("down")
 end
 
+---Returns the soul's vertical speed along its gravity direction.
+---Positive means "falling" (moving towards the platform), negative means jumping.
+---@return number
+function action.GetSpeed()
+    return current_speed
+end
+
+---Overrides the soul's vertical speed.
+---@param value number
+function action.SetSpeed(value)
+    current_speed = (value or 0)
+end
+
+---Locks or unlocks jumping.
+---@param value boolean
+function action.SetCanJump(value)
+    can_jump = (value == true)
+end
+
+---Forces the variable-height jump state.
+---@param value boolean
+function action.SetJumping(value)
+    jumping = (value == true)
+end
+
+---Lands the soul on a one-way platform: kill the fall speed and allow a jump.
+function action.Land()
+    can_jump = true
+    jumping = false
+    current_speed = 0
+    first_jumped = false
+end
+
 ---Controls the player's movement and behaviour.
 ---@param dt number|nil
 function action.Update(dt)
@@ -168,7 +201,7 @@ function action.Update(dt)
         else
             local cos, sin = math.cos(math.rad(sprite.rotation)), math.sin(math.rad(sprite.rotation))
 
-            if (Arenas.PlayerOnGround(sprite)) then
+            if (Arenas.PlayerOnGround(sprite) or Player.platform_ground) then
                 can_jump = true
                 jumping = false
                 current_speed = 0
@@ -259,6 +292,15 @@ function action.Update(dt)
                 else
                     current_speed = current_speed + gravity
                 end
+            end
+
+            -- Head bonk: if the soul's head touches the top of the arena while
+            -- jumping, give it the float/glide speed exactly once, then drop out
+            -- of the jump state so gravity takes over. Clearing `jumping` is what
+            -- stops it lingering on the ceiling while the key stays held.
+            if (jumping and Arenas.PlayerOnCeiling(sprite)) then
+                current_speed = -float
+                jumping = false
             end
 
             current_speed = math.min(current_speed, speed_limit)

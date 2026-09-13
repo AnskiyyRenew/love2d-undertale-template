@@ -145,15 +145,32 @@ function battle.SetEndRoom(room)
     battle.room_end = room
 end
 
-function battle.Win()
+---Plays the victory message. The base lines come from "Battle.WinTexts1"
+---(EXP / GOLD); `extra_texts` are appended after them. When the typewriter
+---finishes, `on_complete` runs and then the battle fades out (`_end = true`).
+---
+---Scenes usually override `Battle.Win` (keeping this as `Battle.defaultWin`) to
+---react on victory, e.g. to append "* Your LOVE increased!" only on a level-up.
+---@param extra_texts table|nil Extra text lines appended to the win message.
+---@param on_complete function|nil Called once the win message has finished.
+function battle.Win(extra_texts, on_complete)
     battle.ChangeState("WIN")
     local texts = Localize.localizeText("Battle.WinTexts1", {Battle.EXP, Battle.GOLD})
 
+    if (extra_texts) then
+        for _, line in ipairs(extra_texts) do
+            texts[#texts + 1] = line
+        end
+    end
+
     local t = Typers.EText.New(texts, {60, 270}, "UponArena", {0, 0}, "manual")
     t._onComplete = function ()
+        if (on_complete) then on_complete() end
         battle._end = true
     end
 end
+-- Base implementation, kept so a scene can override Battle.Win and still call it.
+battle.defaultWin = battle.Win
 
 function battle.SetGame(file)
     battle.gameName = "Scripts.Game." .. file

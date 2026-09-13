@@ -176,44 +176,42 @@ local function find_nearest_valid(px, py)
     return px, py
 end
 
-function arenas.PlayerOnGround(player)
-    local px, py = player.x, player.y
-    local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
-
-    -- The player is a 16x16 square, so from its centre to the foot is 8px.
-    -- That point usually sits inside the box, so we extend the detection by
-    -- one extra grid (9px) along the "down" direction to cover a ~45° range.
-    local foot_x = px - psin * 10
-    local foot_y = py + pcos * 10
+-- Shared arena probe. `ox`/`oy` is an offset from the player's centre; the arena
+-- tests are direction-agnostic, so the same code serves the foot
+-- (PlayerOnGround, gravity side) and the head (PlayerOnCeiling, opposite side).
+local function side_touching(player, ox, oy)
+    local px, py = player.x + ox, player.y + oy
 
     for _, a in ipairs(arenas.insts)
     do
         if (a.is_active) then
-            local dx, dy = foot_x - a.x, foot_y - a.y
+            local dx, dy = px - a.x, py - a.y
             local cos, sin = math.cos(math.rad(a.rotation)), math.sin(math.rad(a.rotation))
             local lx = dx * cos + dy * sin
             local ly = dy * cos - dx * sin
             local w, h = a.width, a.height
 
             if (a.mode == "plus") then
-                -- Grounded when the foot goes one extra grid beyond the range.
+                -- Touching when the probe leaves the arena on any side. Since the
+                -- probe points along a fixed local axis it naturally crosses the
+                -- edge on that side, so this detects all four walls.
                 if (a.shape == "rectangle") then
-                    if (lx >= -w / 2 and lx <= w / 2 and ly >= h / 2) then
+                    if (lx < -w / 2 or lx > w / 2 or ly < -h / 2 or ly > h / 2) then
                         return true
                     end
                 elseif (a.shape == "circle" or a.shape == "ellipse") then
                     local a_axis, b_axis = w / 2, h / 2
-                    if (ly >= 0 and (lx * lx) / (a_axis * a_axis) + (ly * ly) / (b_axis * b_axis) >= 1) then
+                    if ((lx * lx) / (a_axis * a_axis) + (ly * ly) / (b_axis * b_axis) >= 1) then
                         return true
                     end
                 end
             elseif (a.mode == "minus") then
-                -- Grounded when the foot enters the range.
+                -- Touching when the probe enters the range.
                 -- NOTE: the collision in Arenas.Update keeps the player's centre out of the
                 -- expanded forbidden zone (thickness*2 + 8 per side), so after the first frame
-                -- the foot can never reach the raw [-w/2, w/2] x [-h/2, h/2] range. Expand the
+                -- the probe can never reach the raw [-w/2, w/2] x [-h/2, h/2] range. Expand the
                 -- detection zone by the player's half-size (8px) only - not by the arena's visual
-                -- thickness - so the foot poking 9px past the centre still counts as entering it.
+                -- thickness - so the probe poking 9px past the centre still counts as entering it.
                 local half_w = w / 2 + 4
                 local half_h = h / 2 + 4
 
@@ -231,6 +229,28 @@ function arenas.PlayerOnGround(player)
     end
 
     return false
+end
+
+function arenas.PlayerOnGround(player)
+    local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
+
+    -- The player is a 16x16 square, so from its centre to the foot is 8px. The
+    -- foot is probed along the player's local "down" (its gravity direction),
+    -- so the same test works for every soul rotation:
+    -- down (0), left (90), up (180) and right (270).
+    return side_touching(player, -psin * 10, pcos * 10)
+end
+
+---Like PlayerOnGround, but probes the player's local "up": true when the top of
+---the head touches an arena edge (e.g. the ceiling of the battle box, or the
+---underside of a minus obstacle). Used by the blue soul's ceiling float.
+---@param player table
+---@return boolean
+function arenas.PlayerOnCeiling(player)
+    local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
+
+    -- Half the player's height plus a 2px margin, along the local "up" direction.
+    return side_touching(player, psin * 10, -pcos * 10)
 end
 
 function arenas.New(mode, shape, x, y, width, height, angle)
