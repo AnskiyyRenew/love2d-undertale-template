@@ -11,6 +11,7 @@
 --    * :Init(pos)    → builds the sprites (called by New).
 --    * :Update(dt)   → per-frame logic, called by Battle.Update.
 --    * :Hurt()       → hit reaction, called by attack patterns.
+--    * :OnAttack(data) → (optional) attack-launched signal; see stub below.
 --    * :Spare()      → plays the spare reaction (called on MERCY → Spare).
 --    * :Destroy()    → cleans up sprites, called when the enemy dies.
 --
@@ -62,6 +63,18 @@ function MyMonster:Hurt()
     self.sprite:Set(self.hurt_image)
     self.hurting = true
     self.intensity = 16
+end
+
+--- OPTIONAL: called the moment an attack is LAUNCHED at this enemy, before the
+--- hit lands. Implement it to react (brace / dodge / telegraph / counter, ...).
+--- `data` may contain:
+---   data.enemy    → this enemy table
+---   data.damage   → planned damage for the hit
+---   data.perfect  → true when the timing landed in the perfect zone
+---   data.offset   → distance from the perfect zone (0 = perfect)
+---   data.position → {x, y} of the enemy on screen
+---   data.attack   → the attack pattern instance
+function MyMonster:OnAttack(data)
 end
 
 function MyMonster:Spare()

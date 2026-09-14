@@ -86,11 +86,15 @@ local hptext = Layers.add_external(function ()
 end, "UI")
 
 local bar_maxlength = 100 * 1.21
-function ui.setBarMaxLength(length)
+function ui.SetBarMaxLength(length)
     if (not length or type(length) ~= "number") then
         return
     end
     bar_maxlength = length
+end
+
+function ui.SetHPBarColor(color)
+    bar_hp.color = color
 end
 
 function ui.ToggleKR(bool)

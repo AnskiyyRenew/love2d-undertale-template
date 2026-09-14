@@ -39,6 +39,7 @@ end
 Gamejolt = ImportFile("GamejoltAPI")
 Discord = ImportFile("DiscordRPC")
 require("conf_pure")
+ImportFile("Engine.2_0")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
 Border = ImportFile("Utils.Border")

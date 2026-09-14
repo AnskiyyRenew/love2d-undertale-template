@@ -58,6 +58,25 @@ local function doSwitch(sceneName, reset, ...)
         end
 
         print("[Scenes] Scene loaded: " .. sceneName)
+    else
+        -- The scene's top-level code threw (e.g. a missing global such as DATA
+        -- when entering a scene directly from FirstRoom). This used to be
+        -- swallowed by the pcall, so the real error only surfaced later at
+        -- whatever callback first touched the (now nil) current scene - for
+        -- example a window resize - with a completely misleading location.
+        -- Always report the real error, and install a no-op stub so the engine
+        -- keeps running instead of crashing on an unrelated event.
+        print("[Scenes] Failed to load scene '" .. sceneName .. "':")
+        print("  " .. tostring(loaded))
+
+        if (not scenes.current) then
+            scenes.current = {
+                pausing = false,
+                update = function() end,
+                draw = function() end,
+                clear = function() end
+            }
+        end
     end
 
     if (isHotReload) then

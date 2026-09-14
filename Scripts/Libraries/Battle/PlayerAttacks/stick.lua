@@ -48,6 +48,27 @@ function atk.Hurt()
     end
 end
 
+-- Interface: signal the targeted enemy's animation that an attack has just been
+-- LAUNCHED (the moment the player confirms the strike, before the hit lands).
+-- Animations may implement `:OnAttack(data)` to react (brace / dodge / telegraph
+-- / counter, ...). `data` carries the strike details:
+--   data.enemy    → the targeted enemy table
+--   data.damage   → the planned damage for this hit
+--   data.perfect  → true when the timing landed in the perfect zone
+--   data.offset   → distance from the perfect zone (0 = perfect)
+--   data.position → {x, y} of the enemy on screen
+--   data.attack   → this attack pattern instance (atk)
+function atk.Attack(data)
+    if (not enemy or not enemy.animation) then
+        return
+    end
+
+    local anim = enemy.animation
+    if (anim.OnAttack) then
+        anim:OnAttack(data)
+    end
+end
+
 function atk.Destroy()
     atk.bar:Destroy()
     atk.target:Destroy()
@@ -91,6 +112,17 @@ function atk.Update(dt)
             slice:MoveTo(enemy.position[1], enemy.position[2])
 
             attacked = true
+
+            -- Broadcast to the targeted enemy's animation that the attack was
+            -- launched, passing the strike details so monsters can react.
+            atk.Attack({
+                enemy = enemy,
+                damage = damage,
+                perfect = (bonus_factor <= 12),
+                offset = bonus_factor,
+                position = {enemy.position[1], enemy.position[2]},
+                attack = atk,
+            })
         end
     else
         atk._missed = missed
