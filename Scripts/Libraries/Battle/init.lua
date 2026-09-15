@@ -1,10 +1,24 @@
 ---@diagnostic disable: undefined-field
 
+Layers.new_layer("BOTTOM", -1000)
+Layers.new_layer("Background", -10)
+Layers.new_layer("UI", 0)
+Layers.new_layer("ArenasExtraW", 10)
+Layers.new_layer("ArenasExtraB", 10.01)
+Layers.new_layer("UponArena", 11)
+Layers.new_layer("BelowPlayer", 12)
+Layers.new_layer("Player", 13)
+Layers.new_layer("BelowBullets", 25)
+Layers.new_layer("Bullets", 30)
+Layers.new_layer("ArenasCoverW", 50)
+Layers.new_layer("ArenasCoverB", 50.01)
+Layers.new_layer("TopAll", 60)
+Layers.new_layer("TOP", 1000)
+
 local path = (...):match("(.-)[^%.]+$")
 local battle = {
     player = require(path .. "Battle.Player"),
     arenas = require(path .. "Battle.Arenas"),
-    ui = require(path .. "Battle.UI"),
 
     state = "ACTIONSELECT",
     game = nil,
@@ -49,6 +63,7 @@ local game_apis = require(path .. "Battle.game_apis")
 
 Player = battle.player
 Arenas = battle.arenas
+battle.ui = require(path .. "Battle.UI")
 UI = battle.ui
 
 Player.SetSoul(1)

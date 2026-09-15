@@ -90,7 +90,7 @@ local function state_behaviours_drawer()
                 maxhp:MoveTo(400, 270 + 33 * (i - 1) + 18)
 
                 local hp = Sprites.CreateSprite("px.png", "UponArena")
-                hp:Scale(e.hp / e.maxhp * 100, 15)
+                hp:Scale(math.min(e.hp / e.maxhp * 100, 100), 15)
                 hp.xpivot = 0
                 hp.color = {0, 1, 0}
                 hp:MoveTo(maxhp:GetPosition())

@@ -33,6 +33,8 @@ Opts table can contain the following fields:
 - alpha: The alpha value to use for the text, in the range [0, 1].
 - outline: The outline color to use for the text, and the outline width will be set accordingly. in the format {r, g, b, a, width}.
 - scale: The scale to use for the text.
+- voice: The typing voice file under Resources/Sounds/Voices/.
+- voices: A list of typing voice files under Resources/Sounds/Voices; one is selected randomly per character.
 - portrait: A talking portrait (head image that animates while typing). Can be:
   - A table: {files = {"a.png", "b.png", ...}, interval = 0.05, mode = "looponce"}
     (interval and mode are optional; mode defaults to "looponce").
@@ -123,6 +125,7 @@ local reserved_option_keys = {
     autowrap = true,
     wait = true,
     effect = true,
+    voice = true,
     voices = true,
     skip = true,
     portrait = true
@@ -596,6 +599,7 @@ function typers.New(text, position, layer, size, opts, mode)
                                     typer.cantype = false
                                 end
                                 if (opt.effect) then typer.effect = opt.effect end
+                                if (opt.voice) then typer.voices = {opt.voice} end
                                 if (opt.voices) then typer.voices = opt.voices end
                                 if (opt.skip) then
                                     for k, v in pairs(opt.skip) do

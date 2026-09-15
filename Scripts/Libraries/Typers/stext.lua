@@ -28,6 +28,7 @@ Builder API (available via `self` inside the builder function):
   self:setColor(r, g, b)        Set text color (values 0-1 or 0-255, auto-detected).
   self:setColorHEX(hex)         Set text color via hex string (e.g. "ff0000").
   self:setOutline(r,g,b,a,w)    Set outline color (r,g,b), alpha (a), and width (w).
+    self:setVoices(voices)        Set typing voice file(s) under Resources/Sounds/Voices.
   self:addSkipText(text)        Add text that types instantly during skip mode.
   self:setPortrait(frames, interval, mode)
                                 Create a talking portrait. frames = list of image
@@ -537,6 +538,16 @@ function typers.New(fn, position, layer, size, mode)
         style.outline = {r, g, b, a, w}
     end
 
+    function builder:setVoices(voices)
+        if (type(voices) == "string") then
+            voices = {voices}
+        end
+        table.insert(typer.queue, {
+            type = "voices",
+            voices = voices,
+        })
+    end
+
     function builder:setPortrait(frames, interval, mode)
         if (frames) then
             if (type(frames) == "string") then frames = {frames} end
@@ -760,6 +771,12 @@ function typers.New(fn, position, layer, size, mode)
                         typer.queue_index = typer.queue_index + 1
                         typer.time = 0
                     end
+
+                elseif (item.type == "voices") then
+                    if (type(item.voices) == "table") then
+                        typer.voices = item.voices
+                    end
+                    typer.queue_index = typer.queue_index + 1
 
                 elseif (item.type == "wait") then
                     if (typer.skip.skipping) then

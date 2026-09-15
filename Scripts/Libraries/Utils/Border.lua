@@ -1,8 +1,8 @@
 local Border = {}
 
 local presets = {
-    idle  = "Resources/Sprites/Border/idle.png",
-    ruins = "Resources/Sprites/Border/ruins.png",
+    idle  = "idle.png",
+    ruins = "ruins.png",
 }
 
 local cache = {}
@@ -30,7 +30,7 @@ function Border.SetImage(img)
     local path = presets[img] or img
     local image = cache[path]
     if (not image) then
-        image = SE.graphics.newImage(path)
+        image = SE.graphics.newImage("Resources/Sprites/Border/" .. path)
         image:setFilter("linear", "linear")
         cache[path] = image
     end

@@ -7,9 +7,9 @@ local encounter = {
         {
             id = "Poseur",
             name = Localize.localizeText("Battle.EnemiesName.Poseur"),
-            animation = require("Scripts.Game.Animations.dummy"),
+            animation = require("Scripts.Game.Animations.sans"),
 
-            maxdamage = 400,
+            maxdamage = -400,
             dmg_float = 2,  -- Some random stuff......I hate them
 
             show_hpbar = true, -- Sans... stop hiding your hp bar.
@@ -33,7 +33,7 @@ local encounter = {
     },
 
     state = "DEFENDING",
-    wave = "bones.wave1",
+    wave = "wave",
 
     player = {
         name = "end",

@@ -19,6 +19,7 @@ Available tags:
                         bondfont stays off until it is re-set via UseBondFont.
   [effect:name, int]    Set typing effect (e.g. shake, 3).
   [outline:r,g,b,a,w]   Set outline color (r,g,b), alpha (a), and width (w).
+    [voice:name]           Set the typing voice file under Resources/Sounds/Voices/.
   [portrait:frames|interval|mode]
                         Create a talking portrait. frames = comma-separated image
                         paths, interval = seconds per frame (default 0.1), mode =
@@ -307,6 +308,12 @@ local function applyTag(typer, tag_name, tag_value)
         local r, g, b, a, w = tag_value:match("(%d+),%s*(%d+),%s*(%d+),%s*(%d+),%s*(%d+)")
         if (r) then
             typer.outline = {tonumber(r), tonumber(g), tonumber(b), tonumber(a), tonumber(w)}
+        end
+        return true
+    elseif (tag_name == "voice" and tag_value) then
+        local voice = tag_value:match("^%s*(.-)%s*$")
+        if (voice and voice ~= "") then
+            typer.voices = {voice}
         end
         return true
     elseif (tag_name == "skip") then

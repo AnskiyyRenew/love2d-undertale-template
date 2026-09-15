@@ -105,7 +105,7 @@ global._saveData = load_save_data()
 
 function global.SetVariable(name, value)
     global[name] = value
-    return true
+    return value
 end
 
 function global.GetVariable(name)

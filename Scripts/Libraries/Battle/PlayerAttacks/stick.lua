@@ -140,8 +140,8 @@ function atk.Update(dt)
                     -- Trigger the targeted enemy's hurt animation (dispatched by id)
                     atk.Hurt()
                 end
-                UI.newBounceText((damage > 0 and damage or "MISS"), {enemy.position[1], enemy.position[2]})
-                enemy.hp = math.max(0, enemy.hp - damage)
+                UI.newBounceText((damage > 0 and damage or "MISS"), {enemy.position[1], enemy.position[2]}, (damage <= 0 and {1, 1, 1}))
+                enemy.hp = math.max(0, math.min(enemy.maxhp, enemy.hp - damage))
                 atk._max = false
             elseif (time == 130) then
                 atk.Destroy()

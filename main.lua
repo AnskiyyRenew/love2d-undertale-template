@@ -44,6 +44,7 @@ Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
 Border = ImportFile("Utils.Border")
 Border.SetEnabled(true)
+Border.FadeIn(0)
 math.randomseed()
 
 -- Controller simulation (see Engine/PureConf.lua "ControllerSimulation").
