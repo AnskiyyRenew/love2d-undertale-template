@@ -1,162 +1,121 @@
-﻿# SoulEngine - A LOVE2D UNDERTALE Fangame Template
+﻿# SoulEngine — A LOVE2D UNDERTALE Fangame Template
 
 ![ICON](./icon.png)
 
-`SoulEngine` is a LOVE2D-based template and framework for creating games inspired by [UNDERTALE](https://undertale.com/).
+[English](#english) | [中文](#中文)
 
-It is not just a simple battle demo. The template already includes a relatively complete development workflow covering battle scenes, overworld exploration, dialogue presentation, map production, localization, debugging, and packaging, making it a practical starting point for real fangame projects.
+---
 
-This project is influenced by [Create Your Frisk](https://github.com/RhenaudTheLukark/CreateYourFrisk), and therefore shares some similarities in spirit and workflow design.
+<a id="english"></a>
+## English
 
-## Why This Template Stands Out
+`SoulEngine` is a LOVE2D template and framework for building games inspired by [UNDERTALE](https://undertale.com/).
+Rather than a bare battle demo, it ships a complete day-to-day development workflow — battle scenes, overworld exploration, text presentation, Tiled maps, localization, debugging and packaging — so you can start a real fangame project on day one.
 
-Most similar templates only provide a basic combat prototype. `SoulEngine` goes further by trying to solve the actual day-to-day needs of development:
+Influenced by [Create Your Frisk](https://github.com/RhenaudTheLukark/CreateYourFrisk), it shares a similar spirit and workflow design.
 
-*   **Battle system included** - Comes with menu flow, enemy setup, player stats, attack timing, damage calculation, wave scripts, and common UNDERTALE-style battle logic.
-*   **Overworld system included** - Supports map loading, player movement, collisions, triggers, save points, room transitions, chests, signs, and overworld encounters.
-*   **Dialogue and text presentation tools** - Includes typewriter text, instant text drawing, bubble boxes, text effects, multi-font support, and formatting tags.
-*   **Map workflow ready** - Built to work with Tiled maps, object layers, and room-based scene logic instead of requiring everything to be hand-wired from scratch.
-*   **Beginner-friendly documentation** - The project ships with a large documentation set covering setup, core systems, advanced features, battle development, overworld development, localization, packaging, and error handling.
-*   **Built for actual projects** - Includes release configuration, custom error handling, packaging tools, localization support, and API/network-related extensions.
+### Highlights
 
-## Documentation
+The template is organized around six topics. Each one is wired up and comes with working examples — no need to assemble the pieces yourself.
 
-Whether you're at your desk or on the go, ***the docs are always within reach.***
-The repository includes a full documentation site in the `Documentation` folder, covering topics such as:
+- **Battle system** — FIGHT / ACT / ITEM / MERCY flow, enemy and player definitions, attack timing, hit / miss / flee logic, custom waves and wave templates, plus built-in bones and Gaster Blasters.
+- **Overworld** — Tiled-based room maps, player movement and camera follow, collisions and trigger areas, signs, chests, save points, warps, scripted interactions, and random encounters that hand off to the battle scene.
+- **Text, sprites & scenes** — typewriter dialogue, instant text, bubble boxes, color / font / size / effect tags, multilingual text; scene switching, sprite management, layer sorting, tween and timing helpers.
+- **Shaders, audio & GUI** — screen shaders, multi-pass rendering, masks and stencils; sound and music playback with loop points and volume / pitch transitions; buttons, sliders, text inputs, panels, windows, dropdowns.
+- **Tooling & workflow** — custom error screen for readable crash reports, `_RELEASED` switch separating dev from release mode, fast scene reset / reload shortcuts, built-in example scenes / waves / maps, bundled Windows packaging tools, built-in localization flow (English and Simplified Chinese examples included).
+- **API & networking** — GameJolt API (auth, trophies, sessions, datastore, scores / leaderboards), ships with `sock.lua` for multiplayer experiments, Windows-specific utilities (window helpers, screenshots, system dialogs).
 
-*   getting started
-*   Lua basics for beginners
-*   basic engine workflow
-*   advanced development
-*   battle scene development
-*   overworld development
-*   localization
-*   packaging and release
-*   common error handling
+### Documentation
 
-- Online (GitHub) — always up to date, check here for the latest changes: https://anskiyyrenew.github.io/SoulEngine-Documentation/
-- Offline (included in the project) — open the Documentation/ folder locally, works without internet access
+The repo ships with a full documentation site under `Documentation/`, covering getting started, Lua basics, the engine workflow, advanced features, battle development, overworld development, localization, packaging and common error handling.
 
-## Feature Overview
+- **Online** — always up to date: https://anskiyyrenew.github.io/SoulEngine-Documentation/
+- **Offline** — open the `Documentation/` folder locally, works without internet access.
 
-### Core Gameplay Systems
+### Getting Started
 
-*   **UNDERTALE-style battle framework**
-    *   FIGHT / ACT / ITEM / MERCY flow
-    *   enemy definitions and player data
-    *   custom attack waves and wave templates
-    *   attack timing, hit calculation, miss text, flee logic
-    *   built-in support for common attack elements such as bones and Gaster Blasters
-*   **Overworld framework**
-    *   room-based maps
-    *   player movement and camera follow
-    *   physical collision and trigger areas
-    *   signs, chests, save points, warps, and scripted interactions
-    *   random encounter support with battle scene switching
+**Prerequisites**
 
-### Content Creation Tools
+- Familiarity with [UNDERTALE](https://undertale.com/) is recommended.
+- [LOVE2D](https://love2d.org/) **11.3** or compatible. Future updates aim to maintain compatibility with newer LOVE versions.
 
-*   **Text system**
-    *   typewriter dialogue
-    *   instant text rendering
-    *   bubble boxes
-    *   color, font, size, spacing, and effect tags
-    *   support for multilingual text display
-*   **Sprite and scene workflow**
-    *   scene switching system
-    *   sprite management
-    *   layer sorting
-    *   tween and timing helpers
-*   **Map production pipeline**
-    *   Tiled-based workflow
-    *   map examples included in the repository
-    *   object-layer-driven interaction logic
+**Run the project**
 
-### Advanced and Practical Features
+- Use your editor's LOVE2D run feature (recommended: [Visual Studio Code](https://code.visualstudio.com/) with LOVE/Lua extensions), or
+- Drag the project folder onto `love.exe` (`lovec.exe` on Windows).
 
-*   **Shader support**
-    *   screen shaders
-    *   multi-pass rendering workflow
-    *   mask and stencil support
-*   **GUI utilities**
-    *   buttons
-    *   sliders
-    *   text input boxes
-    *   panels
-    *   windows
-    *   dropdowns
-*   **Audio manager**
-    *   sound and music playback
-    *   loop points
-    *   volume and pitch transitions
-*   **Localization support**
-    *   built-in language loading flow
-    *   English and Simplified Chinese examples included
-*   **GameJolt API support**
-    *   user authentication
-    *   trophies
-    *   sessions
-    *   datastore
-    *   scores / leaderboards
-*   **Networking foundation**
-    *   ships with `sock.lua`
-    *   documentation includes online/multiplayer-related development notes
-*   **Windows-specific utilities**
-    *   window handling helpers
-    *   screenshots
-    *   system dialog support
+**Good fit for** — creators making UNDERTALE-inspired fangames in LOVE2D, developers who want both battle and overworld, beginners who need structured docs instead of raw source, and small teams or solo creators who want to start quickly.
 
-## Small but Very Useful Details
+**Mobile** — on Android you can browse and edit scripts with a capable file manager or code editor such as [MT Manager](https://mt2.cn).
 
-These are not flashy features, but they make development smoother:
+### Credits
 
-*   **Custom error screen** - Makes runtime crashes easier to read and report.
-*   **Release switch** - `_RELEASED` lets you clearly separate development mode from release mode.
-*   **Fast scene reset / reload shortcuts** - Handy during iteration and testing.
-*   **Built-in examples** - Example scenes, waves, and maps reduce the time needed to understand the framework.
-*   **Packaging tools included** - Windows users can package projects more conveniently with the bundled tools.
+This template uses the following libraries:
 
-## Good Fit For
+- [MD5](https://github.com/kikito/md5.lua) by kikito — pure-Lua 5.1 MD5 implementation.
+- [dkjson](http://dkolf.de/dkjson-lua/) — JSON module for Lua with UTF-8 support.
+- [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 — Tiled map loader and renderer for LÖVE.
+- [sock](https://github.com/camchenry/sock.lua) by camchenry — networking library for LÖVE, useful for multiplayer experiments.
 
-This template is especially suitable for:
+### Community
 
-*   creators making UNDERTALE-inspired fangames in LOVE2D
-*   developers who want both battle scenes and overworld exploration
-*   beginners who need structured documentation instead of just raw source code
-*   small teams or solo creators who want to start production quickly
+- **Discord:** https://discord.gg/QeCmVMX7Mk
+- **QQ Group:** 626073642
 
-## Prerequisites
+---
 
-*   Familiarity with [UNDERTALE](https://undertale.com/) is recommended.
-*   The [LOVE2D](https://love2d.org/) engine, version **11.3** or compatible, must be installed on your system.
+<a id="中文"></a>
+## 中文
 
-Future updates will aim to maintain compatibility with newer LOVE versions.
+`SoulEngine` 是一个基于 LOVE2D 的模板与框架，用于开发受 [UNDERTALE](https://undertale.com/) 启发的游戏。
+它不只是一个简单的战斗演示，而是一套完整的日常开发工作流——战斗场景、大地图探索、文本呈现、Tiled 地图、本地化、调试与打包——让你第一天就能开始真正的同人游戏项目。
 
-## How to Use the Template
+受 [Create Your Frisk](https://github.com/RhenaudTheLukark/CreateYourFrisk) 影响，在精神与工作流设计上与之类似。
 
-### On PC (Recommended)
+### 亮点
 
-For development and testing, it is recommended to use an editor like [Visual Studio Code](https://code.visualstudio.com/) with relevant extensions for LOVE/Lua, or any other editor of your choice.
+模板围绕六个专题组织，每个专题都已接好线并附带可运行示例——无需自行拼装。
 
-**To run the game:**
+- **战斗系统** —— FIGHT / ACT / ITEM / MERCY 流程、敌人与玩家定义、攻击时机、命中 / 未命中 / 逃跑逻辑、自定义波次与波次模板，内置骨头与 Gaster Blaster。
+- **大地图** —— 基于 Tiled 的房间地图、玩家移动与相机跟随、碰撞与触发区、告示牌、宝箱、存档点、传送门、脚本化交互，以及可交接到战斗场景的随机遇敌。
+- **文本、精灵与场景** —— 打字机对话、即时文本、气泡框、颜色 / 字体 / 字号 / 效果标签、多语言文本；场景切换、精灵管理、图层排序、补间与时序辅助。
+- **着色器、音频与 GUI** —— 屏幕着色器、多通道渲染、遮罩与模板；带循环点与音量 / 音调过渡的声音与音乐播放；按钮、滑块、文本输入框、面板、窗口、下拉框。
+- **工具与工作流** —— 用于可读崩溃报告的自定义错误屏、区分开发 / 发布模式的 `_RELEASED` 开关、快速场景重置 / 重载快捷键、内置示例场景 / 波次 / 地图、随附的 Windows 打包工具、内置本地化流程（含简体中文与英文示例）。
+- **API 与网络** —— GameJolt API（认证、奖杯、会话、数据存储、分数 / 排行榜）、随附 `sock.lua` 用于多人联机实验、Windows 专用工具（窗口辅助、截图、系统对话框）。
 
-*   Use your editor's LOVE2D run feature, if available.
-*   Or drag the project folder onto `love.exe` (or `lovec.exe` on Windows).
+### 文档
 
-### On Mobile (Android)
+仓库随附一套完整文档站点，位于 `Documentation/` 下，涵盖入门、Lua 基础、引擎工作流、进阶特性、战斗开发、大地图开发、本地化、打包与常见错误处理。
 
-You can browse and edit the project's script files using a capable file manager or code editing tool on Android, such as [MT Manager](https://mt2.cn).
+- **在线** —— 始终最新：https://anskiyyrenew.github.io/SoulEngine-Documentation/
+- **离线** —— 在本地打开 `Documentation/` 文件夹，无需联网。
 
-## Credits
+### 快速开始
 
-This template utilizes the following excellent libraries:
+**前置条件**
 
-*   [MD5](https://github.com/kikito/md5.lua) by kikito - A pure-Lua 5.1 implementation of the MD5 algorithm.
-*   [dkjson](http://dkolf.de/dkjson-lua/) - A JSON module for Lua that supports UTF-8.
-*   [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 - A Tiled map loader and renderer for LÖVE.
-*   [sock](https://github.com/camchenry/sock.lua) by camchenry - A networking library for LÖVE, useful for multiplayer-related experiments.
+- 建议熟悉 [UNDERTALE](https://undertale.com/)。
+- [LOVE2D](https://love2d.org/) **11.3** 或兼容版本。后续更新将尽量兼容更新的 LOVE 版本。
 
-## Community
+**运行项目**
 
-*   **Discord Server:** https://discord.gg/QeCmVMX7Mk
-*   **QQ Group:** 626073642
+- 使用编辑器的 LOVE2D 运行功能（推荐：[Visual Studio Code](https://code.visualstudio.com/) 配合 LOVE/Lua 扩展），或
+- 把项目文件夹拖到 `love.exe` 上（Windows 上为 `lovec.exe`）。
+
+**适用人群** —— 想用 LOVE2D 制作 UNDERTALE 风格同人游戏的创作者、需要战斗和大地图的开发者、需要结构化文档而非源码的初学者、想快速起步的小团队或独立创作者。
+
+**移动端** —— 在 Android 上可用 [MT Manager](https://mt2.cn) 等支持代码编辑的文件管理器浏览和编辑脚本。
+
+### 致谢
+
+本模板使用了以下库：
+
+- [MD5](https://github.com/kikito/md5.lua) by kikito —— 纯 Lua 5.1 MD5 实现。
+- [dkjson](http://dkolf.de/dkjson-lua/) —— 支持 UTF-8 的 Lua JSON 模块。
+- [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 —— LÖVE 的 Tiled 地图加载器与渲染器。
+- [sock](https://github.com/camchenry/sock.lua) by camchenry —— LÖVE 的网络库，适合多人联机实验。
+
+### 社区
+
+- **Discord：** https://discord.gg/QeCmVMX7Mk
+- **QQ 群：** 626073642

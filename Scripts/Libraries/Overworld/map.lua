@@ -486,6 +486,10 @@ function map.Init(lua_file)
     world.Init()
 
     map.current = lua_file
+    -- Game area first: a copy at Scripts/Game/<path> overrides the built-in map.
+    if (Overworld and Overworld.ResolveMapPath) then
+        map.current = Overworld.ResolveMapPath(lua_file)
+    end
     map._map = sti(map.current, {"box2d"})
     map._map.draw_objects = false
 

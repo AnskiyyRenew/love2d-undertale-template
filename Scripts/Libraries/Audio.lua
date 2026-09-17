@@ -2,9 +2,69 @@ local audio = {
     _path_sound = "Resources/Sounds/",
     _path_music = "Resources/Music/",
 
+    -- Per-game override roots. The engine first looks for a resource inside the
+    -- Game area (Scripts/Game/...) and only falls back to the main (root) one
+    -- when the Game copy does not exist. Keeping the two lists in the same order
+    -- as _path_sound / _path_music means a caller can request either "foo.wav"
+    -- (relative, gets the prefix) or "Resources/Sounds/foo.wav" (already rooted).
+    _game_path_sound = "Scripts/Game/Resources/Sounds/",
+    _game_path_music = "Scripts/Game/Resources/Music/",
+
     insts = {},
     cache = {}
 }
+
+--- Test whether a file exists on the LÖVE filesystem.
+--- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
+--- and older/odd builds may expose neither, so every shape is tolerated.
+---@param path string
+---@return boolean
+local function fileExists(path)
+    if (not path) then return false end
+
+    local ok, info = pcall(function()
+        return SE.filesystem.getInfo and SE.filesystem.getInfo(path)
+    end)
+    if (ok and info) then return true end
+
+    -- Fallback probe: only a real, non-empty readable file counts.
+    local readable, data = pcall(function()
+        return love.filesystem.read(path, 1)
+    end)
+    return (readable and data ~= nil)
+end
+
+--- Resolve a sound/music name to a real path, preferring the Game copy.
+--- Names that are already "rooted" (leading "/", or already carrying a leading
+--- prefix such as "Resources/Sounds/" or "Scripts/Game/.../") keep working as
+--- before, so callers like the Typers ("/Voices/foo.wav") are unaffected.
+---@param kind "sound"|"music"
+---@param name string
+---@return string The path to load, or the root path when nothing was found.
+function audio.ResolvePath(kind, name)
+    if (not name) then return name end
+    if (type(name) ~= "string") then return name end
+
+    local root_prefix = (kind == "music") and audio._path_music or audio._path_sound
+    local game_prefix = (kind == "music") and audio._game_path_music or audio._game_path_sound
+
+    -- Leading slash: already relative to the love filesystem root, leave as-is.
+    if (name:sub(1, 1) == "/") then
+        return name
+    end
+
+    -- Already rooted: do not prepend anything, just try the Game twin once.
+    if (name:sub(1, #root_prefix) == root_prefix) then
+        local game_twin = game_prefix .. name:sub(#root_prefix + 1)
+        if (fileExists(game_twin)) then return game_twin end
+        return name
+    end
+
+    local game_path = game_prefix .. name
+    if (fileExists(game_path)) then return game_path end
+
+    return root_prefix .. name
+end
 
 ---@param inst table
 ---@return table
@@ -350,12 +410,13 @@ end
 ---@return any, table
 function audio.PlayMusic(music, volume, loop)
     local inst = {}
-    local source = SE.audio.newSource(audio._path_music .. music, "stream")
+    local resolved_path = audio.ResolvePath("music", music)
+    local source = SE.audio.newSource(resolved_path, "stream")
     source:setVolume(volume or Global.GetVariable("Volume").Master * Global.GetVariable("Volume").Music)
     source:setLooping(loop ~= false)
     source:play()
     inst.source = source
-    inst.name = audio._path_music .. music
+    inst.name = resolved_path
 
     -- mark whether this instance is looping so Update can clean non-looping finished sources
     inst.loop = loop ~= false
@@ -368,10 +429,16 @@ function audio.PlayMusic(music, volume, loop)
     return inst.source, inst
 end
 
+--- Presence check for a currently playing music track.
+--- Uses the same resolution as PlayMusic so "which file got loaded" and
+--- "is that file playing" can never disagree (Game copy or root fallback).
+---@param path string
+---@return boolean
 function audio.FindMusic(path)
+    local resolved_path = audio.ResolvePath("music", path)
     for _, m in ipairs(audio.insts)
     do
-        if (m.name == audio._path_music .. path) then
+        if (m.name == resolved_path) then
             return true
         end
     end

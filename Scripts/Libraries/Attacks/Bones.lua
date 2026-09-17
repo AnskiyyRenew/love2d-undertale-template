@@ -1,6 +1,8 @@
 local bones = {
     _2D = {},
-    _3D = {}
+    _3D = {},
+    _WALL = {},
+    _WALLC = {}
 }
 
 -- 3D Math: axis rotation helpers (all angles in degrees)
@@ -57,6 +59,46 @@ end
 local function _perspective(point, d)
     local factor = d / (d + point[3])
     return point[1] * factor, point[2] * factor
+end
+
+-- Shared helpers ------------------------------------------------------------
+
+---Normalizes a character name to the folder used under "Resources/Sprites/Attacks".
+---@param whose string|nil
+---@return string
+local function _characterFolder(whose)
+    local name = tostring(whose or "Sans"):lower()
+    if (name == "papyrus") then
+        return "Papyrus"
+    end
+    return "Sans"
+end
+
+---Sounds the original attacks reference that this project does not ship.
+local _soundFallbacks = {
+    ["snd_pierce.wav"] = {"snd_spearappear.wav", "snd_lazer.wav"}
+}
+
+---Plays a sound defensively: a missing audio file must never break an attack.
+---@param name string
+local function _playSound(name)
+    if (not name) then
+        return
+    end
+
+    local tries = {name}
+    for _, alternative in ipairs(_soundFallbacks[name] or {})
+    do
+        tries[#tries + 1] = alternative
+    end
+
+    for _, sound in ipairs(tries)
+    do
+        if (pcall(Audio.PlaySound, sound)) then
+            return
+        end
+        print("[Attacks - Bones] Sound '" .. sound .. "' is unavailable, trying a fallback.")
+    end
 end
 
 function bones.New2D(whose, length, position, angle, velocity)
@@ -117,7 +159,7 @@ function bones.New2D(whose, length, position, angle, velocity)
     bone.xpivot = 0.5
     bone.ypivot = 0.5
     -- Head/tail width (px), used as the xpivot side-offset scale.
-    bone.width = (_whose == "sans") and 10 or 13
+    bone.width = (bone.whose == "sans") and 10 or 13
 
     if (bone.whose == "sans") then
         bone._head = Sprites.CreateSprite("Attacks/Sans/spr_s_bonebul_top_0.png", "Bullets")
@@ -145,7 +187,7 @@ function bones.New2D(whose, length, position, angle, velocity)
         bone._body.xscale = 5
     end
 
-    --- Change the layer of this 2D bone and all its sprites.
+    --- Change the layer of this 2D bone and all its Sprites.
     --- @param layer string|number  The target layer (name string or numeric).
     function bone:SetLayer(layer)
         self.layer = layer
@@ -205,7 +247,13 @@ function bones.New2D(whose, length, position, angle, velocity)
     end
     bone:SetMode("normal")
 
+    ---Idempotent: a wall and bones.Clear() may both try to destroy the same bone.
     function bone:Destroy()
+        if (self._destroyed) then
+            return
+        end
+        self._destroyed = true
+
         self._head:Destroy()
         self._body:Destroy()
         self._tail:Destroy()
@@ -431,6 +479,499 @@ function bones.New3D(points, percent, mode)
     return bone
 end
 
+------------------------------------------------------------------
+-- Walls
+------------------------------------------------------------------
+
+---Tears a wall down: the warning bar first, then every bone, then unregisters
+---it from whichever list holds it.
+---@param wall table
+local function _destroyWall(wall)
+    if (wall.warning) then
+        wall.warning:Destroy()
+        wall.warning = nil
+    end
+
+    for i = #wall.bones, 1, -1
+    do
+        local bone = wall.bones[i]
+        if (not bone._destroyed) then
+            bone:Destroy()
+        end
+        table.remove(wall.bones, i)
+    end
+
+    wall.isactive = false
+
+    for _, list in ipairs({bones._WALL, bones._WALLC})
+    do
+        for i = #list, 1, -1
+        do
+            if (list[i] == wall) then
+                table.remove(list, i)
+            end
+        end
+    end
+end
+
+---Applies stencil masks to the warning bar and to every bone of a wall.
+---@param wall table
+---@param masks table
+local function _wallSetStencils(wall, masks)
+    if (masks) then
+        wall.stencils = masks
+    end
+
+    if (wall.warning) then
+        wall.warning:SetStencils(masks)
+    end
+
+    for i = #wall.bones, 1, -1
+    do
+        wall.bones[i]:SetStencils(masks)
+    end
+end
+
+-- Method tables: _WALL (one sliding bone sprite per direction) and _WALLC
+-- (20 bones per side). They share the same behaviour today but stay separate
+-- so each variant can grow its own methods later.
+local wall_methods = {
+    SetStencils = _wallSetStencils,
+    Destroy = _destroyWall
+}
+wall_methods.__index = wall_methods
+
+local wallc_methods = {
+    SetStencils = _wallSetStencils,
+    Destroy = _destroyWall
+}
+wallc_methods.__index = wallc_methods
+
+---Normalizes the animation table consumed by the wall tweens. The easing name
+---is built by Tween as ("" .. In):lower(), so "SineOut" resolves to "sineout".
+---@param animation table|nil  {In = "SineOut", Out = "BackIn", It = 15, Ot = 60}
+---@return table
+local function _animationTable(animation)
+    if (type(animation) ~= "table") then
+        return {In = "Linear", Out = "Linear", It = 15, Ot = 15}
+    end
+
+    return {
+        In  = (animation.In  or "Linear"),
+        Out = (animation.Out or "Linear"),
+        It  = (animation.It  or 15),
+        Ot  = (animation.Ot  or 15)
+    }
+end
+
+---A straight wall: a single long bone sprite sliding in from one side of the
+---arena, telegraphed by a blinking warning bar.
+---@param arena table
+---@param whose string  "Sans" | "Papyrus"
+---@param warntime number  ticks the warning bar blinks for
+---@param staytime number  ticks the wall stays fully extended
+---@param length number
+---@param direction string  "up" | "down" | "left" | "right"
+---@param rotation number
+---@param interval number
+---@param animation table  {In = easingName, Out = easingName, It = ticks, Ot = ticks}
+---@return table
+function bones.Wall(arena, whose, warntime, staytime, length, direction, rotation, interval, animation)
+    local X, Y = arena.black:GetPosition()
+    local W, H = arena.width, arena.height
+
+    warntime  = (warntime or 0)
+    staytime  = (staytime or 0)
+    length    = (length or 0)
+    rotation  = (rotation or 0)
+    animation = _animationTable(animation)
+
+    local folder = _characterFolder(whose)
+    local wall = {
+        time = 0,
+        bones = {},
+        stencils = {},
+        isactive = true,
+        interval = (interval or 12),
+        rotation = rotation,
+        warntime = warntime,
+        animation = animation,
+        whose = folder,
+        warning = Sprites.CreateSprite("px.png", "Bullets")
+    }
+
+    wall.warning:Scale(999, length * 2 + 12)
+    wall.warning.alpha = 0.5
+
+    -- The wall sprite is done once it has left the arena again.
+    local function end_spr(spr)
+        spr:Destroy()
+        for i = #wall.bones, 1, -1
+        do
+            if (wall.bones[i] == spr) then
+                table.remove(wall.bones, i)
+            end
+        end
+    end
+
+    -- No more angles calculation, just move the warning sprite directly.
+    -- 0, 90, 180, 270 degrees only.
+    if (direction == "down") then
+        wall.warning:MoveTo(X, Y + H / 2)
+        local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
+        wallspr:MoveTo(X, Y + 480 / 2 + H / 2 + 20)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.In, self.y, Y + H / 2 + 240 - (length + 6), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.Out, self.y, Y + 480 / 2 + H / 2 + 20, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                end_spr(self)
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    elseif (direction == "up") then
+        wall.warning:MoveTo(X, Y - H / 2)
+        local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
+        wallspr:MoveTo(X, Y - 480 / 2 - H / 2 - 20)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.In, self.y, Y - H / 2 - 240 + (length + 6), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.y = value
+                    end,
+                    "", animation.Out, self.y, Y - 480 / 2 - H / 2 - 20, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                end_spr(self)
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    elseif (direction == "left") then
+        wall.warning.rotation = wall.warning.rotation + 90
+        wall.warning:MoveTo(X - W / 2, Y)
+        local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
+        wallspr.rotation = wallspr.rotation + 90
+        wallspr:MoveTo(X - 480 / 2 - W / 2 - 20, Y)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.In, self.x, X - W / 2 - 240 + (length + 3), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.Out, self.x, X - 480 / 2 - W / 2 - 30, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                end_spr(self)
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    elseif (direction == "right") then
+        wall.warning.rotation = wall.warning.rotation + 90
+        wall.warning:MoveTo(X + W / 2, Y)
+        local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
+        wallspr.rotation = wallspr.rotation + 90
+        wallspr:MoveTo(X + 480 / 2 + W / 2 + 20, Y)
+        wallspr.isBullet = true
+
+        wallspr.logic = function (self)
+            if (wall.time == warntime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.In, self.x, X + W / 2 + 240 - (length + 3), animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.x = value
+                    end,
+                    "", animation.Out, self.x, X + 480 / 2 + W / 2 + 20, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                end_spr(self)
+            end
+        end
+
+        table.insert(wall.bones, wallspr)
+    end
+
+    wall.logic = function (self)
+        self.time = self.time + 1
+
+        if (self.time <= self.warntime) then
+            if (self.warning) then
+                if (self.time % 6 == 0) then
+                    self.warning.color = {1, 0, 0}
+                    _playSound("snd_warning_0.wav")
+                elseif (self.time % 6 == 3) then
+                    self.warning.color = {1, 1, 0}
+                    _playSound("snd_warning_1.wav")
+                end
+            end
+        else
+            -- The first frame past the warning phase is the impact frame.
+            if (self.time == self.warntime + 1) then
+                _playSound("snd_pierce.wav")
+            end
+
+            if (self.warning) then
+                self.warning:Destroy()
+                self.warning = nil
+            end
+        end
+
+        for i = #self.bones, 1, -1
+        do
+            local bone = self.bones[i]
+            if (bone.logic) then
+                bone:logic()
+            end
+        end
+
+        -- Nothing left to drive once the warning bar and every bone are gone.
+        if (#self.bones == 0 and not self.warning) then
+            self:Destroy()
+        end
+    end
+
+    setmetatable(wall, wall_methods)
+    table.insert(bones._WALL, wall)
+    return wall
+end
+
+---A wall built out of 20 bones per side: the bones stay parked just outside the
+---arena edge (stencil-clipped) and then grow in, forming a "complex" wall.
+---@param arena table
+---@param whose string  "Sans" | "Papyrus"
+---@param warntime number
+---@param staytime number
+---@param length number
+---@param direction string  "up" | "down" | "left" | "right"
+---@param rotation number
+---@param interval number
+---@param animation table  {In = easingName, Out = easingName, It = ticks, Ot = ticks}
+---@return table
+function bones.WallComplex(arena, whose, warntime, staytime, length, direction, rotation, interval, animation)
+    local X, Y = arena.black:GetPosition()
+    local W, H = arena.width, arena.height
+
+    warntime  = (warntime or 0)
+    staytime  = (staytime or 0)
+    length    = (length or 0)
+    rotation  = (rotation or 0)
+    animation = _animationTable(animation)
+
+    local cos, sin = math.cos(math.rad(rotation)), math.sin(math.rad(rotation))
+    local wall = {
+        time = 0,
+        bones = {},
+        stencils = {},
+        isactive = true,
+        interval = (interval or 12),
+        rotation = rotation,
+        warntime = warntime,
+        warning = Sprites.CreateSprite("px.png", "Bullets")
+    }
+
+    wall.warning:Scale(999, length * 2 + 12)
+    wall.warning.alpha = 0.5
+    wall.warning.rotation = rotation
+
+    -- Every bone of a complex wall shares the same grow/retract behaviour.
+    local function make_logic()
+        return function (self)
+            if (wall.time == warntime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.length = value
+                    end,
+                    "", animation.In, 0, length * 2, animation.It
+                )
+            elseif (wall.time == warntime + animation.It + staytime) then
+                Tween.CreateTween(
+                    function (value)
+                        self.length = value
+                    end,
+                    "", animation.Out, self.length, 0, animation.Ot
+                )
+            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+                self:Destroy()
+                for j = #wall.bones, 1, -1
+                do
+                    if (wall.bones[j] == self) then
+                        table.remove(wall.bones, j)
+                    end
+                end
+            end
+        end
+    end
+
+    if (direction == "down") then
+        -- h = sqrt(pow(w / 2 * cos, 2) - pow(w / 2, 2))
+        -- h += w/2 * tan R
+        wall.warning:MoveTo(
+            X - (H / 2 + 10) * sin,
+            Y + (H / 2 + 10) * cos + W / 2 * math.tan(math.rad(rotation)) + 6
+        )
+        for i = 1, 20 do
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation
+            bone.x = X + wall.interval * (i - 1) * cos - (H / 2 + 10) * sin
+            bone.y = Y + (H / 2 + 10) * cos + (wall.interval * (i - 1)) * sin
+            bone.y = bone.y + W / 2 * math.tan(math.rad(rotation)) + 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation
+            bone.x = X - wall.interval * i * cos - (H / 2 + 10) * sin
+            bone.y = Y + (H / 2 + 10) * cos - (wall.interval * i) * sin
+            bone.y = bone.y + W / 2 * math.tan(math.rad(rotation)) + 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+        end
+    elseif (direction == "up") then
+        wall.warning:MoveTo(
+            X - (H / 2 + 10) * sin,
+            Y - (H / 2 + 10) * cos - W / 2 * math.tan(math.rad(rotation)) - 6
+        )
+        for i = 1, 20 do
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation
+            bone.x = X + wall.interval * (i - 1) * cos - (H / 2 + 10) * sin
+            bone.y = Y - (H / 2 + 10) * cos + (wall.interval * (i - 1)) * sin
+            bone.y = bone.y - W / 2 * math.tan(math.rad(rotation)) - 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation
+            bone.x = X - wall.interval * i * cos - (H / 2 + 10) * sin
+            bone.y = Y - (H / 2 + 10) * cos - (wall.interval * i) * sin
+            bone.y = bone.y - W / 2 * math.tan(math.rad(rotation)) - 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+        end
+    elseif (direction == "left") then
+        wall.warning.rotation = wall.warning.rotation + 90
+        wall.warning:MoveTo(
+            X - (W / 2 + 10) * cos - H / 2 * math.tan(math.rad(rotation)) - 6,
+            Y - (W / 2 + 10) * sin
+        )
+        for i = 1, 20 do
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation + 90
+            bone.x = X - (W / 2 + 10) * cos - (wall.interval * (i - 1)) * sin
+            bone.y = Y + wall.interval * (i - 1) * cos - (W / 2 + 10) * sin
+            bone.x = bone.x - H / 2 * math.tan(math.rad(rotation)) - 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation + 90
+            bone.x = X - (W / 2 + 10) * cos + (wall.interval * i) * sin
+            bone.y = Y - wall.interval * i * cos - (W / 2 + 10) * sin
+            bone.x = bone.x - H / 2 * math.tan(math.rad(rotation)) - 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+        end
+    elseif (direction == "right") then
+        wall.warning.rotation = wall.warning.rotation + 90
+        wall.warning:MoveTo(
+            X + (W / 2 + 10) * cos + H / 2 * math.tan(math.rad(rotation)) + 6,
+            Y + (W / 2 + 10) * sin
+        )
+        for i = 1, 20 do
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation + 90
+            bone.x = X + (W / 2 + 10) * cos - (wall.interval * (i - 1)) * sin
+            bone.y = Y + wall.interval * (i - 1) * cos + (W / 2 + 10) * sin
+            bone.x = bone.x + H / 2 * math.tan(math.rad(rotation)) + 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+
+            local bone = bones.New2D(whose, 0)
+            bone.rotation = wall.rotation + 90
+            bone.x = X + (W / 2 + 10) * cos + (wall.interval * i) * sin
+            bone.y = Y - wall.interval * i * cos + (W / 2 + 10) * sin
+            bone.x = bone.x + H / 2 * math.tan(math.rad(rotation)) + 6
+            bone.logic = make_logic()
+            table.insert(wall.bones, bone)
+        end
+    end
+
+    wall.logic = function (self)
+        self.time = self.time + 1
+
+        if (self.time <= self.warntime) then
+            if (self.warning) then
+                if (self.time % 6 == 0) then
+                    self.warning.color = {1, 0, 0}
+                elseif (self.time % 6 == 3) then
+                    self.warning.color = {1, 1, 0}
+                end
+            end
+        else
+            if (self.warning) then
+                self.warning:Destroy()
+                self.warning = nil
+            end
+        end
+
+        for i = #self.bones, 1, -1
+        do
+            local bone = self.bones[i]
+            if (bone.logic) then
+                bone:logic()
+            end
+        end
+
+        -- Nothing left to drive once the warning bar and every bone are gone.
+        if (#self.bones == 0 and not self.warning) then
+            self:Destroy()
+        end
+    end
+
+    setmetatable(wall, wallc_methods)
+    table.insert(bones._WALLC, wall)
+    return wall
+end
+
 function bones.Update(dt)
     local _2D = bones._2D
     for i = #_2D, 1, -1
@@ -569,6 +1110,39 @@ function bones.Update(dt)
         if (b.Step) then
             b:Step()
         end
+    end
+
+    -- Walls: the warning bar plus the bone waves. Every wall keeps its own
+    -- timer and drives its own bones (wall.logic calls bone:logic()).
+    -- Updated last so newly tweened bone lengths are applied from the next
+    -- frame on, exactly like the original implementation.
+    for _, list in ipairs({bones._WALL, bones._WALLC})
+    do
+        for i = #list, 1, -1
+        do
+            local wall = list[i]
+            if (wall.isactive and wall.logic) then
+                wall.logic(wall)
+            end
+        end
+    end
+end
+
+---Destroys every wall and every 2D bone created through this library.
+---Walls go first: a wall owns bones that also live in `_2D`, and destroying the
+---wall already unregisters them from that list.
+function bones.Clear()
+    for _, list in ipairs({bones._WALL, bones._WALLC})
+    do
+        for i = #list, 1, -1
+        do
+            list[i]:Destroy()
+        end
+    end
+
+    for i = #bones._2D, 1, -1
+    do
+        bones._2D[i]:Destroy()
     end
 end
 

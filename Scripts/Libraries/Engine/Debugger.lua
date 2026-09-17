@@ -1,8 +1,34 @@
+--[[
+    Scripts/Libraries/Engine/Debugger.lua
+    In-game object debugger (Ctrl+D toggles interaction mode).
+
+    - Left-click selects an object, drag moves it; right-click opens the
+      context menu (clone / export / flip / rotate / properties panel with
+      live-editable fields, color swatches, four-point handles).
+    - F9 (while interacting) toggles the on-screen info/property text between
+      alpha 0 and 1, so the dump stops covering the game when not needed.
+    - The context menu flips upward / clamps inside the screen near the edges.
+
+    Sprite authors: set `spr.debugger_ignored = true` on a sprite to make the
+    Debugger skip it entirely — it can never be picked, dragged, inspected or
+    exported (useful for full-screen overlays and other decorative layers).
+
+    Dev-only: loaded only when _RELEASED is false (see main.lua / conf.lua).
+]]
+
+-- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua).
+if (_RELEASED) then
+    return {}
+end
+
 local debugger = {
     interacting = false,
     current_object = nil,
     current_property = nil,
     show = false,
+
+    -- Alpha of the on-screen info/property text (F9 toggles between 0 and 1)
+    info_alpha = 1,
 
     drag_pending = false,
     dragging = false,
@@ -245,6 +271,12 @@ function debugger.Update()
         local menu = debugger.context_menu
         local panel = debugger.panel
 
+        -- F9: toggle the on-screen info/property text (alpha 0 <-> 1)
+        if (Keyboard.GetState("f9") == 1) then
+            debugger.info_alpha = (debugger.info_alpha > 0) and 0 or 1
+            print("Debugger info text:", (debugger.info_alpha > 0) and "visible" or "hidden")
+        end
+
         -- --------------------------------------------------------
         -- 1) Handle field editing (keyboard input)
         -- --------------------------------------------------------
@@ -466,7 +498,8 @@ function debugger.Update()
 
             for i, layer in ipairs(Layers.layers) do
                 for j, object in ipairs(layer.objects) do
-                    if (object.type == "object" and object.visible) then
+                    -- debugger_ignored = true -> the Debugger skips this object entirely
+                    if (object.type == "object" and object.visible and not object.debugger_ignored) then
                         local obj_x, obj_y = object.x, object.y
                         local obj_width, obj_height = math.abs(object.width * (object.xscale or 1)), math.abs(object.height * (object.yscale or 1))
 
@@ -481,7 +514,7 @@ function debugger.Update()
             end
 
             for i, object in ipairs(Layers.objects) do
-                if (object.type == "object" and object.visible) then
+                if (object.type == "object" and object.visible and not object.debugger_ignored) then
                     local obj_x, obj_y = object.x, object.y
                     local obj_width, obj_height = math.abs(object.width * (object.xscale or 1)), math.abs(object.height * (object.yscale or 1))
 
@@ -497,9 +530,15 @@ function debugger.Update()
         -- 6) Right-click context menu trigger
         -- --------------------------------------------------------
         if (mouse2_state == 1 and debugger.current_object) then
+            local menu_height = #context_menu_items * menu.item_height
+            local screen_w = CANVAS_WIDTH or 640
+            local screen_h = CANVAS_HEIGHT or 480
             menu.show = true
-            menu.x = mouse_x
-            menu.y = mouse_y
+            -- Keep the menu fully on screen: near the bottom edge it opens
+            -- upward (its bottom sits at the screen bottom) instead of running
+            -- off-screen, and near the right edge it shifts left to stay inside.
+            menu.x = clamp(mouse_x, 0, screen_w - menu.width)
+            menu.y = clamp(mouse_y, 0, screen_h - menu_height)
             menu.object = debugger.current_object
             debugger.drag_pending = false
             debugger.dragging = false
@@ -565,26 +604,34 @@ end
 -- ============================================================
 function debugger.Draw()
     if (debugger.interacting) then
-        SE.graphics.setColor(1, 1, 1, 1)
-        SE.graphics.setFont(main_font)
-        SE.graphics.print("Click on an object to inspect it", 5, 5)
-        SE.graphics.print("Current Object: " .. tostring(debugger.current_object), 5, 20)
+        -- Info/property text: F9 toggles info_alpha between 0 and 1; hidden
+        -- text is skipped entirely so it never covers the game.
+        if (debugger.info_alpha > 0) then
+            SE.graphics.setColor(1, 1, 1, debugger.info_alpha)
+            SE.graphics.setFont(main_font)
+            SE.graphics.print("Click on an object to inspect it", 5, 5)
+            SE.graphics.print("Current Object: " .. tostring(debugger.current_object), 5, 20)
 
-        if (debugger.current_object) then
-            local obj = debugger.current_object
-            local info_x = 5
-            local info_y = 35
+            if (debugger.current_object) then
+                local obj = debugger.current_object
+                local info_x = 5
+                local info_y = 35
 
-            for key, value in pairs(obj) do
-                if (type(value) ~= "function") then
-                    SE.graphics.print(key .. ": " .. tostring(value), info_x, info_y)
-                    info_y = info_y + 15
-                    if (info_y > 30 * 15) then
-                        info_x = info_x + 300
-                        info_y = 45
+                for key, value in pairs(obj) do
+                    if (type(value) ~= "function") then
+                        SE.graphics.print(key .. ": " .. tostring(value), info_x, info_y)
+                        info_y = info_y + 15
+                        if (info_y > 30 * 15) then
+                            info_x = info_x + 300
+                            info_y = 45
+                        end
                     end
                 end
             end
+        end
+
+        if (debugger.current_object) then
+            local obj = debugger.current_object
 
             -- Draw selection box
             SE.graphics.setColor(1, 0, 0, 1)

@@ -6,10 +6,98 @@ Layers.new_layer("UponPlayer", 51)
 Layers.new_layer("GUI", 80)
 Layers.new_layer("TOP", 100)
 Layers.new_layer("DEBUG", 200)
+
+-- ---------------------------------------------------------------------------
+-- Game-first resource resolution
+--
+-- Scripts/Game/ is the per-game content root. Game data (Logics, maps, waves)
+-- lives there and the engine tree is only a fallback / default.
+-- ---------------------------------------------------------------------------
+
+--- Describe a module name as a project-relative file path, for filesystem probes.
+---@param module_name string e.g. "Scripts.Game.Logics.items"
+---@return string e.g. "Scripts/Game/Logics/items.lua"
+local function owModulePathOf(module_name)
+    return (module_name:gsub("%.", "/")) .. ".lua"
+end
+
+--- Test whether a file exists on disk.
+--- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
+--- so the result is only trusted as a positive when it is truthy.
+---@param file_path string
+---@return boolean
+local function owFileExists(file_path)
+    if (not file_path) or (file_path == "") then return false end
+
+    local ok, info = pcall(function()
+        return SE.filesystem.getInfo and SE.filesystem.getInfo(file_path)
+    end)
+    if (ok and info) then return true end
+
+    -- Fallback probe: a real, readable file counts as existing.
+    local readable, content = pcall(love.filesystem.read, file_path, 1)
+    return (readable and content ~= nil)
+end
+
+--- Require the first module that exists among `roots`, Game area first.
+--- Existence is probed on the filesystem rather than inferred from a failed
+--- require, so a module that exists but throws is reported as a real error
+--- instead of silently looking like a missing fallback candidate.
+---@param roots string[] Module prefixes to try, in order.
+---@param name string Module name suffix.
+---@return any loaded
+---@return string|nil module_name
+local function owRequireGameFirst(roots, name)
+    local first_error = nil
+    local first_error_module = nil
+
+    for _, root in ipairs(roots) do
+        local module_name = root .. name
+        if (owFileExists(owModulePathOf(module_name))) then
+            local ok, loaded = pcall(require, module_name)
+            if (ok and loaded) then
+                -- A Game-area copy that exists but throws must never be silent,
+                -- even when a lower root successfully supplies the module.
+                if (first_error) then
+                    print("[Overworld] WARNING: '" .. tostring(first_error_module) ..
+                        "' exists but failed to load; using " .. module_name .. " instead.")
+                    print("[Overworld]   " .. tostring(first_error))
+                elseif (root ~= roots[1]) then
+                    print("[Overworld] WARNING: '" .. name .. "' not found in " ..
+                        roots[1] .. " (fell back to " .. module_name .. ").")
+                end
+                return loaded, module_name
+            end
+
+            if (not first_error) then
+                first_error = loaded
+                first_error_module = module_name
+            end
+
+            -- Found, but its top-level code threw: surface it rather than
+            -- pretending the module was absent.
+            print("[Overworld] Error loading '" .. module_name .. "': " .. tostring(loaded))
+        end
+    end
+    return nil, nil
+end
+
 DATA = DATA or require("Scripts.Game.Logics")
 FLAG = DATA.flags
 CHEST = DATA.chests
-ITEMS = require("Scripts.Game.Logics.items")
+
+-- Items live next to the logics. Prefer the Game copy, then the engine default.
+-- Note: require is passed the resolved module name, and the Game copy wins even
+-- when a stale `DATA` was carried over from a previous scene.
+ITEMS = ITEMS or owRequireGameFirst({
+    "Scripts.Game.Logics.",
+    "Scripts.Logics."
+}, "items")
+
+if (not ITEMS) then
+    print("[Overworld] WARNING: items table not found under Scripts.Game.Logics or Scripts.Logics.")
+end
+
 DATA.room = Scenes.name_current
 
 local path = (...):match("(.-)[^%.]+$")
@@ -230,6 +318,35 @@ function overworld.AutoCameraBounds()
     end
 
     Camera:setBounds(min_x, min_y, max_x, max_y)
+end
+
+---Resolve a map path, Game area first.
+---
+---A scene asks for a map with a project-relative path such as
+---"Maps/main_scene/main_0.lua". A Game-side copy at
+---"Scripts/Game/Maps/main_scene/main_0.lua" takes priority when it exists, so a
+---game can override any built-in map without touching the scene script.
+---
+---NOTE: STI resolves a map's tile images relative to the map file, so a Game-side
+---override must ship its own ../images/ tree next to it (or reference images by
+---an absolute path). Only the .lua/.tmx file itself is redirected here.
+---@param lua_file string Path as given by the scene.
+---@return string The path that should be handed to STI.
+function overworld.ResolveMapPath(lua_file)
+    if (not lua_file) or (type(lua_file) ~= "string") then
+        return lua_file
+    end
+
+    -- Absolute paths and paths already inside the Game area are left alone.
+    if (lua_file:sub(1, 1) == "/") then return lua_file end
+    if (lua_file:sub(1, #"Scripts/Game/") == "Scripts/Game/") then return lua_file end
+
+    local game_path = "Scripts/Game/" .. lua_file
+    if (owFileExists(game_path)) then
+        return game_path
+    end
+
+    return lua_file
 end
 
 function overworld.Init(lua_file)

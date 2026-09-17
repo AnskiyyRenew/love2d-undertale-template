@@ -14,10 +14,23 @@ _INFO = {
 }
 
 -- This is your window size. Change these values to set your desired resolution.
+-- The Border art is authored for a 960x540 window: a 640x480 game screen with a
+-- 160/160/30/30 decorative frame around it (see Resources/Sprites/Border).
 LOGICAL_WIDTH, LOGICAL_HEIGHT = 640, 480
 CANVAS_WIDTH, CANVAS_HEIGHT = 640, 480
 
--- Set to true to make the game fill the entire screen while maintaining aspect ratio
+-- How much the GAME SCREEN (the CANVAS_WIDTH x CANVAS_HEIGHT canvas) is scaled.
+-- It is ALWAYS kept dead-centre, and the Border frame is locked to it, so the
+-- frame's opening can never drift away from the game screen:
+--     "integer" → whole-number scaling (pixel-perfect; the frame fits exactly
+--                 when the window is canvas + margins, e.g. 960x540 → 1x or
+--                 1920x1080 → 2x). Shrinks proportionally for smaller windows.
+--     "auto"    → fill as much of the window / screen as possible (fractional)
+--     false/nil → 1:1, no scaling
+SCREEN_SCALE = "integer"
+
+-- Legacy switch, only used when SCREEN_SCALE is nil: true = "auto" while
+-- fullscreen and 1:1 otherwise. Prefer SCREEN_SCALE.
 FILL_SCREEN = true
 
 -- Enable error handler to show custom error screen

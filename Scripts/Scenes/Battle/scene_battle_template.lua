@@ -4,9 +4,6 @@ local scene = {}
 Battle = ImportFile("Battle")
 Battle.SetEndRoom("scene_end")
 Game = Battle.SetGame("dummy")
-Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
-Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
-Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Blasters = ImportFile("Attacks.Blasters")
 
 -- Give each enemy its own independent animation instance. The animation
@@ -48,11 +45,11 @@ local function HandleFlee()
 
     Player.sprite.y = Player.sprite.y - 6
     Player.sprite.velocity.x = -1
-    Battle.FullDialogue({
-        "* 我跑路了."
-    }, function ()
-        Battle._end = true
-    end)
+    Battle.FullDialogue({"* 我跑路了."},
+        function ()
+            Battle._end = true
+        end
+    )
 end
 
 local function FleeUpdate(dt)

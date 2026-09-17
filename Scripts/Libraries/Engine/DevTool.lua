@@ -31,6 +31,12 @@
         if focus is never granted, keys are still forwarded while the mouse hovers the tool.
 ]]
 
+-- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua;
+-- main.lua also skips importing this module in release builds).
+if (_RELEASED) then
+    return {}
+end
+
 local DevTool = {}
 
 -- Windows native window library dependency (SDL3 child window + mouse/key events)

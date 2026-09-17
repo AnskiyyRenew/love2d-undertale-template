@@ -84,6 +84,31 @@ function Border.Update(dt)
     end
 end
 
+local opening_x, opening_y = nil, nil
+--- Manually align the frame's opening (in art pixels, from the art's top-left).
+---@param x number
+---@param y number
+function Border.SetOpening(x, y)
+    opening_x, opening_y = x, y
+end
+
+--- Offset of the opening inside the frame art (auto = canvas centred in the art).
+---@param imgW number|nil Image width (defaults to the current frame art).
+---@param imgH number|nil Image height.
+---@return number ox, number oy
+function Border.GetOpening(imgW, imgH)
+    if (opening_x and opening_y) then
+        return opening_x, opening_y
+    end
+    if ((not imgW or not imgH) and currentImg) then
+        imgW, imgH = currentImg:getDimensions()
+    end
+    imgW = imgW or CANVAS_WIDTH
+    imgH = imgH or CANVAS_HEIGHT
+    return math.max(0, (imgW - CANVAS_WIDTH) * 0.5),
+           math.max(0, (imgH - CANVAS_HEIGHT) * 0.5)
+end
+
 function Border.Draw()
     if (not Border.enabled or Border.alpha <= 0) then return end
 
@@ -93,12 +118,15 @@ function Border.Draw()
     if (not currentImg) then return end
 
     local imgW, imgH = currentImg:getDimensions()
-    local s = ScreenScale * math.max(LOGICAL_WIDTH / imgW, LOGICAL_HEIGHT / imgH)
+    local ox, oy = Border.GetOpening(imgW, imgH)
+    local s = ScreenScale or 1
+    local x = (DrawX or 0) - ox * s
+    local y = (DrawY or 0) - oy * s
 
     SE.graphics.push()
     SE.graphics.origin()
     SE.graphics.setColor(1, 1, 1, Border.alpha)
-    SE.graphics.draw(currentImg, 0, 0, 0, s, s)
+    SE.graphics.draw(currentImg, x, y, 0, s, s)
     SE.graphics.pop()
 end
 

@@ -30,10 +30,14 @@ Scenes = ImportFile("SceneManager")
 Layers = ImportFile("Layers")
 Sprites = ImportFile("Sprites")
 Typers = ImportFile("Typers")
-Debugger = ImportFile("Engine.Debugger")
+-- Debugger / DevTool are development-only: skip loading them entirely in
+-- release builds (_RELEASED in conf.lua). The files themselves also bail out
+-- early on _RELEASED, and every call site below is nil-guarded.
 if (not _RELEASED) then
+    Debugger = ImportFile("Engine.Debugger")
     DevTool = ImportFile("Engine.DevTool")
 else
+    Debugger = nil
     DevTool = nil
 end
 Gamejolt = ImportFile("GamejoltAPI")
@@ -74,15 +78,55 @@ Scenes.switchTo(Global.GetVariable("FirstRoom"))
 ScreenScale = 1
 DrawX, DrawY = 0, 0
 local MAIN_CANVAS, INTERMEDIATE_CANVAS
+
+-- SCREEN_SCALE (see conf.lua) decides how big the game canvas is drawn, and the
+-- canvas is ALWAYS kept dead-centre. The Border frame is locked to the canvas
+-- (same scale, opening on the canvas rectangle), so frame and game screen can
+-- never drift apart — windowed or fullscreen, at any window size.
+--
+-- Legacy: when SCREEN_SCALE is nil, FILL_SCREEN keeps its old meaning
+-- ("auto" while fullscreen, 1:1 otherwise).
+local screenScaleMode = SCREEN_SCALE
+if (screenScaleMode == nil) then
+    screenScaleMode = FILL_SCREEN and "auto" or false
+end
+
 local function updateScreenScale()
     local screen_w, screen_h = SE.graphics.getDimensions()
-    if (FILL_SCREEN and SE.window.getFullscreen()) then
-        ScreenScale = math.min(screen_w / LOGICAL_WIDTH, screen_h / LOGICAL_HEIGHT)
+
+    -- How many times the canvas would fit inside the window / screen.
+    local fit = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
+    if (fit <= 0 or fit ~= fit) then fit = 1 end
+
+    if (screenScaleMode == "integer") then
+        -- Pixel-perfect: whole multiples only. If the window is smaller than
+        -- the canvas, shrink proportionally instead of overflowing it.
+        local whole = math.floor(fit)
+        ScreenScale = (whole >= 1) and whole or fit
+    elseif (screenScaleMode == "auto" or screenScaleMode == true) then
+        ScreenScale = fit
+    elseif (type(screenScaleMode) == "number" and screenScaleMode > 0) then
+        ScreenScale = screenScaleMode
     else
         ScreenScale = 1
     end
+
+    -- Always centred, whichever mode is active.
     DrawX = math.floor((screen_w - CANVAS_WIDTH * ScreenScale) * 0.5 + 0.5)
     DrawY = math.floor((screen_h - CANVAS_HEIGHT * ScreenScale) * 0.5 + 0.5)
+end
+
+--- Change how the game screen is scaled at runtime.
+---@param mode string|number|boolean "integer" | "auto" | number | false
+function SetScreenScale(mode)
+    screenScaleMode = mode
+    updateScreenScale()
+end
+
+--- The multiplier currently applied to the game canvas.
+---@return number
+function GetScreenScale()
+    return ScreenScale
 end
 
 function love.load()
@@ -144,7 +188,7 @@ function love.update(dt)
     Sprites.Update(dt)
     Typers.Update(dt)
     Audio.Update(dt)
-    Debugger.Update()
+    if (Debugger and Debugger.Update) then Debugger.Update() end
     if (DevTool and DevTool.Update) then DevTool.Update(dt) end
     Gamejolt.update(dt)
     Discord.update(dt)
@@ -198,6 +242,11 @@ function love.draw()
 
     SE.graphics.setCanvas()
     SE.graphics.clear(0, 0, 0, 1)
+
+    -- Window frame: drawn by the Border library BEHIND the gameplay canvas. It
+    -- uses the same scale as the canvas and positions its opening exactly on
+    -- the canvas rectangle, so the frame always hugs the game screen. Enable /
+    -- pick image / fade / re-align via the Border.* APIs.
     Border.Draw()
 
     SE.graphics.push()
@@ -215,9 +264,7 @@ function love.draw()
     SE.graphics.setLineStyle(prevLineStyle)
     SE.graphics.pop()
 
-    -- Window border frame: drawn by the Border library at screen (0,0), on top
-    -- of the gameplay canvas. Enable / pick image / fade via Border.* APIs.
-    Debugger.Draw()
+    if (Debugger and Debugger.Draw) then Debugger.Draw() end
 
     -- Developer tool: renders its own canvas and pushes it into the SDL child window
     if (DevTool and DevTool.Draw) then DevTool.Draw() end
@@ -249,10 +296,16 @@ function love.keypressed(key, scancode, isrepeat)
             return
         elseif (key == "f5") then
             Localize.reload()
+            ClearModuleTree("Scripts.Libraries")
             local sceneName = Scenes.name_current
-            package.loaded["Scripts.Scenes." .. sceneName] = nil
+            -- Clear whichever copy was actually loaded (Game area or root);
+            -- Scenes.switchTo re-resolves the scene right after this.
+            if (Scenes.UnloadModule) then
+                Scenes.UnloadModule(sceneName)
+            else
+                package.loaded["Scripts.Scenes." .. sceneName] = nil
+            end
             Scenes.switchTo(sceneName)
-            --Scenes.switchTo("scene_logo")
             return
         elseif (key == "f6") then
             print("=== Debug Info ===")

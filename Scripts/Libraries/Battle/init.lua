@@ -1,5 +1,136 @@
 ---@diagnostic disable: undefined-field
 
+-- ---------------------------------------------------------------------------
+-- Game-first module resolution
+--
+-- Encounter scripts, waves and attack patterns are all per-game content, so the
+-- Game area (Scripts/Game/...) wins and the engine directory is the fallback:
+--
+--   encounters      Scripts.Game.Encounter.<file>   (Game-only; no root twin)
+--   waves           Scripts.Game.Waves.<name>      -> Scripts.Waves.<name>
+--   attack patterns Scripts.Libraries.Battle.PlayerAttacks.<name>
+--                                                -> kept, see SetAttackPattern
+--
+-- Existence is probed on the FILESYSTEM first rather than inferred from a failed
+-- require. `pcall(require, ...)` cannot tell "the module is not there" apart from
+-- "the module is there but its top-level code threw", and treating the second as
+-- the first would silently cut the fallback chain short instead of surfacing a
+-- genuine error in a module that really was found.
+local BATTLE_MODULE_ROOTS = {
+    waves = {"Scripts.Game.Waves.", "Scripts.Waves."}
+}
+
+--- Describe a module name as a project-relative file path, for filesystem probes.
+---@param module_name string e.g. "Scripts.Waves.wave"
+---@return string e.g. "Scripts/Waves/wave.lua"
+local function battleModulePathOf(module_name)
+    return (module_name:gsub("%.", "/")) .. ".lua"
+end
+
+--- Test whether a module's file actually exists on disk.
+--- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
+--- so the result is only trusted as a positive when it is truthy.
+---@param module_name string
+---@return boolean
+local function battleModuleExists(module_name)
+    local file_path = battleModulePathOf(module_name)
+
+    local ok, info = pcall(function()
+        return SE.filesystem.getInfo and SE.filesystem.getInfo(file_path)
+    end)
+    if (ok and info) then return true end
+
+    -- Fallback probe: a real, readable file counts as existing.
+    local readable, content = pcall(love.filesystem.read, file_path, 1)
+    return (readable and content ~= nil)
+end
+
+--- Require the first module that exists among `roots`, Game area first.
+---
+--- Returns the module name that was found (nil when no root has the file) plus
+--- the loaded value, so callers can distinguish three outcomes:
+---   * loaded            -> module_name is set and loaded is the table
+---   * found but crashed -> module_name is set, loaded is nil, error_message set
+---   * not found         -> module_name is nil (caller decides on a default)
+--- A missing Game copy never prevents the root copy from being tried.
+---@param roots string[] Module prefixes to try, in order.
+---@param name string Module name suffix (e.g. the wave name).
+---@return string|nil module_name
+---@return any loaded
+---@return any error_message
+---@return string|nil error_module
+local function requireGameFirst(roots, name)
+    -- Bare `return nil` yields exactly ONE value in Lua, which would make the
+    -- caller's 4-value unpack collapse. Return the full shape on every path.
+    if (not name) or (name == "") then return nil, nil, nil, nil end
+
+    local found_module = nil
+    local found_root = nil
+    local first_error = nil
+    local first_error_module = nil
+
+    for _, root in ipairs(roots) do
+        local module_name = root .. name
+
+        if (battleModuleExists(module_name)) then
+            found_module = found_module or module_name
+            found_root = found_root or root
+
+            local ok, loaded = pcall(require, module_name)
+            if (ok and loaded) then
+                -- A Game-area copy that exists but throws must never be silent,
+                -- even when a lower root successfully supplies the module: the
+                -- override is broken and the author needs to know.
+                if (first_error) then
+                    print("[Battle] WARNING: '" .. tostring(first_error_module) ..
+                        "' exists but failed to load; using " .. module_name .. " instead.")
+                    print("[Battle]   " .. tostring(first_error))
+                elseif (root ~= roots[1]) then
+                    print("[Battle] WARNING: '" .. name .. "' not found in " ..
+                        roots[1] .. " (fell back to " .. module_name .. ").")
+                end
+                return module_name, loaded, nil, nil
+            end
+
+            if (not first_error) then
+                first_error = loaded
+                first_error_module = module_name
+            end
+        end
+    end
+
+    if (found_module) then
+        if (found_root ~= roots[1]) then
+            print("[Battle] WARNING: '" .. name .. "' not found in " ..
+                roots[1] .. " (fell back to " .. found_module .. ").")
+        end
+        return found_module, nil, (first_error or "unknown error"), first_error_module
+    end
+
+    return nil, nil, nil, nil
+end
+
+---Clear a wave module from the require cache under BOTH roots, so a wave that
+---moved between the Game area and the engine directory never stays stale.
+---@param wave_name string|nil Defaults to battle.wave when nil.
+local function clearWaveModule(wave_name)
+    local name = wave_name
+    if (not name) or (name == "") then
+        name = Battle.wave
+    end
+    if (not name) or (name == "") then return end
+
+    for _, root in ipairs(BATTLE_MODULE_ROOTS.waves) do
+        ClearModuleTree(root .. name)
+        package.loaded[root .. name] = nil
+    end
+end
+
+---Public wrapper so other Battle modules (e.g. UI states) can drop the wave
+---module without hard-coding which root it came from.
+---NOTE: defined further down, right after the `battle` table exists - this file
+---assigns a field on a local table, so it cannot run before `local battle = {}`.
+
 Layers.new_layer("BOTTOM", -1000)
 Layers.new_layer("Background", -10)
 Layers.new_layer("UI", 0)
@@ -43,6 +174,14 @@ local battle = {
     _end = false,
     _end_time = 0
 }
+
+---Public wrapper so other Battle modules (e.g. UI states) can drop the wave
+---module without hard-coding which root it came from. Defined here (not in the
+---helpers block above) because it assigns a field on the local `battle` table.
+---@param wave_name string|nil Defaults to battle.wave when nil.
+function battle.ClearWaveModule(wave_name)
+    clearWaveModule(wave_name)
+end
 
 local blacktop = Sprites.CreateSprite("px.png", "TOP")
 blacktop:Scale(1000, 1000)
@@ -118,7 +257,7 @@ local function defaultEnteringState(old, new)
         battle.Defending()
         UI.buttons.ResetButtons()
     elseif (old == "DEFENDING" and new == "ACTIONSELECT") then
-        package.loaded["Scripts.Waves." .. Battle.wave] = nil
+        clearWaveModule(Battle.wave)
         if (Battle._wave) then
             Battle._wave._end = false
             Battle._wave.objects = {}
@@ -187,14 +326,30 @@ end
 -- Base implementation, kept so a scene can override Battle.Win and still call it.
 battle.defaultWin = battle.Win
 
+---Load an encounter script from the Game area.
+---
+---Encounters live under Scripts/Game/Encounter/ (there is no engine-side twin -
+---Scripts/Encounter/ does not exist). The file is probed before requiring so a
+---missing encounter reports "not found" instead of being confused with an
+---encounter that exists but throws.
+---@param file string Encounter name, e.g. "Poseur" (no extension).
+---@return table|nil The loaded encounter table, or nil on failure.
 function battle.SetGame(file)
-    battle.gameName = "Scripts.Game." .. file
+    battle.gameName = "Scripts.Game.Encounter." .. file
+
+    if (not battleModuleExists(battle.gameName)) then
+        print("[Battle System] WARNING: encounter '" .. tostring(file) .. "' not found at " ..
+            battleModulePathOf(battle.gameName) .. ".")
+        return nil
+    end
+
     local ok, err = pcall(function ()
         battle.game = require(battle.gameName)
     end)
 
     if (not ok) then
-        print("[Battle System] Error: " .. err)
+        print("[Battle System] Error loading encounter '" .. tostring(file) .. "': " .. tostring(err))
+        return nil
     else
         print("[Battle System] Loaded '" .. file .. "' as the battle successfully!")
         local game_ = battle.game
@@ -226,28 +381,81 @@ end
 
 function battle.SetAttackPattern(pattern)
     local _pattern
-    local ok, err = pcall(function ()
-        _pattern = ImportFile("Battle.PlayerAttacks." .. pattern)
-    end)
+    local module_name = "Scripts.Libraries.Battle.PlayerAttacks." .. tostring(pattern)
+    local _exists = battleModuleExists(module_name)
 
-    if (ok) then
-        battle.attack = _pattern
+    if (_exists) then
+        local ok, err = pcall(function ()
+            _pattern = ImportFile("Battle.PlayerAttacks." .. pattern)
+        end)
 
-        local _add = true
-        for _, v in ipairs(battle.attack_paths)
-        do
-            if (pattern == v) then
-                _add = false
+        if (ok) then
+            battle.attack = _pattern
+
+            local _add = true
+            for _, v in ipairs(battle.attack_paths)
+            do
+                if (pattern == v) then
+                    _add = false
+                end
             end
+
+            if (_add) then
+                table.insert(battle.attack_paths, pattern)
+            end
+            return
         end
 
-        if (_add) then
-            table.insert(battle.attack_paths, pattern)
-        end
+        print("[Battle - PlayerAttack] Error in '" .. module_name .. "': " .. tostring(err))
     else
-        battle.attack = ImportFile("Battle.PlayerAttacks.stick")
-        print("[Battle - PlayerAttack] Error: " .. err)
+        print("[Battle - PlayerAttack] WARNING: attack pattern '" .. tostring(pattern) ..
+            "' not found at " .. battleModulePathOf(module_name) .. ".")
     end
+
+    -- Fall back to the default attack pattern so ACTIONSELECT still works.
+    print("[Battle - PlayerAttack] Falling back to the default pattern (stick).")
+    battle.attack = ImportFile("Battle.PlayerAttacks.stick")
+end
+
+---Load a wave script, Game area first (Scripts/Game/Waves/) then engine
+---(Scripts/Waves/). A wave that is missing or broken falls back to the default
+---"wave" script and warns, so a battle always has *something* to run.
+---@param wave_name string
+---@return table The wave table that was selected.
+function battle.LoadWave(wave_name)
+    local name = (wave_name and wave_name ~= "") and wave_name or "wave"
+    local roots = BATTLE_MODULE_ROOTS.waves
+
+    local module_name, loaded, error_message, error_module = requireGameFirst(roots, name)
+    battle.waveModule = module_name
+
+    if (loaded) then
+        return loaded
+    end
+
+    if (module_name) then
+        -- Found, but its top-level code threw: report the real error instead of
+        -- silently degrading, then still fall back so the battle can continue.
+        print("[Battle - Wave] Error in '" .. tostring(error_module) .. "': " .. tostring(error_message))
+    else
+        print("[Battle - Wave] WARNING: wave '" .. name .. "' not found. Searched, in order:")
+        for _, root in ipairs(roots) do
+            print("    " .. root .. name .. "  (" .. battleModulePathOf(root .. name) .. ")")
+        end
+    end
+
+    -- Fall back to the default wave. It lives in the engine directory, but go
+    -- through the resolver so a Game-side "wave" override still wins.
+    local fallback_module, fallback, fallback_error = requireGameFirst(roots, "wave")
+    battle.waveModule = fallback_module or battle.waveModule
+
+    if (fallback) then
+        print("[Battle - Wave] Falling back to the default wave (" .. tostring(fallback_module) .. ").")
+        return fallback
+    end
+
+    print("[Battle - Wave] Error: default wave unavailable: " .. tostring(fallback_error))
+    return {}
 end
 
 function battle.Defending()
@@ -255,22 +463,12 @@ function battle.Defending()
     Battle.mainarena.is_active = true
     Battle.mainarena:Resize(155, 130)
 
-    local _wave = {}
-    local ok, err = pcall(function ()
-        _wave = require("Scripts.Waves." .. Battle.wave)
-    end)
+    local _wave = battle.LoadWave(Battle.wave)
 
     -- Defensive reset: the wave is the shared "Battle.Waves" table, which may
     -- still hold _end = true from a previous run if cleanup was skipped.
-    if (ok) then
-        _wave._end = false
-        Battle._wave = _wave
-    else
-        _wave = require("Scripts.Waves.wave")
-        _wave._end = false
-        Battle._wave = _wave
-        print("[Battle - Wave] Error: " .. err)
-    end
+    _wave._end = false
+    Battle._wave = _wave
 end
 
 function battle.Update(dt)
@@ -346,9 +544,9 @@ function battle.Clear()
         Battle._wave._paths = {}
     end
     Battle._wave = {}
-    -- Clear the wave wrapper and reset the shared "Battle.Waves" state so a
-    -- future wave doesn't inherit a stale _end = true flag.
-    ClearModuleTree("Scripts.Waves." .. Battle.wave)
+    -- Clear the wave wrapper (under both roots) and reset the shared
+    -- "Battle.Waves" state so a future wave doesn't inherit a stale _end = true.
+    clearWaveModule(Battle.wave)
     battle.restoring_arena = false
     battle.enemy_anims = {}
 

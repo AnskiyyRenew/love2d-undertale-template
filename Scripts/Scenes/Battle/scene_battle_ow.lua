@@ -1,20 +1,5 @@
 local scene = {}
 
--- Init layers
-Layers.new_layer("BOTTOM", -1000)
-Layers.new_layer("Background", -10)
-Layers.new_layer("UI", 0)
-Layers.new_layer("ArenasExtraW", 10)
-Layers.new_layer("ArenasExtraB", 10.01)
-Layers.new_layer("UponArena", 11)
-Layers.new_layer("BelowPlayer", 12)
-Layers.new_layer("Player", 13)
-Layers.new_layer("Bullets", 30)
-Layers.new_layer("ArenasCoverW", 50)
-Layers.new_layer("ArenasCoverB", 50.01)
-Layers.new_layer("TopAll", 60)
-Layers.new_layer("TOP", 1000)
-
 -- ---------------------------------------------------------------------------
 -- Overworld save-data bridge
 --

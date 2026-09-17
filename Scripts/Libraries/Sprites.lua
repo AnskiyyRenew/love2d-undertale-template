@@ -91,7 +91,67 @@ local function loadImageSafe(path)
     return result, imgData, true
 end
 
-local function normalizeSpritePath(path)
+-- Game-first sprite roots. Sprites are looked up inside the Game area
+-- (Scripts/Game/Resources/Sprites/) first and silently fall back to the main
+-- Resources/Sprites/ tree when no Game copy exists.
+local SPRITE_ROOT = "Resources/Sprites/"
+local GAME_SPRITE_ROOT = "Scripts/Game/Resources/Sprites/"
+
+--- Test whether a file exists on the LÖVE filesystem. Tolerates both the
+--- LÖVE 11 (table) and LÖVE 12 (direct value) shapes of getInfo.
+---@param path string
+---@return boolean
+local function spriteFileExists(path)
+    if (not path) then return false end
+
+    local ok, info = pcall(function()
+        return SE.filesystem.getInfo and SE.filesystem.getInfo(path)
+    end)
+    if (ok and info) then return true end
+
+    local readable, data = pcall(function()
+        return love.filesystem.read(path, 1)
+    end)
+    return (readable and data ~= nil)
+end
+
+--- Resolve a sprite path to the file that should actually be loaded.
+--- Order of preference:
+---   1. an absolute ("/...") or already-rooted Game path -> used as-is;
+---   2. the same file inside Scripts/Game/Resources/Sprites/;
+---   3. the main Resources/Sprites/ copy.
+---@param path string
+---@return string
+local function resolveGameSpritePath(path)
+    if (not path) or (path == "") then return nil end
+
+    if (path:sub(1, 1) == "/") then
+        return path
+    end
+
+    if (path:sub(1, #GAME_SPRITE_ROOT) == GAME_SPRITE_ROOT) then
+        return path
+    end
+
+    if (path:sub(1, #SPRITE_ROOT) == SPRITE_ROOT) then
+        local relative = path:sub(#SPRITE_ROOT + 1)
+        local game_path = GAME_SPRITE_ROOT .. relative
+        if (spriteFileExists(game_path)) then return game_path end
+        return path
+    end
+
+    local game_path = GAME_SPRITE_ROOT .. path
+    if (spriteFileExists(game_path)) then return game_path end
+
+    return SPRITE_ROOT .. path
+end
+
+--- Normalise a sprite path into its final resolvable form.
+--- Absolute paths, Game paths and root Game paths are returned untouched.
+---@param path string
+---@param use_game boolean|nil When false the Game lookup is skipped entirely.
+---@return string|nil
+local function normalizeSpritePath(path, use_game)
     if not path or path == "" then
         return nil
     end
@@ -102,11 +162,26 @@ local function normalizeSpritePath(path)
         return path
     end
 
-    if path:sub(1, #"Resources/Sprites/") == "Resources/Sprites/" then
+    -- Already an explicit Game path (or a caller that opted out): keep as-is.
+    if (path:sub(1, #GAME_SPRITE_ROOT) == GAME_SPRITE_ROOT) then
         return path
     end
 
-    return "Resources/Sprites/" .. path
+    if (path:sub(1, #SPRITE_ROOT) == SPRITE_ROOT) then
+        if (use_game == false) then
+            return path
+        end
+        local relative = path:sub(#SPRITE_ROOT + 1)
+        local game_path = GAME_SPRITE_ROOT .. relative
+        if (spriteFileExists(game_path)) then return game_path end
+        return path
+    end
+
+    if (use_game == false) then
+        return SPRITE_ROOT .. path
+    end
+
+    return resolveGameSpritePath(path)
 end
 
 local function findSpriteFromCache(path)
@@ -938,7 +1013,13 @@ local sprite_methods = {}
     end
 
     function sprite_methods:Set(p)
-        self.image = findSpriteFromCache(p)
+        -- Store the fully resolved path: callers (and GetAnimationPath) can then
+        -- compare against an unambiguous "Resources/Sprites/..." or
+        -- "Scripts/Game/Resources/Sprites/..." string, and later calls to Set
+        -- with the already-resolved value behave identically.
+        local resolved_p = normalizeSpritePath(p) or p
+        self.path = resolved_p
+        self.image = findSpriteFromCache(resolved_p)
         if self.image then
             self.width = self.image:getWidth()
             self.height = self.image:getHeight()
@@ -971,6 +1052,24 @@ local sprite_methods = {}
                 }
             end
         end
+    end
+
+    --- Collect the file that is actually being displayed for this sprite, used
+    --- for animation bookkeeping and by external lookup helpers.
+    ---@return string|nil The resolved path ("Resources/Sprites/..." or "Scripts/Game/Resources/Sprites/...").
+    function sprite_methods:GetImagePath()
+        return self.path
+    end
+
+    --- Whether this sprite is currently driven by an animation (more than one
+    --- frame given to SetAnimation).
+    ---@return boolean
+    function sprite_methods:GetAnimationPath()
+        local anim = self.animation
+        if (anim and anim.textures and #anim.textures > 0) then
+            return anim.textures
+        end
+        return nil
     end
 
     function sprite_methods:SetAnimation(frames, interval, mode)
@@ -1202,6 +1301,8 @@ local sprite_methods = {}
     end
 
 ---@param path string Sprite path, relative to Resources/Sprites/ (no prefix).
+---                     A matching copy inside Scripts/Game/Resources/Sprites/
+---                     is used instead whenever one exists.
 ---@param layer number|string|nil Layer to place the sprite on.
 ---@return Sprite
 function sprites.CreateSprite(path, layer)
@@ -1258,9 +1359,11 @@ function sprites.CreateSprite(path, layer)
     sprite._layer_id = nil
     sprite._layer_value = layer or 0
     sprite.is_moving = false
-    sprite.path = path
     sprite.pixel_smooth = false
-    local full_path = "Resources/Sprites/" .. path
+    -- Resolve first (Game copy wins) so sprite.path always names the file that
+    -- was really loaded, not the caller-supplied shortcut.
+    local full_path = resolveGameSpritePath(path)
+    sprite.path = full_path
     sprite.image, sprite._loaded = findSpriteFromCache(full_path)
 
     sprite.width = sprite.image:getWidth()
@@ -1378,7 +1481,7 @@ function sprites.CreateSpriteQuad(path, quad, layer)
     -- ...then swap in a cropped copy of the sheet, so the sprite's width / height
     -- (and therefore pivot / outline / dust handling) match the requested region
     -- instead of the whole sheet.
-    local full_path = "Resources/Sprites/" .. path
+    local full_path = resolveGameSpritePath(path)
     local sheet_w = sprite.image:getWidth()
     local sheet_h = sprite.image:getHeight()
 
