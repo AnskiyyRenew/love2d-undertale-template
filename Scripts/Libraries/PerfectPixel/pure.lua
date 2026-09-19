@@ -1,9 +1,9 @@
--- 纯 Lua 实现的矩形分解库
+-- Pure Lua implementation of the rectangle decomposition library
 local re = {}
 
 local function globalExpandRect(grid)
     local m, n = #grid, #grid[1]
-    -- 创建前缀和数组 (行0..m, 列0..n)
+    -- Build the prefix-sum array (rows 0..m, columns 0..n)
     local prefix = {}
     for i = 0, m do
         prefix[i] = {}
@@ -12,7 +12,7 @@ local function globalExpandRect(grid)
         end
     end
 
-    -- 填充
+    -- Fill
     for i = 1, m do
         for j = 1, n do
             local score = (grid[i][j] == 2) and 1 or 0
@@ -22,16 +22,16 @@ local function globalExpandRect(grid)
 
     local max_score = 0
     local best_rect = nil
-    local height = {}  -- 高度数组（基于1的列索引）
+    local height = {}  -- Height array (1-based column index)
 
-    -- 初始化
+    -- Initialise
     for j = 1, n do
         height[j] = 0
     end
 
-    -- 遍历每一行
+    -- Walk every row
     for i = 1, m do
-        -- 更新高度数组
+        -- Update the height array
         for j = 1, n do
             if grid[i][j] ~= 0 then
                 height[j] = height[j] + 1
@@ -40,44 +40,44 @@ local function globalExpandRect(grid)
             end
         end
 
-        local stack = {}  -- 单调栈（存储列索引）
+        local stack = {}  -- Monotonic stack (holds column indices)
 
-        -- 遍历当前行的每一列
+        -- Walk every column of the current row
         for j = 1, n do
-            -- 维护单调递增栈
+            -- Keep the stack monotonically increasing
             while #stack > 0 and height[j] < height[stack[#stack]] do
-                local k = table.remove(stack)  -- 弹出栈顶元素
+                local k = table.remove(stack)  -- Pop the top of the stack
                 local left = (#stack > 0) and stack[#stack] or 0
                 local rect_height = height[k]
-                local x1 = i - rect_height + 1  -- 起始行（基于1）
-                local x2 = i                     -- 结束行（基于1）
-                local y1 = left + 1              -- 起始列（基于1）
-                local y2 = j - 1                 -- 结束列（基于1）
+                local x1 = i - rect_height + 1  -- Start row (1-based)
+                local x2 = i                     -- End row (1-based)
+                local y1 = left + 1              -- Start column (1-based)
+                local y2 = j - 1                 -- End column (1-based)
 
-                -- 确保矩形有效
+                -- Make sure the rectangle is valid
                 if y1 <= y2 then
-                    -- 计算矩形得分
+                    -- Score the rectangle
                     local score_here = prefix[x2][y2]
                         - prefix[x1-1][y2]
                         - prefix[x2][y1-1]
                         + prefix[x1-1][y1-1]
 
-                    -- 更新最大得分
+                    -- Update the best score
                     if score_here > max_score then
                         max_score = score_here
                         best_rect = {
-                            x1 - 1,     -- 起始行(基于0)
-                            y1 - 1,     -- 起始列(基于0)
-                            x2 - x1 + 1,-- 高度（行数）
-                            y2 - y1 + 1 -- 宽度（列数）
+                            x1 - 1,     -- Start row (0-based)
+                            y1 - 1,     -- Start column (0-based)
+                            x2 - x1 + 1,-- Height (number of rows)
+                            y2 - y1 + 1 -- Width (number of columns)
                         }
                     end
                 end
             end
-            table.insert(stack, j)  -- 当前列入栈
+            table.insert(stack, j)  -- Push the current column
         end
 
-        -- 处理栈中剩余元素
+        -- Drain whatever is left on the stack
         while #stack > 0 do
             local k = table.remove(stack)
             local left = (#stack > 0) and stack[#stack] or 0
@@ -85,7 +85,7 @@ local function globalExpandRect(grid)
             local x1 = i - rect_height + 1
             local x2 = i
             local y1 = left + 1
-            local y2 = n  -- 边界设为最后一列
+            local y2 = n  -- Clamp the boundary to the last column
 
             if y1 <= y2 then
                 local score_here = prefix[x2][y2]
@@ -96,10 +96,10 @@ local function globalExpandRect(grid)
                 if score_here > max_score then
                     max_score = score_here
                     best_rect = {
-                        x1 - 1,     -- 起始行(基于0)
-                        y1 - 1,     -- 起始列(基于0)
-                        x2 - x1 + 1,-- 高度（行数）
-                        y2 - y1 + 1 -- 宽度（列数）
+                        x1 - 1,     -- Start row (0-based)
+                        y1 - 1,     -- Start column (0-based)
+                        x2 - x1 + 1,-- Height (number of rows)
+                        y2 - y1 + 1 -- Width (number of columns)
                     }
                 end
             end
@@ -114,7 +114,8 @@ function re.rectangulate_grid(grid)
     for i = 1, #grid do
         new_grid[i] = {}
         for j = 1, #grid[i] do
-            -- visited 和 grid 一体化, 2: 未访问, 1: 访问过, 0: 障碍
+            -- visited and grid are merged into one: 2 = unvisited, 1 = visited,
+            -- 0 = obstacle
             new_grid[i][j] = grid[i][j] == 1 and 2 or 0
         end
     end

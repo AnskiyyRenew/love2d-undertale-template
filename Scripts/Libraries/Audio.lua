@@ -3,12 +3,12 @@ local audio = {
     _path_music = "Resources/Music/",
 
     -- Per-game override roots. The engine first looks for a resource inside the
-    -- Game area (Scripts/Game/...) and only falls back to the main (root) one
+    -- Game area (Game/...) and only falls back to the main (root) one
     -- when the Game copy does not exist. Keeping the two lists in the same order
     -- as _path_sound / _path_music means a caller can request either "foo.wav"
     -- (relative, gets the prefix) or "Resources/Sounds/foo.wav" (already rooted).
-    _game_path_sound = "Scripts/Game/Resources/Sounds/",
-    _game_path_music = "Scripts/Game/Resources/Music/",
+    _game_path_sound = "Game/Resources/Sounds/",
+    _game_path_music = "Game/Resources/Music/",
 
     insts = {},
     cache = {}
@@ -36,7 +36,7 @@ end
 
 --- Resolve a sound/music name to a real path, preferring the Game copy.
 --- Names that are already "rooted" (leading "/", or already carrying a leading
---- prefix such as "Resources/Sounds/" or "Scripts/Game/.../") keep working as
+--- prefix such as "Resources/Sounds/" or "Game/.../") keep working as
 --- before, so callers like the Typers ("/Voices/foo.wav") are unaffected.
 ---@param kind "sound"|"music"
 ---@param name string

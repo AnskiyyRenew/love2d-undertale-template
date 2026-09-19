@@ -42,7 +42,10 @@ else
 end
 Gamejolt = ImportFile("GamejoltAPI")
 Discord = ImportFile("DiscordRPC")
-require("conf_pure")
+-- Configuration: root conf_pure.lua (engine defaults) then Game/conf_pure.lua
+-- (game overrides). Re-run with F2; a broken Game copy rolls back to defaults.
+Conf = ImportFile("Engine.GameConf")
+Conf.Load()
 ImportFile("Engine.2_0")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
@@ -68,6 +71,12 @@ local _deadzone = Global.GetVariable("ControllerDeadzone")
 if (_deadzone ~= nil) then
     Controller.SetDeadzone(_deadzone)
 end
+
+-- Game-side hacks (Game/Hacks/). Loaded after every engine library but before
+-- the first scene, so a hack can replace or patch engine modules (battle UI,
+-- battle flow, sprites, ...) without editing anything under Scripts/.
+Hack = ImportFile("Engine.HackLoader")
+Hack.Load()
 
 local frameTime = 1 / Global.GetVariable("FPS")
 local startTime = SE.timer.getTime()
@@ -247,7 +256,7 @@ function love.draw()
     -- uses the same scale as the canvas and positions its opening exactly on
     -- the canvas rectangle, so the frame always hugs the game screen. Enable /
     -- pick image / fade / re-align via the Border.* APIs.
-    Border.Draw()
+    --Border.Draw()
 
     SE.graphics.push()
     SE.graphics.translate(DrawX, DrawY)
@@ -286,8 +295,10 @@ function love.keypressed(key, scancode, isrepeat)
         return
     elseif (key == "f2") then
         Localize.reload()
-        package.loaded["Scripts.Libraries.Engine.PureConf"] = nil
-        require("conf_pure")
+        -- Re-execute BOTH config scripts (root defaults + Game overrides).
+        -- The old `require("conf_pure")` was served from the require cache and
+        -- therefore never actually reloaded anything on F2.
+        if (Conf and Conf.Load) then Conf.Load() end
         Scenes.switchTo(Global.GetVariable("F2Room"))
     end
     if (not _RELEASED) then
@@ -296,7 +307,16 @@ function love.keypressed(key, scancode, isrepeat)
             return
         elseif (key == "f5") then
             Localize.reload()
+            -- Undo the hacks BEFORE the modules they patched are thrown away:
+            -- ClearModuleTree drops Scripts.Libraries, so the patched tables go
+            -- with them. Load() right after re-applies everything onto whatever
+            -- the reloaded modules hand us, instead of stacking wrappers.
+            if (Hack and Hack.Unapply) then Hack.Unapply() end
             ClearModuleTree("Scripts.Libraries")
+            -- Game content is a second root: without this, Game/Souls,
+            -- Game/Encounter, Game/Attacks ... stay cached and a reload keeps
+            -- their module-level state instead of re-executing the files.
+            ClearGameTree()
             local sceneName = Scenes.name_current
             -- Clear whichever copy was actually loaded (Game area or root);
             -- Scenes.switchTo re-resolves the scene right after this.
@@ -306,6 +326,7 @@ function love.keypressed(key, scancode, isrepeat)
                 package.loaded["Scripts.Scenes." .. sceneName] = nil
             end
             Scenes.switchTo(sceneName)
+            if (Hack and Hack.Load) then Hack.Load() end
             return
         elseif (key == "f6") then
             print("=== Debug Info ===")
@@ -317,6 +338,7 @@ function love.keypressed(key, scancode, isrepeat)
             print("Input: VK=" .. tostring(_dev.virtualKeyboard) .. " Gamepads=" .. tostring(_dev.joystickCount))
             print("Sprites:", #Sprites.images)
             print("Layers objects:", Layers.count())
+            if (Hack and Hack.Report) then Hack.Report() end
             print("==================")
             return
         end

@@ -247,6 +247,18 @@ function bones.New2D(whose, length, position, angle, velocity)
     end
     bone:SetMode("normal")
 
+    function bone:SetColor(color)
+        if (self._head) then
+            self._head.color = (color or Global.GetVariable("MainColor"))
+        end
+        if (self._body) then
+            self._body.color = (color or Global.GetVariable("MainColor"))
+        end
+        if (self._tail) then
+            self._tail.color = (color or Global.GetVariable("MainColor"))
+        end
+    end
+
     ---Idempotent: a wall and bones.Clear() may both try to destroy the same bone.
     function bone:Destroy()
         if (self._destroyed) then

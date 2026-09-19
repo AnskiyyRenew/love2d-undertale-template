@@ -1,27 +1,30 @@
 --[[
     se_12_compat.lua
-    LOVE 11.x -> 12.x 兼容补丁
-    数据来源: https://github.com/love2d/love/blob/main/changes.txt (12.0 段落)
+    LOVE 11.x -> 12.x compatibility patch
+    Source: https://github.com/love2d/love/blob/main/changes.txt (12.0 section)
 
-    用法:
+    Usage:
         require("12_0").apply()
-    在 main.lua 的最顶部、任何 love.xxx 调用之前执行。
+    Run it at the very top of main.lua, before any love.xxx call.
 
-    注意: 12.0 还在 nightly 阶段，以此文件为准但建议你跑一遍游戏后对照
-    实际报错信息修正，因为 nightly build 之间可能还有细节变动。
+    NOTE: 12.0 is still at the nightly stage. Use this file as the baseline,
+    but run the game once and fix it against the actual error messages -
+    details may still shift between nightly builds.
 ]]
 
 local compat = {}
 
 -- ============================================================
--- 第一类: love.<module>.<func> 这种模块级函数改名/替换
--- 在 11.x 里调用旧名字, 12.0 里旧名字已被彻底删除 (Removed)
--- 这些是 1:1 直接转发，可以安全自动 patch
+-- Category 1: renamed/replaced module-level functions of the form
+-- love.<module>.<func>
+-- Called by their old names in 11.x; in 12.0 the old names have been
+-- removed entirely (Removed)
+-- These are plain 1:1 forwards and can be patched automatically and safely
 -- ============================================================
 compat.moduleFunctionAliases = {
     -- old_full_name = new_full_name
     ["love.audio.getSourceCount"]      = "love.audio.getActiveSourceCount",
-    ["love.filesystem.isDirectory"]    = nil, -- 特殊: 改用 getInfo, 见下方 specialCases
+    ["love.filesystem.isDirectory"]    = nil, -- Special: uses getInfo, see specialCases below
     ["love.filesystem.isFile"]         = nil,
     ["love.filesystem.isSymlink"]      = nil,
     ["love.filesystem.getLastModified"]= nil,
@@ -31,16 +34,18 @@ compat.moduleFunctionAliases = {
 }
 
 -- ============================================================
--- 第二类: 还在用但已 Deprecated 的模块级函数 (12.0 里旧名字还能跑,
--- 但官方建议换新名字; 如果你的代码用的是老API, 这里做兼容转发)
+-- Category 2: module-level functions that still work but are deprecated
+-- (in 12.0 the old names still run, but the official recommendation is to
+-- use the new names; if your code uses the old API, these shims forward it)
 -- ============================================================
 compat.deprecatedModuleFunctions = {
     ["love.filesystem.newFile"] = function(...)
-        -- newFile 被 openFile 取代，但参数/返回值有差异，需要你确认具体用法后再放开
+        -- newFile is superseded by openFile, but the arguments and return
+        -- values differ - confirm the exact usage before enabling this one
         return love.filesystem.openFile(...)
     end,
     ["love.math.noise"] = function(...)
-        -- 旧 noise() 等价于 perlinNoise()
+        -- the old noise() is equivalent to perlinNoise()
         return love.math.perlinNoise(...)
     end,
     ["love.graphics.setNewFont"] = function(...)
@@ -54,8 +59,8 @@ compat.deprecatedModuleFunctions = {
 }
 
 -- ============================================================
--- 第三类: love.filesystem 的 isXxx 系列，全部改用 getInfo 判断
--- 这几个不是简单转发，需要包一层逻辑
+-- Category 3: the love.filesystem isXxx family, all rewritten to test with
+-- getInfo. These are not simple forwards, they need a wrapper around them.
 -- ============================================================
 compat.specialCases = {
     ["love.filesystem.isDirectory"] = function(path)
@@ -81,15 +86,17 @@ compat.specialCases = {
 }
 
 -- ============================================================
--- 第四类: 对象方法 (Type:method) 改名。这些无法直接挂在 love 表上，
--- 必须 hook 到具体类型的 metatable 上。LOVE 对象的 metatable 可以
--- 通过 debug.getmetatable(obj) 拿到，同一类型的所有实例共享同一个
--- metatable，所以只需要 patch 一次。
--- 下面提供一个通用 helper，你在创建对象后调用一次即可（或者 hook
--- 构造函数自动处理，见 compat.hookConstructors）
+-- Category 4: object method (Type:method) renames. These cannot be attached
+-- to the love table directly, they must be hooked into the metatable of the
+-- concrete type. A LOVE object's metatable can be fetched with
+-- debug.getmetatable(obj); every instance of the same type shares one
+-- metatable, so patching it once is enough.
+-- A generic helper is provided below - call it once after creating an object
+-- (or hook the constructors to handle it automatically, see
+-- compat.hookConstructors)
 -- ============================================================
 compat.methodAliases = {
-    -- 这些是 12.0 中彻底删除的旧方法名 (Removed)
+    -- These are old method names removed entirely in 12.0 (Removed)
     Source  = { getChannels = "getChannelCount" },
     Decoder = { getChannels = "getChannelCount" },
     ParticleSystem = {
@@ -110,7 +117,8 @@ compat.methodAliases = {
     RevoluteJoint  = { hasLimitsEnabled = "areLimitsEnabled" },
 }
 
--- 给单个对象实例打补丁（在 metatable 层面，所以只需对每种类型调用一次）
+-- Patch a single object instance (at the metatable level, so calling it once
+-- per type is enough)
 local patchedTypes = {}
 function compat.patchObjectMethods(obj)
     if not obj or type(obj) ~= "userdata" or not obj.type then return obj end
@@ -130,15 +138,17 @@ function compat.patchObjectMethods(obj)
     return obj
 end
 
--- 自动 hook 常见构造函数，创建对象后立刻打补丁
+-- Automatically hook the common constructors so an object is patched right
+-- after it is created
 function compat.hookConstructors()
     local hooks = {
         { love.audio,    "newSource" },
         { love.physics,  "newWorld" },
         { love.physics,  "newBody" },
         { love.graphics, "newParticleSystem" },
-        -- Joint 是通过 World:newXxxJoint 创建的，World 也已被上面 hook，
-        -- 但如果你直接用 love.physics.newXxxJoint 也要在这里加
+        -- Joints are created through World:newXxxJoint and World is already
+        -- hooked above, but if you call love.physics.newXxxJoint directly you
+        -- need to add it here as well
     }
     for _, h in ipairs(hooks) do
         local mod, fname = h[1], h[2]
@@ -156,10 +166,10 @@ function compat.hookConstructors()
 end
 
 -- ============================================================
--- 总入口
+-- Main entry point
 -- ============================================================
 function compat.apply()
-    -- 第一类: 简单 1:1 转发
+    -- Category 1: simple 1:1 forwards
     for oldFull, newFull in pairs(compat.moduleFunctionAliases) do
         if newFull then
             local modName, fnName = oldFull:match("^love%.([%w_]+)%.([%w_]+)$")
@@ -171,7 +181,7 @@ function compat.apply()
         end
     end
 
-    -- 第三类: 特殊逻辑 (getInfo 系列)
+    -- Category 3: special logic (the getInfo family)
     for oldFull, impl in pairs(compat.specialCases) do
         local modName, fnName = oldFull:match("^love%.([%w_]+)%.([%w_]+)$")
         if modName and love[modName] and love[modName][fnName] == nil then
@@ -179,7 +189,7 @@ function compat.apply()
         end
     end
 
-    -- 第二类: deprecated 但还能转发的
+    -- Category 2: deprecated but still forwardable
     for oldFull, impl in pairs(compat.deprecatedModuleFunctions) do
         local modName, fnName = oldFull:match("^love%.([%w_]+)%.([%w_]+)$")
         if modName and love[modName] and love[modName][fnName] == nil then
@@ -187,7 +197,7 @@ function compat.apply()
         end
     end
 
-    -- 第四类: 对象方法，hook 构造函数
+    -- Category 4: object methods, hook the constructors
     compat.hookConstructors()
 end
 

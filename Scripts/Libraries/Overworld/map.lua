@@ -486,7 +486,7 @@ function map.Init(lua_file)
     world.Init()
 
     map.current = lua_file
-    -- Game area first: a copy at Scripts/Game/<path> overrides the built-in map.
+    -- Game area first: a copy at Game/<path> overrides the built-in map.
     if (Overworld and Overworld.ResolveMapPath) then
         map.current = Overworld.ResolveMapPath(lua_file)
     end

@@ -7,7 +7,8 @@
         "undefined-doc-name",
         "need-check-nil",
         "param-type-mismatch",
-        "missing-fields"
+        "missing-fields",
+        "redundant-parameter"
     ],
     "Lua.completion.autoRequire": false,
     "Lua.runtime.special": {

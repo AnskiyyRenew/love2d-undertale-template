@@ -3,10 +3,10 @@ local dkjson = ImportFile("Utils.dkjson")
 localize.currentLanguage = nil
 
 -- Localization lookup roots, tried in order. A translation file placed in the
--- Game area (Scripts/Game/Localization/) overrides the engine default
+-- Game area (Game/Localization/) overrides the engine default
 -- (Localization/); when no Game copy exists the root file is used as before.
 local ROOT_LOCALIZATION = "Localization/"
-local GAME_LOCALIZATION = "Scripts/Game/Localization/"
+local GAME_LOCALIZATION = "Game/Localization/"
 
 --- Read a localization JSON file, preferring the Game copy.
 ---@param language string Language code, e.g. "en" or "zh_CN".

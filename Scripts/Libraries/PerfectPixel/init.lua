@@ -2,7 +2,7 @@ local lib_path = package.searchpath(....."/cpp", package.cpath)
 --lib_path = nil
 if lib_path == nil then
     --error("Cannot find dynamic link library for your os.")
-    -- 警告并启用纯 Lua 版本
+    -- Warn and fall back to the pure Lua version
     print("[Warning]rectangulation: Cannot find dynamic link library for your os. Using pure Lua version.")
     return require(.....".pure")
 end
@@ -47,7 +47,7 @@ function re.rectangulate_grid(grid)
             rect.h,
         })
     end
-    -- 释放 C 层内存
+    -- Free the C-side memory
     lib.free_rect_list(c_rects)
     return lua_rects
 end
@@ -64,7 +64,7 @@ function re.rectangulate(imageData)
             rect.h,
         })
     end
-    -- 释放 * 2
+    -- Free * 2
     lib.free_rect_list(c_rects)
     return lua_rects
 end

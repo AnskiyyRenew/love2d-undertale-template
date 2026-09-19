@@ -142,6 +142,10 @@ function ui.SetHPBarColor(color)
     bar_hp.color = color
 end
 
+function ui.SetMaxHPBarColor(color)
+    bar_maxhp.color = color
+end
+
 function ui.ToggleKR(bool)
     kr_configuration = (bool or not kr_configuration)
 end
@@ -183,6 +187,7 @@ function ui.newBounceText(text, pos, color)
         end
     }
     t.color = (color or {1, 0, 0})
+    t.outline = {0, 0, 0, 1, 2}
     t:SetAlign("center")
     t:Rebuild()
     t._speed = -3
@@ -213,7 +218,7 @@ function ui.newMonsterBar(pos, start, target)
     table.insert(ui._notbtexts, _hp)
 end
 
-function ui.newMissText(text, pos)
+function ui.newMissText(text, pos, color)
     pos[2] = pos[2] - 60
     local t = Typers.InstText.New(text, pos, "TopAll")
     t.bondfont = {
@@ -245,7 +250,9 @@ function ui.newMissText(text, pos)
             t.scale = 2
         end
     }
+    t.color = (color or {1, 1, 1})
     t:SetAlign("center")
+    t.outline = {0, 0, 0, 1, 2}
     t:Rebuild()
     t._speed = -3
     t._gravity = 0.3

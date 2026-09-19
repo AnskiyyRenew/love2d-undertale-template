@@ -212,6 +212,7 @@ function buttons.SetSprites(sprs)
     end
 
     buttons.sprites = sprs
+    buttons.ResetButtons()
 end
 
 function buttons.SetAnimations(anims)

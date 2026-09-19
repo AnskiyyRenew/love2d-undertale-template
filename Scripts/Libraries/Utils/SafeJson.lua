@@ -38,8 +38,8 @@ safejson.config = {
         ["javascript:"] = true,
         ["os.execute"] = true,
         ["io.popen"] = true,
-        ["\x00"] = true,    -- 空字符
-        ["\\u0000"] = true  -- Unicode 空字符
+        ["\x00"] = true,    -- Null character
+        ["\\u0000"] = true  -- Unicode null character
     },
     max_depth = 100,
     max_items = 12000,
@@ -48,13 +48,13 @@ safejson.config = {
 }
 
 local error_types = {
-    MALFORMED = 1,      -- JSON 格式错误
-    UNSAFE_KEY = 2,     -- 危险键名
-    CIRCULAR = 3,       -- 循环引用
-    OVER_LIMIT = 4      -- 超出限制
+    MALFORMED = 1,      -- Malformed JSON
+    UNSAFE_KEY = 2,     -- Dangerous key name
+    CIRCULAR = 3,       -- Circular reference
+    OVER_LIMIT = 4      -- Over the limit
 }
 
--- 在precheck_json和check_object_safety中增加Unicode规范化
+-- Add Unicode normalization to precheck_json and check_object_safety
 local function normalize_unicode(str)
     return str:gsub("\\u([%da-fA-F][%da-fA-F][%da-fA-F][%da-fA-F])", function(u)
         return utf8.char(tonumber(u, 16)):lower()
@@ -62,7 +62,7 @@ local function normalize_unicode(str)
 end
 
 local function precheck_json(str)
-    if str:find("\\u[0-9a-fA-F][0-9a-fA-F]00") then  -- 检测可能的空字符变种
+    if str:find("\\u[0-9a-fA-F][0-9a-fA-F]00") then  -- Detect possible null character variants
         return false, "Suspicious Unicode escape sequence"
     end
     if str:find("\\x[0-9a-fA-F][0-9a-fA-F]") and str:find("\\u[0-9a-fA-F]") then

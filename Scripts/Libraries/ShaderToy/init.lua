@@ -168,7 +168,7 @@ function shadertoy.project:draw()
         SE.graphics.setCanvas(writeCanvas)
         SE.graphics.clear()
 
-        -- 设置前序通道纹理
+        -- Set up the textures of the preceding passes
         for j, prev in ipairs(self.passes) do
             if j < i then
                 pass.shaderObj.shader:send("iChannel" .. (j - 1),

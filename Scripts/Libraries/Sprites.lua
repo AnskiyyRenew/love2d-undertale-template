@@ -92,10 +92,10 @@ local function loadImageSafe(path)
 end
 
 -- Game-first sprite roots. Sprites are looked up inside the Game area
--- (Scripts/Game/Resources/Sprites/) first and silently fall back to the main
+-- (Game/Resources/Sprites/) first and silently fall back to the main
 -- Resources/Sprites/ tree when no Game copy exists.
 local SPRITE_ROOT = "Resources/Sprites/"
-local GAME_SPRITE_ROOT = "Scripts/Game/Resources/Sprites/"
+local GAME_SPRITE_ROOT = "Game/Resources/Sprites/"
 
 --- Test whether a file exists on the LÖVE filesystem. Tolerates both the
 --- LÖVE 11 (table) and LÖVE 12 (direct value) shapes of getInfo.
@@ -118,7 +118,7 @@ end
 --- Resolve a sprite path to the file that should actually be loaded.
 --- Order of preference:
 ---   1. an absolute ("/...") or already-rooted Game path -> used as-is;
----   2. the same file inside Scripts/Game/Resources/Sprites/;
+---   2. the same file inside Game/Resources/Sprites/;
 ---   3. the main Resources/Sprites/ copy.
 ---@param path string
 ---@return string
@@ -595,7 +595,7 @@ local sprite_methods = {}
             end
         end
 
-        -- Draw 4-directional outline (up/down/left/right) behind the sprite
+        -- Draw 8-directional outline behind the sprite
         if self.outline and not self._four_point.enabled then
             self:_drawOutline(ox, oy)
         end
@@ -669,8 +669,10 @@ local sprite_methods = {}
         end
     end
 
-    --- Draw a 4-directional outline (up/down/left/right) behind the sprite.
-    --- Only the four cardinal directions are drawn (no diagonal corners).
+    --- Draw an 8-directional outline behind the sprite.
+    --- The 8 offsets are the 4 cardinal directions plus the 4 diagonal
+    --- corners, each shifted by exactly t pixels (square offsets, NOT
+    --- sqrt(2)-scaled), so the result is a normal 8-direction rectangle ring.
     --- The outline is unshaded and always rendered with nearest-neighbor
     --- filtering so it stays crisp regardless of rotation/pixel_smooth mode.
     function sprite_methods:_drawOutline(ox, oy)
@@ -687,10 +689,14 @@ local sprite_methods = {}
         SE.graphics.setColor(outline[1] or 0, outline[2] or 0, outline[3] or 0, a)
 
         local rot = math.rad(self.rotation)
-        SE.graphics.draw(self.image, self.x - t, self.y, rot, self.xscale, self.yscale, ox, oy)
-        SE.graphics.draw(self.image, self.x + t, self.y, rot, self.xscale, self.yscale, ox, oy)
-        SE.graphics.draw(self.image, self.x, self.y - t, rot, self.xscale, self.yscale, ox, oy)
-        SE.graphics.draw(self.image, self.x, self.y + t, rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x - t, self.y,      rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x + t, self.y,      rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x,      self.y - t, rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x,      self.y + t, rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x - t, self.y - t, rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x - t, self.y + t, rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x + t, self.y - t, rot, self.xscale, self.yscale, ox, oy)
+        SE.graphics.draw(self.image, self.x + t, self.y + t, rot, self.xscale, self.yscale, ox, oy)
 
         SE.graphics.setColor(1, 1, 1, 1)
     end
@@ -1015,7 +1021,7 @@ local sprite_methods = {}
     function sprite_methods:Set(p)
         -- Store the fully resolved path: callers (and GetAnimationPath) can then
         -- compare against an unambiguous "Resources/Sprites/..." or
-        -- "Scripts/Game/Resources/Sprites/..." string, and later calls to Set
+        -- "Game/Resources/Sprites/..." string, and later calls to Set
         -- with the already-resolved value behave identically.
         local resolved_p = normalizeSpritePath(p) or p
         self.path = resolved_p
@@ -1056,7 +1062,7 @@ local sprite_methods = {}
 
     --- Collect the file that is actually being displayed for this sprite, used
     --- for animation bookkeeping and by external lookup helpers.
-    ---@return string|nil The resolved path ("Resources/Sprites/..." or "Scripts/Game/Resources/Sprites/...").
+    ---@return string|nil The resolved path ("Resources/Sprites/..." or "Game/Resources/Sprites/...").
     function sprite_methods:GetImagePath()
         return self.path
     end
@@ -1301,7 +1307,7 @@ local sprite_methods = {}
     end
 
 ---@param path string Sprite path, relative to Resources/Sprites/ (no prefix).
----                     A matching copy inside Scripts/Game/Resources/Sprites/
+---                     A matching copy inside Game/Resources/Sprites/
 ---                     is used instead whenever one exists.
 ---@param layer number|string|nil Layer to place the sprite on.
 ---@return Sprite
@@ -1399,8 +1405,9 @@ function sprites.CreateSprite(path, layer)
     sprite.color = {1, 1, 1}
     sprite.alpha = 1
     sprite.visible = true
-    -- Optional outline: {r, g, b, a, thickness} drawn from the four
-    -- cardinal directions (up/down/left/right). Set to nil to remove.
+    -- Optional outline: {r, g, b, a, thickness} drawn as 8 shifted copies
+    -- (cardinal + diagonal directions, square t-pixel offsets).
+    -- Set to nil to remove.
     sprite.outline = nil
 
     sprite.parent = nil

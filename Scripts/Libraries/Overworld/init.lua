@@ -10,13 +10,13 @@ Layers.new_layer("DEBUG", 200)
 -- ---------------------------------------------------------------------------
 -- Game-first resource resolution
 --
--- Scripts/Game/ is the per-game content root. Game data (Logics, maps, waves)
+-- Game/ is the per-game content root. Game data (Logics, maps, waves)
 -- lives there and the engine tree is only a fallback / default.
 -- ---------------------------------------------------------------------------
 
 --- Describe a module name as a project-relative file path, for filesystem probes.
----@param module_name string e.g. "Scripts.Game.Logics.items"
----@return string e.g. "Scripts/Game/Logics/items.lua"
+---@param module_name string e.g. "Game.Logics.items"
+---@return string e.g. "Game/Logics/items.lua"
 local function owModulePathOf(module_name)
     return (module_name:gsub("%.", "/")) .. ".lua"
 end
@@ -82,7 +82,7 @@ local function owRequireGameFirst(roots, name)
     return nil, nil
 end
 
-DATA = DATA or require("Scripts.Game.Logics")
+DATA = DATA or require("Game.Logics")
 FLAG = DATA.flags
 CHEST = DATA.chests
 
@@ -90,12 +90,12 @@ CHEST = DATA.chests
 -- Note: require is passed the resolved module name, and the Game copy wins even
 -- when a stale `DATA` was carried over from a previous scene.
 ITEMS = ITEMS or owRequireGameFirst({
-    "Scripts.Game.Logics.",
+    "Game.Logics.",
     "Scripts.Logics."
 }, "items")
 
 if (not ITEMS) then
-    print("[Overworld] WARNING: items table not found under Scripts.Game.Logics or Scripts.Logics.")
+    print("[Overworld] WARNING: items table not found under Game.Logics or Scripts.Logics.")
 end
 
 DATA.room = Scenes.name_current
@@ -151,7 +151,7 @@ Overworld = overworld
 Map = overworld.map
 World = overworld.map.world
 Char = overworld.map.char
--- Drive the Frisk Dance ("屠杀之舞") toggle through the dedicated
+-- Drive the Frisk Dance ("Dance of Genocide") toggle through the dedicated
 -- overworld._friskdance variable (read from the "EnableFriskDance" flag).
 Char.friskdance = overworld._friskdance
 Stat = overworld.stat
@@ -324,7 +324,7 @@ end
 ---
 ---A scene asks for a map with a project-relative path such as
 ---"Maps/main_scene/main_0.lua". A Game-side copy at
----"Scripts/Game/Maps/main_scene/main_0.lua" takes priority when it exists, so a
+---"Game/Maps/main_scene/main_0.lua" takes priority when it exists, so a
 ---game can override any built-in map without touching the scene script.
 ---
 ---NOTE: STI resolves a map's tile images relative to the map file, so a Game-side
@@ -339,9 +339,9 @@ function overworld.ResolveMapPath(lua_file)
 
     -- Absolute paths and paths already inside the Game area are left alone.
     if (lua_file:sub(1, 1) == "/") then return lua_file end
-    if (lua_file:sub(1, #"Scripts/Game/") == "Scripts/Game/") then return lua_file end
+    if (lua_file:sub(1, #"Game/") == "Game/") then return lua_file end
 
-    local game_path = "Scripts/Game/" .. lua_file
+    local game_path = "Game/" .. lua_file
     if (owFileExists(game_path)) then
         return game_path
     end

@@ -11,9 +11,136 @@ local function copy_soul(soul)
     return new
 end
 
+-- Soul resolution (Game area first, engine second):
+--   Game.Souls.<name>                            -> Game/Souls/<name>.lua
+--   Scripts.Libraries.Battle.Player.Souls.<name> -> (engine fallback)
+--
+-- `Scripts.Libraries.*` is normally exempt from the Game override mechanism, but
+-- souls are per-game content, so they get an explicit Game root here.
+--
+-- Existence is probed on the FILESYSTEM first rather than inferred from a failed
+-- require. `pcall(require, ...)` cannot tell "the module is not there" apart from
+-- "the module is there but its top-level code threw", and treating the second as
+-- the first would silently cut the fallback chain short instead of surfacing a
+-- genuine error in a module that really was found.
+local SOUL_ROOTS = {"Game.Souls.", path .. "Player.Souls."}
+
+--- Describe a module name as a project-relative file path, for filesystem probes.
+---@param module_name string e.g. "Game.Souls.red"
+---@return string e.g. "Game/Souls/red.lua"
+local function soulModulePathOf(module_name)
+    return (module_name:gsub("%.", "/")) .. ".lua"
+end
+
+--- Test whether a module's file actually exists on disk.
+--- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
+--- so the result is only trusted as a positive when it is truthy.
+---@param module_name string
+---@return boolean
+local function soulModuleExists(module_name)
+    local file_path = soulModulePathOf(module_name)
+
+    local ok, info = pcall(function()
+        return SE.filesystem.getInfo and SE.filesystem.getInfo(file_path)
+    end)
+    if (ok and info) then return true end
+
+    -- Fallback probe: a real, readable file counts as existing.
+    local readable, content = pcall(love.filesystem.read, file_path, 1)
+    return (readable and content ~= nil)
+end
+
+-- The soul resolved by the last requireSoul() call.
+--
+-- Player.action IS the soul module table (SetSoul does not copy it), so anything
+-- a soul writes on itself stays in package.loaded and would be handed out again
+-- to the next battle that uses the same soul - the same "stale state on a second
+-- entry" problem scenes had. Dropping the old module before loading a new one is
+-- what SceneManager does in doSwitch()/unloadSceneModule().
+---@type string|nil
+local current_soul_id = nil
+
+--- Drop a soul module from package.loaded so the next require re-executes the
+--- file from disk instead of handing back the cached table.
+---
+--- Cleared under BOTH roots, same as SceneManager.unloadSceneModule(): clearing
+--- only one root would leave a stale copy alive whenever the file lives in the
+--- other one (a soul can move between Game/Souls and the engine directory).
+---@param id string|nil Soul name; nil and "" are no-ops.
+local function unloadSoulModule(id)
+    if (not id) or (id == "") then return end
+    for _, root in ipairs(SOUL_ROOTS) do
+        package.loaded[root .. id] = nil
+    end
+end
+
+--- Require a soul module, Game area first.
+---
+--- A missing Game copy never prevents the engine copy from being tried, and a
+--- Game copy that exists but throws is always reported - even when the engine
+--- copy then loads fine, because the override is broken and the author needs to
+--- know. Errors keep their original message (level 0 adds no location prefix).
+---
+--- Every call hands back a FRESHLY EXECUTED module: the soul that was in use
+--- before this one is dropped from package.loaded, and so is the one about to be
+--- loaded. Without the second one, switching A -> B -> A would be clean but any
+--- module cached by some other path would still be served stale.
+---@param id string Soul name (e.g. "red", "orange", "blue").
+---@return table The soul module.
+local function requireSoul(id)
+    if (not id) or (id == "") then
+        error("[Player] Invalid soul name.", 0)
+    end
+
+    -- Unload the previous soul, then the one we are about to load. Mirrors
+    -- SceneManager: unloadSceneModule(previous) + unloadSceneModule(next).
+    unloadSoulModule(current_soul_id)
+    unloadSoulModule(id)
+    current_soul_id = id
+
+    local found_module = nil
+    local first_error = nil
+    local first_error_module = nil
+
+    for _, root in ipairs(SOUL_ROOTS) do
+        local module_name = root .. id
+
+        if (soulModuleExists(module_name)) then
+            found_module = found_module or module_name
+
+            local ok, loaded = pcall(require, module_name)
+            if (ok and loaded) then
+                if (first_error) then
+                    print("[Player] WARNING: '" .. tostring(first_error_module) ..
+                        "' exists but failed to load; using " .. module_name .. " instead.")
+                    print("[Player]   " .. tostring(first_error))
+                elseif (root ~= SOUL_ROOTS[1]) then
+                    print("[Player] WARNING: soul '" .. id .. "' not found in " ..
+                        SOUL_ROOTS[1] .. " (fell back to " .. module_name .. ").")
+                end
+                return loaded
+            end
+
+            if (not first_error) then
+                first_error = loaded
+                first_error_module = module_name
+            end
+        end
+    end
+
+    if (found_module) then
+        -- Every candidate was found, but none of them loaded: re-raise the real
+        -- error instead of pretending the soul does not exist.
+        error(first_error, 0)
+    end
+
+    error("[Player] soul '" .. tostring(id) .. "' not found (looked in " ..
+        SOUL_ROOTS[1] .. ", " .. SOUL_ROOTS[2] .. ").", 0)
+end
+
 local Player = {
     _spr_default = "Soul Library Sprites/spr_default_heart.png",
-    action = require(path .. "Player.Souls.red"),
+    action = requireSoul("red"),
 
     canMove = true,
     souls = {},
@@ -54,7 +181,7 @@ function Player.SetSoul(id, args, use_sound)
         _id = "blue"
         spr.color = {0, 0, 1}
     end
-    Player.action = require(path .. "Player.Souls." .. _id)
+    Player.action = requireSoul(_id)
     Player.action.sprite = Player.sprite
     Player.action.can_move = Player.canMove
     Player.soul = _id
@@ -108,7 +235,7 @@ function Player.NewSoul(id, args, use_sound)
     sprite._hitbox = {4, 4}
 
     -- Load the soul module and create a unique instance for this soul
-    local module = require(path .. "Player.Souls." .. _id)
+    local module = requireSoul(_id)
     local soul = copy_soul(module)
     soul.sprite = sprite
     soul.can_move = Player.canMove

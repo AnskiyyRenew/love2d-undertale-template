@@ -1,8 +1,8 @@
 --  HOW TO USE
---    1. Copy this file and rename it, e.g. Scripts/Game/Animations/Sol.lua
+--    1. Copy this file and rename it, e.g. Game/Animations/Sol.lua
 --    2. Replace the placeholders marked with "-- TODO" below.
 --    3. Reference it from an encounter:
---       animation = require("Scripts.Game.Animations.MyMonster")
+--       animation = require("Game.Animations.MyMonster")
 --    4. Instantiate once per enemy in the scene:
 --       Game:InitAnimation(i, {x, y})
 --

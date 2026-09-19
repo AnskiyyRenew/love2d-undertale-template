@@ -5,13 +5,13 @@ How to use:
 
 local hp = 5
 local text = Typers.SText(function (self)
-    self:addText("你好")
+    self:addText("Hi there")
     self:nextSentence()
 
     if (hp) then
-        self:addText("现在血量有" .. hp .. "点。")
+        self:addText("You have " .. hp .. " HP left.")
     else
-        self:addText("我是盲人看不见血量。")
+        self:addText("I'm blind, I can't see the HP.")
     end
 end, {80, 60}, 0, {200, 100})
 
@@ -27,7 +27,9 @@ Builder API (available via `self` inside the builder function):
   self:setSpeed(interval)       Set typing interval (seconds per character).
   self:setColor(r, g, b)        Set text color (values 0-1 or 0-255, auto-detected).
   self:setColorHEX(hex)         Set text color via hex string (e.g. "ff0000").
-  self:setOutline(r,g,b,a,w)    Set outline color (r,g,b), alpha (a), and width (w).
+  self:setOutline(r,g,b,a,w)    Set outline color (r,g,b), alpha (a), and thickness (w).
+                                Drawn as 8 shifted copies (8-directional, square
+                                t-pixel offsets) behind each letter.
     self:setVoices(voices)        Set typing voice file(s) under Resources/Sounds/Voices.
   self:addSkipText(text)        Add text that types instantly during skip mode.
   self:setPortrait(frames, interval, mode)
@@ -834,13 +836,20 @@ function typers.New(fn, position, layer, size, mode)
             local main_y = typer.y + letter.y + eff_y
             SE.graphics.setFont(font)
             if (letter.outline) then
-                SE.graphics.setColor(letter.outline[1], letter.outline[2], letter.outline[3], letter.outline[4])
-                SE.graphics.setLineWidth(letter.outline[5])
-                for j = -1, 1, 2 do
-                    for k = -1, 1, 2 do
-                        SE.graphics.draw(letter.text_obj, main_x + j, main_y + k, 0, draw_scale, draw_scale)
-                    end
-                end
+                local ol = letter.outline
+                local t = ol[5] or 1
+                local s = draw_scale
+                SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
+                -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
+                -- square t-pixel offsets). setLineWidth has no effect on draw.
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
             end
             SE.graphics.setColor(letter.color[1], letter.color[2], letter.color[3], letter.alpha)
             SE.graphics.draw(letter.text_obj, main_x, main_y, 0, draw_scale, draw_scale)

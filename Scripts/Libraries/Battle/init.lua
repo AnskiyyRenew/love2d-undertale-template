@@ -4,12 +4,13 @@
 -- Game-first module resolution
 --
 -- Encounter scripts, waves and attack patterns are all per-game content, so the
--- Game area (Scripts/Game/...) wins and the engine directory is the fallback:
+-- Game area (Game/...) wins and the engine directory is the fallback:
 --
---   encounters      Scripts.Game.Encounter.<file>   (Game-only; no root twin)
---   waves           Scripts.Game.Waves.<name>      -> Scripts.Waves.<name>
---   attack patterns Scripts.Libraries.Battle.PlayerAttacks.<name>
---                                                -> kept, see SetAttackPattern
+--   encounters      Game.Encounter.<file>   (Game-only; no root twin)
+--   waves           Game.Waves.<name>      -> Scripts.Waves.<name>
+--   attack patterns Game.Attacks.<name>    -> Scripts.Libraries.Battle.PlayerAttacks.<name>
+--   souls           Game.Souls.<name>      -> Scripts.Libraries.Battle.Player.Souls.<name>
+--                                                (resolved in Battle/Player/init.lua)
 --
 -- Existence is probed on the FILESYSTEM first rather than inferred from a failed
 -- require. `pcall(require, ...)` cannot tell "the module is not there" apart from
@@ -17,7 +18,8 @@
 -- the first would silently cut the fallback chain short instead of surfacing a
 -- genuine error in a module that really was found.
 local BATTLE_MODULE_ROOTS = {
-    waves = {"Scripts.Game.Waves.", "Scripts.Waves."}
+    waves = {"Game.Waves.", "Scripts.Waves."},
+    attacks = {"Game.Attacks.", "Scripts.Libraries.Battle.PlayerAttacks."}
 }
 
 --- Describe a module name as a project-relative file path, for filesystem probes.
@@ -126,6 +128,33 @@ local function clearWaveModule(wave_name)
     end
 end
 
+---Load an attack pattern module, Game area first (Game/Attacks/) then engine
+---(Scripts/Libraries.Battle.PlayerAttacks/).
+---NOTE: declared before `local battle = {}` because the default pattern is
+---resolved while that table is being built (Lua `local`s are not hoisted).
+---@param name string e.g. "stick"
+---@return table|nil attack Nil when no root has it or every candidate threw.
+---@return string|nil module_name The module that was found (nil when none).
+local function loadAttackPattern(name)
+    local roots = BATTLE_MODULE_ROOTS.attacks
+    local module_name, loaded, error_message, error_module = requireGameFirst(roots, name)
+
+    if (loaded) then return loaded, module_name end
+
+    if (module_name) then
+        print("[Battle - PlayerAttack] Error in '" .. tostring(error_module) ..
+            "': " .. tostring(error_message))
+    else
+        print("[Battle - PlayerAttack] WARNING: attack pattern '" .. tostring(name) ..
+            "' not found. Searched, in order:")
+        for _, root in ipairs(roots) do
+            print("    " .. root .. name .. "  (" .. battleModulePathOf(root .. name) .. ")")
+        end
+    end
+
+    return nil, module_name
+end
+
 ---Public wrapper so other Battle modules (e.g. UI states) can drop the wave
 ---module without hard-coding which root it came from.
 ---NOTE: defined further down, right after the `battle` table exists - this file
@@ -147,6 +176,13 @@ Layers.new_layer("TopAll", 60)
 Layers.new_layer("TOP", 1000)
 
 local path = (...):match("(.-)[^%.]+$")
+-- The default attack pattern is resolved through the same Game-first chain, so
+-- a game can ship its own Game/Attacks/stick.lua.
+local default_attack, default_attack_module = loadAttackPattern("stick")
+if (not default_attack) then
+    error("[Battle - PlayerAttack] the default attack pattern 'stick' could not be loaded.", 0)
+end
+
 local battle = {
     player = require(path .. "Battle.Player"),
     arenas = require(path .. "Battle.Arenas"),
@@ -159,8 +195,10 @@ local battle = {
     selected_index = 0,
     dialog_texts = nil,
 
-    attack = ImportFile("Battle.PlayerAttacks.stick"),
-    attack_paths = {"Scripts.Libraries.Battle.PlayerAttacks.stick"},
+    attack = default_attack,
+    -- Resolved module names (not bare pattern names) so battle.Clear() can drop
+    -- them from the require cache, whichever root they came from.
+    attack_paths = {default_attack_module},
     wave = "wave",
     _wave = {},
     restoring_arena = false,
@@ -328,14 +366,14 @@ battle.defaultWin = battle.Win
 
 ---Load an encounter script from the Game area.
 ---
----Encounters live under Scripts/Game/Encounter/ (there is no engine-side twin -
+---Encounters live under Game/Encounter/ (there is no engine-side twin -
 ---Scripts/Encounter/ does not exist). The file is probed before requiring so a
 ---missing encounter reports "not found" instead of being confused with an
 ---encounter that exists but throws.
 ---@param file string Encounter name, e.g. "Poseur" (no extension).
 ---@return table|nil The loaded encounter table, or nil on failure.
 function battle.SetGame(file)
-    battle.gameName = "Scripts.Game.Encounter." .. file
+    battle.gameName = "Game.Encounter." .. file
 
     if (not battleModuleExists(battle.gameName)) then
         print("[Battle System] WARNING: encounter '" .. tostring(file) .. "' not found at " ..
@@ -380,44 +418,31 @@ function battle.SetGame(file)
 end
 
 function battle.SetAttackPattern(pattern)
-    local _pattern
-    local module_name = "Scripts.Libraries.Battle.PlayerAttacks." .. tostring(pattern)
-    local _exists = battleModuleExists(module_name)
+    local loaded, module_name = loadAttackPattern(tostring(pattern))
 
-    if (_exists) then
-        local ok, err = pcall(function ()
-            _pattern = ImportFile("Battle.PlayerAttacks." .. pattern)
-        end)
+    if (loaded) then
+        battle.attack = loaded
 
-        if (ok) then
-            battle.attack = _pattern
-
-            local _add = true
-            for _, v in ipairs(battle.attack_paths)
-            do
-                if (pattern == v) then
-                    _add = false
-                end
+        local _add = true
+        for _, v in ipairs(battle.attack_paths)
+        do
+            if (module_name == v) then
+                _add = false
             end
-
-            if (_add) then
-                table.insert(battle.attack_paths, pattern)
-            end
-            return
         end
 
-        print("[Battle - PlayerAttack] Error in '" .. module_name .. "': " .. tostring(err))
-    else
-        print("[Battle - PlayerAttack] WARNING: attack pattern '" .. tostring(pattern) ..
-            "' not found at " .. battleModulePathOf(module_name) .. ".")
+        if (_add) then
+            table.insert(battle.attack_paths, module_name)
+        end
+        return
     end
 
     -- Fall back to the default attack pattern so ACTIONSELECT still works.
     print("[Battle - PlayerAttack] Falling back to the default pattern (stick).")
-    battle.attack = ImportFile("Battle.PlayerAttacks.stick")
+    battle.attack = default_attack
 end
 
----Load a wave script, Game area first (Scripts/Game/Waves/) then engine
+---Load a wave script, Game area first (Game/Waves/) then engine
 ---(Scripts/Waves/). A wave that is missing or broken falls back to the default
 ---"wave" script and warns, so a battle always has *something* to run.
 ---@param wave_name string
@@ -532,11 +557,24 @@ function battle.Clear()
         ClearModuleTree(battle.gameName)
     end
 
-    -- Clear all loaded attack pattern modules (Scripts.Libraries.Battle.PlayerAttacks.*)
+    -- Clear all loaded attack pattern modules. attack_paths holds resolved
+    -- module names, so both roots (Game.Attacks.* and
+    -- Scripts.Libraries.Battle.PlayerAttacks.*) are covered; the tree clear
+    -- below catches any that were never registered.
     for i = #battle.attack_paths, 1, -1
     do
         ClearModuleTree(battle.attack_paths[i])
     end
+    ClearGameTree("Attacks")
+
+    -- Game-area battle content lives under its own root, so clearing only
+    -- "Scripts.Libraries.Battle" would leave these cached: re-entering a battle
+    -- would then hand the new encounter last run's encounter / monster
+    -- animation / soul module, state included.
+    ClearGameTree("Encounter")
+    ClearGameTree("Animations")
+    ClearGameTree("Waves")
+    ClearGameTree("Souls")
 
     if (Battle._wave) then
         Battle._wave._end = false

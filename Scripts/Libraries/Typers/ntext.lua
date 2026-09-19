@@ -31,7 +31,8 @@ Opts table can contain the following fields:
 - size: The font size to use for the text.
 - color: The color to use for the text, in the format {r, g, b}.
 - alpha: The alpha value to use for the text, in the range [0, 1].
-- outline: The outline color to use for the text, and the outline width will be set accordingly. in the format {r, g, b, a, width}.
+- outline: The outline to use for the text, in the format {r, g, b, a, width}.
+  Drawn as 8 shifted copies (8-directional, square t-pixel offsets) behind each letter.
 - scale: The scale to use for the text.
 - voice: The typing voice file under Resources/Sounds/Voices/.
 - voices: A list of typing voice files under Resources/Sounds/Voices; one is selected randomly per character.
@@ -800,13 +801,20 @@ function typers.New(text, position, layer, size, opts, mode)
             local main_y = typer.y + letter.y + eff_y
             SE.graphics.setFont(font)
             if (letter.outline) then
-                SE.graphics.setColor(letter.outline[1], letter.outline[2], letter.outline[3], letter.outline[4])
-                SE.graphics.setLineWidth(letter.outline[5])
-                for j = -1, 1, 2 do
-                    for k = -1, 1, 2 do
-                        SE.graphics.draw(letter.text_obj, main_x + j, main_y + k, 0, letter.scale or 1, letter.scale or 1)
-                    end
-                end
+                local ol = letter.outline
+                local t = ol[5] or 1
+                local s = letter.scale or 1
+                SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
+                -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
+                -- square t-pixel offsets). setLineWidth has no effect on draw.
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
             end
             SE.graphics.setColor(letter.color[1], letter.color[2], letter.color[3], letter.alpha)
             SE.graphics.draw(letter.text_obj, main_x, main_y, 0, letter.scale or 1, letter.scale or 1)

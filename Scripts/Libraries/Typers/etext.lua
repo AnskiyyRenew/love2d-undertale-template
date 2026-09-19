@@ -3,7 +3,7 @@
 
 How to use:
 
-local text = Typers.EText.New("[colorHEX:ff0000][effect:shake, 3]简简单单的文本", {80, 60}, 0, {200, 100})
+local text = Typers.EText.New("[colorHEX:ff0000][effect:shake, 3]Just some simple text", {80, 60}, 0, {200, 100})
 
 
 EText uses inline tags wrapped in [ ] to style text directly, instead of a separate opts table.
@@ -17,8 +17,17 @@ Available tags:
   [font:name]           Switch typing font to name (e.g. determination_mono.ttf).
                         Setting a font directly disables the bondfont feature;
                         bondfont stays off until it is re-set via UseBondFont.
+  [size:x]              Set the font size of all FOLLOWING text to x (number
+                        only, no expressions). Letters already typed keep the
+                        size they were created with, so text on screen never
+                        changes retroactively. Both bondfont entries (ASCII and
+                        non-ASCII) are resized, and unlike [font:] bondfont
+                        stays enabled so per-character scale/spacing still
+                        applies. Survives into later sentences, same as [font:].
   [effect:name, int]    Set typing effect (e.g. shake, 3).
-  [outline:r,g,b,a,w]   Set outline color (r,g,b), alpha (a), and width (w).
+  [outline:r,g,b,a,w]   Set outline color (r,g,b), alpha (a), and thickness (w).
+                        Drawn as 8 shifted copies (8-directional, square
+                        t-pixel offsets) behind each letter.
     [voice:name]           Set the typing voice file under Resources/Sounds/Voices/.
   [portrait:frames|interval|mode]
                         Create a talking portrait. frames = comma-separated image
@@ -26,6 +35,14 @@ Available tags:
                         "looponce" (default; plays once, returns to first frame).
   [portrait:remove]     Remove/hide the portrait.
   [skip]                Mark this sentence for auto-skip (no colon/value needed).
+  [next]                End the sentence the moment it finishes typing and move
+                        on to the next one without waiting for input. Works in
+                        every mode, including "manual": the sentence advances on
+                        its own, the confirm key is not needed (and not waited
+                        for). A bubble belongs to the sentence that showed it, so
+                        [next] clears it together with the text (same as
+                        [hidebubble]); the following sentence has to
+                        [showbubble:] again.
   [func:name]           Call function `name()` from _G (global scope).
   [func:name|a, b, c]   Call function `name(a, b, c)` with arguments separated by commas.
                         Use `|` to separate function name from arguments.
@@ -294,6 +311,13 @@ local function applyTag(typer, tag_name, tag_value)
         -- An explicitly-set font must win over the eng/non-eng bondfont split,
         -- so every following character (ASCII and non-ASCII) uses this font.
         typer.use_bondfont = false
+        return true
+    elseif (tag_name == "size" and tag_value) then
+        -- Font size of all following text. Letters already typed keep their own
+        -- font object, so this never resizes what is on screen already.
+        typer:SetFontSize(tag_value)
+        -- NOTE: unlike [font:], this keeps bondfont enabled - only the size of
+        -- both bondfont entries changes, the per-character funcs still run.
         return true
     elseif (tag_name == "effect" and tag_value) then
         local name, intensity = tag_value:match("([^,]+),%s*(.+)")
@@ -646,6 +670,31 @@ function typers.New(text, position, layer, size, mode)
         typer.pending_next = false
     end
 
+    ---Change the font size for everything typed from here on. Already-typed
+    ---letters keep the size they were created with, so only following text
+    ---changes - the same way [font:] only affects what comes after it.
+    ---
+    ---@param size number|string font size in pixels; ignored when it is not a
+    ---  positive number.
+    ---
+    ---NOTE: this deliberately does more than `typer.fontsize = n`. A plain
+    ---write never reaches the bondfont entries, because __newindex only fires
+    ---for keys the table does not hold yet and New() already stored `fontsize`
+    ---(so the metatable branch is dead from then on). While bondfont is on,
+    ---each character is sized from bondfont.engfont.size / non_engfont.size,
+    ---so those two are what actually decide the result; the plain field is
+    ---what the [font:]-style path (bondfont off) reads. Both are kept in sync.
+    function typer:SetFontSize(size)
+        local value = tonumber(size)
+        if (not value) or (value <= 0) then return end
+
+        rawset(typer, "fontsize", value)
+        if (typer.bondfont) then
+            typer.bondfont.engfont.size = value
+            typer.bondfont.non_engfont.size = value
+        end
+    end
+
     function typer:UseBondFont(config)
         typer.bondfont = config
         -- Re-setting bondfont re-enables the bondfont feature.
@@ -894,18 +943,28 @@ function typers.New(text, position, layer, size, mode)
             if (typer.counter > #typer.texts[typer.sentence_index]) then
                 typer.skip.skipping = false
                 local should_advance = false
-                if (typer.mode == "none") then
-                    if (typer.pending_next) then
-                        should_advance = true
-                    end
-                else
-                    if (Controller.GetState("confirm") == 1) then
-                        should_advance = true
-                    end
+                -- True when [next] is what advances us. The bubble was shown for
+                -- THIS sentence, so it has to go away with its text; a confirm
+                -- keypress (the other modes) must not do that, because the usual
+                -- "[showbubble:] once, several sentences" dialogue would lose its
+                -- bubble on the first confirm.
+                local advance_ends_sentence = false
+
+                -- [next] ends the sentence on its own, in EVERY mode: that is
+                -- the whole point of the tag, and in "none" mode it is the only
+                -- way to move on at all (no key is ever read there).
+                if (typer.pending_next) then
+                    should_advance = true
+                    advance_ends_sentence = true
+                elseif (typer.mode ~= "none" and Controller.GetState("confirm") == 1) then
+                    should_advance = true
                 end
                 if (should_advance) then
                     typer.pending_next = false
                     typer:Reset()
+                    if (advance_ends_sentence) then
+                        typer:HideBubble()
+                    end
                     typer.sentence_index = typer.sentence_index + 1
                     typer.counter = 1
                     if (typer.sentence_index > #typer.texts) then
@@ -937,13 +996,20 @@ function typers.New(text, position, layer, size, mode)
             local main_y = typer.y + letter.y + eff_y
             SE.graphics.setFont(font)
             if (letter.outline) then
-                SE.graphics.setColor(letter.outline[1], letter.outline[2], letter.outline[3], letter.outline[4])
-                SE.graphics.setLineWidth(letter.outline[5])
-                for j = -1, 1, 2 do
-                    for k = -1, 1, 2 do
-                        SE.graphics.draw(letter.text_obj, main_x + j, main_y + k, 0, letter.scale or 1, letter.scale or 1)
-                    end
-                end
+                local ol = letter.outline
+                local t = ol[5] or 1
+                local s = letter.scale or 1
+                SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
+                -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
+                -- square t-pixel offsets). setLineWidth has no effect on draw.
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
             end
             SE.graphics.setColor(letter.color[1], letter.color[2], letter.color[3], letter.alpha)
             SE.graphics.draw(letter.text_obj, main_x, main_y, 0, letter.scale or 1, letter.scale or 1)

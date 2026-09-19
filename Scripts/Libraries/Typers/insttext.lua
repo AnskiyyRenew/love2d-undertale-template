@@ -3,7 +3,7 @@
 
 How to use:
 
-local text = Typers.InstText.New("Hello 你好\nWorld 世界", {320, 60}, 0)
+local text = Typers.InstText.New("Hello there\nWorld of mine", {320, 60}, 0)
 text:SetAlign("center")
 
 Draws the full text instantly (no typing animation).
@@ -314,13 +314,20 @@ function typers.New(text, position, layer, size)
 
             SE.graphics.setFont(letter.font)
             if (letter.outline) then
-                SE.graphics.setColor(letter.outline[1], letter.outline[2], letter.outline[3], letter.outline[4])
-                SE.graphics.setLineWidth(letter.outline[5])
-                for j = -1, 1, 2 do
-                    for k = -1, 1, 2 do
-                        SE.graphics.draw(letter.text_obj, main_x + j, main_y + k, 0, letter.scale or 1, letter.scale or 1)
-                    end
-                end
+                local ol = letter.outline
+                local t = ol[5] or 1
+                local s = letter.scale or 1
+                SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
+                -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
+                -- square t-pixel offsets). setLineWidth has no effect on draw.
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
+                SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
             end
             SE.graphics.setColor(typer.color[1], typer.color[2], typer.color[3], typer.alpha)
             SE.graphics.draw(letter.text_obj, main_x, main_y, 0, letter.scale or 1, letter.scale or 1)

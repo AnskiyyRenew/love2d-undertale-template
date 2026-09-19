@@ -1,0 +1,7 @@
+# WorkBuddy workspace: agent memory, scratch files and verification
+# harnesses. Local only - never committed.
+.workbuddy/
+
+# Python caches (Packager tooling)
+__pycache__/
+*.pyc

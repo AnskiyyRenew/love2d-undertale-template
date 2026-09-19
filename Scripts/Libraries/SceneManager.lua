@@ -7,10 +7,10 @@ scenes.pending_clear = false
 scenes._pending_switch = nil
 
 -- Scene lookup roots, tried in order. A scene placed in the Game area
--- (Scripts/Game/Scenes/) overrides the engine default (Scripts/Scenes/);
+-- (Game/Scenes/) overrides the engine default (Scripts/Scenes/);
 -- when no Game copy exists the root module is used exactly as before.
 scenes.MODULE_ROOTS = {
-    "Scripts.Game.Scenes.",
+    "Game.Scenes.",
     "Scripts.Scenes."
 }
 
@@ -27,13 +27,18 @@ local function sceneNameOf(path)
     local name = normalize_path(path or "")
     name = name:gsub("^%.+", ""):gsub("%.+$", "")
     name = name:gsub("^[Ss]cripts%.", "")
+    -- "Game.Scenes.x" and "Scenes.x" both collapse to "x". Only the full
+    -- "Game.Scenes." prefix is stripped, so a scene living in a folder that
+    -- happens to be called "Game" (i.e. "Game.foo") is not mistaken for the
+    -- Game area itself.
+    name = name:gsub("^[Gg]ame%.[Ss]cenes%.", "")
     name = name:gsub("^[Ss]cenes%.", "")
     return name
 end
 
 --- Describe a module name as a project-relative file path, for filesystem probes.
----@param module_name string e.g. "Scripts.Game.Scenes.scene_x"
----@return string e.g. "Scripts/Game/Scenes/scene_x.lua"
+---@param module_name string e.g. "Game.Scenes.scene_x"
+---@return string e.g. "Game/Scenes/scene_x.lua"
 local function modulePathOf(module_name)
     return (module_name:gsub("%.", "/")) .. ".lua"
 end
@@ -69,6 +74,7 @@ end
 ---@return string|nil moduleName The module that was found, or nil when no root has it.
 ---@return any loaded The module value returned by require (only when found).
 ---@return any lookup_error Non-nil when a found scene failed to load: the thrown error.
+---@return any first_error
 local function findSceneModule(name)
     if (not name) or (name == "") then return nil end
 
@@ -88,7 +94,13 @@ local function findSceneModule(name)
             if (ok and loaded) then
                 -- Warn whenever the Game-area lookup did not produce the scene
                 -- that ended up loading, so a missing override is never silent.
-                if (root ~= scenes.MODULE_ROOTS[1]) then
+                -- A Game copy that exists but throws is named as such: reporting
+                -- it as "not found" would blame the wrong cause.
+                if (first_error) then
+                    print("[Scenes] WARNING: '" .. tostring(first_error_module) ..
+                        "' exists but failed to load; using " .. module_name .. " instead.")
+                    print("[Scenes]   " .. tostring(first_error))
+                elseif (root ~= scenes.MODULE_ROOTS[1]) then
                     print("[Scenes] WARNING: '" .. name .. "' not found in " ..
                         scenes.MODULE_ROOTS[1] .. " (skipped to " .. root .. name .. ").")
                 end
