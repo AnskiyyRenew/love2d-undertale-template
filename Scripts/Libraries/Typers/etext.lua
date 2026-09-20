@@ -11,6 +11,9 @@ EText uses inline tags wrapped in [ ] to style text directly, instead of a separ
 Available tags:
 
   [wait:x]              Pause typing for x seconds (number only, no expressions).
+                        Uses its own timer, so a following [speed:] cannot
+                        swallow the pause. Fast-forward (cancel key / [skip])
+                        skips pauses entirely and types the rest instantly.
   [speed:x]             Set typing interval to x (number only, no expressions).
   [colorRGB:r, g, b]    Set text color using RGB values (0-255).
   [colorHEX:xxxxxx]     Set text color using hex string (e.g. ff0000 for red).
@@ -270,8 +273,14 @@ local function applyTag(typer, tag_name, tag_value)
     if (tag_name == "wait" and tag_value) then
         local val = tonumber(tag_value)
         if (val) then
-            typer.interval = val
-            typer.cantype = false
+            -- Pauses ride on the dedicated waittime timer, NOT typer.interval:
+            -- a [speed:] tag parsed later in the same scan would otherwise
+            -- overwrite interval and the pause would evaporate. Ignored while
+            -- skipping so fast-forward stays fast.
+            if (not typer.skip.skipping) then
+                typer.waittime = val
+                typer.cantype = false
+            end
         end
         return true
     elseif (tag_name == "speed" and tag_value) then
@@ -558,6 +567,7 @@ function typers.New(text, position, layer, size, mode)
     typer.time = 0
     typer.dint = 1 / 15
     typer.interval = 1 / 15
+    typer.waittime = 0
     typer.counter = 1
     typer.sentence_index = 1
 
@@ -667,6 +677,7 @@ function typers.New(text, position, layer, size, mode)
         typer.sentence_index = 1
         typer.counter = 1
         typer.time = 0
+        typer.waittime = 0
         typer.pending_next = false
     end
 
@@ -780,7 +791,28 @@ function typers.New(text, position, layer, size, mode)
             typer.skip.skipping = true
         end
 
-        if (typer.time >= typer.interval and typer.sentence_index <= #typer.texts) then
+        -- Fast-forward (cancel key / [skip]) has to be instant: it clears any
+        -- pending pause and opens the interval gate on the very same frame, so
+        -- the rest of the sentence bursts out no matter what [wait:] or
+        -- [speed:] are currently set to.
+        if (typer.skip.skipping) then
+            typer.waittime = 0
+            if (typer.time < typer.interval) then
+                typer.time = typer.interval
+            end
+        end
+
+        if (typer.waittime > 0) then
+            -- Dedicated pause timer: counts down independently of the
+            -- per-character interval timer (typer.time / typer.interval), so a
+            -- [speed:] tag can never swallow a [wait:] and vice versa.
+            typer.waittime = typer.waittime - dt
+            if (typer.waittime <= 0) then
+                typer.waittime = 0
+                -- Resume on the next frame instead of waiting another interval.
+                typer.time = typer.interval
+            end
+        elseif (typer.time >= typer.interval and typer.sentence_index <= #typer.texts) then
             typer.cantype = true
             typer.interval = typer.dint
             local raw_sentence = typer.texts[typer.sentence_index]
@@ -808,7 +840,9 @@ function typers.New(text, position, layer, size, mode)
                     elseif (temp_char == "^") then
                         counter = counter + 1
                         if (not typer.skip.skipping) then
-                            typer.interval = 0.3
+                            -- Same as [wait:]: pause via waittime, so a
+                            -- following [speed:] cannot swallow it.
+                            typer.waittime = 0.3
                             typer.cantype = false
                         end
                         typer.color = {1, 1, 1}

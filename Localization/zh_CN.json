@@ -1,5 +1,5 @@
 {
-  "Battle.Narration.Default": "* 颇似儿摆了一个姿势！",
+  "Battle.Narration.Default": "* 颇似儿摆了[wait:0.5]\n  [speed:0.05]一个姿势！",
 
   "Battle.Spare": "饶恕",
   "Battle.Flee": "逃跑",

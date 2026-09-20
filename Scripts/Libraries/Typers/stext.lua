@@ -23,7 +23,9 @@ Builder API (available via `self` inside the builder function):
   self:setFont(name)            Switch font for subsequent addText calls.
                                 Setting a font disables the bondfont feature until
                                 it is re-set via UseBondFont.
-  self:setWaitTime(time)        Pause typing for `time` seconds.
+  self:setWaitTime(time)        Pause typing for `time` seconds. Uses its own
+                                timer, so a following setSpeed cannot swallow
+                                it. Fast-forward (cancel key) skips waits.
   self:setSpeed(interval)       Set typing interval (seconds per character).
   self:setColor(r, g, b)        Set text color (values 0-1 or 0-255, auto-detected).
   self:setColorHEX(hex)         Set text color via hex string (e.g. "ff0000").
@@ -342,6 +344,7 @@ function typers.New(fn, position, layer, size, mode)
     typer.time = 0
     typer.dint = 1 / 15
     typer.interval = 1 / 15
+    typer.waittime = 0
     typer.waiting_for_confirm = false
 
     typer.pos = {
@@ -684,6 +687,7 @@ function typers.New(fn, position, layer, size, mode)
                 typer.waiting_for_confirm = false
                 typer.interval = typer.dint
                 typer.time = 0
+                typer.waittime = 0
 
                 -- If no more items in queue, auto-Destroy
                 if (typer.queue_index > #typer.queue) then
@@ -698,8 +702,27 @@ function typers.New(fn, position, layer, size, mode)
             typer.skip.skipping = true
         end
 
+        -- Fast-forward (cancel key) has to be instant: it clears any pending
+        -- pause and opens the interval gate on the very same frame, so the rest
+        -- of the queue bursts out regardless of wait / speed values.
+        if (typer.skip.skipping) then
+            typer.waittime = 0
+            if (typer.time < typer.interval) then
+                typer.time = typer.interval
+            end
+        end
+
         -- Process queue items (repeat loop handles skip-mode burst typing)
-        if (typer.time >= typer.interval and typer.queue_index <= #typer.queue) then
+        if (typer.waittime > 0) then
+            -- Dedicated pause timer: counts down independently of the
+            -- per-character interval timer (typer.time / typer.interval).
+            typer.waittime = typer.waittime - dt
+            if (typer.waittime <= 0) then
+                typer.waittime = 0
+                -- Resume on the next frame instead of waiting another interval.
+                typer.time = typer.interval
+            end
+        elseif (typer.time >= typer.interval and typer.queue_index <= #typer.queue) then
             repeat
                 typer.interval = typer.dint
                 local item = typer.queue[typer.queue_index]
@@ -785,10 +808,12 @@ function typers.New(fn, position, layer, size, mode)
                         -- Skip wait during skip mode
                         typer.queue_index = typer.queue_index + 1
                     else
-                        typer.interval = item.time
-                        typer.cantype = false
+                        -- Dedicated pause timer (waittime), NOT typer.interval:
+                        -- a speed item right after this would otherwise cut the
+                        -- pause short, and a long wait would keep fast-forward
+                        -- from kicking in.
+                        typer.waittime = item.time
                         typer.queue_index = typer.queue_index + 1
-                        typer.time = 0
                         break  -- pause here even in skip-repeat
                     end
 

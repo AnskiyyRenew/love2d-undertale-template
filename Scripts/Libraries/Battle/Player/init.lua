@@ -184,8 +184,8 @@ function Player.SetSoul(id, args, use_sound)
     Player.action = requireSoul(_id)
     Player.action.sprite = Player.sprite
     Player.action.can_move = Player.canMove
+    Player.action.Update()
     Player.soul = _id
-    Player.ClearPlatforms()
 
     if (use_sound) then
         Audio.PlaySound("snd_ding.wav")

@@ -233,19 +233,24 @@ function bones.New2D(whose, length, position, angle, velocity)
 
     function bone:SetMode(mode, color)
         if (self._head) then
-            self._head.color = (color or Global.GetVariable("MainColor"))
+            if (color) then
+                self._head.color = color
+            end
             self._head["HurtMode"] = (mode or "normal")
         end
         if (self._body) then
-            self._body.color = (color or Global.GetVariable("MainColor"))
+            if (color) then
+                self._body.color = color
+            end
             self._body["HurtMode"] = (mode or "normal")
         end
         if (self._tail) then
-            self._tail.color = (color or Global.GetVariable("MainColor"))
+            if (color) then
+                self._tail.color = color
+            end
             self._tail["HurtMode"] = (mode or "normal")
         end
     end
-    bone:SetMode("normal")
 
     function bone:SetColor(color)
         if (self._head) then

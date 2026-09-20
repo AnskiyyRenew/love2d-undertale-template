@@ -359,6 +359,7 @@ function typers.New(text, position, layer, size, opts, mode)
     typer.time = 0
     typer.dint = 1 / 15
     typer.interval = 1 / 15
+    typer.waittime = 0
     typer.counter = 1
     typer.sentence_index = 1
 
@@ -471,6 +472,7 @@ function typers.New(text, position, layer, size, opts, mode)
         typer.counter = 1
         typer.opt_index = 1
         typer.time = 0
+        typer.waittime = 0
     end
 
     function typer:UseBondFont(config)
@@ -558,7 +560,28 @@ function typers.New(text, position, layer, size, opts, mode)
             typer.skip.skipping = true
         end
 
-        if (typer.time >= typer.interval and typer.sentence_index <= #typer.texts) then
+        -- Fast-forward (cancel key / [skip]) has to be instant: it clears any
+        -- pending pause and opens the interval gate on the very same frame, so
+        -- the rest of the sentence bursts out no matter what wait / speed is
+        -- currently set to.
+        if (typer.skip.skipping) then
+            typer.waittime = 0
+            if (typer.time < typer.interval) then
+                typer.time = typer.interval
+            end
+        end
+
+        if (typer.waittime > 0) then
+            -- Dedicated pause timer: counts down independently of the
+            -- per-character interval timer (typer.time / typer.interval), so
+            -- an option parsed after a wait cannot swallow the pause.
+            typer.waittime = typer.waittime - dt
+            if (typer.waittime <= 0) then
+                typer.waittime = 0
+                -- Resume on the next frame instead of waiting another interval.
+                typer.time = typer.interval
+            end
+        elseif (typer.time >= typer.interval and typer.sentence_index <= #typer.texts) then
             typer.cantype = true
             typer.interval = typer.dint
             local raw_sentence = typer.texts[typer.sentence_index]
@@ -596,8 +619,16 @@ function typers.New(text, position, layer, size, opts, mode)
                                 if (opt.scale) then typer.scale = opt.scale end
                                 if (opt.autowrap ~= nil) then typer.auto_wrap = opt.autowrap end
                                 if (opt.wait) then
-                                    typer.interval = opt.wait
-                                    typer.cantype = false
+                                    -- Pauses ride on the dedicated waittime
+                                    -- timer, NOT typer.interval: anything
+                                    -- parsed later in the same scan would
+                                    -- otherwise overwrite the pause (and a
+                                    -- huge interval would block fast-forward).
+                                    -- Ignored while skipping.
+                                    if (not typer.skip.skipping) then
+                                        typer.waittime = opt.wait
+                                        typer.cantype = false
+                                    end
                                 end
                                 if (opt.effect) then typer.effect = opt.effect end
                                 if (opt.voice) then typer.voices = {opt.voice} end
@@ -627,7 +658,9 @@ function typers.New(text, position, layer, size, opts, mode)
                     elseif (temp_char == "^") then
                         counter = counter + 1
                         if (not typer.skip.skipping) then
-                            typer.interval = 0.3
+                            -- Same as opt.wait: pause via waittime so a later
+                            -- option cannot swallow it.
+                            typer.waittime = 0.3
                             typer.cantype = false
                         end
                         typer.color = {1, 1, 1}
