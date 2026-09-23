@@ -33,5 +33,27 @@
   "Overworld.Shop.Action.Sell": "出售",
   "Overworld.Shop.Action.Talk": "交谈",
   "Overworld.Shop.Action.Exit": "离开",
-  "Overworld.Text.NobodyCame": "* 但是谁也没有来。"
+  "Overworld.Text.NobodyCame": "* 但是谁也没有来。",
+
+  "VirtualKeyboard.title": "虚拟按键",
+  "VirtualKeyboard.add_button": "添加按钮",
+  "VirtualKeyboard.add_dpad": "添加方向盘",
+  "VirtualKeyboard.delete": "删除按键",
+  "VirtualKeyboard.edit": "编辑布局",
+  "VirtualKeyboard.import": "导入布局",
+  "VirtualKeyboard.export": "导出布局",
+  "VirtualKeyboard.reset": "重置布局",
+  "VirtualKeyboard.close": "关闭",
+  "VirtualKeyboard.back": "返回",
+  "VirtualKeyboard.pick_key": "选择要映射的按键",
+  "VirtualKeyboard.pick_scheme": "选择方向键映射方案",
+  "VirtualKeyboard.delete_hint": "点按要删除的控件",
+  "VirtualKeyboard.added": "已添加",
+  "VirtualKeyboard.deleted": "已删除",
+  "VirtualKeyboard.exported": "已导出",
+  "VirtualKeyboard.imported": "已导入",
+  "VirtualKeyboard.no_json": "缺少 JSON 库",
+  "VirtualKeyboard.export_failed": "导出失败",
+  "VirtualKeyboard.import_failed": "导入失败",
+  "VirtualKeyboard.failed": "操作失败"
 }

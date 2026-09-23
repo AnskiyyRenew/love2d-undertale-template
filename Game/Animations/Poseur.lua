@@ -1,5 +1,18 @@
 -- Poseur animation factory.
 --
+-- STYLE — no metatables, dot notation only.
+--   * Every function is declared with a dot and takes the instance as its
+--     first argument: `PoseurAnim.Hurt(self)`.
+--   * `New(pos)` returns a PLAIN table (no metatable). It carries `_class`,
+--     pointing back at this module, so any caller can find the functions from
+--     the instance alone:  `anim._class.Hurt(anim)`.
+--   * The engine does exactly that — Battle.Update calls
+--     `anim._class.Update(anim, dt)`, attack patterns call
+--     `anim._class.Hurt(anim)` / `anim._class.OnAttack(anim, data)`, the mercy
+--     menu calls `anim._class.Spare(anim)` / `anim._class.Destroy(anim)`.
+--   * Sprites are still engine objects → keep the colon there
+--     (`sprite:Set(...)`, `sprite:Dust(...)`).
+--
 -- This module is a FACTORY: `require` returns the module once (Lua caches it
 -- in `package.loaded`), so `New(...)` is the only way to get a usable anim.
 -- Every enemy gets its OWN instance (own sprite + own state) by calling
@@ -7,11 +20,13 @@
 -- single `anim` table — updating or destroying one can't touch the other.
 
 local PoseurAnim = {}
-PoseurAnim.__index = PoseurAnim
 
 -- Create a brand-new, independent Poseur animation instance.
 function PoseurAnim.New(pos)
-    local self = setmetatable({}, PoseurAnim)
+    local self = {}
+
+    -- Back-reference to the function table. This is the whole "class" link.
+    self._class = PoseurAnim
 
     self.running = true
     self.x = 0
@@ -22,12 +37,12 @@ function PoseurAnim.New(pos)
     self.hurttime = 0
     self.intensity = 16
 
-    self:Init(pos)
+    PoseurAnim.Init(self, pos)
     return self
 end
 
 -- Create the sprites.
-function PoseurAnim:Init(pos)
+function PoseurAnim.Init(self, pos)
     local _pos = (pos or {320, 140})
     local poseur = Sprites.CreateSprite("poseur.png", "UI")
     poseur:MoveTo(_pos[1], _pos[2])
@@ -36,15 +51,16 @@ function PoseurAnim:Init(pos)
     self.poseur = poseur
 end
 
-function PoseurAnim:Hurt()
+function PoseurAnim.Hurt(self)
     if (not self.poseur) then
         return
     end
+
     self.hurting = true
     self.intensity = 16
 end
 
-function PoseurAnim:Spare()
+function PoseurAnim.Spare(self)
     if (not self.poseur) then
         return
     end
@@ -52,11 +68,7 @@ function PoseurAnim:Spare()
     self.poseur.alpha = 0.5
 end
 
-local function swing()
-    
-end
-
-function PoseurAnim:Update(dt)
+function PoseurAnim.Update(self, dt)
     if (not self.running) then
         return
     end
@@ -74,7 +86,7 @@ end
 
 -- Destroy the anim.
 -- You can also use `sprite:Dust` function here.
-function PoseurAnim:Destroy()
+function PoseurAnim.Destroy(self)
     if (not self.poseur) then
         return
     end
@@ -88,10 +100,11 @@ function PoseurAnim:Destroy()
     for i = #self.elements, 1, -1
     do
         local e = self.elements[i]
-        if (e.Destroy) then
+        if (e and e.Destroy) then
             e:Destroy()
         end
     end
+    self.elements = {}
 end
 
 return PoseurAnim

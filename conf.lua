@@ -60,7 +60,7 @@ function love.conf(t)
     t.window.fullscreen = false         -- Enable fullscreen (boolean)
     t.window.fullscreentype = "desktop" -- Choose "desktop" or "exclusive" fullscreen mode (string)
     t.window.vsync = 0                  -- Vertical sync mode (number)
-    t.window.msaa = 0                   -- Number of samples to use for multisample anti-aliasing (number)
+    t.window.msaa = 4                   -- Number of samples to use for multisample anti-aliasing (number)
     t.window.depth = nil                -- Number of bits per sample in the depth buffer
     t.window.stencil = nil              -- Number of bits per sample in the stencil buffer
     t.window.displayindex = 1                -- Index of the monitor the window is displayed on (number)

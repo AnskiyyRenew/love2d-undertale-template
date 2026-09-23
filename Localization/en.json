@@ -33,5 +33,27 @@
   "Overworld.Shop.Action.Sell": "Sell",
   "Overworld.Shop.Action.Talk": "Talk",
   "Overworld.Shop.Action.Exit": "Exit",
-  "Overworld.Text.NobodyCame": "* But nobody came."
+  "Overworld.Text.NobodyCame": "* But nobody came.",
+
+  "VirtualKeyboard.title": "VIRTUAL PAD",
+  "VirtualKeyboard.add_button": "Add button",
+  "VirtualKeyboard.add_dpad": "Add d-pad",
+  "VirtualKeyboard.delete": "Delete a control",
+  "VirtualKeyboard.edit": "Edit layout",
+  "VirtualKeyboard.import": "Import",
+  "VirtualKeyboard.export": "Export",
+  "VirtualKeyboard.reset": "Reset layout",
+  "VirtualKeyboard.close": "Close",
+  "VirtualKeyboard.back": "Back",
+  "VirtualKeyboard.pick_key": "Pick a key to map",
+  "VirtualKeyboard.pick_scheme": "Pick a direction scheme",
+  "VirtualKeyboard.delete_hint": "Tap a control to delete it",
+  "VirtualKeyboard.added": "Added",
+  "VirtualKeyboard.deleted": "Deleted",
+  "VirtualKeyboard.exported": "Exported",
+  "VirtualKeyboard.imported": "Imported",
+  "VirtualKeyboard.no_json": "JSON library missing",
+  "VirtualKeyboard.export_failed": "Export failed",
+  "VirtualKeyboard.import_failed": "Import failed",
+  "VirtualKeyboard.failed": "Failed"
 }

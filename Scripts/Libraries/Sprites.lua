@@ -24,6 +24,87 @@ local function getPixelPerfectShader()
     return pixel_smooth_shader
 end
 
+-- ---------------------------------------------------------------------------
+-- Texture filter cache
+-- ---------------------------------------------------------------------------
+-- A filter change is GPU texture state (glTexParameteri on the bound texture).
+-- Re-applying it on every draw of every sprite buys nothing -- the sprite is
+-- always drawn with the same filter -- and on mobile drivers it costs real
+-- milliseconds: re-issuing sampler state mid-frame breaks the driver's batching.
+-- The desktop GL driver happily absorbs it, which is why this only shows up on
+-- a phone. The requested filter is remembered per image and only touched when it
+-- actually changes.
+--
+-- NOTE: the cache is keyed per image, so two sprites sharing one texture must
+-- want the same filter. They do: `pixel_smooth` (the only path asking for
+-- "linear") defaults to false in CreateSprite and nothing turns it on.
+local _applied_filter = setmetatable({}, {__mode = "k"})
+
+local function applyFilter(image, min_filter, mag_filter)
+    if (image == nil) then return end
+    local want = tostring(min_filter) .. "/" .. tostring(mag_filter or min_filter)
+    if (_applied_filter[image] == want) then return end
+    _applied_filter[image] = want
+    image:setFilter(min_filter, mag_filter)
+end
+
+-- ---------------------------------------------------------------------------
+-- Pixel snapping
+-- ---------------------------------------------------------------------------
+-- Sprites are drawn with nearest-neighbour filtering, so a fractional position
+-- smears the art over two device pixels (and makes it shimmer while moving).
+-- Snapping pulls the draw position back onto the pixel grid:
+--
+--     x = floor(x + 0.5)      y = floor(y + 0.5)
+--
+-- ...but NOT on the sprite's centre. A screen is 640 BLOCKS, not 640 lines:
+-- pixel column n covers [n, n + 1), so crisp nearest-neighbour art needs the
+-- quad's EDGES on whole pixels. Edge == centre only for even-sized art:
+--
+--     even width  → centre on a whole pixel   (sans caps: 10 x 6)
+--     odd  width  → centre on a half pixel    (papyrus caps: 13 x 5)
+--
+-- Rounding the centre instead would be right for sans and wrong for papyrus
+-- (their edges land on .5, i.e. exactly on a pixel boundary, which is the one
+-- place that renders half-covered / unstable). So we snap the quad's top-left
+-- corner and put the centre wherever that implies; see sprites.SnapEdge.
+--
+-- It is applied at draw time only: the stored x / y keep their sub-pixel value,
+-- so slow motion (velocity * dt, often well under 1 px per frame) still adds up
+-- and the sprite really moves. Rounding the stored value every frame would
+-- swallow those small steps and freeze anything slower than 0.5 px/frame.
+--
+-- `sprites.pixel_snap` is the global switch (see sprites.SetPixelSnap); a single
+-- sprite can override it with its own `pixel_snap` field (true / false, and
+-- nil = follow the global switch).
+sprites.pixel_snap = true
+
+--- Snap one coordinate to the nearest whole pixel (half-up).
+local function snapCoord(v)
+    if (type(v) ~= "number") then return v end
+    return math.floor(v + 0.5)
+end
+
+--- Public wrapper for the snap helper.
+function sprites.SnapCoord(v)
+    return snapCoord(v)
+end
+
+--- Snap the LEADING EDGE of a quad to the pixel grid and return the centre that
+--- puts it there. `offset` is the distance from that edge to the centre, i.e.
+--- pivot offset * scale (ox * xscale for x, oy * yscale for y).
+--- This is the parity-safe way to snap: it works for even AND odd sized art,
+--- at any pivot and any scale.
+function sprites.SnapEdge(centre, offset)
+    if (type(centre) ~= "number") then return centre end
+    return snapCoord(centre - (offset or 0)) + (offset or 0)
+end
+
+--- Turn pixel snapping on / off for every sprite that does not override it.
+function sprites.SetPixelSnap(enabled)
+    sprites.pixel_snap = (enabled == true)
+end
+
 local dust_shader = nil
 local function getDustShader()
     if not dust_shader then
@@ -313,7 +394,7 @@ function sprites.MultiDust(sprs, sound, remove, time)
         if spr.image and spr.visible then
             local ox, oy = spr:GetPivotOffset()
             SE.graphics.setColor(spr.color[1], spr.color[2], spr.color[3], spr.alpha)
-            spr.image:setFilter("nearest", "nearest")
+            applyFilter(spr.image, "nearest")
             SE.graphics.draw(
                 spr.image,
                 spr.x - min_x, spr.y - min_y,
@@ -359,9 +440,15 @@ function sprites.MultiDust(sprs, sound, remove, time)
         shader:send("screen_size_inv", {1/self._dust.w, 1/self._dust.h})
         shader:send("scale_factor", {1, 1})
         SE.graphics.setShader(shader)
+        -- The composite is baked from the sprites' real (sub-pixel) positions, so
+        -- it gets the same whole-pixel snap when the switch is on.
+        local dx, dy = self._dust.x, self._dust.y
+        if (sprites.pixel_snap) then
+            dx, dy = snapCoord(dx), snapCoord(dy)
+        end
         SE.graphics.draw(
             self._dust.canvas,
-            self._dust.x, self._dust.y, 0, 1, 1,
+            dx, dy, 0, 1, 1,
             self._dust.w / 2, self._dust.h / 2
         )
         SE.graphics.setShader()
@@ -546,6 +633,38 @@ local sprite_methods = {}
 
         local ox, oy = self:GetPivotOffset()
 
+        -- Shake offset + pixel snapping: both are DRAW-ONLY. They are written
+        -- straight into the "_x"/"_y" storage (the metatable maps x -> _x,
+        -- y -> _y) so every draw path below -- dust, image, outline, shader
+        -- chain -- picks them up, and the real position is restored at the end.
+        -- The stored x / y (and therefore Move / MoveTo / velocity / parent
+        -- logic) is never modified, so sub-pixel motion still accumulates.
+        local base_x = rawget(self, "_x")
+        local base_y = rawget(self, "_y")
+        local draw_x, draw_y = base_x, base_y
+
+        if (self._shake and self._shake.use) then
+            draw_x = draw_x + (self._shake.dx or 0)
+            draw_y = draw_y + (self._shake.dy or 0)
+        end
+
+        -- Pixel snap: put the quad's top-left corner on the pixel grid
+        -- (floor(v + 0.5) on the EDGE, centre follows). Rounding the centre
+        -- would only be correct for even-sized art -- see the note above
+        -- sprites.pixel_snap.
+        local snap = self.pixel_snap
+        if (snap == nil) then snap = sprites.pixel_snap end
+        if (snap) then
+            draw_x = sprites.SnapEdge(draw_x, ox * (self.xscale or 1))
+            draw_y = sprites.SnapEdge(draw_y, oy * (self.yscale or 1))
+        end
+
+        local shifted = (draw_x ~= base_x or draw_y ~= base_y)
+        if (shifted) then
+            rawset(self, "_x", draw_x)
+            rawset(self, "_y", draw_y)
+        end
+
         -- Apply stencils if any (masks clip the sprite to specific areas)
         local stencil_active = (#self._stencils > 0)
         if stencil_active then
@@ -577,22 +696,11 @@ local sprite_methods = {}
             SE.graphics.setShader()
             SE.graphics.setColor(1, 1, 1, 1)
             if stencil_active then Masks.Clear() end
-            return
-        end
-
-        -- Shake effect (visual only): temporarily shift the draw position by the
-        -- per-frame shake offset. Uses rawset on the underlying "_x"/"_y" storage
-        -- (the metatable maps x -> _x, y -> _y) to bypass the coordinate-tracking
-        -- hooks, then restores the values below so the stored position (and any
-        -- Move / MoveTo / velocity logic) is never modified.
-        local shake_dx, shake_dy = 0, 0
-        if (self._shake and self._shake.use) then
-            shake_dx = self._shake.dx or 0
-            shake_dy = self._shake.dy or 0
-            if (shake_dx ~= 0 or shake_dy ~= 0) then
-                rawset(self, "_x", self.x + shake_dx)
-                rawset(self, "_y", self.y + shake_dy)
+            if (shifted) then
+                rawset(self, "_x", base_x)
+                rawset(self, "_y", base_y)
             end
+            return
         end
 
         -- Draw 8-directional outline behind the sprite
@@ -616,17 +724,17 @@ local sprite_methods = {}
 
         if stencil_active then Masks.Clear() end
 
-        -- Restore the base position after the shaken draw.
-        if (shake_dx ~= 0 or shake_dy ~= 0) then
-            rawset(self, "_x", self.x - shake_dx)
-            rawset(self, "_y", self.y - shake_dy)
+        -- Restore the base position after the shaken / snapped draw.
+        if (shifted) then
+            rawset(self, "_x", base_x)
+            rawset(self, "_y", base_y)
         end
     end
 
     function sprite_methods:_drawImage(ox, oy)
         -- Four-point mode: draw with a mesh using the four corner positions
         if self._four_point.enabled then
-            self.image:setFilter("nearest", "nearest")
+            applyFilter(self.image, "nearest")
             self:_drawFourPointImage()
             return
         end
@@ -639,7 +747,9 @@ local sprite_methods = {}
             -- Pixel-smooth rendering via PixelSmooth shader:
             -- Set filter to linear for smooth interpolation,
             -- then apply shader to keep pixel-art crispness at rotation boundaries
-            self.image:setFilter("linear", "linear")
+            -- (routed through applyFilter so the cache stays honest about what
+            -- this texture is currently set to)
+            applyFilter(self.image, "linear")
 
             local shader = getPixelPerfectShader()
             SE.graphics.setShader(shader)
@@ -656,7 +766,7 @@ local sprite_methods = {}
             SE.graphics.setShader()
             SE.graphics.setColor(1, 1, 1, 1)
         else
-            self.image:setFilter("nearest", "nearest")
+            applyFilter(self.image, "nearest")
             SE.graphics.setColor(self.color[1], self.color[2], self.color[3], self.alpha)
             SE.graphics.draw(
                 self.image,
@@ -685,7 +795,7 @@ local sprite_methods = {}
         local a = outline[4]
         if not a or a <= 0 then return end
 
-        self.image:setFilter("nearest", "nearest")
+        applyFilter(self.image, "nearest")
         SE.graphics.setColor(outline[1] or 0, outline[2] or 0, outline[3] or 0, a)
 
         local rot = math.rad(self.rotation)
@@ -733,7 +843,7 @@ local sprite_methods = {}
         -- The shader will compute correct UV for each pixel to achieve the deformation
         SE.graphics.setShader(shader)
         SE.graphics.setColor(self.color[1], self.color[2], self.color[3], self.alpha)
-        self.image:setFilter("nearest", "nearest")
+        applyFilter(self.image, "nearest")
         SE.graphics.draw(
             self.image,
             min_x, min_y,
@@ -910,7 +1020,7 @@ local sprite_methods = {}
         local prev = SE.graphics.getCanvas()
         SE.graphics.setCanvas(dust_canvas)
         SE.graphics.clear(0, 0, 0, 0)
-        self.image:setFilter("nearest", "nearest")
+        applyFilter(self.image, "nearest")
         SE.graphics.draw(self.image, 0, 0, 0, 1, 1, 0, 0)
         SE.graphics.setCanvas(prev)
 

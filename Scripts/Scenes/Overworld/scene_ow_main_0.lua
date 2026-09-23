@@ -61,10 +61,10 @@ local trigger_7 = false
 
 function scene.update(dt)
     ow.Update(dt)
-    --print(Keyboard.GetMousePosition())
+    --print(Controller.GetMousePosition())
 
     if (ow.getInteractResult("trigger", 1)) then
-        if (Keyboard.GetState("confirm") == 1) then
+        if (Controller.GetState("confirm") == 1) then
             if (trigger_1 == 0) then
                 ow.dialogNew({
                     "* (You notice a piece of paper\n  tucked under the clock.)",
@@ -84,14 +84,14 @@ function scene.update(dt)
     end
 
     if (ow.getInteractResult("trigger", 2)) then
-        if (Keyboard.GetState("confirm") == 1) then
+        if (Controller.GetState("confirm") == 1) then
             ow.dialogNew({
                 "Entry Number 01: ",
                 "[colorhex:990000]* Hacked by someone."
             })
         end
     elseif (ow.getInteractResult("trigger", 3)) then
-        if (Keyboard.GetState("confirm") == 1) then
+        if (Controller.GetState("confirm") == 1) then
             ow.dialogNew({
                 "Entry Number 02: ",
                 "* The leftmost door leads to the\n  shop.",
@@ -101,8 +101,7 @@ function scene.update(dt)
             })
         end
     elseif (ow.getInteractResult("trigger", 4)) then
-        print(true)
-        if (Keyboard.GetState("confirm") == 1) then
+        if (Controller.GetState("confirm") == 1) then
             local d = ow.dialogNew({
                 "Entry Number 03: ",
                 "[colorhex:ff0000]* Determination.",
@@ -113,7 +112,7 @@ function scene.update(dt)
             })
         end
     elseif (ow.getInteractResult("trigger", 5)) then
-        if (Keyboard.GetState("confirm") == 1) then
+        if (Controller.GetState("confirm") == 1) then
             ow.dialogNew({
                 "* This might be the vending\n  machine.",
                 "* Oops[wait:0.4], it's not working.",
@@ -121,14 +120,14 @@ function scene.update(dt)
             })
         end
     elseif (ow.getInteractResult("trigger", 7) and not trigger_7) then
-        if (Keyboard.GetState("confirm") == 1) then
+        if (Controller.GetState("confirm") == 1) then
             poseur._fly = true
             trigger_7 = true
         end
     end
 
     if (ow.getInteractResult("sign", 1, nil, true)) then
-        if (Keyboard.GetState("confirm") == 1) then
+        if (Controller.GetState("confirm") == 1) then
             ow.dialogNew({
                 "* SOL, SINCERA and SPYDER"
             })
@@ -145,10 +144,6 @@ function scene.update(dt)
         local _s = ow.FindObject("save", 1)
         ow.SaveInteract({"* 测试存档。", "* 看到这是个测试存档点，这\n  使你充满了决心。"}, "真实验室 - 地下1层", {_s.x, _s.y - 20}, "down")
     end)
-
-    if (Controller.GetState("i") == 1) then
-        ow.ChestInteract("chest")
-    end
 end
 
 function scene.draw()

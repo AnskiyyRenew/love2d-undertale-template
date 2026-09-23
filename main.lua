@@ -381,6 +381,8 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
+    -- Desktop simulation: dragging over the virtual d-pad acts like a sliding finger
+    VirtualKeyboard.MouseMoved(x, y)
     if (scene_.mousemoved and not scene_.pausing) then scene_.mousemoved(x, y, dx, dy, istouch) end
 end
 
@@ -424,6 +426,9 @@ function love.wheelmoved(x, y)
 end
 
 function love.focus(f)
+    -- Losing the window never delivers mouse/touch releases: drop any held
+    -- virtual key so nothing stays stuck down while we are in the background.
+    if (not f) then VirtualKeyboard.ReleaseAll() end
     if (scene_.focus and not scene_.pausing) then scene_.focus(f) end
 end
 

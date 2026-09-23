@@ -119,14 +119,13 @@ function battle_methods.InitAnimation(self, index, ...)
     end
 
     -- `enemy.animation` is either the animation *module* (from `require`) or
-    -- already an independent instance. Detection is fully generic and has no
-    -- monster-specific fields (e.g. `poseur`): an instance is a table whose
-    -- metatable is a factory class exposing `New`, while the module itself is
-    -- not an instance (it has no such metatable). This works for any enemy.
+    -- already an independent instance. Animations are plain tables now (no
+    -- metatable): an instance carries `_class` → the module holding its
+    -- functions, the module itself does not. So `_class` is the marker, and it
+    -- works for any enemy without any monster-specific field.
     local module = enemy.animation
 
-    local meta = getmetatable(module)
-    if (meta and meta.New) then
+    if (module and module._class) then
         return  -- already an independent instance → nothing to do
     end
 

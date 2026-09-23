@@ -398,12 +398,17 @@ end
 ---is a property name (string), the object is matched by that property's value
 ---instead (e.g. getInteractResult("trigger", 1, "rr") matches the trigger whose
 ---rr == 1) and the property value is returned.
+---
+---There is NO facing requirement: touching the object is enough, from any
+---direction. The interaction data comes from the physics beginContact callback
+---(world.interactions), so simply colliding with the object arms it.
+---NOTE: a legacy 4th argument (the old `require_facing` flag) is ignored; it is
+---accepted for backwards compatibility with existing scene scripts only.
 ---@param obj_type string
 ---@param id number | string | nil
 ---@param extra_key string | number | nil
----@param require_facing boolean | nil Defaults to true, except for warps.
 ---@return boolean | any
-function overworld.getInteractResult(obj_type, id, extra_key, require_facing)
+function overworld.getInteractResult(obj_type, id, extra_key)
     -- If a dialog just finished this frame, swallow EVERY interaction result for
     -- the rest of the frame so the same confirm press that completed the
     -- typewriter can't re-trigger any of them (this applies to every call made
@@ -423,32 +428,8 @@ function overworld.getInteractResult(obj_type, id, extra_key, require_facing)
     local final_type = interactions.current_object
     if (final_type ~= obj_type) then return false end
 
-    if (require_facing == nil) then
-        require_facing = (obj_type ~= "warp")
-    end
-
-    if (require_facing) then
-        local obj = interactions.current_obj
-        local body = Char.collision and Char.collision.body
-        if (not obj or not body or body:isDestroyed() or not Char.direction) then
-            return false
-        end
-
-        local player_x, player_y = body:getX(), body:getY()
-        local object_x = ((obj.x or 0) + (obj.width or 0) / 2) * 2
-        local object_y = ((obj.y or 0) + (obj.height or 0) / 2) * 2
-        local dx, dy = object_x - player_x, object_y - player_y
-
-        if (math.abs(dx) >= math.abs(dy)) then
-            if ((dx >= 0 and Char.direction ~= "right") or
-                (dx < 0 and Char.direction ~= "left")) then
-                return false
-            end
-        elseif ((dy >= 0 and Char.direction ~= "down") or
-                (dy < 0 and Char.direction ~= "up")) then
-            return false
-        end
-    end
+    -- No facing check here: the object is armed by the physics contact alone,
+    -- so any direction the player touches it from counts.
 
     -- id not given: only require the object type to match.
     if (id == nil) then

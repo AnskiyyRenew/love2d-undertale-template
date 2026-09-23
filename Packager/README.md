@@ -10,7 +10,7 @@ A GUI (tkinter) tool to package a Love2D (LÖVE) project into several formats.
 | ---------------------------- | ----------------------------------------------------------------------- |
 | `.love`                      | 游戏 zip，可直接被 LÖVE 加载                                            |
 | Windows `.exe`               | 将 `love.exe` 与 `.love` 合并为独立可执行文件并复制所需 DLL              |
-| Android 准备文件 (APK)       | 复制 love-android 模板并把 `game.love` 放入 `app/src/main/assets`        |
+| Android 准备文件 (APK)       | 复制 love-android 模板，把 `game.love` 放入 `app/src/embed/assets`（旧模板自动退回 `app/src/main/assets`）；可勾选继续调用 `gradlew` 直接出 APK |
 | love-js (Web)                | 复制 `game.love` 供 love.js 使用，可自动调用 love.js 命令生成网页版      |
 | 源码备份 `.zip`              | 完整源码备份                                                            |
 
@@ -59,7 +59,7 @@ Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（默认
 
 | 严格度 | 目标平台 | 说明 |
 | ------ | -------- | ---- |
-| `1` | Windows 开发端 | 最宽松。NTFS 大小写不敏感，`require` 大小写写错也能命中；LÖVE 12 / Lua 5.4 的新语法（`goto`、位运算等）都能用 |
+| `1` | Windows 开发端 | 最宽松。NTFS 大小写不敏感，`require` 大小写写错也能命中；LÖVE 12 默认带 LuaJIT 2.1（Lua 5.1 语义 + `goto`、位运算等扩展），语法比纯 5.1 宽 |
 | `2` | exe 发布 / Linux 等 | 较严格。`.love` 一旦在区分大小写的文件系统上解包，`require` / `ImportFile` 引用的大小写必须与磁盘一致 |
 | `3` | love.js (Web) | 最严格。love.js 是 LuaJIT / Lua 5.1 语义：`goto`、`::label::`、`// << >> & \| ~`、`0b` 字面量会编译失败；虚拟文件系统也大小写敏感 |
 
@@ -72,7 +72,7 @@ Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（默认
   - 大小写与磁盘不一致（严格度 2/3 时）
   - `goto` / `::label::` 等 Lua 5.2+ 语法（严格度 3 时）
 - **warning（可能踩雷）**：
-  - `loadstring` / `setfenv` / `getfenv` 等 Lua 5.1 专属 API（LÖVE 12 换成 Lua 5.4 后已移除）
+  - `loadstring` / `setfenv` / `getfenv` 等 Lua 5.1 专属 API（默认 LuaJIT 下仍可用；若编译时关掉 `LOVE_JIT` 改用 Lua 5.3 则已移除）
   - 动态 `require`（运行时变量拼路径，静态无法确认；严格度 2/3 上升为警告）
 - **info（仅供参考）**：
   - `require` 到 `love` / `ffi` / `bit` 等运行时模块（注意 `ffi` 仅 LuaJIT/5.1 有）
@@ -96,6 +96,79 @@ Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（默认
 - 生成 Android 准备文件：需下载 [love-android](https://github.com/love2d/love-android) 模板
 - 生成 love-js：可选，需要 Node.js + [love.js](https://github.com/Davidobot/love.js)
 
+## Android / APK 导出
+
+工具的 Android 选项**默认只产出构建准备文件**（模板副本 + `game.love`），
+APK 仍要由 Gradle 编译。想一步到位就顺手勾上「…并调用 gradlew 直接构建 APK」。
+
+### 模板准备（只需一次）
+
+```bash
+git clone --recurse-submodules https://github.com/love2d/love-android
+```
+
+`--recurse-submodules` 不能省，否则会报 `Missing LÖVE` / 缺 `liblove.so`。
+若已克隆但漏了子模块：
+
+```bash
+git submodule sync --recursive
+git submodule update --init --force --recursive
+```
+
+需要 **JDK 17**（不能更高也不能更低）、**CMake ≥ 3.21**、并设置 `ANDROID_HOME`。
+SDK / NDK 的版本**以模板的 `app/build.gradle` 为准**，当前克隆到的 `main`
+分支要求：
+
+| 项 | 值 | 出处 |
+| -- | -- | ---- |
+| NDK | `27.3.13750724` | `app/build.gradle` 的 `ndkVersion` |
+| compileSdk / targetSdk | `35` | 同上 |
+| minSdk | `23` | 同上 |
+| CMake | `3.21.0+` | 同上 |
+| ABI | `armeabi-v7a`、`arm64-v8a`、`x86_64` | 同上 |
+
+装 NDK 时选模板要的那一版即可（Android Studio 的 SDK Manager → NDK）。
+**别照抄网上的旧教程**：不同 love-android 版本要求的 NDK 差很多，写错会直接
+在 CMake 配置阶段失败。
+
+### game.love 放在哪
+
+| 模板版本 | 目录 | 对应 Gradle 任务 |
+| -------- | ---- | ---------------- |
+| 现代模板（≥ 11.4，有 `app/src/embed`） | `app/src/embed/assets` | `assembleEmbedNoRecordRelease` |
+| 旧模板 | `app/src/main/assets` | `assembleNormalRecord` |
+
+工具会自动判断：有 `app/src/embed` 就用它，否则退回 `app/src/main/assets`，
+并在日志里说明用了哪个。**放错目录不会报错**，只会导致 APK 装上去启动是空的
+LÖVE 界面——所以这条专门做了显式判断。
+
+### Gradle 任务
+
+默认填 `assembleEmbedNoRecordRelease`。
+
+- 游戏要用麦克风录音 → 改成 `assembleEmbedRecordRelease`
+- 要上架 Play 的 AAB → `bundleEmbedNoRecordRelease`
+
+构建过程会**实时输出到右侧的日志面板**（首次要编译原生库，十几分钟很正常）。
+完成后工具会列出 `app/build/outputs` 下找到的 `.apk` / `.aab`。
+
+### LÖVE 版本与分支
+
+`conf.lua` 里的 `t.version` 要与模板分支匹配。本仓库写的是 `12.0`，
+因此**直接用 `main` 分支即可**（当前 `main` 的 love 子模块 `version.h` 就是 12.0）。
+
+| 分支 | 对应 LÖVE |
+| ---- | --------- |
+| `main` / `12.x` | 12.0 |
+| `11.x` | 11.x |
+
+要 11.x：`git clone -b 11.x --recurse-submodules https://github.com/love2d/love-android`
+
+**关于 `ffi`**：Android 上 LuaJIT 是**默认开启**的（love 的 `CMakeLists.txt` 里
+`LOVE_DEFAULT_JIT` 只有 Apple 分支为 `FALSE`），所以 `ffi` / `jit` 都可用。
+即便某天关掉也不会崩 —— `DiscordRPC.lua`、`MD5.lua`、`GamejoltAPI.lua` 全部用
+`pcall(require, ...)` 包着，缺库时只是禁用对应功能（Rich Presence 等）。
+
 ## 语言 / Language
 
 工具启动时会自动检测系统语言并切换为 **中文** 或 **English**。
@@ -112,13 +185,15 @@ at any time from the "Language / 语言" menu.
 - 工具所在文件夹（`Packager/`，当其位于项目内时）
 - 输出目录（默认 `<项目>/Export`）
 - 已有的 `*.love` 文件（可在“排除设置”中关闭）
+- `.git` / `.vscode` / `__pycache__` / `.workbuddy` 等目录（可在“排除设置”中关闭）
 
 以上规则都可在界面“排除设置”里调整，但工具自身与输出目录始终会被排除。
 
 To avoid recursive packaging ("memory bomb"), the tool always excludes its own
 script, its own folder (when inside the project), the output directory, and
-existing `*.love` files. These can be adjusted under "Exclusions", but the tool
-itself and the output directory are always excluded.
+existing `*.love` files. VCS/tooling directories such as `.git`, `.vscode`,
+`__pycache__` and `.workbuddy` are skipped as well. These can be adjusted under
+"Exclusions", but the tool itself and the output directory are always excluded.
 
 ## 结构 / Layout
 
@@ -145,7 +220,7 @@ Export/
     SDL2.dll
     ...
   game-android/           # Android 准备文件（用 Android Studio 构建 APK）
-    app/src/main/assets/game.love
+    app/src/embed/assets/game.love
     ...
   game-web/               # love-js 准备文件
     game.love

@@ -26,6 +26,16 @@ Lua 跨平台兼容检查器 / Lua cross-platform compatibility checker
          Lua 5.2+ 语法会直接编译失败；
        - 虚拟文件系统大小写敏感，大小写问题同样致命。
 
+  * Android APK —— 介于 2 与 3 之间，用严格度 2 更贴近实情
+       - love-android 默认启用 LuaJIT（love 的 CMakeLists.txt 里
+         LOVE_DEFAULT_JIT 只有 Apple 分支为 FALSE），所以方言等于
+         Windows 桌面端的官方构建：LuaJIT 2.x；
+       - LuaJIT 2.x 支持 goto / ::label::（lj_parse.c 里 goto 走
+         "5.1 软关键字" 分支），所以严格度 3 报的 goto 错误对 Android
+         是误报，不必按它改代码；
+       - 真正的 Android 雷区是"大小写敏感 + 只读游戏目录"：字符串里写死的
+         贴图/音频路径不在本工具检查范围内，需另跑素材路径检查。
+
 本工具据此把"问题"分成三类严重性：
     error   -> 该严格度下会阻断运行
     warning -> 该严格度下通常能跑，但存在踩雷风险（或某条代码路径会崩）
@@ -117,7 +127,7 @@ EXTERNAL_MODULES = EXTERNAL_RUNTIME_MODULES | EXTERNAL_THIRD_PARTY
 EXCLUDED_DIR_NAMES = {
     ".git", ".svn", ".hg", ".idea", ".vscode", "__pycache__",
     "node_modules", ".cache", ".gradle", "Export", "love-android",
-    "Packager", "Documentation",
+    "Packager", "Documentation", ".workbuddy",
 }
 LUA_SUFFIX = ".lua"
 
@@ -945,11 +955,13 @@ def analyze_file(root, rel, cidx):
     for t in tokens:
         if t.kind == "keyword" and t.value == "goto":
             rep.add(t.line, "goto_statement",
-                    "使用了 goto（Lua 5.2+ 语法，LuaJIT/Lua 5.1 会编译失败）")
+                    "使用了 goto（Lua 5.2+ 语法；只有真正的 PUC Lua 5.1 会编译失败 —— "
+                    "LuaJIT 2.x 把它当 5.1 软关键字支持，Android 就是 LuaJIT）")
         if t.kind == "symbol":
             if t.value == "::":
                 rep.add(t.line, "label_5_2",
-                        "使用了 ::label::（Lua 5.2+ 语法，LuaJIT/Lua 5.1 不支持）")
+                        "使用了 ::label::（Lua 5.2+ 语法；只有真正的 PUC Lua 5.1 不支持 —— "
+                        "LuaJIT 2.x 支持，Android 就是 LuaJIT）")
             elif t.value in TOKEN_5_3:
                 rep.add(t.line, "op_5_3",
                         "使用了运算符 %r（Lua 5.3+，LuaJIT/Lua 5.1 不支持）" % t.value)

@@ -6,14 +6,15 @@
 --    4. Instantiate once per enemy in the scene:
 --       Game:InitAnimation(i, {x, y})
 --
---  CONTRACT
---    * New(pos)      → creates a brand-new, INDEPENDENT instance.
---    * :Init(pos)    → builds the sprites (called by New).
---    * :Update(dt)   → per-frame logic, called by Battle.Update.
---    * :Hurt()       → hit reaction, called by attack patterns.
---    * :OnAttack(data) → (optional) attack-launched signal; see stub below.
---    * :Spare()      → plays the spare reaction (called on MERCY → Spare).
---    * :Destroy()    → cleans up sprites, called when the enemy dies.
+--  CONTRACT  (plain tables, NO metatable — every function uses a dot and takes
+--             the instance as its first argument)
+--    * New(pos)               → creates a brand-new, INDEPENDENT instance.
+--    * Init(self, pos)        → builds the sprites (called by New).
+--    * Update(self, dt)       → per-frame logic, called by Battle.Update.
+--    * Hurt(self)             → hit reaction, called by attack patterns.
+--    * OnAttack(self, data)   → (optional) attack-launched signal; see stub.
+--    * Spare(self)            → plays the spare reaction (MERCY → Spare).
+--    * Destroy(self)          → cleans up sprites, called when the enemy dies.
 --
 --  ENGINE-PROVIDED FIELDS (refreshed on every instance each frame)
 --    * self.enemy    → the enemy table from the encounter (id, name, hp, maxhp,
@@ -22,7 +23,14 @@
 --    * self.killable → shortcut for self.enemy.killable
 --    * self.hp / self.maxhp
 --    * self.dead     → true once HP reached 0 AND the enemy is killable.
---                      Use this in :Update to switch to a death animation.
+--                      Use this in Update to switch to a death animation.
+--
+--  HOW CALLERS REACH THE FUNCTIONS
+--    Instances are plain tables carrying `_class` → this module, so from an
+--    instance everything is one lookup away:
+--        local anim = enemy.animation
+--        anim._class.Hurt(anim)          -- engine does exactly this
+--    Sprites stay colon-style (`sprite:Set(...)`, `sprite:Dust(...)`).
 --
 --  IMPORTANT
 --    * Lua's `require` returns this module ONCE (it is cached). Two enemies of
@@ -33,10 +41,13 @@
 -- ============================================================================
 
 local MyMonster = {}
-MyMonster.__index = MyMonster
 
 function MyMonster.New(pos)
-    local self = setmetatable({}, MyMonster)
+    local self = {}
+
+    -- Back-reference to the function table (see "HOW CALLERS REACH..." above).
+    self._class = MyMonster
+
     self.running = true
     self.x = 0
     self.y = 0
@@ -44,11 +55,12 @@ function MyMonster.New(pos)
     self.hurting = false
     self.hurttime = 0
     self.intensity = 16
-    self:Init(pos)
+
+    MyMonster.Init(self, pos)
     return self
 end
 
-function MyMonster:Init(pos)
+function MyMonster.Init(self, pos)
     local _pos = (pos or {320, 140})
     local sprite = Sprites.CreateSprite("poseur.png", "UI")
     sprite:MoveTo(_pos[1], _pos[2])
@@ -57,7 +69,7 @@ function MyMonster:Init(pos)
     self.cpos = {sprite.x, sprite.y}
 end
 
-function MyMonster:Hurt()
+function MyMonster.Hurt(self)
     self.hurting = true
     self.intensity = 16
 end
@@ -71,13 +83,13 @@ end
 ---   data.offset   → distance from the perfect zone (0 = perfect)
 ---   data.position → {x, y} of the enemy on screen
 ---   data.attack   → the attack pattern instance
-function MyMonster:OnAttack(data)
+function MyMonster.OnAttack(self, data)
 end
 
-function MyMonster:Spare()
+function MyMonster.Spare(self)
 end
 
-function MyMonster:Update(dt)
+function MyMonster.Update(self, dt)
     if (not self.running) then
         return
     end
@@ -105,7 +117,7 @@ function MyMonster:Update(dt)
     -- <====================
 end
 
-function MyMonster:Destroy()
+function MyMonster.Destroy(self)
     if (not self.sprite) then
         return
     end

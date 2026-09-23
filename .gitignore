@@ -5,3 +5,16 @@
 # Python caches (Packager tooling)
 __pycache__/
 *.pyc
+
+# love-android build template. Cloned locally by the packager (~640 MB with
+# submodules) and carries its own .git, so it must never be committed here.
+Packager/love-android/
+
+# Packager output directory (default target of run.bat): built .love / .exe /
+# APK artifacts plus the copied android template. Hundreds of MB of build
+# output - never commit it.
+Export/
+
+# SoulEngine documentation dump (generated md/html). Kept out of the game repo;
+# it is maintained separately.
+soulengine-doc3/

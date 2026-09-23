@@ -155,6 +155,7 @@ function bones.New2D(whose, length, position, angle, velocity)
     bone.concat = true
     bone.layer = "Bullets"
     bone.isBullet = true
+    bone.alpha = 1
 
     bone.xpivot = 0.5
     bone.ypivot = 0.5
@@ -186,6 +187,20 @@ function bones.New2D(whose, length, position, angle, velocity)
         bone._tail.ypivot = 0
         bone._body.xscale = 5
     end
+
+    bone._head:MoveTo(999, 999)
+    bone._body:MoveTo(999, 999)
+    bone._tail:MoveTo(999, 999)
+
+    -- The three parts form ONE composite: they must NOT be pixel-snapped
+    -- individually. bones.Update snaps the bone's anchor once and places every
+    -- part at exact offsets from it; per-part rounding would let the caps
+    -- drift up to a full pixel away from the shaft as soon as the offsets are
+    -- fractional (odd length, non-90-degree rotation) -> crooked / detached
+    -- head and tail.
+    bone._head.pixel_snap = false
+    bone._body.pixel_snap = false
+    bone._tail.pixel_snap = false
 
     --- Change the layer of this 2D bone and all its Sprites.
     --- @param layer string|number  The target layer (name string or numeric).
@@ -512,6 +527,8 @@ local function _destroyWall(wall)
     for i = #wall.bones, 1, -1
     do
         local bone = wall.bones[i]
+        -- Silences the tween of a wall torn down mid-animation.
+        bone._wall_phase = nil
         if (not bone._destroyed) then
             bone:Destroy()
         end
@@ -581,6 +598,68 @@ local function _animationTable(animation)
     }
 end
 
+---Runs one wall animation phase (extend or retract) on a target.
+---
+---Why this is not a bare Tween.CreateTween call: main.lua runs Tween.Update
+---*before* the scene update that drives bones.Update, so a tween created from
+---a wall's logic only starts writing on the NEXT frame and lives for
+---`ticks + 2` frames in total (one extra pass re-writes the final value and
+---then drops the animation). Two consequences the old wall.time arithmetic
+---got wrong:
+---   * tearing the wall down at `warntime + It + staytime + Ot` destroys the
+---     sprite one frame before the retract tween writes its final value, so the
+---     last frame of motion is never drawn and the wall pops out of existence
+---     (up to ~26% of the travel with a fast-finishing easing);
+---   * with staytime <= 1 the retract is started while the extend tween is
+---     still writing its final value, so the wall freezes at full extension for
+---     a couple of frames and then catches up in a single frame (visible snap).
+---
+---Both are handled here: `_wall_phase` silences a superseded tween, and
+---`_wall_done` reports the exact frame the phase reached its target.
+---@param target table   sprite (writes x / y) or 2D bone (writes length)
+---@param phase string   "in" | "out"
+---@param easing string
+---@param from number
+---@param to number
+---@param ticks number
+---@param field string   "x" | "y" | "length"
+local function _wallTween(target, phase, easing, from, to, ticks, field)
+    target._wall_phase  = phase
+    target._wall_writes = 0
+    target._wall_done   = false
+
+    Tween.CreateTween(
+        function (value)
+            -- A newer phase already took over: never drag the wall back to the
+            -- previous phase's value.
+            if (target._wall_phase ~= phase) then
+                return
+            end
+
+            target._wall_writes = target._wall_writes + 1
+            target[field] = value
+
+            -- Call number `ticks + 1` carries the final value; Tween then makes
+            -- one more call while dropping the animation. Report the finish on
+            -- that extra call so the final value gets at least one frame on
+            -- screen before the wall is torn down.
+            if (target._wall_writes > ticks + 1) then
+                target._wall_done = true
+            end
+        end,
+        "", easing, from, to, ticks
+    )
+end
+
+---True once the *retract* phase has written its final value. The extend phase
+---sets _wall_done as well, so the phase must be checked too — otherwise the
+---wall would be torn down while it is just sitting there during staytime.
+---@param target table
+---@return boolean
+local function _wallRetracted(target)
+    return (target._wall_phase == "out" and target._wall_done == true)
+end
+
 ---A straight wall: a single long bone sprite sliding in from one side of the
 ---arena, telegraphed by a blinking warning bar.
 ---@param arena table
@@ -603,6 +682,10 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
     rotation  = (rotation or 0)
     animation = _animationTable(animation)
 
+    -- wall.time starts at 1, so a warntime of 0 would never fire the extend
+    -- tween at all. Clamp the schedule (the warning bar keeps using warntime).
+    local intime = (warntime > 0) and warntime or 1
+
     local folder = _characterFolder(whose)
     local wall = {
         time = 0,
@@ -622,6 +705,8 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
 
     -- The wall sprite is done once it has left the arena again.
     local function end_spr(spr)
+        -- Silences the tween that is still ticking for one more frame.
+        spr._wall_phase = nil
         spr:Destroy()
         for i = #wall.bones, 1, -1
         do
@@ -633,28 +718,28 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
 
     -- No more angles calculation, just move the warning sprite directly.
     -- 0, 90, 180, 270 degrees only.
+    --
+    -- Both phases travel between two fixed positions, so the retract can start
+    -- from the exact extended position instead of from `self.y` (which is a
+    -- fraction short of it while the extend tween is on its last frames).
+    -- `over` is only a safety net: the normal teardown is driven by
+    -- _wallRetracted().
+    local over = intime + animation.It + staytime + animation.Ot + 4
+
     if (direction == "down") then
         wall.warning:MoveTo(X, Y + H / 2)
         local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
-        wallspr:MoveTo(X, Y + 480 / 2 + H / 2 + 20)
+        local home = Y + 480 / 2 + H / 2 + 20
+        local ext  = Y + H / 2 + 240 - (length + 6)
+        wallspr:MoveTo(X, home)
         wallspr.isBullet = true
 
         wallspr.logic = function (self)
-            if (wall.time == warntime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.y = value
-                    end,
-                    "", animation.In, self.y, Y + H / 2 + 240 - (length + 6), animation.It
-                )
-            elseif (wall.time == warntime + animation.It + staytime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.y = value
-                    end,
-                    "", animation.Out, self.y, Y + 480 / 2 + H / 2 + 20, animation.Ot
-                )
-            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+            if (wall.time == intime) then
+                _wallTween(self, "in", animation.In, home, ext, animation.It, "y")
+            elseif (wall.time == intime + animation.It + staytime) then
+                _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "y")
+            elseif (_wallRetracted(self) or wall.time >= over) then
                 end_spr(self)
             end
         end
@@ -663,25 +748,17 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
     elseif (direction == "up") then
         wall.warning:MoveTo(X, Y - H / 2)
         local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
-        wallspr:MoveTo(X, Y - 480 / 2 - H / 2 - 20)
+        local home = Y - 480 / 2 - H / 2 - 20
+        local ext  = Y - H / 2 - 240 + (length + 6)
+        wallspr:MoveTo(X, home)
         wallspr.isBullet = true
 
         wallspr.logic = function (self)
-            if (wall.time == warntime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.y = value
-                    end,
-                    "", animation.In, self.y, Y - H / 2 - 240 + (length + 6), animation.It
-                )
-            elseif (wall.time == warntime + animation.It + staytime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.y = value
-                    end,
-                    "", animation.Out, self.y, Y - 480 / 2 - H / 2 - 20, animation.Ot
-                )
-            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+            if (wall.time == intime) then
+                _wallTween(self, "in", animation.In, home, ext, animation.It, "y")
+            elseif (wall.time == intime + animation.It + staytime) then
+                _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "y")
+            elseif (_wallRetracted(self) or wall.time >= over) then
                 end_spr(self)
             end
         end
@@ -692,25 +769,17 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
         wall.warning:MoveTo(X - W / 2, Y)
         local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
         wallspr.rotation = wallspr.rotation + 90
-        wallspr:MoveTo(X - 480 / 2 - W / 2 - 20, Y)
+        local home = X - 480 / 2 - W / 2 - 20
+        local ext  = X - W / 2 - 240 + (length + 3)
+        wallspr:MoveTo(home, Y)
         wallspr.isBullet = true
 
         wallspr.logic = function (self)
-            if (wall.time == warntime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.x = value
-                    end,
-                    "", animation.In, self.x, X - W / 2 - 240 + (length + 3), animation.It
-                )
-            elseif (wall.time == warntime + animation.It + staytime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.x = value
-                    end,
-                    "", animation.Out, self.x, X - 480 / 2 - W / 2 - 30, animation.Ot
-                )
-            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+            if (wall.time == intime) then
+                _wallTween(self, "in", animation.In, home, ext, animation.It, "x")
+            elseif (wall.time == intime + animation.It + staytime) then
+                _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "x")
+            elseif (_wallRetracted(self) or wall.time >= over) then
                 end_spr(self)
             end
         end
@@ -721,25 +790,17 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
         wall.warning:MoveTo(X + W / 2, Y)
         local wallspr = Sprites.CreateSprite("Attacks/" .. folder .. "/spr_wall.png", "Bullets")
         wallspr.rotation = wallspr.rotation + 90
-        wallspr:MoveTo(X + 480 / 2 + W / 2 + 20, Y)
+        local home = X + 480 / 2 + W / 2 + 20
+        local ext  = X + W / 2 + 240 - (length + 3)
+        wallspr:MoveTo(home, Y)
         wallspr.isBullet = true
 
         wallspr.logic = function (self)
-            if (wall.time == warntime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.x = value
-                    end,
-                    "", animation.In, self.x, X + W / 2 + 240 - (length + 3), animation.It
-                )
-            elseif (wall.time == warntime + animation.It + staytime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.x = value
-                    end,
-                    "", animation.Out, self.x, X + 480 / 2 + W / 2 + 20, animation.Ot
-                )
-            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+            if (wall.time == intime) then
+                _wallTween(self, "in", animation.In, home, ext, animation.It, "x")
+            elseif (wall.time == intime + animation.It + staytime) then
+                _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "x")
+            elseif (_wallRetracted(self) or wall.time >= over) then
                 end_spr(self)
             end
         end
@@ -813,6 +874,10 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
     rotation  = (rotation or 0)
     animation = _animationTable(animation)
 
+    -- wall.time starts at 1, so a warntime of 0 would never fire the grow
+    -- tween at all. Clamp the schedule (the warning bar keeps using warntime).
+    local intime = (warntime > 0) and warntime or 1
+
     local cos, sin = math.cos(math.rad(rotation)), math.sin(math.rad(rotation))
     local wall = {
         time = 0,
@@ -830,23 +895,21 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
     wall.warning.rotation = rotation
 
     -- Every bone of a complex wall shares the same grow/retract behaviour.
+    -- Same two off-by-ones as bones.Wall: the shrink used to start from
+    -- self.length (a fraction short of the full length while the grow tween was
+    -- still writing) and the bone used to be destroyed one frame before the
+    -- shrink reached 0, popping out of existence while still visibly long.
+    local full  = length * 2
+    local over  = intime + animation.It + staytime + animation.Ot + 4
+
     local function make_logic()
         return function (self)
-            if (wall.time == warntime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.length = value
-                    end,
-                    "", animation.In, 0, length * 2, animation.It
-                )
-            elseif (wall.time == warntime + animation.It + staytime) then
-                Tween.CreateTween(
-                    function (value)
-                        self.length = value
-                    end,
-                    "", animation.Out, self.length, 0, animation.Ot
-                )
-            elseif (wall.time >= warntime + animation.It + staytime + animation.Ot) then
+            if (wall.time == intime) then
+                _wallTween(self, "in", animation.In, 0, full, animation.It, "length")
+            elseif (wall.time == intime + animation.It + staytime) then
+                _wallTween(self, "out", animation.Out, full, 0, animation.Ot, "length")
+            elseif (_wallRetracted(self) or wall.time >= over) then
+                self._wall_phase = nil
                 self:Destroy()
                 for j = #wall.bones, 1, -1
                 do
@@ -1004,6 +1067,10 @@ function bones.Update(dt)
             body.rotation = b.rotation
             tail.rotation = b.rotation
 
+            head.alpha = b.alpha
+            body.alpha = b.alpha
+            tail.alpha = b.alpha
+
             head.isBullet = b.isBullet
             body.isBullet = b.isBullet
             tail.isBullet = b.isBullet
@@ -1016,8 +1083,32 @@ function bones.Update(dt)
             local offL = (b.ypivot - 0.5) * b.length  -- along the bone (toward head = +)
             local offS = (b.xpivot - 0.5) * width     -- to the side
 
-            local bx = b.x + offL * s + offS * c
-            local by = b.y - offL * c + offS * s
+            -- Pixel snapping, composite edition: align the bone's bounding-box
+            -- EDGES to the pixel grid and lay every part out from there. Neither
+            -- a per-part snap nor a centre snap can serve both art sets: papyrus
+            -- caps are 13 x 5 (odd) and sans caps are 10 x 6 (even), and a
+            -- centre is only on the grid for one of the two. Integer bounding
+            -- edges put the caps AND the 5 px / 6 px body on the grid for both,
+            -- and stay exact for odd lengths as well.
+            local total = b.length + (b._head.height or 0) + (b._tail.height or 0)
+            local half_l = total * 0.5                       -- along the bone
+            local half_w = (b.width or 10) * 0.5             -- across it
+            -- AABB half extents (the two axes swap as the bone rotates).
+            local half_x = math.abs(half_l * s) + math.abs(half_w * c)
+            local half_y = math.abs(half_l * c) + math.abs(half_w * s)
+
+            -- Distance from the anchor to the AABB centre (pivot offsets).
+            local dx = offL * s + offS * c
+            local dy = -offL * c + offS * s
+
+            local ax, ay = b.x, b.y
+            if (Sprites.pixel_snap) then
+                ax = Sprites.SnapEdge(ax + dx, half_x) - dx
+                ay = Sprites.SnapEdge(ay + dy, half_y) - dy
+            end
+
+            local bx = ax + dx
+            local by = ay + dy
 
             body:MoveTo(bx, by)
             local abs_length = math.abs(b.length)

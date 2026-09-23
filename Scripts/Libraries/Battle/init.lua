@@ -304,6 +304,7 @@ local function defaultEnteringState(old, new)
         Battle._wave = {}
         battle.DefenseEnding()
         Arenas.Clear()
+        battle.mainarena:MoveTo(320, 320)
         battle.mainarena:Resize(565, 130)
         battle.mainarena:RotateTo(0)
         battle.mainarena.is_active = false
@@ -521,8 +522,12 @@ function battle.Update(dt)
             -- Convenience signal: HP has reached 0 and the enemy is killable.
             anim.dead     = (v.hp ~= nil and v.hp <= 0 and v.killable == true)
 
-            if (anim.Update) then
-                anim:Update(dt)
+            -- Animations are plain instances (no metatable): the functions live
+            -- on the module the instance points at with `_class`. A bare module
+            -- that was never instantiated falls back to itself.
+            local cls = anim._class or anim
+            if (cls and cls.Update) then
+                cls.Update(anim, dt)
             end
         end
     end

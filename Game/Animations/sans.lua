@@ -6,14 +6,23 @@
 --    4. Instantiate once per enemy in the scene:
 --       Game:InitAnimation(i, {x, y})
 --
---  CONTRACT
---    * New(pos)      → creates a brand-new, INDEPENDENT instance.
---    * :Init(pos)    → builds the sprites (called by New).
---    * :Update(dt)   → per-frame logic, called by Battle.Update.
---    * :Hurt()       → hit reaction, called by attack patterns.
---    * :OnAttack(data) → (optional) attack-launched signal; see stub below.
---    * :Spare()      → plays the spare reaction (called on MERCY → Spare).
---    * :Destroy()    → cleans up sprites, called when the enemy dies.
+--  CONTRACT  (plain tables, NO metatable — every function uses a dot and takes
+--             the instance as its first argument)
+--    * New(pos)               → creates a brand-new, INDEPENDENT instance.
+--    * Init(self, pos)        → builds the sprites (called by New).
+--    * Update(self, dt)       → per-frame logic, called by Battle.Update.
+--    * Hurt(self)             → hit reaction, called by attack patterns.
+--    * OnAttack(self, data)   → (optional) attack-launched signal; see below.
+--    * Spare(self)            → plays the spare reaction (called on MERCY → Spare).
+--    * Destroy(self)          → cleans up sprites, called when the enemy dies.
+--
+--  HOW CALLERS REACH THE FUNCTIONS
+--    Instances are plain tables carrying `_class` → this module, so from an
+--    instance everything is one lookup away:
+--        local anim = enemy.animation
+--        anim._class.Hurt(anim)          -- engine does exactly this
+--        Sans.SetFace(anim, 3)           -- or straight from the module
+--    Sprites stay colon-style (`sprite:Set(...)`, `sprite:Dust(...)`).
 --
 --  ENGINE-PROVIDED FIELDS (refreshed on every instance each frame)
 --    * self.enemy    → the enemy table from the encounter (id, name, hp, maxhp,
@@ -22,7 +31,7 @@
 --    * self.killable → shortcut for self.enemy.killable
 --    * self.hp / self.maxhp
 --    * self.dead     → true once HP reached 0 AND the enemy is killable.
---                      Use this in :Update to switch to a death animation.
+--                      Use this in Update to switch to a death animation.
 --
 --  IMPORTANT
 --    * Lua's `require` returns this module ONCE (it is cached). Two enemies of
@@ -53,17 +62,16 @@
 --      cycles through spr_sansb_torso_0..7 while no arm pose is playing.
 --
 --  STATE YOU CAN DRIVE (all settable at runtime, from waves / ACT handlers)
---    self.bounce        0..3  → :SetBounce(n)
+--    self.bounce        0..3  → Sans.SetBounce(anim, n)
 --    self.bounce_scale  number → multiplies the sway amplitude
---    self.faceemotion   0..10 → :SetFace(n)      (spr_sans_bface_<n>.png)
---    self.facetype      0 = normal, 1 = blue eye → :SetFaceType / :FlashBlueEye
---    self.sweat         0 = none, 1..3           → :SetSweat(n)
+--    self.faceemotion   0..10 → Sans.SetFace(anim, n)   (spr_sans_bface_<n>.png)
+--    self.facetype      0 = normal, 1 = blue eye → Sans.SetFaceType / Sans.FlashBlueEye
+--    self.sweat         0 = none, 1..3           → Sans.SetSweat(anim, n)
 --    self.movearm       0 = idle torso, ~= 0 pauses the torso cycle (arms TBD)
---    self.headx/heady   extra head offset        → :SetHeadOffset(x, y)
+--    self.headx/heady   extra head offset        → Sans.SetHeadOffset(anim, x, y)
 -- ============================================================================
 
 local Sans = {}
-Sans.__index = Sans
 
 -- ---------------------------------------------------------------------------
 -- Tunables.
@@ -115,7 +123,11 @@ end
 -- Instance
 -- ---------------------------------------------------------------------------
 function Sans.New(pos)
-    local self = setmetatable({}, Sans)
+    local self = {}
+
+    -- Back-reference to the function table: how callers reach Sans.* from the
+    -- instance (anim._class.Update(anim, dt), anim._class.Hurt(anim), ...).
+    self._class = Sans
 
     self.running = true
     self.x = 0
@@ -160,16 +172,16 @@ function Sans.New(pos)
     self.sweat_frames = frameList(FACE_DIR, "spr_sansb_face_sweat", SWEAT_FRAMES)
     self.eye_frames = frameList(FACE_DIR, "spr_sansb_blueeye", EYE_FRAMES)
 
-    -- Last applied frames, so :Set() is only called when something changed.
+    -- Last applied frames, so Set() is only called when something changed.
     self._last_face = 0
     self._last_eye = -1
     self._last_sweat = -1
 
-    self:Init(pos)
+    Sans.Init(self, pos)
     return self
 end
 
-function Sans:Init(pos)
+function Sans.Init(self, pos)
     local _pos = (pos or {320, 140})
 
     local legs = Sprites.CreateSprite(BODY_DIR .. "spr_sansb_legs_0.png", "UI")
@@ -197,8 +209,8 @@ function Sans:Init(pos)
     self.cpos = {_pos[1], _pos[2]}
 
     -- Place everything once so nothing flashes at (0, 0) before the first
-    -- :Update() call.
-    self:ApplyOffsets(0, 0, 0)
+    -- Update() call.
+    Sans.ApplyOffsets(self, 0, 0, 0)
 end
 
 -- ---------------------------------------------------------------------------
@@ -206,7 +218,7 @@ end
 -- ---------------------------------------------------------------------------
 
 --- Every sprite this instance currently owns (body parts + live overlays).
-function Sans:AllSprites()
+function Sans.AllSprites(self)
     local list = {}
     if (self.legs) then table.insert(list, self.legs) end
     if (self.body) then table.insert(list, self.body) end
@@ -218,7 +230,7 @@ end
 
 --- Lazily build a head overlay (blue eye / sweat) and put it right on top of
 --- the head. Returns nil (once) when the image is missing from Resources.
-function Sans:CreateOverlay(path, z_offset)
+function Sans.CreateOverlay(self, path, z_offset)
     local sprite = Sprites.CreateSprite(path, "UI")
     if (not sprite or not sprite.image or sprite._loaded == false) then
         -- Missing image → the engine hands back a 1x1 placeholder; drop it.
@@ -237,9 +249,9 @@ function Sans:CreateOverlay(path, z_offset)
 end
 
 --- The blue-eye overlay (created on first use).
-function Sans:EnsureBlueEye()
+function Sans.EnsureBlueEye(self)
     if (not self.blueeye and not self._no_blueeye) then
-        self.blueeye = self:CreateOverlay(self.eye_frames[1], 0.2)
+        self.blueeye = Sans.CreateOverlay(self, self.eye_frames[1], 0.2)
         if (self.blueeye) then
             self.blueeye.visible = false
         else
@@ -254,9 +266,9 @@ end
 --- NOTE: spr_sansb_face_sweat_*.png is not in
 --- Resources/Sprites/Characters/Sans/Face yet — drop the files in and this
 --- starts working with no code change.
-function Sans:EnsureSweat()
+function Sans.EnsureSweat(self)
     if (not self.sweat_sprite and not self._no_sweat) then
-        self.sweat_sprite = self:CreateOverlay(self.sweat_frames[1], 0.3)
+        self.sweat_sprite = Sans.CreateOverlay(self, self.sweat_frames[1], 0.3)
         if (self.sweat_sprite) then
             self.sweat_sprite.visible = false
         else
@@ -271,29 +283,29 @@ end
 -- ---------------------------------------------------------------------------
 
 --- Bounce mode: 0 = still, 1 = idle 8-shape, 2 = medium bob, 3 = tired bob.
-function Sans:SetBounce(mode)
+function Sans.SetBounce(self, mode)
     self.bounce = math.floor(mode or 0)
 end
 
 --- Head expression (0..10 → spr_sans_bface_<n>.png).
-function Sans:SetFace(index)
+function Sans.SetFace(self, index)
     self.faceemotion = math.max(0, math.min(HEAD_FRAMES - 1, math.floor(index or 0)))
 end
 
 --- 0 = normal face, 1 = blue eye.
-function Sans:SetFaceType(t)
+function Sans.SetFaceType(self, t)
     self.facetype = math.floor(t or 0)
     self.f_i = 0
     self._blueeye_flash = false
 end
 
 --- Sweat drops: 0 = none, 1..3 (needs the missing spr_sansb_face_sweat_*.png).
-function Sans:SetSweat(level)
+function Sans.SetSweat(self, level)
     self.sweat = math.max(0, math.min(SWEAT_FRAMES, math.floor(level or 0)))
 end
 
 --- Show the blue eye for `duration` seconds, then go back to the normal face.
-function Sans:FlashBlueEye(duration)
+function Sans.FlashBlueEye(self, duration)
     self.facetype = 1
     self.f_i = 0
     self._blueeye_flash = true
@@ -302,7 +314,7 @@ end
 
 --- Offset the head (attack lean). With `head_auto_return` on (the default) the
 --- offset smoothly returns to 0; set `self.head_auto_return = false` to hold it.
-function Sans:SetHeadOffset(hx, hy)
+function Sans.SetHeadOffset(self, hx, hy)
     self.headx = hx or 0
     self.heady = hy or 0
 end
@@ -315,7 +327,7 @@ end
 ---@param xoff    number Horizontal sway, already scaled (legs ignore it).
 ---@param yoff    number Vertical bob, already scaled (legs ignore it).
 ---@param shake_x number Hurt knock-back.
-function Sans:ApplyOffsets(xoff, yoff, shake_x)
+function Sans.ApplyOffsets(self, xoff, yoff, shake_x)
     local shake = shake_x or 0
     local ax = self.cpos[1] + xoff + shake
     local ay = self.cpos[2]
@@ -343,7 +355,7 @@ end
 
 --- Face, blue eye and sweat overlays.
 ---@param step number A "30 FPS frame tick" (dt * SOURCE_FPS).
-function Sans:UpdateFace(step)
+function Sans.UpdateFace(self, step)
     -- --- expression (original: global.faceemotion) -------------------------
     local face = math.max(0, math.min(HEAD_FRAMES - 1, math.floor(self.faceemotion or 0)))
     if (face ~= self._last_face) then
@@ -354,7 +366,7 @@ function Sans:UpdateFace(step)
     -- --- blue eye (original: facetype == 1, floor(f_i / 2)) ----------------
     if ((self.facetype or 0) == 1) then
         self.f_i = self.f_i + step
-        local eye = self:EnsureBlueEye()
+        local eye = Sans.EnsureBlueEye(self)
         if (eye) then
             local frame = math.floor(self.f_i / 2) % EYE_FRAMES
             eye.visible = true
@@ -370,7 +382,7 @@ function Sans:UpdateFace(step)
     end
 
     -- --- sweat (original: sweat == 1 / 2 / 3) -----------------------------
-    local sweat = self:EnsureSweat()
+    local sweat = Sans.EnsureSweat(self)
     if (sweat) then
         local level = math.max(0, math.min(SWEAT_FRAMES, math.floor(self.sweat or 0)))
         if (level > 0) then
@@ -389,7 +401,7 @@ end
 -- Contract callbacks
 -- ---------------------------------------------------------------------------
 
-function Sans:Hurt()
+function Sans.Hurt(self)
     --self.hurting = true
     self.intensity = 0
 end
@@ -403,7 +415,7 @@ end
 ---   data.offset   → distance from the perfect zone (0 = perfect)
 ---   data.position → {x, y} of the enemy on screen
 ---   data.attack   → the attack pattern instance
-function Sans:OnAttack(data)
+function Sans.OnAttack(self, data)
     -- Classic skeleton reaction: the eye lights up and the head nods toward the
     -- arena. A perfect strike keeps the glint on screen a little longer.
     local ty = 220
@@ -415,14 +427,14 @@ function Sans:OnAttack(data)
     end, "Quad", "Out", ty, 320, 35, 80)
 end
 
-function Sans:Spare()
+function Sans.Spare(self)
     -- Spared: sans fades out instead of dying.
-    for _, sprite in ipairs(self:AllSprites()) do
+    for _, sprite in ipairs(Sans.AllSprites(self)) do
         sprite.alpha = 0.5
     end
 end
 
-function Sans:Update(dt)
+function Sans.Update(self, dt)
     if (not self.running) then
         return
     end
@@ -492,7 +504,7 @@ function Sans:Update(dt)
         if (math.abs(self.heady) < 0.05) then self.heady = 0 end
     end
 
-    -- 4) BLUE-EYE AUTO-OFF (only for :FlashBlueEye) -----------------------
+    -- 4) BLUE-EYE AUTO-OFF (only for FlashBlueEye) ------------------------
     if (self._blueeye_timer) then
         self._blueeye_timer = self._blueeye_timer - dt
         if (self._blueeye_timer <= 0) then
@@ -518,22 +530,22 @@ function Sans:Update(dt)
     end
 
     -- 6) FACE / BLUE EYE / SWEAT ------------------------------------------
-    self:UpdateFace(step)
+    Sans.UpdateFace(self, step)
 
     -- 7) PLACE EVERY PART --------------------------------------------------
-    self:ApplyOffsets(xoff, yoff, shake_x)
+    Sans.ApplyOffsets(self, xoff, yoff, shake_x)
 
     -- 8) DEATH -------------------------------------------------------------
     -- `self.dead` is set by Battle.Update once HP hit 0 and the enemy is
     -- killable. sans has no death sheet yet, so we just freeze the idle sway
-    -- and let :Destroy() play the dust effect. Add your own animation here.
+    -- and let Destroy() play the dust effect. Add your own animation here.
     if (self.dead) then
         self.bounce = 0
     end
     -- <====================
 end
 
-function Sans:Destroy()
+function Sans.Destroy(self)
     self.running = false
 
     if (not self.legs and not self.body and not self.head) then

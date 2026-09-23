@@ -201,7 +201,7 @@ function blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_spr
         _fire = 20
     end
 
-    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", "TopAll")
+    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", 100)
     sprite:Scale(2, 2)
     sprite.rotation = _angles[1]
     sprite:MoveTo(unpack(_start))
@@ -291,7 +291,7 @@ function blasters.NewTween(pos_tween, angles_tween, move_time, fire_time, gb_spr
         _fire = 20
     end
 
-    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", "TopAll")
+    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", 100)
     sprite:Scale(2, 2)
     sprite.rotation = _angles[1]
     sprite:MoveTo(unpack(_pos[1]))
@@ -403,7 +403,6 @@ function blasters.Update(dt)
                         b_.alpha = b_.alpha - 0.05
                         b_.yscale = b_.yscale + (0 - b_.yscale) / 8
                         if (b_.alpha <= 0) then
-                            print("a")
                             b_:Destroy()
                             table.remove(b.beams, j)
                         end

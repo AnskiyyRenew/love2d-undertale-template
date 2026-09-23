@@ -124,6 +124,7 @@ local function createElements(state)
             t.alpha = 0
         end
         shop.main:SetText(shop.main_text)
+        opinion_text:SetText("")
     elseif (state == "BUY") then
         text_pointer.alpha = 1
         updateTextPointer()
@@ -270,7 +271,6 @@ function shop.Update(dt)
                     goods_startpos = 0
                     createElements("BUY")
                     opinion_text:SetText(shop.GetBuyOpinion(goods[1].id))
-                    print(shop.GetBuyOpinion(goods[1].id))
                 end
             else
                 choosing_page = "EXITING"

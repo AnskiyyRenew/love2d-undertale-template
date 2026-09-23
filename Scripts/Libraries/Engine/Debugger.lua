@@ -114,11 +114,6 @@ local context_menu_items = {
                 str = str .. "spr.visible = " .. tostring(obj.visible) .. "\n"
             end
 
-            -- Pixel smooth
-            if (obj.pixel_smooth) then
-                str = str .. "spr.pixel_smooth = true\n"
-            end
-
             -- Four-point mesh deformation
             if (obj._four_point) then
                 local fp = obj._four_point

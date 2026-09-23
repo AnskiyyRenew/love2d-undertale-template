@@ -54,8 +54,12 @@ APP_VERSION = "1.0.0"
 LANGUAGES = ("zh", "en")
 
 DEFAULT_VCS_DIRS = {".git", ".svn", ".hg", ".idea", ".vscode",
-                    "__pycache__", "node_modules", ".cache", ".gradle"}
+                    "__pycache__", "node_modules", ".cache", ".gradle",
+                    ".workbuddy"}
 DEFAULT_EXCLUDED_EXTS = ".love, .pyc, .pyo, .tmp, .bak"
+# love-android: the "embed" flavour bakes game.love into the APK. Use the
+# "...Record..." variants instead when the game records microphone audio.
+DEFAULT_ANDROID_TASK = "assembleEmbedNoRecordRelease"
 
 # ---------------------------------------------------------------------------
 # Localization (zh / en)
@@ -106,7 +110,7 @@ STRINGS = {
         "err_output_same": "输出目录不能与项目目录相同（否则会被全部排除，无法打包）。",
         "err_no_target": "请至少勾选一种导出目标。",
         "err_love_dir": "未找到 love.exe，请检查 LÖVE 安装目录。",
-        "err_android_template": "未找到 love-android 模板目录或 app/src/main 结构。",
+        "err_android_template": "未找到 love-android 模板目录（需要 app/src/main 或 app/src/embed 结构）。",
         "confirm_open_out": "打包完成！是否打开输出目录？",
         "msg_done": "所有导出任务已完成。",
         "msg_love_created": "已生成 .love 文件: {path}（{count} 个文件）",
@@ -130,6 +134,15 @@ STRINGS = {
         "msg_icon_warn_small": "图标只有 {sizes}，尺寸过小，资源管理器大图标会模糊。建议使用含 16/32/48/256 的 .ico。",
         "msg_start": "===== 开始打包: {name} =====",
         "msg_err": "错误: {err}",
+        "target_android_apk": "…并调用 gradlew 直接构建 APK（慢，首次十几分钟）",
+        "android_task": "Gradle 任务名:",
+        "msg_android_assets": "game.love 已放入: {path}",
+        "msg_android_legacy": "模板较旧，改用旧路径: {path}",
+        "msg_android_no_gradlew": "未找到 {path}，请手动构建。",
+        "msg_android_gradle_start": "开始 Gradle 构建: {task}（首次要编译原生库，请耐心等待）",
+        "msg_android_gradle_fail": "Gradle 构建失败: {err}",
+        "msg_android_gradle_ok": "Gradle 构建完成: {task}",
+        "msg_android_apk_found": "产物: {path}",
         "help_title": "帮助",
         "help_text": (
             "使用方法:\n"
@@ -140,8 +153,10 @@ STRINGS = {
             "   - Windows .exe: 需本机安装 LÖVE，填写 love.exe 所在目录；\n"
             "     工具会把 love.exe 与 game.love 合并为独立 exe，并复制所需 DLL。\n"
             "   - Android: 需下载 love-android 模板\n"
-            "     (https://github.com/love2d/love-android)；工具会把 game.love\n"
-            "     放入 app/src/main/assets，之后用 Android Studio 构建 APK。\n"
+            "     (https://github.com/love2d/love-android，务必带 --recurse-submodules)；\n"
+            "     工具会把 game.love 放入 app/src/embed/assets（旧模板自动退回\n"
+            "     app/src/main/assets）。勾选 gradlew 构建可直接出 APK，\n"
+            "     否则用 Android Studio 打开该目录构建。\n"
             "   - love-js: 可填写 love.js 命令（如 npx love.js），\n"
             "     否则仅生成 game.love 与说明。\n"
             "4. 排除设置默认已排除工具本身、输出目录、*.love、.git 等，\n"
@@ -194,7 +209,7 @@ STRINGS = {
         "err_output_same": "The output directory must be different from the project directory.",
         "err_no_target": "Please select at least one export target.",
         "err_love_dir": "love.exe not found. Check the LÖVE installation directory.",
-        "err_android_template": "love-android template not found, or missing app/src/main structure.",
+        "err_android_template": "love-android template not found (needs an app/src/main or app/src/embed structure).",
         "confirm_open_out": "Build finished! Open the output directory?",
         "msg_done": "All export tasks completed.",
         "msg_love_created": "Created .love file: {path} ({count} files)",
@@ -218,6 +233,15 @@ STRINGS = {
         "msg_icon_warn_small": "Icon only has {sizes} - too small; Explorer large icons will look blurry. Use an .ico containing 16/32/48/256 sizes.",
         "msg_start": "===== Build started: {name} =====",
         "msg_err": "Error: {err}",
+        "target_android_apk": "...then build the APK with gradlew (slow on first run)",
+        "android_task": "Gradle task:",
+        "msg_android_assets": "game.love placed at: {path}",
+        "msg_android_legacy": "Older template detected, falling back to: {path}",
+        "msg_android_no_gradlew": "{path} not found; build it manually.",
+        "msg_android_gradle_start": "Starting Gradle build: {task} (first run compiles native libs, please wait)",
+        "msg_android_gradle_fail": "Gradle build failed: {err}",
+        "msg_android_gradle_ok": "Gradle build finished: {task}",
+        "msg_android_apk_found": "Output: {path}",
         "help_title": "Help",
         "help_text": (
             "How to use:\n"
@@ -230,8 +254,10 @@ STRINGS = {
             "     love.exe. The tool merges love.exe + game.love into a standalone\n"
             "     exe and copies the required DLLs.\n"
             "   - Android: download the love-android template\n"
-            "     (https://github.com/love2d/love-android); the tool places game.love\n"
-            "     into app/src/main/assets, then build the APK with Android Studio.\n"
+            "     (https://github.com/love2d/love-android, with --recurse-submodules);\n"
+            "     the tool places game.love into app/src/embed/assets (falls back to\n"
+            "     app/src/main/assets on older templates). Tick the gradlew option to\n"
+            "     build the APK directly, or open the folder in Android Studio.\n"
             "   - love-js: optionally provide a love.js command (e.g. npx love.js);\n"
             "     otherwise only game.love and a README are produced.\n"
             "4. The exclusion settings skip the tool itself, the output directory,\n"
@@ -310,9 +336,36 @@ def find_android_template():
     tool = os.path.dirname(os.path.abspath(__file__))
     for base in (tool, cwd):
         p = os.path.join(base, "love-android")
-        if os.path.isdir(os.path.join(p, "app", "src", "main")):
+        if is_android_template(p):
             return p
     return None
+
+
+# love-android assets layout:
+#   modern templates (>= 11.4) -> app/src/embed/assets  (embed flavour, the
+#                                                        game is baked into
+#                                                        the APK itself)
+#   old templates              -> app/src/main/assets   (LÖVE player build)
+# Dropping game.love into the WRONG one does not fail the build - the APK
+# simply boots into an empty LÖVE screen - so the choice is explicit here.
+ANDROID_EMBED_ASSETS = ("app", "src", "embed", "assets")
+ANDROID_LEGACY_ASSETS = ("app", "src", "main", "assets")
+
+
+def is_android_template(path):
+    """True when path looks like a love-android checkout."""
+    if not path or not os.path.isdir(path):
+        return False
+    src = os.path.join(path, "app", "src")
+    return (os.path.isdir(os.path.join(src, "embed"))
+            or os.path.isdir(os.path.join(src, "main")))
+
+
+def android_assets_dir(template_root):
+    """Return the assets folder love-android actually reads at build time."""
+    if os.path.isdir(os.path.join(template_root, "app", "src", "embed")):
+        return os.path.join(template_root, *ANDROID_EMBED_ASSETS)
+    return os.path.join(template_root, *ANDROID_LEGACY_ASSETS)
 
 
 def iter_project_files(project_dir, exclude_dirs, exclude_exts, exclude_paths):
@@ -426,8 +479,8 @@ class PackagerApp:
         self._export_groups = []      # (BooleanVar, [widgets...])
 
         root.title("")
-        root.geometry("780x860")
-        root.minsize(700, 720)
+        root.geometry("1240x780")
+        root.minsize(980, 560)
 
         self._build_menu()
         self._build_ui()
@@ -496,26 +549,52 @@ class PackagerApp:
 
     # ---- UI construction --------------------------------------------------
     def _build_ui(self):
-        pad = {"padx": 8, "pady": 4}
+        pad = {"padx": 8, "pady": 3}
         main = ttk.Frame(self.root, padding=10)
         main.pack(fill="both", expand=True)
+        self._main = main
+        main.columnconfigure(0, weight=0)
+        main.columnconfigure(1, weight=1)
+        main.rowconfigure(0, weight=1)
 
-        tip = ttk.Label(main, text="", wraplength=720, justify="left")
+        # ---- Left column: settings (scrollable) + pinned action bar -------
+        # The action bar is packed against the bottom of the column, so the
+        # buttons stay reachable no matter how short the window is. The settings
+        # above it live in a canvas and scroll when they do not fit.
+        left_wrap = ttk.Frame(main)
+        left_wrap.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+
+        self._left_canvas = tk.Canvas(left_wrap, highlightthickness=0,
+                                      borderwidth=0, width=440)
+        self._left_vsb = ttk.Scrollbar(left_wrap, orient="vertical",
+                                       command=self._left_canvas.yview)
+        self._left_canvas.configure(yscrollcommand=self._left_vsb.set)
+        self._left_canvas.pack(side="top", fill="both", expand=True)
+        self._left_vsb_shown = False
+
+        left = ttk.Frame(self._left_canvas)
+        self._left_inner = left
+        self._left_win = self._left_canvas.create_window((0, 0), window=left,
+                                                         anchor="nw")
+        left.bind("<Configure>", self._on_left_configure)
+        self._left_canvas.bind("<Configure>", self._on_left_canvas_configure)
+
+        tip = ttk.Label(left, text="", wraplength=540, justify="left")
         self.add_lang(tip, "tip_text")
         tip.pack(fill="x", **pad)
 
         # ---- Project settings ----
-        f1 = ttk.LabelFrame(main, padding=6)
+        f1 = ttk.LabelFrame(left, padding=4)
         self.add_lang(f1, "section_project", "text")
         f1.pack(fill="x", **pad)
         f1.columnconfigure(1, weight=1)
 
         lbl = ttk.Label(f1, text="")
         self.add_lang(lbl, "project_dir")
-        lbl.grid(row=0, column=0, sticky="w", padx=4, pady=5)
+        lbl.grid(row=0, column=0, sticky="w", padx=4, pady=4)
         self.var_proj = tk.StringVar()
         self.entry_proj = ttk.Entry(f1, textvariable=self.var_proj)
-        self.entry_proj.grid(row=0, column=1, sticky="ew", padx=4, pady=5)
+        self.entry_proj.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
         self.btn_proj = ttk.Button(f1, text="", width=10,
                                    command=lambda: self._pick_dir(self.var_proj, self._on_project_picked))
         self.add_lang(self.btn_proj, "browse")
@@ -523,10 +602,10 @@ class PackagerApp:
 
         lbl = ttk.Label(f1, text="")
         self.add_lang(lbl, "output_dir")
-        lbl.grid(row=1, column=0, sticky="w", padx=4, pady=5)
+        lbl.grid(row=1, column=0, sticky="w", padx=4, pady=4)
         self.var_out = tk.StringVar()
         self.entry_out = ttk.Entry(f1, textvariable=self.var_out)
-        self.entry_out.grid(row=1, column=1, sticky="ew", padx=4, pady=5)
+        self.entry_out.grid(row=1, column=1, sticky="ew", padx=4, pady=4)
         self.btn_out = ttk.Button(f1, text="", width=10,
                                   command=lambda: self._pick_dir(self.var_out))
         self.add_lang(self.btn_out, "browse")
@@ -534,19 +613,20 @@ class PackagerApp:
 
         lbl = ttk.Label(f1, text="")
         self.add_lang(lbl, "project_name")
-        lbl.grid(row=2, column=0, sticky="w", padx=4, pady=5)
+        lbl.grid(row=2, column=0, sticky="w", padx=4, pady=4)
         self.var_name = tk.StringVar()
         self.entry_name = ttk.Entry(f1, textvariable=self.var_name)
-        self.entry_name.grid(row=2, column=1, columnspan=2, sticky="ew", padx=4, pady=5)
+        self.entry_name.grid(row=2, column=1, columnspan=2, sticky="ew", padx=4, pady=4)
 
         # ---- Export targets ----
-        f2 = ttk.LabelFrame(main, padding=6)
+        f2 = ttk.LabelFrame(left, padding=4)
         self.add_lang(f2, "section_targets", "text")
         f2.pack(fill="x", **pad)
 
         self.var_love = tk.BooleanVar(value=True)
         self.var_exe = tk.BooleanVar(value=False)
         self.var_android = tk.BooleanVar(value=False)
+        self.var_android_build = tk.BooleanVar(value=False)
         self.var_web = tk.BooleanVar(value=False)
         self.var_source = tk.BooleanVar(value=False)
 
@@ -566,12 +646,16 @@ class PackagerApp:
         self.add_lang(self.cb_web, "target_web")
         self.cb_web.grid(row=1, column=1, sticky="w", padx=8, pady=3)
 
+        self.cb_android_apk = ttk.Checkbutton(f2, text="", variable=self.var_android_build)
+        self.add_lang(self.cb_android_apk, "target_android_apk")
+        self.cb_android_apk.grid(row=2, column=1, sticky="w", padx=8, pady=3)
+
         self.cb_source = ttk.Checkbutton(f2, text="", variable=self.var_source)
         self.add_lang(self.cb_source, "target_source")
         self.cb_source.grid(row=2, column=0, sticky="w", padx=8, pady=3)
 
         # ---- Export options ----
-        f3 = ttk.LabelFrame(main, padding=6)
+        f3 = ttk.LabelFrame(left, padding=4)
         self.add_lang(f3, "section_exports", "text")
         f3.pack(fill="x", **pad)
         f3.columnconfigure(1, weight=1)
@@ -580,6 +664,7 @@ class PackagerApp:
         self.var_rcedit = tk.StringVar()
         self.var_icon = tk.StringVar()
         self.var_android_template = tk.StringVar()
+        self.var_android_task = tk.StringVar()
         self.var_lovejs = tk.StringVar()
 
         self.entry_love_dir = self._opt_row(f3, 0, "love_dir", self.var_love_dir, True)
@@ -595,20 +680,22 @@ class PackagerApp:
                                                    ("All files", "*.*")])
         self.entry_android_template = self._opt_row(f3, 3, "android_template",
                                                     self.var_android_template, True)
-        self.entry_lovejs = self._opt_row(f3, 4, "lovejs_cmd", self.var_lovejs, False)
+        self.entry_android_task = self._opt_row(f3, 4, "android_task",
+                                                self.var_android_task, False)
+        self.entry_lovejs = self._opt_row(f3, 5, "lovejs_cmd", self.var_lovejs, False)
 
         # ---- Exclusions ----
-        f4 = ttk.LabelFrame(main, padding=6)
+        f4 = ttk.LabelFrame(left, padding=4)
         self.add_lang(f4, "section_excludes", "text")
         f4.pack(fill="x", **pad)
         f4.columnconfigure(1, weight=1)
 
         lbl = ttk.Label(f4, text="")
         self.add_lang(lbl, "excluded_exts")
-        lbl.grid(row=0, column=0, sticky="w", padx=4, pady=5)
+        lbl.grid(row=0, column=0, sticky="w", padx=4, pady=4)
         self.var_excluded_exts = tk.StringVar()
         self.entry_excluded_exts = ttk.Entry(f4, textvariable=self.var_excluded_exts)
-        self.entry_excluded_exts.grid(row=0, column=1, columnspan=2, sticky="ew", padx=4, pady=5)
+        self.entry_excluded_exts.grid(row=0, column=1, columnspan=2, sticky="ew", padx=4, pady=4)
 
         self.var_exclude_tool = tk.BooleanVar(value=True)
         self.var_exclude_out = tk.BooleanVar(value=True)
@@ -632,9 +719,9 @@ class PackagerApp:
         self.add_lang(cb, "exclude_doc")
         cb.grid(row=3, column=0, sticky="w", padx=8, pady=3)
 
-        # ---- Actions ----
-        f5 = ttk.Frame(main)
-        f5.pack(fill="x", **pad)
+        # ---- Actions (pinned below the scrollable settings) ----
+        f5 = ttk.Frame(left_wrap)
+        f5.pack(side="bottom", fill="x", **pad)
         f5.columnconfigure(2, weight=1)
 
         self.btn_build = ttk.Button(f5, text="", command=self.on_build)
@@ -652,22 +739,86 @@ class PackagerApp:
         self.lbl_status = ttk.Label(f5, textvariable=self.status)
         self.lbl_status.grid(row=1, column=0, columnspan=3, sticky="w", padx=4, pady=2)
 
-        # ---- Log ----
-        f6 = ttk.LabelFrame(main, padding=6)
-        self.add_lang(f6, "log_title", "text")
-        f6.pack(fill="both", expand=True, **pad)
+        # ---- Log (right column) ----
+        right = ttk.Frame(main)
+        right.grid(row=0, column=1, sticky="nsew")
+        right.columnconfigure(0, weight=1)
+        right.rowconfigure(0, weight=1)
 
-        self.log_text = scrolledtext.ScrolledText(f6, height=14, wrap="word",
-                                                  state="disabled", font=("Consolas", 9))
+        f6 = ttk.LabelFrame(right, padding=6)
+        self.add_lang(f6, "log_title", "text")
+        f6.grid(row=0, column=0, sticky="nsew")
+
+        self.log_text = scrolledtext.ScrolledText(f6, width=48, height=14,
+                                                  wrap="word", state="disabled",
+                                                  font=("Consolas", 9))
         self.log_text.pack(fill="both", expand=True)
+
+        # Wheel events over the settings column scroll it; bound per widget so
+        # the log pane keeps its own scrolling and no global binding leaks.
+        self._bind_wheel(self._left_canvas)
+        self._bind_wheel(left)
+
+    # ---- scrollable settings column --------------------------------------
+    def _on_left_configure(self, _event=None):
+        """Settings content changed size.
+
+        The canvas is resized to the content and the settings column is pinned
+        to that width, so sections are never clipped horizontally - the log pane
+        absorbs any shrinkage instead.
+        """
+        reqw = self._left_inner.winfo_reqwidth()
+        if reqw > 0 and self._left_canvas.winfo_reqwidth() != reqw:
+            self._left_canvas.configure(width=reqw)
+            self._main.columnconfigure(0, minsize=reqw + 18)
+        self._left_canvas.configure(scrollregion=self._left_canvas.bbox("all"))
+        self._sync_left_scrollbar()
+
+    def _on_left_canvas_configure(self, _event=None):
+        """The canvas was resized (window resize) - re-check the scrollbar."""
+        self._sync_left_scrollbar()
+
+    def _sync_left_scrollbar(self):
+        """Show the scrollbar only while the settings really overflow.
+
+        Skipped until the canvas has a real height, otherwise the pre-map
+        geometry (height 1) would always look like an overflow.
+        """
+        h = self._left_canvas.winfo_height()
+        if h <= 1:
+            return
+        need = self._left_inner.winfo_reqheight() > h
+        if need and not self._left_vsb_shown:
+            self._left_vsb.pack(side="right", fill="y")
+            self._left_vsb_shown = True
+        elif not need and self._left_vsb_shown:
+            self._left_vsb.pack_forget()
+            self._left_vsb_shown = False
+
+    def _bind_wheel(self, widget):
+        """Route wheel events over the settings column to its canvas.
+
+        Every descendant is bound explicitly: the settings widgets sit inside
+        the canvas as a window item, so a handler on the canvas alone stops
+        firing as soon as the pointer moves onto an Entry or a Checkbutton.
+        """
+        widget.bind("<MouseWheel>", self._on_left_wheel)
+        for child in widget.winfo_children():
+            self._bind_wheel(child)
+
+    def _on_left_wheel(self, event):
+        if self._left_inner.winfo_reqheight() <= self._left_canvas.winfo_height():
+            return None
+        self._left_canvas.yview_scroll(-1 if event.delta > 0 else 1, "units")
+        return "break"      # do not let the event reach the log pane
 
     def _opt_row(self, parent, row, label_key, var, with_browse,
                  picker="dir", filetypes=None):
         lbl = ttk.Label(parent, text="")
         self.add_lang(lbl, label_key)
-        lbl.grid(row=row, column=0, sticky="w", padx=4, pady=4)
+        lbl.grid(row=row, column=0, sticky="w", padx=4, pady=3)
         entry = ttk.Entry(parent, textvariable=var)
-        entry.grid(row=row, column=1, sticky="ew", padx=4, pady=4)
+        entry.grid(row=row, column=1, sticky="ew", padx=4, pady=3)
         if with_browse:
             if picker == "file":
                 btn = ttk.Button(parent, text="", width=10,
@@ -684,7 +835,8 @@ class PackagerApp:
             (self.var_exe, [self.entry_love_dir]),
             (self.var_exe, [self.entry_rcedit]),
             (self.var_exe, [self.entry_icon]),
-            (self.var_android, [self.entry_android_template]),
+            (self.var_android, [self.entry_android_template, self.entry_android_task]),
+            (self.var_android_build, [self.entry_android_task]),
             (self.var_web, [self.entry_lovejs]),
         ]
         for var, _ in self._export_groups:
@@ -723,6 +875,8 @@ class PackagerApp:
             tpl = find_android_template()
             if tpl:
                 self.var_android_template.set(tpl)
+        if not self.var_android_task.get():
+            self.var_android_task.set(DEFAULT_ANDROID_TASK)
         if not self.var_rcedit.get():
             rc = find_rcedit()
             if rc:
@@ -900,20 +1054,30 @@ class PackagerApp:
         # ---- Android preparation ----
         if self.var_android.get():
             template = self.var_android_template.get().strip() or (find_android_template() or "")
-            if not os.path.isdir(os.path.join(template, "app", "src", "main")):
+            if not is_android_template(template):
                 raise RuntimeError(self.s("err_android_template"))
             target = os.path.join(output_dir, name + "-android")
             if os.path.isdir(target):
                 shutil.rmtree(target)
-            shutil.copytree(template, target)
-            assets = os.path.join(target, "app", "src", "main", "assets")
+            # Skip the template VCS data and build caches: the love submodule
+            # sources are still copied (they are needed to compile liblove).
+            shutil.copytree(template, target,
+                            ignore=shutil.ignore_patterns(".git", "build",
+                                                          ".gradle", ".idea"))
+            assets = android_assets_dir(target)
             os.makedirs(assets, exist_ok=True)
             dest = os.path.join(assets, "game.love")
             if os.path.isfile(dest):
                 os.remove(dest)
             shutil.copy2(love_path, dest)
             self._emit("msg_android_created", path=target)
-            self._emit("msg_android_hint")
+            self._emit("msg_android_assets", path=dest)
+            if assets != os.path.join(target, *ANDROID_EMBED_ASSETS):
+                self._emit("msg_android_legacy", path=os.path.relpath(assets, target))
+            if self.var_android_build.get():
+                self._build_android_apk(target)
+            else:
+                self._emit("msg_android_hint")
 
         # ---- love-js (Web) ----
         if self.var_web.get():
@@ -943,6 +1107,53 @@ class PackagerApp:
             count = create_zip(project_dir, zip_path, exclude_dirs,
                                exclude_exts, exclude_paths)
             self._emit("msg_source_created", path=zip_path)
+
+    def _build_android_apk(self, project_root):
+        """Run gradlew inside the prepared project and stream its output."""
+        script = "gradlew.bat" if sys.platform.startswith("win") else "gradlew"
+        gradlew = os.path.join(project_root, script)
+        if not os.path.isfile(gradlew):
+            self._emit("msg_android_no_gradlew", path=gradlew)
+            self._emit("msg_android_hint")
+            return
+        task = self.var_android_task.get().strip() or DEFAULT_ANDROID_TASK
+        self._emit("msg_android_gradle_start", task=task)
+        # .bat is not a PE binary: CreateProcess cannot launch it directly,
+        # so on Windows it has to go through cmd.exe.
+        use_shell = sys.platform.startswith("win")
+        cmd = '"%s" %s' % (gradlew, task) if use_shell else [gradlew, task]
+        try:
+            proc = subprocess.Popen(cmd, cwd=project_root, shell=use_shell,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    text=True, errors="replace", bufsize=1)
+        except Exception as exc:
+            self._emit("msg_android_gradle_fail", err=exc)
+            self._emit("msg_android_hint")
+            return
+        for line in proc.stdout:
+            self._emit_raw(line.rstrip())
+        proc.stdout.close()
+        proc.wait()
+        if proc.returncode != 0:
+            self._emit("msg_android_gradle_fail", err="exit code %d" % proc.returncode)
+            self._emit("msg_android_hint")
+            return
+        self._emit("msg_android_gradle_ok", task=task)
+        for artifact in self._find_android_outputs(project_root):
+            self._emit("msg_android_apk_found", path=artifact)
+
+    def _find_android_outputs(self, project_root):
+        """Collect .apk / .aab files produced under app/build/outputs."""
+        out = []
+        root_dir = os.path.join(project_root, "app", "build", "outputs")
+        if not os.path.isdir(root_dir):
+            return out
+        for base, _dirs, files in os.walk(root_dir):
+            for f in files:
+                if f.lower().endswith((".apk", ".aab")):
+                    out.append(os.path.join(base, f))
+        return sorted(out)
 
     def _embed_icon(self, exe_path, icon_path=None):
         """Embed icon_path (or the UI-selected icon) into exe_path via rcedit.

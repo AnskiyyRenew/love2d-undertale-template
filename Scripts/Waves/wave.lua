@@ -10,6 +10,7 @@ local bullet = Sprites.CreateSprite("bullet.png", "Bullets")
 bullet:Scale(4, 4)
 bullet:MoveTo(math.random(220, 420), math.random(240, 400))
 bullet:SetStencils({mask})
+bullet.rotation = 0
 bullet.isBullet = true
 table.insert(wave.objects, bullet)
 
