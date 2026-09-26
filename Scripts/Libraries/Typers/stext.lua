@@ -66,12 +66,11 @@ end
 
 local fonts_cache = {}
 local function getFont(name, size)
-    local prepath = "Resources/Fonts/"
     local key = name .. "_" .. size
     if (fonts_cache[key]) then
         return fonts_cache[key]
     else
-        local font = SE.graphics.newFont(prepath .. name, size, "mono")
+        local font = Fonts.New(name, size, "mono")
         font:setFilter("nearest", "nearest")
         fonts_cache[key] = font
         return font

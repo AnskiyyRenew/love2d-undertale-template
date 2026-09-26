@@ -1,6 +1,11 @@
 # Game/Waves/bones
 
-骨头（bones）波次脚本目录（波次只认 Game 区与此处对应规则）。
+Bone (`bones`) wave script directory.
 
-- 波次模块 `Game.Waves.<名称>` 对应本目录下 `<名称>.lua`
-- 未提供时回退引擎侧 `Scripts.Waves.<名称>`；未知波次名走默认波
+- A wave file `<name>.lua` in this directory is module `Game.Waves.bones.<name>` — i.e. the
+  wave name you pass around is `bones.<name>` (e.g. `bones.wave1`)
+- Resolution is Game area first, then the engine twin `Scripts.Waves.<name>` (so
+  `bones.wave1` also matches `Scripts/Waves/bones/wave1.lua`). A module found in the engine
+  directory after the Game area has no copy logs a `[Battle - Wave] WARNING`
+- A wave that is missing **or** throws falls back to the default wave (`wave`), so a battle
+  always has something to run; the module actually used is recorded in `Battle.waveModule`

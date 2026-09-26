@@ -1,23 +1,18 @@
--- Poseur animation factory.
+-- Poseur animation — the monster of the sample encounter.
 --
--- STYLE — no metatables, dot notation only.
---   * Every function is declared with a dot and takes the instance as its
---     first argument: `PoseurAnim.Hurt(self)`.
---   * `New(pos)` returns a PLAIN table (no metatable). It carries `_class`,
---     pointing back at this module, so any caller can find the functions from
---     the instance alone:  `anim._class.Hurt(anim)`.
---   * The engine does exactly that — Battle.Update calls
---     `anim._class.Update(anim, dt)`, attack patterns call
---     `anim._class.Hurt(anim)` / `anim._class.OnAttack(anim, data)`, the mercy
---     menu calls `anim._class.Spare(anim)` / `anim._class.Destroy(anim)`.
---   * Sprites are still engine objects → keep the colon there
---     (`sprite:Set(...)`, `sprite:Dust(...)`).
+-- Contract and style rules live in Game/Animations/_temp.lua — read that first.
+-- Short version: plain table, NO metatable; every function is declared with a
+-- dot and takes the instance as its first argument; `New(pos)` returns a plain
+-- instance that carries `_class` back to this module and gets these functions
+-- bound onto it (Battle.BindAnimation), so the engine, the attack patterns and
+-- the mercy menu all write `anim.Foo(...)` on the instance.
+-- Everything inside this file calls the module by name (`PoseurAnim.Foo(self, ...)`).
+-- Sprites stay colon-style (`sprite:Set(...)`, `sprite:Dust(...)`).
 --
--- This module is a FACTORY: `require` returns the module once (Lua caches it
--- in `package.loaded`), so `New(...)` is the only way to get a usable anim.
--- Every enemy gets its OWN instance (own sprite + own state) by calling
--- `New(pos)`, which means two enemies of the same type no longer share a
--- single `anim` table — updating or destroying one can't touch the other.
+-- This module is a FACTORY: `require` returns the module once (Lua caches it in
+-- `package.loaded`), so `New(pos)` is the only way to get a usable instance.
+-- Every enemy gets its OWN sprite and its own state, which means two enemies of
+-- the same type no longer share one table.
 
 local PoseurAnim = {}
 
@@ -25,19 +20,21 @@ local PoseurAnim = {}
 function PoseurAnim.New(pos)
     local self = {}
 
-    -- Back-reference to the function table. This is the whole "class" link.
+    -- Back-reference to this module's function table. Do not rename it.
     self._class = PoseurAnim
 
     self.running = true
-    self.x = 0
-    self.y = 0
     self.elements = {}
 
     self.hurting = false
-    self.hurttime = 0
     self.intensity = 16
 
     PoseurAnim.Init(self, pos)
+
+    -- The instance drives itself from here on (`anim.SetFace(3)`) — see
+    -- Battle.BindAnimation for the rule.
+    Battle.BindAnimation(self, PoseurAnim)
+
     return self
 end
 
@@ -74,14 +71,12 @@ function PoseurAnim.Update(self, dt)
     end
 
     -- Put your monster's animation code here.
-    --===================>
     if (self.hurting) then
         local p = self.poseur
         p.x = self.cpos[1] + self.intensity
         if (self.intensity > 0) then self.intensity = self.intensity - 1; self.intensity = -self.intensity
         elseif (self.intensity < 0) then self.intensity = -self.intensity end
     end
-    --<===================
 end
 
 -- Destroy the anim.

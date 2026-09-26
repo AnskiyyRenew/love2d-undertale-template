@@ -1,6 +1,6 @@
 # Game/Resources/Sounds
 
-游戏侧音效资源目录（引擎优先读取此处）。
+Game-side sound effect resource directory (the engine reads from here first).
 
-- 放置 `.wav` / `.ogg` 等音效文件，代码中按文件名引用
-- 未找到时回退引擎目录 `Resources/Sounds/`
+- Put `.wav` / `.ogg` sound files here and reference them by filename in code
+- Falls back to the engine directory `Resources/Sounds/` when not found

@@ -111,6 +111,24 @@ function battle_methods.AddEnemy(self, enemy_data)
     return e
 end
 
+--- Give enemy #`index` its own animation instance, and hand that instance back.
+---
+--- `enemy.animation` starts life as the animation *module* (what the encounter
+--- `require`d); this call swaps that field for a fresh instance built by
+--- `New(pos)` and returns it. The instance carries its own bound methods, so a
+--- scene drives it with plain dot calls:
+---
+---     local sans = Game:InitAnimation(1, {320, 140})
+---     sans.SetFace(3)
+---     sans.cpos[1] = 100
+---
+--- Calling this twice is harmless: the second call changes nothing and answers
+--- with the instance already in place, so it doubles as a way to fetch the
+--- handle. An instance that was never registered here is invisible to the
+--- engine — nothing would drive it.
+---
+---@param index integer Position in `self.enemies` (1-based).
+---@return table|nil anim The instance now stored at `enemy.animation`.
 function battle_methods.InitAnimation(self, index, ...)
     local enemy = self.enemies and self.enemies[index]
     if (not enemy or not enemy.animation) then
@@ -118,39 +136,59 @@ function battle_methods.InitAnimation(self, index, ...)
         return
     end
 
-    -- `enemy.animation` is either the animation *module* (from `require`) or
-    -- already an independent instance. Animations are plain tables now (no
-    -- metatable): an instance carries `_class` → the module holding its
-    -- functions, the module itself does not. So `_class` is the marker, and it
-    -- works for any enemy without any monster-specific field.
+    -- `enemy.animation` is either the animation *module* (what `require` gave
+    -- the encounter) or already an independent instance. `_class` is the marker
+    -- — see Battle.AnimModule / Battle.IsAnimInstance for the whole rule.
     local module = enemy.animation
 
-    if (module and module._class) then
-        return  -- already an independent instance → nothing to do
+    if (Battle.IsAnimInstance(module)) then
+        -- Already built → nothing to do, but still answer with the handle so a
+        -- second call is a valid way to fetch it. Re-binding is a no-op.
+        Battle.BindAnimation(module)
+        return module
+    end
+
+    -- The contract is `New(pos)` → a fresh, independent instance per enemy
+    -- (see Game/Animations/_temp.lua). A module without New() is reported
+    -- rather than guessed at: the old `module.Init(...)` fallback pushed `pos`
+    -- into the `self` slot, so it never did anything useful.
+    if (type(module) ~= "table" or not module.New) then
+        print("[Game - Animation] WARNING: Enemy #" .. tostring(index)
+            .. " animation has no New(pos); call Game:InitAnimation from the scene.")
+        return
     end
 
     local created_instance = false
     local ok, err = pcall(function (...)
         -- Factory module → produce a fresh, independent instance per enemy.
-        if (module.New) then
-            enemy.animation = module.New(...)
-            created_instance = true
-        -- Legacy module with an in-place Init() (single shared instance).
-        elseif (module.Init) then
-            module.Init(...)
-        end
+        enemy.animation = module.New(...)
+        created_instance = true
     end, ...)
 
     if (not ok) then
         print("[Game - Animation] Error: " .. err)
+        return
+    end
+
+    -- A `New()` that answers with something other than a table is a broken
+    -- module: report nothing, hand back nothing, leave `enemy.animation` as it
+    -- ended up (it is `nil` in that case, so Battle.Update skips the enemy).
+    local anim = enemy.animation
+    if (not created_instance or type(anim) ~= "table") then
+        return
     end
 
     -- Expose the owning enemy table to the animation instance, so monster code
     -- can read enemy data (e.g. `self.enemy.canspare`, `self.enemy.killable`).
     -- Battle.Update also refreshes a few shortcut fields on it every frame.
-    if (ok and created_instance and enemy.animation and type(enemy.animation) == "table") then
-        enemy.animation.enemy = enemy
-    end
+    anim.enemy = enemy
+
+    -- Finally, hang the module's functions on the instance: from here on the
+    -- instance drives itself (`anim.SetFace(3)`, `anim.Update(dt)`). See
+    -- Battle.BindAnimation for the rule.
+    Battle.BindAnimation(anim, module)
+
+    return anim
 end
 
 --- Find an enemy by its string `id` (e.g. "SOL", "SINCERA") and apply forced damage / attack.

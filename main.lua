@@ -17,6 +17,10 @@ print("配置已加载成功，引擎版本:             " .. _VER .. "\n")
 -- Libraries
 LuaEX = ImportFile("Utils.LuaExtended")
 Global = ImportFile("Global")
+-- Fonts: Game-first lookup (Game/Resources/Fonts/ before Resources/Fonts/).
+-- Every font load goes through Fonts.New so a game can swap any typeface by
+-- dropping a same-named file into its own Resources folder.
+Fonts = ImportFile("Fonts")
 Collisions = ImportFile("Collisions")
 Tween = ImportFile("Tween")
 Masks = ImportFile("Masks")

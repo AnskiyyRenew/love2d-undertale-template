@@ -1,6 +1,6 @@
 # Game/Resources/Music
 
-游戏侧音乐资源目录（引擎优先读取此处）。
+Game-side music resource directory (the engine reads from here first).
 
-- 放置 `.ogg` / `.mp3` 等音乐文件，代码中按文件名引用
-- 未找到时回退引擎目录 `Resources/Music/`
+- Put `.ogg` / `.mp3` music files here and reference them by filename in code
+- Falls back to the engine directory `Resources/Music/` when not found

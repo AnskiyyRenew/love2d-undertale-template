@@ -7,10 +7,10 @@ local time = 0
 local alpha = 0
 
 Audio.PlaySound("snd_intro.ogg")
-local font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13, "mono")
+local font = Fonts.New("determination_mono.ttf", 13, "mono")
 font:setFilter("nearest", "nearest")
 
-local tip = SE.graphics.newFont("Resources/Fonts/Mars Needs Cunnilingus.ttf", 13, "mono")
+local tip = Fonts.New("Mars Needs Cunnilingus.ttf", 13, "mono")
 tip:setFilter("nearest", "nearest")
 
 function scene.update(dt)

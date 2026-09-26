@@ -1,6 +1,6 @@
 # Game/Maps/main_scene
 
-主场景（main_scene）地图文件目录。
+Map files for the main scene (main_scene).
 
-- 地图文件按场景给出的相对路径在此优先查找（Game 区优先）
-- 未找到时回退场景指定的原路径
+- Map files are looked up here first, under the relative path given by the scene (Game side takes priority)
+- Falls back to the original path given by the scene when not found here

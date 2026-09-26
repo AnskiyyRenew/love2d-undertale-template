@@ -35,17 +35,9 @@ function atk.SetMaxDamage(dmg)
     damage = dmg
 end
 
--- Resolve the function table that drives an animation value, plus the instance
--- to pass as `self`. Animations are plain tables (no metatable): an instance
--- carries `_class` → the module holding its functions; a bare module that was
--- never instantiated falls back to itself, which keeps the old shared-instance
--- behaviour working. Returns nil when there is nothing to call.
-local function animClass(anim)
-    if (type(anim) ~= "table") then
-        return nil, nil
-    end
-    return (anim._class or anim), anim
-end
+-- Animations drive themselves: an instance carries its own bound methods (see
+-- Battle.BindAnimation), so the callers below just write `anim.Hurt()` /
+-- `anim.OnAttack(data)`. A bare module that was never bound is skipped.
 
 -- Interface pulled out by this attack pattern: signal that the targeted enemy
 -- has been hit. The battle system dispatches to the enemy's animation Hurt()
@@ -55,9 +47,9 @@ function atk.Hurt()
         return
     end
 
-    local cls, anim = animClass(enemy.animation)
-    if (cls and cls.Hurt) then
-        cls.Hurt(anim)
+    local anim = enemy.animation
+    if (type(anim) == "table" and anim._bound and anim.Hurt) then
+        anim.Hurt()
     end
 end
 
@@ -76,13 +68,9 @@ function atk.Attack(data)
         return
     end
 
-    local cls, anim = animClass(enemy.animation)
-    if (not cls) then
-        return
-    end
-
-    if (cls.OnAttack) then
-        cls.OnAttack(anim, data)
+    local anim = enemy.animation
+    if (type(anim) == "table" and anim._bound and anim.OnAttack) then
+        anim.OnAttack(data)
     end
 end
 

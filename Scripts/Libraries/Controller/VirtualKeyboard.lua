@@ -1130,9 +1130,9 @@ local function loadFont(path, size)
     if (f == nil) then
         local ok, font
         if (path) then
-            ok, font = pcall(SE.graphics.newFont, path, size)
+            ok, font = pcall(Fonts.New, path, size)
         else
-            ok, font = pcall(SE.graphics.newFont, size)
+            ok, font = pcall(Fonts.New, nil, size)
         end
         f = (ok and font) or false
         fontCache[key] = f

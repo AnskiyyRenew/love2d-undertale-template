@@ -1,6 +1,6 @@
 local scene = {}
 
-local font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13, "mono")
+local font = Fonts.New("determination_mono.ttf", 13, "mono")
 font:setFilter("nearest", "nearest")
 
 local time = 0

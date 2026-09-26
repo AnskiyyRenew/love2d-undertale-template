@@ -53,7 +53,7 @@ python check_compat.py --all
 python check_compat.py --json
 ```
 
-Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（默认按严格度 3 检查）。
+Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（**默认按严格度 2 检查**，与直接跑 `python check_compat.py` 的默认值 3 不同）。
 
 ### 三级严格度（对应三种目标平台）
 
@@ -202,8 +202,10 @@ Packager/
   build_tool.py       # 主程序（GUI + 打包逻辑）
   count_lua_files.py  # Lua 文件统计脚本
   check_compat.py     # Lua 跨平台兼容检查器（三级严格度）
-  check_compat.bat    # 检查器 Windows 启动脚本
+  check_compat.bat    # 检查器 Windows 启动脚本（默认 --strict 2）
   run.bat             # Windows 启动脚本
+  rcedit-x64.exe      # 给导出的 exe 写图标 / 版本信息的工具（随仓库分发）
+  love-android/       # love-android 模板（git 子模块，clone 后才有）
   README.md           # 本说明
 ```
 

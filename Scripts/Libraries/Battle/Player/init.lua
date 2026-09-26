@@ -138,6 +138,33 @@ local function requireSoul(id)
         SOUL_ROOTS[1] .. ", " .. SOUL_ROOTS[2] .. ").", 0)
 end
 
+---Hand a freshly loaded soul module its sprite and let the soul initialise
+---itself.
+---
+---The soul owns its own setup - binding the sprite, picking its own tint,
+---resetting its own state, consuming `args`. The contract is written down once,
+---in Souls/_temp.lua; this file pokes no soul fields of its own.
+---
+---A soul written before `Init` existed still runs: the two fields the engine
+---itself reads back (`sprite` / `can_move`) are bound here instead, loudly, so a
+---game is never left with a soul that drives nothing.
+---@param module table The soul module that was just required.
+---@param sprite table The sprite this soul drives.
+---@param can_move boolean Mirrors Player.canMove at switch time.
+---@param args table|nil Extra arguments from SetSoul / NewSoul.
+---@return table module The same module, for chaining.
+local function initSoul(module, sprite, can_move, args)
+    if (module.Init) then
+        module.Init(sprite, can_move, args)
+    else
+        print("[Player] WARNING: this soul has no Init(); binding sprite/can_move " ..
+            "from the engine side (contract: Souls/_temp.lua).")
+        module.sprite = sprite
+        module.can_move = (can_move ~= false)
+    end
+    return module
+end
+
 local Player = {
     _spr_default = "Soul Library Sprites/spr_default_heart.png",
     action = requireSoul("red"),
@@ -163,29 +190,29 @@ Player.sprite:MoveTo(999, 999)
 Player.sprite.color = {1, 0, 0}
 Player.sprite._hitbox = {4, 4}
 
+---Switches the player's soul. The soul sets itself up through its own `Init`
+---(sprite, tint, starting state) - see initSoul above.
+---@param id string|number Soul name, or the numeric shortcuts 1 / 2 / 6.
+---@param args table|nil Forwarded to the soul's Init.
+---@param use_sound boolean|nil Play the switch sound.
 function Player.SetSoul(id, args, use_sound)
     if (id == nil) then
         print("[WARNING] Invalid soul name.")
         return
     end
     local _id = id
-    local spr = Player.sprite
 
+    -- Numeric shortcuts for the souls the engine ships.
     if (_id == 1) then
         _id = "red"
-        spr.color = {1, 0, 0}
     elseif (_id == 2) then
         _id = "orange"
-        spr.color = {1, 0.5, 0}
     elseif (_id == 6) then
         _id = "blue"
-        spr.color = {0, 0, 1}
     end
-    Player.action = requireSoul(_id)
-    Player.action.sprite = Player.sprite
-    Player.action.can_move = Player.canMove
-    Player.action.Update()
+
     Player.soul = _id
+    Player.action = initSoul(requireSoul(_id), Player.sprite, Player.canMove, args)
 
     if (use_sound) then
         Audio.PlaySound("snd_ding.wav")
@@ -215,7 +242,7 @@ end
 ---Each new soul loads the same soul module as a separate instance,
 ---so it behaves like the main soul but has its own state and sprite.
 ---@param id string|number The soul identifier (e.g. "red", "orange", or 1 for red)
----@param args any Optional arguments passed to the soul module
+---@param args table|nil Forwarded to the soul's Init.
 ---@param use_sound boolean|nil Whether to play the ding sound
 function Player.NewSoul(id, args, use_sound)
     if (id == nil) then
@@ -234,11 +261,10 @@ function Player.NewSoul(id, args, use_sound)
     sprite.color = {1, 0, 0}
     sprite._hitbox = {4, 4}
 
-    -- Load the soul module and create a unique instance for this soul
-    local module = requireSoul(_id)
+    -- Load the soul module, let it set itself up on that fresh sprite, then keep
+    -- a private copy so this entry in Player.souls owns its own fields.
+    local module = initSoul(requireSoul(_id), sprite, Player.canMove, args)
     local soul = copy_soul(module)
-    soul.sprite = sprite
-    soul.can_move = Player.canMove
 
     table.insert(Player.souls, soul)
 
@@ -256,6 +282,26 @@ function Player.SetHitBox(width, height, soul)
     else
         soul.sprite._hitbox = {w, h}
     end
+end
+
+---Switch the player soul sprite(s) to perfect-pixel collision, so the bullet
+---test follows the heart's real pixels instead of the `_hitbox` box (see
+---Sprites.SetPPCollision). Applies to the main soul and every extra soul sprite.
+---Turn this on only if you want the art's true shape: for the 16x16 heart that
+---is a wider hit area than the default 4x4 test box.
+---@param enabled boolean
+---@return boolean ok Whether a usable tiling was found.
+---@return integer count How many collision rectangles it produced.
+function Player.SetPerfectPixel(enabled)
+    local ok, count = Player.sprite:SetPPCollision(enabled)
+
+    for _, soul in ipairs(Player.souls) do
+        if (soul.sprite) then
+            soul.sprite:SetPPCollision(enabled)
+        end
+    end
+
+    return ok, count
 end
 
 function Player.Heal(amount, use_sound)
@@ -588,13 +634,20 @@ function Player.Update(dt)
         do
             if (b.isBullet) then
                 local coll_b = Collisions.FollowShape(b)
-                local coll_p = Collisions.FollowShape(Player.sprite)
-
-                coll_p.w, coll_p.h = Player.sprite._hitbox[1], Player.sprite._hitbox[2]
+                -- The player's own box: the sprite's image rectangle narrowed to
+                -- `_hitbox` when one is set (a 16x16 heart tested as a small box).
+                local coll_p = Sprites.GetHitbox(Player.sprite)
 
                 if (Collisions.RectangleWithRectangle(coll_b, coll_p)) then
-                    Battle.OnHit(b)
-                    break
+                    -- Broad phase hit. When either side asked for perfect-pixel
+                    -- collision (sprite:SetPPCollision(true)) the real answer
+                    -- comes from the rectangulated shapes; nil means neither
+                    -- side opted in, so the box result stands.
+                    local pp = Sprites.PPCollide(b, Player.sprite)
+                    if (pp == nil or pp == true) then
+                        Battle.OnHit(b)
+                        break
+                    end
                 end
             end
         end

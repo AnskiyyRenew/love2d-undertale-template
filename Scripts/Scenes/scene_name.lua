@@ -1,6 +1,6 @@
 local scene = {}
 
-local font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 27, "mono")
+local font = Fonts.New("determination_mono.ttf", 27, "mono")
 local name_str = "AAAAAA"
 local alphabets = {}
 local positions = {}

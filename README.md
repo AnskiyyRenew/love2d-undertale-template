@@ -27,17 +27,19 @@ The template is organized around six topics. Each one is wired up and comes with
 
 ### Documentation
 
-The repo ships with a full documentation site under `Documentation/`, covering getting started, Lua basics, the engine workflow, advanced features, battle development, overworld development, localization, packaging and common error handling.
+The docs are **maintained in a separate repository** and published as a documentation site — they are not part of this game repo.
 
 - **Online** — always up to date: https://anskiyyrenew.github.io/SoulEngine-Documentation/
-- **Offline** — open the `Documentation/` folder locally, works without internet access.
+- **Locally** — if you have a `soulengine-doc3/` folder sitting next to the project, it is the MkDocs source for that site. Note that it is listed in `.gitignore`, so a fresh `git clone` will not contain it; use the online site instead.
+
+> `soulengine-doc3/` is a local working copy only. There is **no** `Documentation/` directory in this repository.
 
 ### Getting Started
 
 **Prerequisites**
 
 - Familiarity with [UNDERTALE](https://undertale.com/) is recommended.
-- [LOVE2D](https://love2d.org/) **11.3** or compatible. Future updates aim to maintain compatibility with newer LOVE versions.
+- [LOVE2D](https://love2d.org/) **12.0** or compatible. Future updates aim to maintain compatibility with newer LOVE versions.
 
 **Run the project**
 
@@ -52,10 +54,13 @@ The repo ships with a full documentation site under `Documentation/`, covering g
 
 This template uses the following libraries:
 
-- [MD5](https://github.com/kikito/md5.lua) by kikito — pure-Lua 5.1 MD5 implementation.
-- [dkjson](http://dkolf.de/dkjson-lua/) — JSON module for Lua with UTF-8 support.
-- [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 — Tiled map loader and renderer for LÖVE.
-- [sock](https://github.com/camchenry/sock.lua) by camchenry — networking library for LÖVE, useful for multiplayer experiments.
+- [MD5](https://github.com/kikito/md5.lua) by kikito — pure-Lua 5.1 MD5 implementation (`Scripts/Libraries/Utils/MD5.lua`), used for the GameJolt request signature.
+- [dkjson](http://dkolf.de/dkjson-lua/) — JSON module for Lua with UTF-8 support (`Scripts/Libraries/Utils/dkjson.lua`).
+- [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 — Tiled map loader and renderer for LÖVE (`Scripts/Libraries/STI/`).
+- [sock](https://github.com/camchenry/sock.lua) by camchenry — networking library for LÖVE, useful for multiplayer experiments (`Scripts/Libraries/Network/sock.lua`).
+- [bitser](https://github.com/gvx/bitser) by Robin Wellner — fast Lua binary serializer, one of sock's backends.
+- [binser](https://github.com/CalvinRose/binser) by Calvin Rose — the other serialization backend shipped alongside sock.
+- [lua-https](https://github.com/love2d/lua-https) — the native `https` module used by the GameJolt API (`Resources/Libs/https.dll`, Windows only).
 
 ### Community
 
@@ -85,17 +90,19 @@ This template uses the following libraries:
 
 ### 文档
 
-仓库随附一套完整文档站点，位于 `Documentation/` 下，涵盖入门、Lua 基础、引擎工作流、进阶特性、战斗开发、大地图开发、本地化、打包与常见错误处理。
+文档**单独一个仓库维护**，以文档站的形式发布，并不随这个游戏仓库一起分发。
 
 - **在线** —— 始终最新：https://anskiyyrenew.github.io/SoulEngine-Documentation/
-- **离线** —— 在本地打开 `Documentation/` 文件夹，无需联网。
+- **本地** —— 如果你恰好有一个 `soulengine-doc3/` 文件夹放在项目旁边，那就是这个站点的 MkDocs 源；但它在 `.gitignore` 里，**全新 `git clone` 下来的仓库不会有它**，直接用在线站即可。
+
+> `soulengine-doc3/` 只是本地工作副本。本仓库里**没有** `Documentation/` 目录。
 
 ### 快速开始
 
 **前置条件**
 
 - 建议熟悉 [UNDERTALE](https://undertale.com/)。
-- [LOVE2D](https://love2d.org/) **11.3** 或兼容版本。后续更新将尽量兼容更新的 LOVE 版本。
+- [LOVE2D](https://love2d.org/) **12.0** 或兼容版本。后续更新将尽量兼容更新的 LOVE 版本。
 
 **运行项目**
 
@@ -110,10 +117,13 @@ This template uses the following libraries:
 
 本模板使用了以下库：
 
-- [MD5](https://github.com/kikito/md5.lua) by kikito —— 纯 Lua 5.1 MD5 实现。
-- [dkjson](http://dkolf.de/dkjson-lua/) —— 支持 UTF-8 的 Lua JSON 模块。
-- [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 —— LÖVE 的 Tiled 地图加载器与渲染器。
-- [sock](https://github.com/camchenry/sock.lua) by camchenry —— LÖVE 的网络库，适合多人联机实验。
+- [MD5](https://github.com/kikito/md5.lua) by kikito —— 纯 Lua 5.1 MD5 实现（ `Scripts/Libraries/Utils/MD5.lua` ），GameJolt 请求签名用。
+- [dkjson](http://dkolf.de/dkjson-lua/) —— 支持 UTF-8 的 Lua JSON 模块（ `Scripts/Libraries/Utils/dkjson.lua` ）。
+- [STI](https://github.com/karai17/Simple-Tiled-Implementation) by karai17 —— LÖVE 的 Tiled 地图加载器与渲染器（ `Scripts/Libraries/STI/` ）。
+- [sock](https://github.com/camchenry/sock.lua) by camchenry —— LÖVE 的网络库，适合多人联机实验（ `Scripts/Libraries/Network/sock.lua` ）。
+- [bitser](https://github.com/gvx/bitser) by Robin Wellner —— 快速的 Lua 二进制序列化库，sock 的后端之一。
+- [binser](https://github.com/CalvinRose/binser) by Calvin Rose —— 随 sock 一起附带的另一个序列化后端。
+- [lua-https](https://github.com/love2d/lua-https) —— GameJolt API 依赖的原生 `https` 模块（ `Resources/Libs/https.dll` ，仅 Windows）。
 
 ### 社区
 

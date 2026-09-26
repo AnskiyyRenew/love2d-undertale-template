@@ -48,8 +48,33 @@ function audio.ResolvePath(kind, name)
     local root_prefix = (kind == "music") and audio._path_music or audio._path_sound
     local game_prefix = (kind == "music") and audio._game_path_music or audio._game_path_sound
 
-    -- Leading slash: already relative to the love filesystem root, leave as-is.
+    name = name:gsub("\\", "/")
+
+    -- Leading slash: an absolute path from the love filesystem root. The Game
+    -- twin and the sounds/music root are still probed, because callers such as
+    -- the Typers write "/Voices/foo.wav" meaning "under Resources/Sounds/"
+    -- rather than "a Voices/ folder at the project root". Absolute paths that
+    -- really do live at the root keep working - nothing is replaced, the extra
+    -- candidates are only consulted when the original file does not exist.
     if (name:sub(1, 1) == "/") then
+        local relative = name:gsub("^/+", "")
+        if (relative == "") then return name end
+
+        local game_path = game_prefix .. relative
+        if (fileExists(game_path)) then return game_path end
+
+        if (fileExists(name)) then return name end
+
+        local root_path = root_prefix .. relative
+        if (fileExists(root_path)) then return root_path end
+
+        return name
+    end
+
+    -- Already an explicit Game path: leave it alone, otherwise it would be
+    -- prefixed a second time ("Game/Resources/Sounds/Game/Resources/Sounds/..")
+    -- and the lookup would silently miss.
+    if (name:sub(1, #game_prefix) == game_prefix) then
         return name
     end
 
@@ -386,12 +411,13 @@ end
 ---@return any, table
 function audio.PlaySound(sound, volume, loop)
     local inst = {}
-    local source = SE.audio.newSource(audio._path_sound .. sound, "static")
+    local resolved_path = audio.ResolvePath("sound", sound)
+    local source = SE.audio.newSource(resolved_path, "static")
     source:setVolume(volume or Global.GetVariable("Volume").Master * Global.GetVariable("Volume").Sounds)
     source:setLooping(loop or false)
     source:play()
     inst.source = source
-    inst.name = audio._path_sound .. sound
+    inst.name = resolved_path
 
     -- mark whether this instance is looping so Update can clean non-looping finished sources
     inst.loop = loop or false

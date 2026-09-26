@@ -1,52 +1,97 @@
 # Game/Hacks
 
-游戏侧的引擎注入（hack）入口。引擎在**所有库加载完之后、第一个场景之前**自动
-执行本目录下的脚本，用来改引擎底层（战斗 UI、战斗流程、精灵行为等）而**不需要
-改 `Scripts/` 里的任何文件**。
+Game-side entry point for engine injections (hacks). The engine runs the scripts in
+this directory automatically, **after all libraries are loaded and before the first
+scene**, so you can change engine internals (battle UI, battle flow, sprite behavior,
+...) **without editing any file under `Scripts/`**.
 
-## 文件规则
+## File rules
 
-- 目录下所有 `.lua` 都是入口，**以下划线 `_` 开头的文件除外**（它们是给入口
-  require 的普通模块，不会被当入口执行）。
-- 按**文件名数字前缀**排序执行：`010_ui.lua` 早于 `020_flow.lua`。
-- 每个文件返回 `{name = ..., apply = function(Hack) ... end}`，也可以直接返回
-  一个函数（等价于 `apply`）。
+- Every `.lua` file **directly in this directory** is an entry point, **except files starting
+  with an underscore `_`** (those are plain modules for entries to require, and are not
+  executed as entries). Subdirectories are not scanned at all.
+- Entries run sorted by the **numeric prefix of the filename**: `010_ui.lua` before
+  `020_flow.lua`.
+- Each file returns `{name = ..., apply = function(Hack) ... end}`, or a plain function
+  (equivalent to `apply`).
 
 ```lua
 -- Game/Hacks/010_my_ui.lua
 return {
-    name = "自定义战斗 UI",
+    name = "Custom battle UI",
     apply = function(Hack)
-        Hack.Replace("Scripts.Libraries.Battle.UI", "Game.Hacks.MyUI")
+        Hack.Replace("Scripts.Libraries.Battle.UI", "Game.Hacks._MyUI")
     end
 }
 ```
 
-## 三个原语
+!!! warning "The replacement module must NOT look like an entry"
+    A replacement module placed at `Game/Hacks/MyUI.lua` will also be picked up as an entry
+    point and run (with a `[Hack] WARNING`, because it returns a table without `apply`).
+    Put it under an underscore name (`Game.Hacks._MyUI`) or in a subdirectory
+    (`Game.Hacks.ui.MyUI`).
 
-| API | 用途 |
+## Declarative overrides: `Game/Overrides.lua`
+
+If you only need whole-module replacement, skip the imperative API entirely and write a
+mapping table in `Game/Overrides.lua`:
+
+```lua
+-- Game/Overrides.lua
+return {
+    ["Scripts.Libraries.Battle.UI"] = "Game.UI.Battle",
+}
+```
+
+It shares the same mechanism (and the same diagnostics) as `Hack.Replace`. The file is read
+on every `Hack.Load()`, and an empty `return {}` means "nothing to override".
+
+| | `Game/Hacks/*.lua` | `Game/Overrides.lua` |
+| --- | --- | --- |
+| Style | imperative Lua | declarative table |
+| Can do | whole-module replace **and** fine-grained Wrap/Set/Patch | whole-module replace only |
+| Use when | you need to touch a couple of functions | you rewrote an entire module |
+
+## Primitives
+
+| API | Purpose |
 | --- | --- |
-| `Hack.Replace(引擎模块, Game 模块)` | 整份替换模块。写进 `package.preload` 生效，**懒加载模块（Battle / UI）也照样吃得到** |
-| `Hack.After(模块名, fn)` | 模块一加载完就执行 `fn(module)`。改 `Battle` / `UI` 这种启动时还不存在的全局，只能用这个 |
-| `Hack.Wrap(owner, key, wrapper)` | 包住一个函数，`wrapper(original, ...)` 里先拿到原函数 |
-| `Hack.Set(owner, key, value)` | 直接覆盖一个字段 |
-| `Hack.Patch(owner, patch)` | 深合并一张表（表递归合并，其它值覆盖） |
+| `Hack.Replace(engine module, Game module)` | Replace a whole module. Written into `package.preload`, so it also takes effect for **lazily loaded modules (Battle / UI)** |
+| `Hack.After(module name, fn)` | Run `fn(module)` as soon as the module is loaded. This is the only way to change globals like `Battle` / `UI` that do not exist yet at startup |
+| `Hack.Wrap(owner, key, wrapper)` | Wrap a function; `wrapper(original, ...)` receives the original function first |
+| `Hack.Set(owner, key, value)` | Overwrite a field directly |
+| `Hack.Patch(owner, patch)` | Deep-merge a table (tables merge recursively, other values are overwritten) |
 
-## 行为约定
+## Behavior
 
-- **隔离**：单个 hack 崩了只报 `[Hack] ERROR` 并跳过，不影响其它 hack，也不阻止
-  游戏启动。
-- **顺序**：数字小的先跑；后跑的 `Wrap` 包在更外层（先看到调用）。
-- **冲突**：同一个 `owner.key` 被包两次会打 `[Hack] WARNING`。
-- **F5**：先 `Hack.Unapply()` 还原所有原值，再 `Hack.Load()` 重放，不会叠成
-  套娃。还原信息存在全局 `_HACK_STATE`，不受 `ClearModuleTree` 影响。
-- **无副作用**：不放任何文件（或只有 `_` 开头的模块）时，什么都不发生。
-- F6 调试信息会列出当前生效的 hack。
+- **Isolation**: if one hack crashes, it only logs `[Hack] ERROR` and is skipped. Other
+  hacks are unaffected and the game still starts.
+- **Order**: lower numbers run first; a later `Wrap` sits further outside (sees the call first).
+- **Conflicts**: wrapping the same `owner.key` twice logs a `[Hack] WARNING`.
+- **F5**: `Hack.Unapply()` restores all original values first, then `Hack.Load()` replays
+  them, so nothing nests. Restore info lives in the global `_HACK_STATE` and is not
+  affected by `ClearModuleTree`.
+- **No side effects**: with no files here (or only `_`-prefixed modules), nothing happens.
+- F6 debug info lists the hacks currently in effect.
 
-## 注意
+## Caveats
 
-- `Hack.Replace` 的目标如果**已经加载**，会退化为逐字段热替换，并打 WARNING：
-  此时可能有代码已经持有旧函数引用，行为不完全等价。优先在目标加载前替换
-  （或直接用 `Hack.After`）。
-- 想换灵魂脚本请用 `Game/Souls/`，换贴图请用 `Game/Resources/Sprites/`——
-  那两处是正经的覆盖机制，不用 hack。
+- If a `Hack.Replace` target is **already loaded**, it degrades to a per-field hot swap and
+  logs a WARNING: some code may already hold a reference to the old function, so behavior
+  is not exactly equivalent. Prefer replacing before the target loads (or just use
+  `Hack.After`).
+- **Reach for a proper override first.** Only the content that has a Game-area lookup needs
+  no hack at all; the rest is engine behavior and belongs here.
+
+| What you want to change | Proper mechanism (no hack) |
+| --- | --- |
+| Soul scripts | `Game/Souls/<name>.lua` |
+| Enemy animations | `Game/Animations/<name>.lua` |
+| Wave scripts | `Game/Waves/<name>.lua` |
+| Attack patterns | `Game/Attacks/<name>.lua` |
+| Encounters | `Game/Encounter/<file>.lua` (Game-only, no engine twin) |
+| World rules / items | `Game/Logics/init.lua`, `Game/Logics/items.lua` (hard required) |
+| Any sprite / map / music / text | the matching file under `Game/Resources/` or `Game/Maps/` |
+| Any font | the same filename under `Game/Resources/Fonts/` (loaded through `Fonts.New`) |
+| Configuration defaults | `Game/conf_pure.lua` (layered on top of the root copy) |
+| Anything else (battle UI, battle flow, ...) | **`Game/Hacks/` or `Game/Overrides.lua`** |

@@ -5,8 +5,8 @@ local scene = {}
 -- ============================================
 
 local progress = 0
-local main_font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13, "mono")
-local small_font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 9, "mono")
+local main_font = Fonts.New("determination_mono.ttf", 13, "mono")
+local small_font = Fonts.New("determination_mono.ttf", 9, "mono")
 local top_buttons = {}
 local function new_top_button(text, x, y, w, h, func)
     top_buttons[#top_buttons + 1] = {

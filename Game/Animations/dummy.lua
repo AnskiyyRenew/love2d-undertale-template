@@ -1,67 +1,41 @@
---  HOW TO USE
---    1. Copy this file and rename it, e.g. Game/Animations/Sol.lua
---    2. Replace the placeholders marked with "-- TODO" below.
---    3. Reference it from an encounter:
---       animation = require("Game.Animations.MyMonster")
---    4. Instantiate once per enemy in the scene:
---       Game:InitAnimation(i, {x, y})
+-- Dummy animation.
 --
---  CONTRACT  (plain tables, NO metatable — every function uses a dot and takes
---             the instance as its first argument)
---    * New(pos)               → creates a brand-new, INDEPENDENT instance.
---    * Init(self, pos)        → builds the sprites (called by New).
---    * Update(self, dt)       → per-frame logic, called by Battle.Update.
---    * Hurt(self)             → hit reaction, called by attack patterns.
---    * OnAttack(self, data)   → (optional) attack-launched signal; see stub.
---    * Spare(self)            → plays the spare reaction (MERCY → Spare).
---    * Destroy(self)          → cleans up sprites, called when the enemy dies.
+-- NOTE: this is NOT the animation of Game/Encounter/dummy.lua — that encounter
+-- points at Game/Animations/Poseur.lua. Rename this file to whatever monster it
+-- actually belongs to before wiring it up.
 --
---  ENGINE-PROVIDED FIELDS (refreshed on every instance each frame)
---    * self.enemy    → the enemy table from the encounter (id, name, hp, maxhp,
---                      canspare, killable, actions, and any custom fields).
---    * self.canspare → shortcut for self.enemy.canspare
---    * self.killable → shortcut for self.enemy.killable
---    * self.hp / self.maxhp
---    * self.dead     → true once HP reached 0 AND the enemy is killable.
---                      Use this in Update to switch to a death animation.
---
---  HOW CALLERS REACH THE FUNCTIONS
---    Instances are plain tables carrying `_class` → this module, so from an
---    instance everything is one lookup away:
---        local anim = enemy.animation
---        anim._class.Hurt(anim)          -- engine does exactly this
---    Sprites stay colon-style (`sprite:Set(...)`, `sprite:Dust(...)`).
---
---  IMPORTANT
---    * Lua's `require` returns this module ONCE (it is cached). Two enemies of
---      the same type would otherwise share ONE table → they would share one
---      sprite. `New(...)` is the ONLY way to get a usable, per-enemy instance.
---    * NEVER store per-monster state (sprites, timers, flags) at module level.
---      Put everything on `self` so each instance owns its own data.
--- ============================================================================
+-- Contract and style rules live in Game/Animations/_temp.lua — read that first.
+-- Short version: plain table, NO metatable; every function is declared with a
+-- dot and takes the instance as its first argument; `New(pos)` returns a plain
+-- instance that carries `_class` back to this module and gets these functions
+-- bound onto it (Battle.BindAnimation), so callers write `anim.SetFace(3)`.
+-- Everything inside this file calls the module by name (`Dummy.Foo(self, ...)`).
+-- Sprites stay colon-style (`sprite:Set(...)`).
 
-local MyMonster = {canspare = false}
+local Dummy = {}
 
-function MyMonster.New(pos)
+function Dummy.New(pos)
     local self = {}
 
-    -- Back-reference to the function table (see "HOW CALLERS REACH..." above).
-    self._class = MyMonster
+    -- Back-reference to this module's function table. Do not rename it.
+    self._class = Dummy
 
     self.running = true
-    self.x = 0
-    self.y = 0
     self.elements = {}
     self.hurting = false
-    self.hurttime = 0
     self.intensity = 16
     self.time = 0
 
-    MyMonster.Init(self, pos)
+    Dummy.Init(self, pos)
+
+    -- The instance drives itself from here on (`anim.SetFace(3)`) — see
+    -- Battle.BindAnimation for the rule.
+    Battle.BindAnimation(self, Dummy)
+
     return self
 end
 
-function MyMonster.Init(self, pos)
+function Dummy.Init(self, pos)
     local _pos = (pos or {320, 200})
     local sprite = Sprites.CreateSprite("Characters/Ruins/spr_migosp_0.png", "UI")
 
@@ -72,42 +46,24 @@ function MyMonster.Init(self, pos)
     self.cpos = {sprite.x, sprite.y}
 end
 
-function MyMonster.Hurt(self)
+function Dummy.Hurt(self)
     self.sprite:Set(self.hurt_image)
     self.hurting = true
     self.intensity = 16
 end
 
---- OPTIONAL: called the moment an attack is LAUNCHED at this enemy, before the
---- hit lands. Implement it to react (brace / dodge / telegraph / counter, ...).
---- `data` may contain:
----   data.enemy    → this enemy table
----   data.damage   → planned damage for the hit
----   data.perfect  → true when the timing landed in the perfect zone
----   data.offset   → distance from the perfect zone (0 = perfect)
----   data.position → {x, y} of the enemy on screen
----   data.attack   → the attack pattern instance
-function MyMonster.OnAttack(self, data)
-end
-
-function MyMonster.Spare(self)
+function Dummy.Spare(self)
     self.sprite:Set(self.hurt_image)
     self.sprite.alpha = 0.5
 end
 
-function MyMonster.Update(self, dt)
+function Dummy.Update(self, dt)
     if (not self.running) then
         return
     end
 
-    -- ====================>
-    -- TODO: put your monster's animation code here.
-    --
-    -- Example: react to engine-provided state
-    --   if (self.canspare) then ... end            -- spareable?
-    --   if (self.dead) then                        -- HP hit 0 and killable
-    --       self.sprite:SetAnimation({"death_0.png", "death_1.png"}, 0.1)
-    --   end
+    -- Idle: reset to frame 0, then blink through the 2-frame sheet at a random
+    -- interval.
     self.time = self.time + 1
     if (self.time == 10) then
         self.sprite:Set("Characters/Ruins/spr_migosp_0.png")
@@ -130,34 +86,15 @@ function MyMonster.Update(self, dt)
             self.intensity = -self.intensity
         else
             self.hurting = false
-            --[[self.sprite:SetAnimation({
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_1.png",
-                "Characters/Ruins/spr_loox_2.png",
-                "Characters/Ruins/spr_loox_1.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-                "Characters/Ruins/spr_loox_0.png",
-            }, 0.08)]]
         end
     end
-    -- <====================
 end
 
-function MyMonster.Destroy(self)
+function Dummy.Destroy(self)
     if (not self.sprite) then
         return
     end
 
-    -- TODO: play a death effect here, e.g. sprite:Dust(true, true)
     self.sprite:Set(self.hurt_image)
     self.sprite:Dust(true, true)
     self.sprite = nil
@@ -173,4 +110,4 @@ function MyMonster.Destroy(self)
     self.elements = {}
 end
 
-return MyMonster
+return Dummy

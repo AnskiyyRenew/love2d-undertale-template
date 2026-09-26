@@ -261,9 +261,8 @@ local function state_behaviours_updater(dt)
                     if (e.killable) then
                         if (e.hp <= 0) then
                             local anim = e.animation
-                            local cls = anim and (anim._class or anim)
-                            if (cls and cls.Destroy) then
-                                cls.Destroy(anim)
+                            if (type(anim) == "table" and anim._bound and anim.Destroy) then
+                                anim.Destroy()
                             end
                             Battle.EXP = Battle.EXP + e.exp
                             Battle.GOLD = Battle.GOLD + e.gold
@@ -436,9 +435,8 @@ local function state_behaviours_updater(dt)
 
                     if (e.killable and e.canspare) then
                         local anim = e.animation
-                        local cls = anim and (anim._class or anim)
-                        if (cls and cls.Spare) then
-                            cls.Spare(anim)
+                        if (type(anim) == "table" and anim._bound and anim.Spare) then
+                            anim.Spare()
                         end
                         Battle.GOLD = Battle.GOLD + e.gold
                         table.remove(enemies, i)

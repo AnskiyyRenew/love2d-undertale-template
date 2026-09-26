@@ -6,8 +6,9 @@ Player.canMove = true
 
 local mask = Masks.New("rectangle", 320, 320, 155, 130, 0, 0)
 
-local bullet = Sprites.CreateSprite("bullet.png", "Bullets")
+local bullet = Sprites.CreateSprite("Soul Library Sprites/spr_default_heart.png", "Bullets")
 bullet:Scale(4, 4)
+bullet:SetPPCollision(true)
 bullet:MoveTo(math.random(220, 420), math.random(240, 400))
 bullet:SetStencils({mask})
 bullet.rotation = 0
@@ -20,7 +21,7 @@ function wave.Update(dt)
     mask:Follow(Arena.black)
 
     time = time + 1
-    if (time == 60) then
+    if (time == 50) then
         EndWave()
     end
 end

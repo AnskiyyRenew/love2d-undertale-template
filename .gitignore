@@ -18,3 +18,7 @@ Export/
 # SoulEngine documentation dump (generated md/html). Kept out of the game repo;
 # it is maintained separately.
 soulengine-doc3/
+
+# Stray zero-byte file left behind by a mistyped shell redirect (`2>0`).
+# Local only.
+/0

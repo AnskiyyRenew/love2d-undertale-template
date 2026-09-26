@@ -1,10 +1,11 @@
 # Game/Attacks
 
-游戏侧战斗攻击模式（PlayerAttacks）脚本目录，引擎优先读取此处。
+Game-side battle attack pattern (PlayerAttacks) script directory; the engine reads from here first.
 
-- 模块 `Game.Attacks.<名称>` 对应本目录下 `<名称>.lua`
-- 未提供时回退引擎目录 `Scripts/Libraries/Battle/PlayerAttacks/`
-- 引擎默认的 `stick` 同样可以覆盖（`Game/Attacks/stick.lua`）
-- 找不到或加载报错时会回退默认攻击模式并打日志，战斗不会因此卡死
+- Module `Game.Attacks.<name>` maps to `<name>.lua` in this directory
+- Falls back to the engine directory `Scripts/Libraries/Battle/PlayerAttacks/` when not provided
+- The engine's default `stick` can be overridden too (`Game/Attacks/stick.lua`)
+- If a file is missing or fails to load, the engine falls back to the default attack pattern and logs it — the battle will not hang because of it
 
-只想改某个攻击模式的一两个行为时，用 `Game/Hacks/` 更轻；要整份换实现时放这里。
+If you only want to change one or two behaviors of an attack pattern, `Game/Hacks/` is
+lighter; put the file here when you want to replace the implementation entirely.

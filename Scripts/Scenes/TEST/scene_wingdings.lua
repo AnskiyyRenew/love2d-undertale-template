@@ -37,7 +37,7 @@ e2:UseBondFont({
 local e3 = Typers.EText.New("[font:Wingdings.ttf]" .. SAMPLE, {60, 360}, "GUI")
 e3.voices = {}
 
-local label_font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 14, "mono")
+local label_font = Fonts.New("determination_mono.ttf", 14, "mono")
 label_font:setFilter("nearest", "nearest")
 
 local labels = {

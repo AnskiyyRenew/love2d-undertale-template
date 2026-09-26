@@ -58,7 +58,7 @@ end
 
 function camera:unBounds()
     self.min_x = -math.huge
-    self.max_X = math.huge
+    self.max_x = math.huge
     self.min_y = -math.huge
     self.max_y = math.huge
 end

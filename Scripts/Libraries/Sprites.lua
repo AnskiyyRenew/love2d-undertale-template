@@ -77,7 +77,7 @@ end
 -- `sprites.pixel_snap` is the global switch (see sprites.SetPixelSnap); a single
 -- sprite can override it with its own `pixel_snap` field (true / false, and
 -- nil = follow the global switch).
-sprites.pixel_snap = true
+sprites.pixel_snap = false
 
 --- Snap one coordinate to the nearest whole pixel (half-up).
 local function snapCoord(v)
@@ -170,6 +170,324 @@ local function loadImageSafe(path)
     end
 
     return result, imgData, true
+end
+
+-- ---------------------------------------------------------------------------
+-- Perfect-pixel collision (rectangulation)
+-- ---------------------------------------------------------------------------
+-- A sprite's collision shape is normally its whole image rectangle (that is
+-- what Collisions.FollowShape + RectangleWithRectangle test). For sparse art --
+-- a heart, a bone, a blaster beam -- that over-reports: every transparent pixel
+-- inside the box counts as a hit.
+--
+-- Perfect-pixel collision replaces the single box with the set of RECTANGLES
+-- that exactly tile the opaque pixels of the sprite's own image, so the hit
+-- area follows the art. The tiling is derived from the ImageData of the image
+-- that is actually on screen and cached per IMAGE (not per path): several
+-- sprites share one texture, a quad sprite has its own cropped image, and the
+-- LRU cache may release / reload a texture underneath us.
+--
+-- Opt in per sprite:
+--
+--     sprite:SetPPCollision(true)    -- -> ok, rect_count
+--     sprite:SetPPCollision(false)   -- back to the plain box
+--
+-- ...and decide hits with sprites.PPCollide(a, b), which answers nil while
+-- NEITHER side opted in, so a caller can keep its own (cheaper) box answer.
+--
+-- The rectangulation itself is the vendored PerfectPixel library
+-- (Scripts/Libraries/PerfectPixel): a C implementation in cpp.dll (needs
+-- LuaJIT) plus a pure-Lua twin for every other platform. Both hand back rects
+-- as {x, y, w, h} in image pixel space, origin at the image's top-left corner.
+local PP_LIB = "Scripts.Libraries.PerfectPixel"
+local PP_LIB_PURE = "Scripts.Libraries.PerfectPixel.pure"
+
+local pp_rects = setmetatable({}, {__mode = "k"})       -- image -> rect list (false = no usable data)
+local pp_image_data = setmetatable({}, {__mode = "k"})  -- image -> the ImageData behind it
+local pp_backend = nil                                   -- nil = unresolved, false = none, table = usable
+local pp_is_pure = false                                 -- true once the pure-Lua twin is in charge
+
+--- Remember which ImageData backs an image, so perfect-pixel collision can read
+--- the sprite's own pixels later. Both maps use weak keys: the entries die with
+--- the image, so an LRU release of a texture also drops its pixels and rects.
+---@param image any LÖVE Image (or nil)
+---@param image_data any LÖVE ImageData (or nil)
+local function rememberImageData(image, image_data)
+    if (image and image_data) then
+        pp_image_data[image] = image_data
+    end
+end
+
+--- Load one rectangulation backend by module name.
+---@param name string
+---@return table|nil
+local function loadPPBackend(name)
+    local ok, mod = pcall(require, name)
+    if (ok and type(mod) == "table" and type(mod.rectangulate) == "function") then
+        return mod
+    end
+    return nil
+end
+
+--- Resolve the backend once, C first. `require` of an already-loaded module is
+--- a package.loaded lookup, so this stays cheap even when called per image.
+---@return table|nil
+local function getPPBackend()
+    if (pp_backend ~= nil) then
+        return pp_backend or nil
+    end
+
+    if (not pp_is_pure) then
+        pp_backend = loadPPBackend(PP_LIB)
+    end
+    if (not pp_backend) then
+        pp_backend = loadPPBackend(PP_LIB_PURE)
+        pp_is_pure = (pp_backend ~= nil)
+    end
+    if (not pp_backend) then
+        pp_backend = false
+        print("[Sprites] Perfect-pixel collision unavailable: neither '" ..
+            PP_LIB .. "' nor '" .. PP_LIB_PURE .. "' could be loaded.")
+    end
+    return pp_backend or nil
+end
+
+--- Run a backend over one ImageData and normalise its answer.
+---@param backend table
+---@param image_data any
+---@return table|nil rects Nil when the call failed or returned nothing usable.
+local function runRectangulation(backend, image_data)
+    local ok, rects = pcall(backend.rectangulate, image_data)
+    if (not ok or type(rects) ~= "table") then
+        return nil
+    end
+
+    local out = {}
+    for i = 1, #rects do
+        local r = rects[i]
+        if (type(r) == "table" and type(r[1]) == "number" and type(r[2]) == "number" and
+            type(r[3]) == "number" and type(r[4]) == "number" and r[3] > 0 and r[4] > 0) then
+            out[#out + 1] = {r[1], r[2], r[3], r[4]}
+        end
+    end
+    return out
+end
+
+--- Rectangulate (and cache) the opaque pixels of an image. An empty tiling is
+--- treated as "no data" and NOT cached as a result: a fully transparent frame
+--- must not silently turn a sprite into something that can never be hit, it
+--- falls back to the plain box instead.
+---@param image any LÖVE Image
+---@param path string|nil Sprite path, used as a second way to find the ImageData.
+---@return table|nil rects List of {x, y, w, h}, or nil when there is no usable data.
+local function rectsForImage(image, path)
+    if (not image) then return nil end
+
+    local cached = pp_rects[image]
+    if (cached ~= nil) then
+        if (cached == false) then return nil end
+        return cached
+    end
+
+    local image_data = pp_image_data[image]
+    if (not image_data and path and sprites.cache[path] and sprites.cache[path].img == image) then
+        image_data = sprites.cache[path].imageData
+    end
+    if (not image_data) then
+        pp_rects[image] = false
+        return nil
+    end
+
+    local backend = getPPBackend()
+    if (not backend) then
+        pp_rects[image] = false
+        return nil
+    end
+
+    local rects = runRectangulation(backend, image_data)
+
+    -- The C backend can also fail on the first real call (no LuaJIT, no
+    -- ImageData:getFFIPointer, a binary built for another platform). Retry with
+    -- the pure-Lua twin and keep using it from then on.
+    if (not rects and not pp_is_pure) then
+        local pure = loadPPBackend(PP_LIB_PURE)
+        if (pure) then
+            rects = runRectangulation(pure, image_data)
+            if (rects) then
+                pp_backend = pure
+                pp_is_pure = true
+                print("[Sprites] Perfect-pixel: the C backend failed, falling back to the pure-Lua one.")
+            end
+        end
+    end
+
+    if (not rects or #rects == 0) then
+        pp_rects[image] = false
+        return nil
+    end
+
+    pp_rects[image] = rects
+    return rects
+end
+
+--- The rectangulated shapes of a sprite in IMAGE space (origin at the image's
+--- top-left corner, y down), as a list of {x, y, w, h}. These are the raw rects
+--- the tiling produced, before scale / rotation / pivot are applied.
+---@param sprite Sprite
+---@return table|nil rects
+function sprites.GetPPRects(sprite)
+    if (not sprite) then return nil end
+    return rectsForImage(sprite.image, sprite.path)
+end
+
+--- Map a list of IMAGE-space rects ({x, y, w, h}, origin top-left, y down) into
+--- WORLD-space collision shapes ({x, y, w, h, angle}).
+---
+--- Each rect centre is routed through the sprite's pivot exactly the way
+--- Collisions.FollowShape does it for the whole-image box: measure from the
+--- pivot, scale, rotate, then translate to the sprite's own position. A rect
+--- covering the whole image therefore reproduces FollowShape's box, which is
+--- what keeps the perfect-pixel path and the plain-box path in agreement.
+---@param sprite Sprite
+---@param rects table|nil List of {x, y, w, h}.
+---@return table|nil shapes Nil when there is nothing to map.
+local function imageRectsToWorld(sprite, rects)
+    if (not rects or #rects == 0) then return nil end
+
+    local angle = sprite.rotation or 0
+    local rad = math.rad(angle)
+    local cos_a, sin_a = math.cos(rad), math.sin(rad)
+    local sx, sy = sprite.xscale or 1, sprite.yscale or 1
+
+    -- Pivot offset in image pixels; the sprite centre when the sprite is a bare
+    -- table without the prototype's GetPivotOffset.
+    local ox, oy = (sprite.width or 0) * 0.5, (sprite.height or 0) * 0.5
+    if (sprite.GetPivotOffset) then
+        ox, oy = sprite:GetPivotOffset()
+    end
+
+    local shapes = {}
+    for i = 1, #rects do
+        local r = rects[i]
+        local dx = ((r[1] + r[3] * 0.5) - ox) * sx
+        local dy = ((r[2] + r[4] * 0.5) - oy) * sy
+        shapes[i] = {
+            x = sprite.x + dx * cos_a - dy * sin_a,
+            y = sprite.y + dx * sin_a + dy * cos_a,
+            w = math.abs(r[3] * sx),
+            h = math.abs(r[4] * sy),
+            angle = angle
+        }
+    end
+    return shapes
+end
+
+--- The rectangulated shapes of a sprite in WORLD space, as a list of
+--- {x, y, w, h, angle} tables shaped exactly like Collisions.FollowShape, so
+--- they can go straight into Collisions.RectangleWithRectangle.
+--- The rects from the tiling OVERLAP each other (the library maximises the area
+--- covered, not a partition), which is harmless for hit testing: every rect lies
+--- inside the art, so their union is exactly the opaque pixels either way.
+---@param sprite Sprite
+---@return table|nil shapes Nil when the sprite has no usable tiling.
+function sprites.GetPPShapes(sprite)
+    if (not sprite) then return nil end
+    return imageRectsToWorld(sprite, rectsForImage(sprite.image, sprite.path))
+end
+
+--- The plain collision box of a sprite in world space: the image rectangle with
+--- the sprite's own `_hitbox` override ({width, height}, centred on that box)
+--- applied when it has one -- the exact shape Battle's player/bullet test uses
+--- for a sprite without perfect pixels. Same maths as Collisions.FollowShape
+--- (see imageRectsToWorld), so both paths always describe the same box.
+---@param sprite Sprite
+---@return table|nil {x, y, w, h, angle}; nil only for an invalid sprite.
+function sprites.GetHitbox(sprite)
+    if (not sprite) then return nil end
+
+    local shapes = imageRectsToWorld(sprite, {{0, 0, sprite.width or 0, sprite.height or 0}})
+    local box = shapes[1]
+
+    local hitbox = sprite._hitbox
+    if (hitbox) then
+        box.w = hitbox[1] or box.w
+        box.h = hitbox[2] or box.h
+    end
+    return box
+end
+
+--- Axis-aligned half-extents of a (possibly rotated) rectangle, for the cheap
+--- rejection pass in sprites.PPCollide.
+---@param shape table {w, h, angle}
+---@return number half_w
+---@return number half_h
+local function shapeHalfExtents(shape)
+    local rad = math.rad(shape.angle or 0)
+    local cos_a, sin_a = math.abs(math.cos(rad)), math.abs(math.sin(rad))
+    local hw, hh = math.abs(shape.w) * 0.5, math.abs(shape.h) * 0.5
+    return hw * cos_a + hh * sin_a, hw * sin_a + hh * cos_a
+end
+
+--- Perfect-pixel overlap test between two sprites.
+---
+--- Returns nil when NEITHER side opted into perfect-pixel collision, so a caller
+--- can keep the plain-box answer it already computed. Otherwise it answers
+--- true / false from the rectangulated shapes: a side with PP enabled is
+--- reduced to its rect list, a side without it contributes its single collision
+--- box (so `_hitbox` overrides still apply, and a sprite can safely enable PP
+--- while its counterpart stays a box).
+---
+--- Shapes are compared pairwise with an axis-aligned rejection first, so a
+--- bullet built from a dozen pieces stays cheap.
+---@param a Sprite
+---@param b Sprite
+---@return boolean|nil
+function sprites.PPCollide(a, b)
+    local a_pp = (a ~= nil and a.pp_collision == true and a.image ~= nil)
+    local b_pp = (b ~= nil and b.pp_collision == true and b.image ~= nil)
+    if (not a_pp and not b_pp) then return nil end
+    if (not Collisions) then return nil end
+
+    -- No usable tiling (image data gone, backend down, art fully transparent):
+    -- fall back to that side's box, so the test still means something.
+    local shapes_a = (a_pp and sprites.GetPPShapes(a)) or nil
+    local shapes_b = (b_pp and sprites.GetPPShapes(b)) or nil
+    if (not shapes_a) then shapes_a = {sprites.GetHitbox(a)} end
+    if (not shapes_b) then shapes_b = {sprites.GetHitbox(b)} end
+
+    local ext_a, ext_b = {}, {}
+    for i = 1, #shapes_a do
+        local hw, hh = shapeHalfExtents(shapes_a[i])
+        ext_a[i] = {hw, hh}
+    end
+    for i = 1, #shapes_b do
+        local hw, hh = shapeHalfExtents(shapes_b[i])
+        ext_b[i] = {hw, hh}
+    end
+
+    for i = 1, #shapes_a do
+        local ra = shapes_a[i]
+        for j = 1, #shapes_b do
+            local rb = shapes_b[j]
+            if (math.abs(ra.x - rb.x) <= ext_a[i][1] + ext_b[j][1] and
+                math.abs(ra.y - rb.y) <= ext_a[i][2] + ext_b[j][2]) then
+                if (Collisions.RectangleWithRectangle(ra, rb)) then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+--- Drop every cached tiling and the resolved backend, so the next use runs
+--- rectangulation again. Call after hot-reloading the PerfectPixel library (F5
+--- clears Scripts.Libraries) or when sprite art changed on disk.
+function sprites.ClearPPCache()
+    pp_rects = setmetatable({}, {__mode = "k"})
+    pp_backend = nil
+    pp_is_pure = false
 end
 
 -- Game-first sprite roots. Sprites are looked up inside the Game area
@@ -277,6 +595,7 @@ local function findSpriteFromCache(path)
     end
 
     local img, imgData, loaded = loadImageSafe(normalized_path)
+    rememberImageData(img, imgData)
 
     sprites.cache[normalized_path] = {
         img = img,
@@ -1416,6 +1735,47 @@ local sprite_methods = {}
         return false
     end
 
+    --- Switch this sprite to perfect-pixel collision (see the PerfectPixel
+    --- section near the top of this file).
+    ---
+    --- Turned on, the sprite stops being one box and becomes the set of
+    --- rectangles that tile the opaque pixels of its own image; decide hits with
+    --- sprites.PPCollide(a, b). A sprite that keeps this OFF contributes its
+    --- single collision box, so mixing perfect and boxy sprites is fine.
+    ---
+    --- Note for a soul sprite: `_hitbox` still defines the box used while PP is
+    --- OFF. Turning PP on replaces that box with the art's real pixels (for the
+    --- 16x16 heart that is wider than the default 4x4 test box) -- pick one.
+    ---@param enabled boolean
+    ---@return boolean ok Whether a usable tiling was found (false = PP stays off).
+    ---@return integer count How many rectangles the tiling has.
+    function sprite_methods:SetPPCollision(enabled)
+        if (enabled ~= true) then
+            self.pp_collision = false
+            return false, 0
+        end
+
+        -- Resolve the tiling right away: a failure (pixel data missing, backend
+        -- unavailable) has to be visible at the call site rather than silently
+        -- swallowing every hit later on.
+        local shapes = sprites.GetPPShapes(self)
+        if (not shapes) then
+            self.pp_collision = false
+            print("[Sprites] SetPPCollision: no rectangulation data for '" ..
+                tostring(self.path) .. "' (image data or backend missing).")
+            return false, 0
+        end
+
+        self.pp_collision = true
+        return true, #shapes
+    end
+
+    --- Whether this sprite uses perfect-pixel collision.
+    ---@return boolean
+    function sprite_methods:IsPPCollision()
+        return self.pp_collision == true
+    end
+
 ---@param path string Sprite path, relative to Resources/Sprites/ (no prefix).
 ---                     A matching copy inside Game/Resources/Sprites/
 ---                     is used instead whenever one exists.
@@ -1476,6 +1836,8 @@ function sprites.CreateSprite(path, layer)
     sprite._layer_value = layer or 0
     sprite.is_moving = false
     sprite.pixel_smooth = false
+    -- Perfect-pixel collision is opt-in: see sprite:SetPPCollision.
+    sprite.pp_collision = false
     -- Resolve first (Game copy wins) so sprite.path always names the file that
     -- was really loaded, not the caller-supplied shortcut.
     local full_path = resolveGameSpritePath(path)
@@ -1635,6 +1997,7 @@ function sprites.CreateSpriteQuad(path, quad, layer)
 
     if (entry) then
         sprite.image = entry.img
+        rememberImageData(entry.img, entry.imageData)
         sprite.width = qw
         sprite.height = qh
         sprite.quad = {x = qx, y = qy, width = qw, height = qh}

@@ -47,6 +47,27 @@ local function set_direction(direction)
     end
 end
 
+-- Init: the contract lives in _temp.lua. A soul switch must not carry the
+-- previous run's gravity direction, jump or slam state over, so Init resets the
+-- soul and lines the sprite up with the fresh direction ("down" = rotation 0).
+---@param sprite table|nil The player sprite driven by this soul.
+---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
+---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.
+---@return table self This soul module.
+function action.Init(sprite, can_move, args)
+    action.sprite = sprite
+    if (can_move ~= nil) then
+        action.can_move = (can_move ~= false)
+    end
+    if (sprite) then
+        sprite.color = {0, 0, 1}
+        sprite.rotation = 0
+    end
+
+    action.Reset()
+    return action
+end
+
 ---Sets the sprite rotation without changing the gravity direction.
 ---@param angle number
 function action.Angle(angle)

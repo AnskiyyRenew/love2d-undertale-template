@@ -497,7 +497,251 @@ function battle.Defending()
     Battle._wave = _wave
 end
 
+-- ---------------------------------------------------------------------------
+-- Animation dispatch
+--
+-- An enemy animation is a plain table with NO metatable, split in two:
+--   * the MODULE  — what `require` returns; holds the functions, no state.
+--   * an INSTANCE — what `New(pos)` returns; holds the state, plus `_class`
+--                   pointing back at its module.
+--
+-- `_class` is a plain field on the instance (not `__index` sugar), so it is
+-- greppable and assertable, and `AnimModule` / `IsAnimInstance` keep working
+-- for callers that want the module table itself.
+--
+-- `New` hands the instance to `BindAnimation` below, which hangs a thin closure
+-- over every module function. From then on the instance drives itself with a
+-- plain dot call — `anim.SetFace(3)`, `anim.Update(dt)`, `anim.Spare()` — and
+-- that is the form every engine call site uses. Still no metatable: the
+-- functions stay on the module (one copy each), only the binding is per-instance.
+-- ---------------------------------------------------------------------------
+
+--- The function table that drives `anim`, or nil when there is nothing to call.
+--- A normal instance answers with `anim._class`. A bare module (an enemy whose
+--- scene never called `Game:InitAnimation`) answers with itself, which keeps the
+--- no-op guards inside those modules working instead of crashing the battle.
+---@param anim any
+---@return table|nil
+function battle.AnimModule(anim)
+    if (type(anim) ~= "table") then
+        return nil
+    end
+    return anim._class or anim
+end
+
+--- True when `t` is an independent instance produced by `New(pos)`, rather than
+--- the module `require` handed back. `_class` is the marker: an instance carries
+--- it, a module does not.
+---@param t any
+---@return boolean
+function battle.IsAnimInstance(t)
+    return type(t) == "table" and t._class ~= nil
+end
+
+--- Hang the module's functions on `instance` as bound, dot-callable methods, so
+--- callers write `anim.SetFace(3)` instead of `cls.SetFace(anim, 3)`.
+---
+--- Each method is a thin closure that supplies the instance as its first
+--- argument — the functions themselves stay on the module, so there is still one
+--- copy of each and no metatable anywhere. `New` is skipped (it is a factory,
+--- not a method), a field of the same name already on the instance is never
+--- overwritten, and calling this twice is a no-op.
+---
+--- A colon call (`anim:Update(dt)`) would smuggle the instance in as a *second*
+--- argument, so it raises a clear error where it is written instead of failing
+--- deep inside the animation. There is exactly one call form.
+---@param instance table The object `New(pos)` just returned.
+---@param module table|nil Its module; defaults to `instance._class`.
+---@return table instance The same table, so calls can be chained.
+function battle.BindAnimation(instance, module)
+    if (type(instance) ~= "table" or instance._bound) then
+        return instance
+    end
+
+    module = module or instance._class
+    if (type(module) ~= "table") then
+        return instance
+    end
+
+    for name, fn in pairs(module) do
+        if (type(fn) == "function" and name ~= "New" and instance[name] == nil) then
+            -- Copied into locals so each closure captures its own pair.
+            local method_name, method_fn = name, fn
+            instance[name] = function (first, ...)
+                if (first == instance) then
+                    error("animation methods are dot calls: write anim."
+                        .. method_name .. "(...) without self", 2)
+                end
+                return method_fn(instance, first, ...)
+            end
+        end
+    end
+
+    instance._bound = true
+    return instance
+end
+
+-- ---------------------------------------------------------------------------
+-- Hitbox viewer (development builds only)
+--
+-- One key (F7) toggles an overlay showing the collision shapes that are really
+-- tested each frame: every sprite flagged `isBullet` plus the player soul(s).
+-- A sprite with perfect-pixel collision on (sprite:SetPPCollision(true)) is
+-- drawn as its individual rectangles, one without it as the single box it
+-- actually collides with. The plain box is always outlined faintly underneath,
+-- so the difference between "box" and "true shape" is visible at a glance.
+--
+-- It is drawn through the layer system on the TOP layer, so it follows the
+-- camera and covers the gameplay. Nothing here is even reachable in a release
+-- build (_RELEASED), which is what the user asked for.
+-- ---------------------------------------------------------------------------
+local HITBOX_KEY = "f7"
+
+battle.debug_hitboxes = false
+battle.hitbox_sprites = 0
+battle.hitbox_shapes = 0
+
+local hitbox_overlay = nil
+
+--- Draw one (possibly rotated) rectangle as a closed outline.
+---@param shape table {x, y, w, h, angle}
+local function drawHitboxShape(shape)
+    local rad = math.rad(shape.angle or 0)
+    local cos_a, sin_a = math.cos(rad), math.sin(rad)
+    local hw, hh = math.abs(shape.w) * 0.5, math.abs(shape.h) * 0.5
+
+    SE.graphics.polygon("line",
+        shape.x - hw * cos_a + hh * sin_a, shape.y - hw * sin_a - hh * cos_a,
+        shape.x + hw * cos_a + hh * sin_a, shape.y + hw * sin_a - hh * cos_a,
+        shape.x + hw * cos_a - hh * sin_a, shape.y + hw * sin_a + hh * cos_a,
+        shape.x - hw * cos_a - hh * sin_a, shape.y - hw * sin_a + hh * cos_a)
+end
+
+--- Outline one sprite: the faint box plus the shapes that really collide, in the
+--- colour of its role.
+---@param sprite Sprite
+---@param r number Red
+---@param g number Green
+---@param b number Blue
+---@return integer count How many collision shapes were drawn for this sprite.
+local function drawSpriteHitbox(sprite, r, g, b)
+    local box = Sprites.GetHitbox(sprite)
+
+    SE.graphics.setColor(r * 0.45, g * 0.45, b * 0.45, 1)
+    drawHitboxShape(box)
+
+    local shapes = sprite.pp_collision and Sprites.GetPPShapes(sprite) or nil
+    if (shapes and #shapes > 0) then
+        SE.graphics.setColor(r, g, b, 1)
+        for i = 1, #shapes do
+            drawHitboxShape(shapes[i])
+        end
+        return #shapes
+    end
+
+    SE.graphics.setColor(r, g, b, 1)
+    drawHitboxShape(box)
+    return 1
+end
+
+--- The overlay's draw function. Runs inside the layer pass (world space, on top
+--- of everything) and restores every graphics state it touches, because the
+--- layer pass keeps drawing after it.
+local function drawHitboxOverlay()
+    -- The entry stays registered while hidden (cheaper than re-hooking), so the
+    -- off state has to bail out here as well as in ToggleHitboxes.
+    if (not battle.debug_hitboxes) then
+        battle.hitbox_sprites = 0
+        battle.hitbox_shapes = 0
+        return
+    end
+
+    local prev_r, prev_g, prev_b, prev_a = SE.graphics.getColor()
+    local prev_width = SE.graphics.getLineWidth()
+    local prev_style = SE.graphics.getLineStyle()
+    SE.graphics.setLineStyle("rough")
+    SE.graphics.setLineWidth(1)
+
+    local sprite_count, shape_count = 0, 0
+
+    -- Souls first (cyan), bullets last (red) so they land on top.
+    for _, soul in ipairs(Player.souls) do
+        local spr = soul.sprite
+        if (spr and spr.image and spr.visible ~= false) then
+            shape_count = shape_count + drawSpriteHitbox(spr, 0.35, 1, 1)
+            sprite_count = sprite_count + 1
+        end
+    end
+    if (Player.sprite and Player.sprite.image and Player.sprite.visible ~= false) then
+        shape_count = shape_count + drawSpriteHitbox(Player.sprite, 0.35, 1, 1)
+        sprite_count = sprite_count + 1
+    end
+
+    for _, spr in ipairs(Sprites.images) do
+        if (spr.isBullet and spr.image and spr.visible ~= false) then
+            shape_count = shape_count + drawSpriteHitbox(spr, 1, 0.3, 0.3)
+            sprite_count = sprite_count + 1
+        end
+    end
+
+    SE.graphics.setColor(prev_r, prev_g, prev_b, prev_a)
+    SE.graphics.setLineWidth(prev_width)
+    if (prev_style) then SE.graphics.setLineStyle(prev_style) end
+
+    battle.hitbox_sprites = sprite_count
+    battle.hitbox_shapes = shape_count
+end
+
+--- Whether the overlay is still hooked into the layer system. A scene clear
+--- empties the layer lists without flagging the old entry, so membership is
+--- checked by identity rather than by `_active`.
+---@return boolean
+local function hitboxOverlayRegistered()
+    return (hitbox_overlay ~= nil) and (Layers.find_by_id(hitbox_overlay._id) == hitbox_overlay)
+end
+
+--- Hook the overlay into the layer system (top layer) if it is not already in.
+local function registerHitboxOverlay()
+    if (hitboxOverlayRegistered()) then return end
+    hitbox_overlay = Layers.add_external(drawHitboxOverlay, "TOP")
+end
+
+--- Show or hide the hitbox viewer. Without an argument it toggles.
+--- Development builds only: does nothing and returns false when released.
+---@param show boolean|nil true / false to set it, nil to flip it.
+---@return boolean on
+function battle.ToggleHitboxes(show)
+    if (_RELEASED) then
+        return false
+    end
+
+    if (show == nil) then
+        battle.debug_hitboxes = not battle.debug_hitboxes
+    else
+        battle.debug_hitboxes = (show == true)
+    end
+
+    if (battle.debug_hitboxes) then
+        registerHitboxOverlay()
+    end
+
+    print("[Battle] Hitbox viewer: " .. (battle.debug_hitboxes and "ON" or "OFF"))
+    return battle.debug_hitboxes
+end
+
 function battle.Update(dt)
+    -- Hitbox viewer (development builds only): F7 toggles it, and it is
+    -- re-hooked every frame while on, because a scene clear wipes the layer
+    -- system's external draws.
+    if (not _RELEASED) then
+        if (Keyboard.GetState(HITBOX_KEY) == 1) then
+            battle.ToggleHitboxes()
+        end
+        if (battle.debug_hitboxes) then
+            registerHitboxOverlay()
+        end
+    end
+
     Player.Update(dt)
     Arenas.Update(dt)
     UI.Update(dt)
@@ -522,12 +766,12 @@ function battle.Update(dt)
             -- Convenience signal: HP has reached 0 and the enemy is killable.
             anim.dead     = (v.hp ~= nil and v.hp <= 0 and v.killable == true)
 
-            -- Animations are plain instances (no metatable): the functions live
-            -- on the module the instance points at with `_class`. A bare module
-            -- that was never instantiated falls back to itself.
-            local cls = anim._class or anim
-            if (cls and cls.Update) then
-                cls.Update(anim, dt)
+            -- The instance drives itself (`anim.Update(dt)`) — see
+            -- BindAnimation() above. A bare module, i.e. a scene that never
+            -- called Game:InitAnimation, has nothing bound and is skipped; its
+            -- Update would only have run its no-op guard anyway.
+            if (type(anim) == "table" and anim._bound and anim.Update) then
+                anim.Update(dt)
             end
         end
     end
@@ -538,18 +782,24 @@ function battle.Update(dt)
 end
 
 -- Called while returning from DEFENDING to ACTIONSELECT. Defers the narration
--- text until the arena has scaled back to full size (565x130); pressing confirm
--- during the restore snaps the arena to full size so the text can show at once.
+-- text until the arena has scaled back to full size (565x130) on its OWN — we no
+-- longer snap it with confirm.
+--
+-- During the restore, state.Update() routes every confirm/cancel through this
+-- function instead of the logic_list, so pressing Z (confirm) is intercepted
+-- and effectively ignored: it can not open FIGHT/ACT/ITEM/MERCY until the box
+-- finishes restoring. Left/right still work, because buttons.Update() handles
+-- them independently and only checks Battle.state == "ACTIONSELECT".
+--
+-- The arena reaches its target through its own per-frame tween (see
+-- Arenas.Update), so all this function does is wait for that to land and then
+-- drop the flag + show the narration text.
 function battle.UpdateRestore(dt)
     if (not battle.restoring_arena) then
         return
     end
 
     local arena = battle.mainarena
-    if (Controller.GetState("confirm") == 1) then
-        arena:Resize(565, 130, true)
-    end
-
     if (arena.width == arena.target.width and arena.height == arena.target.height) then
         battle.restoring_arena = false
         battle.narration_text:SetText(battle.game.narration)
@@ -591,7 +841,6 @@ function battle.Clear()
     -- "Battle.Waves" state so a future wave doesn't inherit a stale _end = true.
     clearWaveModule(Battle.wave)
     battle.restoring_arena = false
-    battle.enemy_anims = {}
 
     -- Clear the entire Battle library tree (UI, buttons, Player, Arenas,
     -- game_apis, Waves, PlayerAttacks, Souls, etc.) in a single pass.

@@ -745,7 +745,7 @@ end
 -- 3. LIFECYCLE
 -- ============================================
 function scene.load()
-    main_font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13, "mono")
+    main_font = Fonts.New("determination_mono.ttf", 13, "mono")
 
     bpm = 180
     beat_current = 0

@@ -864,9 +864,9 @@ end
 -- Window lifecycle
 -- ============================================================
 local function loadFonts()
-    local ok1, f1 = pcall(SE.graphics.newFont, "Resources/Fonts/determination_mono.ttf", 15)
+    local ok1, f1 = pcall(Fonts.New, "determination_mono.ttf", 15)
     DevTool.font = (ok1 and f1) or SE.graphics.newFont(15)
-    local ok2, f2 = pcall(SE.graphics.newFont, "Resources/Fonts/determination_mono.ttf", 12)
+    local ok2, f2 = pcall(Fonts.New, "determination_mono.ttf", 12)
     DevTool.fontSmall = (ok2 and f2) or SE.graphics.newFont(12)
 end
 

@@ -78,7 +78,7 @@ local debugger = {
     swatch_gap = 2,
 }
 
-local main_font = SE.graphics.newFont("Resources/Fonts/determination_mono.ttf", 13, "mono")
+local main_font = Fonts.New("determination_mono.ttf", 13, "mono")
 
 -- ============================================================
 -- CONTEXT MENU ITEMS (with new entries at the bottom)

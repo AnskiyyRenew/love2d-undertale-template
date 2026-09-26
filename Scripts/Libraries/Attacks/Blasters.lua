@@ -201,7 +201,7 @@ function blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_spr
         _fire = 20
     end
 
-    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", 100)
+    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", "TopAll")
     sprite:Scale(2, 2)
     sprite.rotation = _angles[1]
     sprite:MoveTo(unpack(_start))
@@ -291,7 +291,7 @@ function blasters.NewTween(pos_tween, angles_tween, move_time, fire_time, gb_spr
         _fire = 20
     end
 
-    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", 100)
+    local sprite = Sprites.CreateSprite("Blaster/" .. blaster._path .. "/spr_gasterblaster_0.png", "TopAll")
     sprite:Scale(2, 2)
     sprite.rotation = _angles[1]
     sprite:MoveTo(unpack(_pos[1]))

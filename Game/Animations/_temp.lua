@@ -1,13 +1,41 @@
---  HOW TO USE
---    1. Copy this file and rename it, e.g. Game/Animations/Sol.lua
---    2. Replace the placeholders marked with "-- TODO" below.
---    3. Reference it from an encounter:
---       animation = require("Game.Animations.MyMonster")
---    4. Instantiate once per enemy in the scene:
---       Game:InitAnimation(i, {x, y})
+--  ENEMY ANIMATION — TEMPLATE AND CONTRACT
+--  ============================================================================
+--  This file is the ONLY place the animation contract is written down. Every
+--  real animation module (Poseur.lua, loox.lua, sans.lua, ...) points here
+--  instead of repeating it.
 --
---  CONTRACT  (plain tables, NO metatable — every function uses a dot and takes
---             the instance as its first argument)
+--  THE THREE RULES
+--    1. Plain table, NO metatable. `New(pos)` returns an independent instance
+--       (a plain table) that owns ALL the state; the module owns ALL the
+--       functions. `New` then calls `Battle.BindAnimation(self, MyMonster)`,
+--       which hangs a thin closure over each function ON the instance — so the
+--       instance drives itself, and `_class` still points back at its module.
+--    2. DOT ONLY, no `self` at the call site. Everything outside this file —
+--       the engine, waves, ACT handlers — writes `anim.Foo(...)`:
+--           anim.SetFace(3)     anim.Update(dt)     anim.cpos[1] = 100
+--       A colon call (`anim:Foo(...)`) would smuggle the instance in a SECOND
+--       time and raises a clear error where it is written: one call form, not two.
+--       Inside this file the functions keep the usual `self` parameter
+--       (`function MyMonster.Foo(self, ...)`) and call each other by module name
+--       (`MyMonster.Foo(self, ...)`), so the state being touched is always
+--       visible right next to the code that touches it.
+--    3. Sprites are engine objects, so they stay colon-style:
+--       `sprite:Set(...)`, `sprite:Dust(...)`.
+--
+--  HOW TO USE THIS FILE
+--    1. Copy it and rename it after your monster, e.g. Game/Animations/Sol.lua
+--    2. Rename the module local `MyMonster` below to the SAME name, everywhere
+--       in the file. A stale `MyMonster` left behind in a real monster is the
+--       single most common way these files become unreadable.
+--    3. Replace the placeholders marked with "-- TODO".
+--    4. Point an encounter at it:
+--       animation = require("Game.Animations.Sol")
+--    5. Instantiate once per enemy, from the scene:
+--       local anim = Game:InitAnimation(i, {x, y})
+--       From here on, drive it with dot calls straight on the instance:
+--           anim.SetFace(3)      anim.Update(dt)      anim.cpos[1] = 100
+--
+--  THE CALLBACKS (module-side signatures; callers write `anim.Foo(...)`)
 --    * New(pos)               → creates a brand-new, INDEPENDENT instance.
 --    * Init(self, pos)        → builds the sprites (called by New).
 --    * Update(self, dt)       → per-frame logic, called by Battle.Update.
@@ -25,13 +53,6 @@
 --    * self.dead     → true once HP reached 0 AND the enemy is killable.
 --                      Use this in Update to switch to a death animation.
 --
---  HOW CALLERS REACH THE FUNCTIONS
---    Instances are plain tables carrying `_class` → this module, so from an
---    instance everything is one lookup away:
---        local anim = enemy.animation
---        anim._class.Hurt(anim)          -- engine does exactly this
---    Sprites stay colon-style (`sprite:Set(...)`, `sprite:Dust(...)`).
---
 --  IMPORTANT
 --    * Lua's `require` returns this module ONCE (it is cached). Two enemies of
 --      the same type would otherwise share ONE table → they would share one
@@ -45,18 +66,21 @@ local MyMonster = {}
 function MyMonster.New(pos)
     local self = {}
 
-    -- Back-reference to the function table (see "HOW CALLERS REACH..." above).
+    -- Back-reference to this module's function table. Do not rename it.
     self._class = MyMonster
 
     self.running = true
-    self.x = 0
-    self.y = 0
     self.elements = {}
     self.hurting = false
-    self.hurttime = 0
     self.intensity = 16
 
     MyMonster.Init(self, pos)
+
+    -- Required: binds this module's functions onto the instance, so callers
+    -- write `anim.Foo(...)`. `New` itself is never bound, and calling this
+    -- twice is a no-op.
+    Battle.BindAnimation(self, MyMonster)
+
     return self
 end
 
@@ -112,6 +136,8 @@ function MyMonster.Update(self, dt)
             self.intensity = -self.intensity
         elseif (self.intensity < 0) then
             self.intensity = -self.intensity
+        else
+            self.hurting = false
         end
     end
     -- <====================

@@ -724,7 +724,7 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
     -- fraction short of it while the extend tween is on its last frames).
     -- `over` is only a safety net: the normal teardown is driven by
     -- _wallRetracted().
-    local over = intime + animation.It + staytime + animation.Ot + 4
+    local over = intime + animation.It + staytime + animation.Ot + 14
 
     if (direction == "down") then
         wall.warning:MoveTo(X, Y + H / 2)
@@ -739,7 +739,7 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
                 _wallTween(self, "in", animation.In, home, ext, animation.It, "y")
             elseif (wall.time == intime + animation.It + staytime) then
                 _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "y")
-            elseif (_wallRetracted(self) or wall.time >= over) then
+            elseif (_wallRetracted(self) or wall.time >= over + 10) then
                 end_spr(self)
             end
         end
@@ -758,7 +758,7 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
                 _wallTween(self, "in", animation.In, home, ext, animation.It, "y")
             elseif (wall.time == intime + animation.It + staytime) then
                 _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "y")
-            elseif (_wallRetracted(self) or wall.time >= over) then
+            elseif (_wallRetracted(self) or wall.time >= over + 10) then
                 end_spr(self)
             end
         end
@@ -779,7 +779,7 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
                 _wallTween(self, "in", animation.In, home, ext, animation.It, "x")
             elseif (wall.time == intime + animation.It + staytime) then
                 _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "x")
-            elseif (_wallRetracted(self) or wall.time >= over) then
+            elseif (_wallRetracted(self) or wall.time >= over + 10) then
                 end_spr(self)
             end
         end
@@ -800,7 +800,7 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
                 _wallTween(self, "in", animation.In, home, ext, animation.It, "x")
             elseif (wall.time == intime + animation.It + staytime) then
                 _wallTween(self, "out", animation.Out, ext, home, animation.Ot, "x")
-            elseif (_wallRetracted(self) or wall.time >= over) then
+            elseif (_wallRetracted(self) or wall.time >= over + 10) then
                 end_spr(self)
             end
         end

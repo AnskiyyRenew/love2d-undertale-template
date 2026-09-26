@@ -53,8 +53,8 @@ bar_kr.xpivot = 0
 bar_kr.xscale = 0
 bar_kr.yscale = 20
 
-local ui_font = SE.graphics.newFont("Resources/Fonts/Mars Needs Cunnilingus.ttf", 24, "mono")
-local lit_font = SE.graphics.newFont("Resources/Fonts/8bit-wonder.TTF", 12, "mono")
+local ui_font = Fonts.New("Mars Needs Cunnilingus.ttf", 24, "mono")
+local lit_font = Fonts.New("8bit-wonder.TTF", 12, "mono")
 ui_font:setFilter("nearest", "nearest")
 lit_font:setFilter("nearest", "nearest")
 

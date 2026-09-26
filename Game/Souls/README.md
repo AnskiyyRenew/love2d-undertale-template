@@ -1,10 +1,15 @@
 # Game/Souls
 
-游戏侧灵魂（Soul）脚本目录，引擎优先读取此处。
+Game-side soul (Soul) script directory; the engine reads from here first.
 
-- 灵魂模块 `Game.Souls.<名称>` 对应本目录下 `<名称>.lua`
-- 引擎自带灵魂为 `red` / `orange` / `blue`，同名文件可整份覆盖
-- 未提供时回退引擎目录 `Scripts/Libraries/Battle/Player/Souls/`
+- Soul module `Game.Souls.<name>` maps to `<name>.lua` in this directory
+- The engine ships the souls `red` / `orange` / `blue` / `yellow`; a file with the same name replaces the whole module
+- Falls back to the engine directory `Scripts/Libraries/Battle/Player/Souls/` when not provided
+- `_temp.lua` is the template and the one place the contract is written down:
+  every soul sets itself up in `Init(sprite, can_move, args)`, which the engine
+  calls on each soul switch. Sprite binding, tint and state reset live in the
+  soul file, not in `Player.SetSoul`.
 
-灵魂贴图不受本目录影响：贴图走 `Sprites` 的资源查找，放 `Game/Resources/Sprites/`
-下同名文件即可覆盖。
+Soul sprites are not affected by this directory: sprites go through the `Sprites`
+resource lookup, so just drop a file with the same name under `Game/Resources/Sprites/`
+to override it.

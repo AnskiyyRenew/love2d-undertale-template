@@ -1,45 +1,12 @@
---  HOW TO USE
---    1. Copy this file and rename it, e.g. Game/Animations/Sol.lua
---    2. Replace the placeholders marked with "-- TODO" below.
---    3. Reference it from an encounter:
---       animation = require("Game.Animations.MyMonster")
---    4. Instantiate once per enemy in the scene:
---       Game:InitAnimation(i, {x, y})
+-- sans animation.
 --
---  CONTRACT  (plain tables, NO metatable — every function uses a dot and takes
---             the instance as its first argument)
---    * New(pos)               → creates a brand-new, INDEPENDENT instance.
---    * Init(self, pos)        → builds the sprites (called by New).
---    * Update(self, dt)       → per-frame logic, called by Battle.Update.
---    * Hurt(self)             → hit reaction, called by attack patterns.
---    * OnAttack(self, data)   → (optional) attack-launched signal; see below.
---    * Spare(self)            → plays the spare reaction (called on MERCY → Spare).
---    * Destroy(self)          → cleans up sprites, called when the enemy dies.
---
---  HOW CALLERS REACH THE FUNCTIONS
---    Instances are plain tables carrying `_class` → this module, so from an
---    instance everything is one lookup away:
---        local anim = enemy.animation
---        anim._class.Hurt(anim)          -- engine does exactly this
---        Sans.SetFace(anim, 3)           -- or straight from the module
---    Sprites stay colon-style (`sprite:Set(...)`, `sprite:Dust(...)`).
---
---  ENGINE-PROVIDED FIELDS (refreshed on every instance each frame)
---    * self.enemy    → the enemy table from the encounter (id, name, hp, maxhp,
---                      canspare, killable, actions, and any custom fields).
---    * self.canspare → shortcut for self.enemy.canspare
---    * self.killable → shortcut for self.enemy.killable
---    * self.hp / self.maxhp
---    * self.dead     → true once HP reached 0 AND the enemy is killable.
---                      Use this in Update to switch to a death animation.
---
---  IMPORTANT
---    * Lua's `require` returns this module ONCE (it is cached). Two enemies of
---      the same type would otherwise share ONE table → they would share one
---      sprite. `New(...)` is the ONLY way to get a usable, per-enemy instance.
---    * NEVER store per-monster state (sprites, timers, flags) at module level.
---      Put everything on `self` so each instance owns its own data.
--- ============================================================================
+-- Contract and style rules live in Game/Animations/_temp.lua — read that first.
+-- Short version: plain table, NO metatable; every function is declared with a
+-- dot and takes the instance as its first argument; `New(pos)` returns a plain
+-- instance that carries `_class` back to this module and gets these functions
+-- bound onto it (Battle.BindAnimation), so callers write `anim.SetFace(3)`.
+-- Everything inside this file calls the module by name (`Sans.SetFace(self, 3)`).
+-- Sprites stay colon-style.
 --
 --  SANS BATTLE BODY
 --  The battle sprite is THREE independent sprites (legs + torso + head) that
@@ -125,17 +92,13 @@ end
 function Sans.New(pos)
     local self = {}
 
-    -- Back-reference to the function table: how callers reach Sans.* from the
-    -- instance (anim._class.Update(anim, dt), anim._class.Hurt(anim), ...).
+    -- Back-reference to this module's function table. Do not rename it.
     self._class = Sans
 
     self.running = true
-    self.x = 0
-    self.y = 0
     self.elements = {}
 
     self.hurting = false
-    self.hurttime = 0
     self.intensity = 16
 
     -- --- sway / bounce ----------------------------------------------------
@@ -178,6 +141,11 @@ function Sans.New(pos)
     self._last_sweat = -1
 
     Sans.Init(self, pos)
+
+    -- The instance drives itself from here on (`anim.SetFace(3)`) — see
+    -- Battle.BindAnimation for the rule.
+    Battle.BindAnimation(self, Sans)
+
     return self
 end
 

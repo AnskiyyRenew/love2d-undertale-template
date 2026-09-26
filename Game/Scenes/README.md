@@ -1,8 +1,9 @@
 # Game/Scenes
 
-游戏侧场景脚本目录（引擎优先读取此处）。
+Game-side scene script directory (the engine reads from here first).
 
-- 场景模块 `Game.Scenes.<名称>` 对应本目录下 `<名称>.lua`
-- 覆盖引擎同名场景 `Scripts.Scenes.<名称>`；未提供时走引擎侧
-- 注意：若覆盖文件存在但顶层报错，引擎会自动回退引擎侧，并在日志中打出
-  `WARNING: ... exists but failed to load` 与真实错误信息
+- Scene module `Game.Scenes.<name>` maps to `<name>.lua` in this directory
+- Overrides the engine scene of the same name, `Scripts.Scenes.<name>`; falls back to the engine side when not provided
+- Note: if an override file exists but throws at the top level, the engine automatically
+  falls back to the engine side and logs `WARNING: ... exists but failed to load`
+  together with the real error message
