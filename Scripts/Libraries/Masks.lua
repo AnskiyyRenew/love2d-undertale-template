@@ -1,15 +1,16 @@
 local masks = {}
 
 ---Generate a new mask.
----@param shape string
+---@param shape string  "rect"/"rectangle", "ellipse"/"circle", or "image"/"img"
 ---@param x number
 ---@param y number
----@param w number
----@param h number
----@param r number
----@param value number
+---@param w number  rect/ellipse: bbox width; image: target width (0 = native image width)
+---@param h number  rect/ellipse: bbox height; image: target height (0 = native image height)
+---@param r number  Rotation in degrees
+---@param value number  Stencil layer value
+---@param image love.Image|table  Optional. love.Image or sprite table (with .image). Used for "image" shape.
 ---@return table
-function masks.New(shape, x, y, w, h, r, value)
+function masks.New(shape, x, y, w, h, r, value, image)
     local self = {
         shape = shape or "rect",
         x = x or 0,
@@ -18,10 +19,18 @@ function masks.New(shape, x, y, w, h, r, value)
         h = h or 0,
         r = r or 0,
         value = value or 1,
-        isactive = true
+        isactive = true,
+        -- "image" shape only:
+        image = image,    -- love.Image, or sprite table with .image field
+        scaleX = nil,     -- manual X scale (overrides w-based scale when set)
+        scaleY = nil,     -- manual Y scale (overrides h-based scale when set)
+        ox = nil,         -- origin X (defaults to imageWidth / 2)
+        oy = nil,         -- origin Y (defaults to imageHeight / 2)
     }
 
     ---Let a mask follow a sprite's position, scale, and rotation.
+    ---For image masks, the w/h track the sprite's scaled size so manual
+    ---scaleX/scaleY still take effect when set.
     ---@param sprite table
     function self:Follow(sprite)
         self.x = sprite.x
@@ -46,17 +55,38 @@ function masks.Draw(tab)
         SE.graphics.setStencilState("increment", "always", 1)
 
         for _, mask in ipairs(tab) do
-            SE.graphics.push()
-            SE.graphics.translate(mask.x, mask.y)
-            SE.graphics.rotate(math.rad(mask.r))
+            if mask.isactive ~= false then
+                SE.graphics.push()
+                SE.graphics.translate(mask.x, mask.y)
+                SE.graphics.rotate(math.rad(mask.r))
 
-            if mask.shape == "rect" or mask.shape == "rectangle" then
-                SE.graphics.rectangle("fill", -mask.w / 2, -mask.h / 2, mask.w, mask.h)
-            elseif mask.shape == "ellipse" or mask.shape == "circle" then
-                SE.graphics.ellipse("fill", 0, 0, mask.w / 2, mask.h / 2)
+                if mask.shape == "rect" or mask.shape == "rectangle" then
+                    SE.graphics.rectangle("fill", -mask.w / 2, -mask.h / 2, mask.w, mask.h)
+                elseif mask.shape == "ellipse" or mask.shape == "circle" then
+                    SE.graphics.ellipse("fill", 0, 0, mask.w / 2, mask.h / 2)
+                elseif mask.shape == "image" or mask.shape == "img" then
+                    -- Mask shape follows the image's per-pixel alpha: only
+                    -- fragments that the sprite shader actually emits are
+                    -- incremented into the stencil buffer, so fully
+                    -- transparent pixels of the ImageData never become mask.
+                    local img = mask.image
+                    if img and type(img) == "table" and img.image then
+                        img = img.image  -- tolerate sprite tables
+                    end
+
+                    if img then
+                        local iw, ih = img:getDimensions()
+                        local sx = mask.scaleX or (mask.w and mask.w > 0 and mask.w / iw or 1)
+                        local sy = mask.scaleY or (mask.h and mask.h > 0 and mask.h / ih or 1)
+                        local ox = mask.ox or (iw / 2)
+                        local oy = mask.oy or (ih / 2)
+
+                        SE.graphics.draw(img, 0, 0, 0, sx, sy, ox, oy)
+                    end
+                end
+
+                SE.graphics.pop()
             end
-
-            SE.graphics.pop()
         end
     end)
 

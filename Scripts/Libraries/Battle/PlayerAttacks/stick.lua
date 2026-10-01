@@ -115,7 +115,6 @@ function atk.Update(dt)
                 "UI/Battle Screen/Player Attack/spr_slice_o_5.png",
             }, 1 / 6, "empty")
             slice:MoveTo(enemy.position[1], enemy.position[2])
-
             attacked = true
 
             -- Broadcast to the targeted enemy's animation that the attack was

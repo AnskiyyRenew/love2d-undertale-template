@@ -341,8 +341,9 @@ function Player.AddKR(kramount)
     end
 end
 
----Creates a one-way platform for the blue soul.
----The platform only catches the player when its foot crosses the platform's top
+---Creates a one-way platform.
+---The platform only catches a soul that opted in with `use_platforms = true`
+---(see Player.UpdatePlatforms), and only when its foot crosses the platform's top
 ---face from above (a classic one-way platform), so the player can still jump up
 ---through it from below and is never yanked up while standing underneath it.
 ---@param x number|nil X position (default 320).
@@ -489,7 +490,11 @@ function Player.ClearPlatforms()
     Player.platform_ground = false
 end
 
----One-way platform collision for the blue soul.
+---One-way platform collision, for any soul that wants it.
+---This test itself is soul-agnostic (it only looks at the sprite and its
+---vertical speed), so a soul opts in either by setting `use_platforms = true` -
+---Player.UpdatePlatforms then calls this for the active soul every frame - or by
+---calling it directly from its own Update.
 ---The player's foot is probed along the sprite's own local "down" (its gravity
 ---direction) both before and after this frame's movement. A platform catches the
 ---player only when that foot crosses the platform's top face from above, so the
@@ -572,8 +577,49 @@ function Player.BluePlatformCollide(sprite, vertical)
     return false
 end
 
----Updates every blue platform (movement + player collision). Only the blue soul
----is caught; other souls ignore platforms and simply pass through.
+-- The soul field that opts a soul into the blue one-way platforms.
+--
+-- Platforms were written for the blue soul and only the blue soul was caught by
+-- them, decided here from `Player.soul == "blue"`. That put the soul list in the
+-- engine: any other soul that wanted the same platforms had to be wired in
+-- again, here. The field moves that decision into the soul file, where it
+-- belongs:
+--
+--     local action = {
+--         sprite = nil,
+--         use_platforms = true   -- caught by Player.BluePlatform surfaces
+--     }
+--
+-- OPT IN, never opt out: the field is absent from every existing soul, so
+-- nothing changes for them - they pass straight through the platforms exactly
+-- as before. Only a soul that explicitly sets it to `true` is caught.
+local PLATFORM_FIELD = "use_platforms"
+
+---Does the ACTIVE soul want to be caught by the one-way platforms?
+---
+---A soul that declares `use_platforms` decides for itself; a soul that says
+---nothing keeps the historical behaviour, where only the engine's own blue soul
+---was caught. That fallback also protects a `Game/Souls/blue.lua` written
+---before this field existed: it stays on the platforms without being edited.
+---@return boolean
+local function soulUsesPlatforms()
+    local action = Player.action
+
+    if (action and action[PLATFORM_FIELD] ~= nil) then
+        return (action[PLATFORM_FIELD] == true)
+    end
+
+    return (Player.soul == "blue")
+end
+
+---Updates every blue platform (movement + player collision).
+---
+---Collision belongs to the souls that ask for it: a soul is caught only when it
+---sets `action.use_platforms = true` (see soulUsesPlatforms). Every other soul
+---ignores platforms and simply passes through. An extra soul created with
+---`Player.NewSoul` is never driven from here - it can call
+---`Player.BluePlatformCollide(soul.sprite, soul.GetSpeed())` from its own
+---Update if it wants the same treatment.
 ---@param dt number|nil
 function Player.UpdatePlatforms(dt)
     local platforms = Player.platforms
@@ -595,10 +641,12 @@ function Player.UpdatePlatforms(dt)
     end
 
     local grounded = false
-    if (Player.soul == "blue" and Player.action and Player.action.GetSpeed) then
-        grounded = Player.BluePlatformCollide(Player.sprite, Player.action.GetSpeed())
-        if (grounded and Player.action.Land) then
-            Player.action.Land()
+    local action = Player.action
+
+    if (soulUsesPlatforms() and action and action.GetSpeed) then
+        grounded = Player.BluePlatformCollide(Player.sprite, action.GetSpeed())
+        if (grounded and action.Land) then
+            action.Land()
         end
     end
     Player.platform_ground = grounded

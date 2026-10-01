@@ -1,7 +1,11 @@
 local action = {
     sprite = nil,
     can_move = true,
-    is_moving = false
+    is_moving = false,
+    -- Ask the engine to catch this soul on the one-way platforms. The field is
+    -- opt in, so without it the soul would fall straight through
+    -- Player.BluePlatform surfaces (see Player.UpdatePlatforms).
+    use_platforms = true
 }
 
 -- Default vars.

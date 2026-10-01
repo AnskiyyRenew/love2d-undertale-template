@@ -268,6 +268,13 @@ end
 function battle.DefenseEnding() end
 function battle.HandleActions(enemy, action) end
 function battle.HandleItems(item) end
+-- Default: fall back to the enemy's turn, matching the behaviour before the
+-- HandleSpare hook was introduced. A scene that wants custom partial-spare
+-- logic (e.g. only some enemies leave, narration before the next wave)
+-- overrides this on its own battle table. Without an override the old
+-- "go straight to DEFENDING" path is kept so destroy_elements() clearing
+-- state.typers can never strand the MERCYMENU updater on an empty list.
+function battle.HandleSpare() battle.ChangeState("DEFENDING") end
 function battle.HandleFlee() end
 function battle.FleeUpdate(dt) end
 function battle.OnHit(bullet) end

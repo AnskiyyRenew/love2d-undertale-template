@@ -3,17 +3,17 @@ local scene = {}
 -- Import battle module
 Battle = ImportFile("Battle")
 Battle.SetEndRoom("scene_end")
+Blasters = ImportFile("Attacks.Blasters")
 Game = Battle.SetGame("dummy")
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
-Blasters = ImportFile("Attacks.Blasters")
 
 -- Give each enemy its own independent animation instance. The animation
 -- module is a factory, so every call to InitAnimation creates a fresh
 -- instance with its own sprite — enemy #1 and enemy #2 no longer share one.
-Game:InitAnimation(1, {320, 120})
---Game:InitAnimation(2, {120, 140})
+Game:InitAnimation(1, {320, 140})
+Game:InitAnimation(2, {120, 140})
 local enemies = Game.enemies
 
 local function DefenseEnding()

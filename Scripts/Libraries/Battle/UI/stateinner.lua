@@ -444,7 +444,7 @@ local function state_behaviours_updater(dt)
                 end
 
                 if (#enemies > 0) then
-                    Battle.ChangeState("DEFENDING")
+                    Battle.HandleSpare()
                 else
                     Battle.Win()
                 end

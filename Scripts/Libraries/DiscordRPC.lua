@@ -133,12 +133,34 @@ if (ffi_ok) then
     -- Builds the ordered list of candidate DLL paths for the current platform.
     local function buildDllCandidates()
         local candidates = {}
-        local base = nil
-        local ok_base, b = pcall(function()
-            return SE.filesystem.getSourceBaseDirectory()
-        end)
-        if (ok_base and type(b) == "string" and b ~= "") then
-            base = b:gsub("\\", "/")
+
+        -- Resolve the real source directory (where the game's files live on
+        -- the actual filesystem). IMPORTANT: love.filesystem.getSourceBaseDirectory()
+        -- returns the PARENT of the source folder -- e.g. "D:/games" when the
+        -- source is "D:/games/MyGame". So to point ffi.load at the real folder
+        -- we must append love.filesystem.getSource(). ffi.load does NOT use
+        -- LÖVE's virtual filesystem; it goes through the OS loader (LoadLibrary
+        -- / dlopen), which only understands real OS paths or paths relative to
+        -- the process CWD. A bare relative candidate like
+        -- "Resources/Libs/DiscordRPC/discord-rpc-x64.dll" only resolves when the
+        -- process was launched FROM the source folder, so it is unreliable.
+        local source_dir = nil
+        local ok_s, s = pcall(function() return SE.filesystem.getSource() end)
+        local ok_b, b = pcall(function() return SE.filesystem.getSourceBaseDirectory() end)
+        if (ok_s and type(s) == "string" and s ~= "") then
+            s = s:gsub("\\", "/"):gsub("/+$", "")
+            -- getSource() may be a bare folder name ("MyGame") or a full path.
+            -- Drive letter or leading slash => absolute; use as-is. Otherwise
+            -- combine with the base directory.
+            if (s:match("^%a:") or s:match("^/")) then
+                source_dir = s
+            elseif (ok_b and type(b) == "string" and b ~= "") then
+                source_dir = b:gsub("\\", "/"):gsub("/+$", "") .. "/" .. s
+            end
+        elseif (ok_b and type(b) == "string" and b ~= "") then
+            -- No getSource(); fall back to base (the parent). Least reliable,
+            -- but better than nothing.
+            source_dir = b:gsub("\\", "/"):gsub("/+$", "")
         end
 
         local os_name = SE.system.getOS()
@@ -159,22 +181,23 @@ if (ffi_ok) then
             return candidates -- unsupported OS
         end
 
-        local dirs = {
-            "Resources/Libs/DiscordRPC/",
-            "Resources/Libs/",
-            "",
-        }
-        if (base) then
-            dirs[#dirs + 1] = base .. "/Resources/Libs/DiscordRPC/"
-            dirs[#dirs + 1] = base .. "/Resources/Libs/"
+        local dirs = {}
+        -- Most reliable: absolute path into the real source folder.
+        if (source_dir) then
+            dirs[#dirs + 1] = source_dir .. "/Resources/Libs/DiscordRPC/"
+            dirs[#dirs + 1] = source_dir .. "/Resources/Libs/"
         end
+        -- Relative fallback (works only if CWD == source folder).
+        dirs[#dirs + 1] = "Resources/Libs/DiscordRPC/"
+        dirs[#dirs + 1] = "Resources/Libs/"
+        dirs[#dirs + 1] = ""
 
         for _, d in ipairs(dirs) do
             for _, n in ipairs(names) do
                 candidates[#candidates + 1] = d .. n
             end
         end
-        return candidates
+        return candidates, source_dir
     end
 
     -- Loads the native discord-rpc DLL into memory.
@@ -182,8 +205,12 @@ if (ffi_ok) then
         if (discord._lib and discord._lib_loaded) then
             return true
         end
-        local candidates = buildDllCandidates()
-        local last_error = nil
+        local candidates, source_dir = buildDllCandidates()
+        -- Per-candidate error log: the previous code only kept the LAST error,
+        -- which made it impossible to tell why the first (correct-relative-path)
+        -- candidate failed vs. the wrong-base candidates. Collect them all so a
+        -- failure report shows exactly which path was tried and what happened.
+        local errors = {}
         for _, path in ipairs(candidates) do
             local ok_load, lib = pcall(ffi.load, path)
             if (ok_load and lib) then
@@ -191,15 +218,19 @@ if (ffi_ok) then
                 if (ok_fn and fn) then
                     discord._lib = lib
                     discord._lib_loaded = true
+                    print("[DiscordRPC] loaded native library: " .. path)
                     return true
+                else
+                    errors[#errors + 1] = path .. " (loaded, but Discord_Initialize missing)"
                 end
             else
-                last_error = tostring(lib)
+                errors[#errors + 1] = path .. " -> " .. tostring(lib)
             end
         end
-        return false, "discord-rpc library not found / could not be loaded. Tried: " ..
-            table.concat(candidates, ", ") ..
-            (last_error and (" | last error: " .. last_error) or "")
+        return false, "discord-rpc library not found / could not be loaded.\n" ..
+            "  source_dir = " .. tostring(source_dir) .. "\n" ..
+            "  tried " .. #candidates .. " candidates:\n    - " ..
+            table.concat(errors, "\n    - ")
     end
 
     -- User event callbacks (set via onJoin / onSpectate / onJoinRequest).

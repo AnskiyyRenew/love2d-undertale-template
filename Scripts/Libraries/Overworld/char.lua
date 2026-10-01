@@ -60,6 +60,11 @@ local char_prevX, char_prevY = 0, 0
 -- Last physics-body position; used to detect whether the player is pressed
 -- against a wall (the body did not move since the previous frame).
 local body_lastX, body_lastY = nil, nil
+-- Tolerance (world units) when deciding whether the body "moved" between two
+-- frames. A resting contact can still jitter by a fraction of a unit, while a
+-- walking player covers ~3.3 units per frame, so anything above this is real
+-- movement.
+local DANCE_STILL_EPS = 0.5
 
 ---Replace the whole sprite table.
 ---@param tab table
@@ -139,8 +144,13 @@ function char.Update(dt)
     -- Detect whether the physics body stayed in place since last frame
     -- (i.e. the player is pressing against a wall).
     local bx, by = char.collision.body:getX(), char.collision.body:getY()
-    local blocked = (body_lastX ~= nil and body_lastX == bx and body_lastY == by)
+    local prevX, prevY = body_lastX, body_lastY
     body_lastX, body_lastY = bx, by
+    local moved_x = (prevX == nil) or (math.abs(bx - prevX) > DANCE_STILL_EPS)
+    -- Vertical stillness: the body is glued to the wall / ground and is not
+    -- slipping up or down. This is what keeps the Frisk Dance alive.
+    local moved_y = (prevY == nil) or (math.abs(by - prevY) > DANCE_STILL_EPS)
+    local blocked = (not moved_x and not moved_y)
 
     if (char.controlling) then
         -- The first pressed direction is remembered until it is released,
@@ -184,28 +194,31 @@ function char.Update(dt)
 
         local up_held = Controller.GetState("up") > 0
         local down_held = Controller.GetState("down") > 0
+        local was_dancing = char.frisk_dancing
         if (char.friskdance and up_held and down_held) then
-            -- Start condition: facing up AND pushing up against a wall.
-            local blocked_up = (velbodyy < 0 and blocked)
-            if (char.frisk_dancing or blocked_up) then
-                char.frisk_dancing = true
-            else
-                if (char.frisk_dancing) then
-                    char.direction = "up"
-                end
-                char.frisk_dancing = false
-            end
+            -- Start condition: standing completely still AND pushing up
+            -- against a wall. Once started, the body must KEEP standing still
+            -- on the Y axis -- the moment it slips (walked away from the
+            -- wall, pushed through, fell, ...) the dance is cancelled, while
+            -- sliding left/right along the wall is still allowed.
+            -- Note that `velbodyy < 0` can only be required to *start* the
+            -- dance: while dancing the facing flips to "down" every other
+            -- flip, which makes the raw input velocity positive again.
+            char.frisk_dancing = (not moved_y) and (was_dancing or (blocked and velbodyy < 0))
         else
-            if (char.frisk_dancing) then
-                char.direction = "up"
-            end
             char.frisk_dancing = false
+        end
+        if (was_dancing and not char.frisk_dancing) then
+            -- Cancelled: stop the flip timer and face up again.
+            char.direction = "up"
+            char.friskDanceTime = 0
         end
 
         if (char.frisk_dancing) then
-            -- Keep the vertical velocity zero (stay glued to the wall) so the
-            -- dance does not push the player up/down, but let the player still
-            -- walk left/right while performing the Frisk Dance.
+            -- Keep pushing up so the player stays glued to the wall (the
+            -- collision stops the movement, which is exactly what the
+            -- "moved_y == false" check above looks for), while still letting
+            -- the player walk left/right during the Frisk Dance.
             velbodyy = -2
             Step.UpdateTime()
         end

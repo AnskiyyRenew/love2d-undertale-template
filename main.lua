@@ -107,6 +107,35 @@ end
 local function updateScreenScale()
     local screen_w, screen_h = SE.graphics.getDimensions()
 
+    -- BORDER_MODE: scale by the 960x540 Border art instead of the 640x480 canvas,
+    -- so the frame fits inside the window and the canvas drops into the frame's
+    -- inner opening. The frame is centred; the canvas is offset to that
+    -- opening's top-left (so the canvas hugs the inner black rectangle).
+    -- When BORDER_MODE is false the canvas itself is fit to the window and the
+    -- Border frame is not drawn -- the previous behaviour is preserved.
+    if (BORDER_MODE) then
+        local bw = BORDER_WIDTH or CANVAS_WIDTH
+        local bh = BORDER_HEIGHT or CANVAS_HEIGHT
+        local borderFit = math.min(screen_w / bw, screen_h / bh)
+        if (borderFit <= 0 or borderFit ~= borderFit) then borderFit = 1 end
+
+        if (screenScaleMode == "integer") then
+            local whole = math.floor(borderFit)
+            ScreenScale = (whole >= 1) and whole or borderFit
+        else
+            ScreenScale = borderFit
+        end
+
+        -- Opening of the canvas inside the Border art. Defaults to the canvas
+        -- centred in the art; honour Border.SetOpening() if a scene overrides it.
+        local ox, oy = Border.GetOpening(bw, bh)
+        local borderDrawX = math.floor((screen_w - bw * ScreenScale) * 0.5 + 0.5)
+        local borderDrawY = math.floor((screen_h - bh * ScreenScale) * 0.5 + 0.5)
+        DrawX = borderDrawX + math.floor(ox * ScreenScale + 0.5)
+        DrawY = borderDrawY + math.floor(oy * ScreenScale + 0.5)
+        return
+    end
+
     -- How many times the canvas would fit inside the window / screen.
     local fit = math.min(screen_w / CANVAS_WIDTH, screen_h / CANVAS_HEIGHT)
     if (fit <= 0 or fit ~= fit) then fit = 1 end
@@ -169,15 +198,36 @@ function love.load()
     updateScreenScale()
 
     Discord.application_id = Global.GetVariable("DiscordAppID")
-    Discord.init()
 
-    Discord.setActivity({
-        details     = "Fighting Sans",
-        state       = "Route: Genocide",
-        large_image = "qq20250220-225345",
-        large_text  = "It's a bad time.",
-        start       = Discord.timestamp(),   -- elapsed timer
-    })
+    -- Diagnostics: DiscordRPC silently swallows failures unless we hook the
+    -- callbacks. These prints will show EXACTLY what Discord reports, so we can
+    -- tell "App ID invalid" / "art asset missing" / "client not running" apart.
+    Discord.onReady(function(user)
+        print("[DiscordRPC] READY  app=" .. tostring(Discord.application_id) ..
+              "  user=" .. tostring(user and user.username))
+    end)
+    Discord.onDisconnected(function(code, msg)
+        print("[DiscordRPC] DISCONNECTED  code=" .. tostring(code) .. "  msg=" .. tostring(msg))
+    end)
+    Discord.onError(function(code, msg)
+        print("[DiscordRPC] ERROR  code=" .. tostring(code) .. "  msg=" .. tostring(msg))
+    end)
+
+    local ok_init, err_init = Discord.init()
+    if (not ok_init) then
+        print("[DiscordRPC] init() FAILED: " .. tostring(err_init))
+    else
+        local ok_act, err_act = Discord.setActivity({
+            details     = "Fighting Sans",
+            state       = "Route: Genocide",
+            large_image = "qq20250220-225345",
+            large_text  = "It's a bad time.",
+            start       = Discord.timestamp(),   -- elapsed timer
+        })
+        if (not ok_act) then
+            print("[DiscordRPC] setActivity() FAILED: " .. tostring(err_act))
+        end
+    end
 end
 
 function love.update(dt)
@@ -258,9 +308,13 @@ function love.draw()
 
     -- Window frame: drawn by the Border library BEHIND the gameplay canvas. It
     -- uses the same scale as the canvas and positions its opening exactly on
-    -- the canvas rectangle, so the frame always hugs the game screen. Enable /
-    -- pick image / fade / re-align via the Border.* APIs.
-    --Border.Draw()
+    -- the canvas rectangle, so the frame always hugs the game screen.
+    -- Only drawn when BORDER_MODE is on -- in that mode updateScreenScale() has
+    -- already sized the screen to the frame, so drawing it here cannot overflow.
+    -- Enable / pick image / fade / re-align via the Border.* APIs.
+    if (BORDER_MODE) then
+        Border.Draw()
+    end
 
     SE.graphics.push()
     SE.graphics.translate(DrawX, DrawY)
@@ -268,13 +322,6 @@ function love.draw()
 
     SE.graphics.setColor(1, 1, 1, 1)
     SE.graphics.draw(source)
-    local prevLineStyle = SE.graphics.getLineStyle()
-    SE.graphics.setLineStyle("rough")
-    SE.graphics.setLineWidth(1)
-    SE.graphics.setColor(1, 1, 1)
-    SE.graphics.rectangle("line", -1, -1, CANVAS_WIDTH + 2, CANVAS_HEIGHT + 2)
-    SE.graphics.setColor(1, 1, 1, 1)
-    SE.graphics.setLineStyle(prevLineStyle)
     SE.graphics.pop()
 
     if (Debugger and Debugger.Draw) then Debugger.Draw() end

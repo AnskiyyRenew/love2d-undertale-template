@@ -724,7 +724,7 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
     -- fraction short of it while the extend tween is on its last frames).
     -- `over` is only a safety net: the normal teardown is driven by
     -- _wallRetracted().
-    local over = intime + animation.It + staytime + animation.Ot + 14
+    local over = intime + animation.It + staytime + animation.Ot + 4
 
     if (direction == "down") then
         wall.warning:MoveTo(X, Y + H / 2)

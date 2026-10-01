@@ -23,6 +23,9 @@
 --    * action.sprite   the player sprite this soul drives.
 --    * action.can_move mirrors Player.canMove; false = do not move.
 --    * action.is_moving yours, for "am I walking" checks.
+--    * action.use_platforms  OPTIONAL, default absent. Set it to true to be
+--      caught by the one-way platforms created with `Player.BluePlatform`;
+--      a soul that leaves it out passes straight through them.
 --
 --  IMPORTANT
 --    * `Player.action` IS this module table — the engine never copies it. The
@@ -37,7 +40,8 @@
 local action = {
     sprite = nil,
     can_move = true,
-    is_moving = false
+    is_moving = false,
+    -- use_platforms = true,   -- uncomment to stand on Player.BluePlatform surfaces
 }
 
 -- Default vars.

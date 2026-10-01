@@ -1,5 +1,5 @@
 {
-  "Battle.Narration.Default": "* 颇似儿摆了[wait:0.5]\n  [speed:0.05]一个姿势！",
+  "Battle.Narration.Default": "* 颇似儿摆了一个姿势！",
 
   "Battle.Spare": "饶恕",
   "Battle.Flee": "逃跑",
@@ -33,6 +33,20 @@
   "Overworld.Shop.Action.Sell": "出售",
   "Overworld.Shop.Action.Talk": "交谈",
   "Overworld.Shop.Action.Exit": "离开",
+  "Overworld.Shop.Opinion.Default": "……",
+  "Overworld.Shop.TalkOpinion.Default": "想聊点什么？",
+  "Overworld.Shop.Text.Greeting": "* 欢迎光临。",
+  "Overworld.Shop.Text.Leave": "* 下次再来哦。",
+  "Overworld.Shop.Text.SoldOut": "已售罄",
+  "Overworld.Shop.Text.InvFull": "* 你的物品栏已经满了。",
+  "Overworld.Shop.Text.NoGold": "* 你的金钱不够。",
+  "Overworld.Shop.Text.Bought": "* 你买下了%s。\n* 花费 %sG。",
+  "Overworld.Shop.Text.Sold": "* 你卖出了%s。\n* 获得 %sG。",
+  "Overworld.Shop.Text.CannotSell": "* 这个我不收。",
+  "Overworld.Shop.Text.NoSelling": "* 抱歉，我现在不收东西。",
+  "Overworld.Shop.Text.NoItems": "* 你没有任何可以\n  出售的物品。",
+  "Overworld.Shop.Text.NoTalk": "* 没什么好聊的。",
+  "Overworld.Shop.Text.New": "（新）",
   "Overworld.Text.NobodyCame": "* 但是谁也没有来。",
 
   "VirtualKeyboard.title": "虚拟按键",

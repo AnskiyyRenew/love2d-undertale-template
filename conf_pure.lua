@@ -52,5 +52,5 @@ Global.SetVariable("SE_MEMORY_SAFETY", true)    -- DANGEROUS
 Global.SetVariable("OPT_COUNT_SPRITES", 2000)
 Global.SetVariable("OPT_COUNT_TYPERS", 300)
 Global.SetVariable("OPT_MEMORY_MAXSIZE", 0.8)
-Global.SetVariable("OPT_LRU_SPRITES", {true, 180})      -- Unit: seconds. If this time is exceeded without using the texture, it will be removed from the cache according to the LRU algorithm to free up space.
+Global.SetVariable("OPT_LRU_SPRITES", {false, 180})      -- Unit: seconds. If this time is exceeded without using the texture, it will be removed from the cache according to the LRU algorithm to free up space.
 Guard = ImportFile("Engine.MemorySafety")

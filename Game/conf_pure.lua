@@ -1,9 +1,6 @@
 -- Initialize
-Global.SetVariable("FirstRoom", "Overworld.scene_ow_main_0")
---Global.SetVariable("FirstRoom", "TEST.gb")
---Global.SetVariable("FirstRoom", "TEST.scene_wingdings")   -- Wingdings visual check
 Global.SetVariable("FirstRoom", "scene_logo")
-Global.SetVariable("FirstRoom", "Battle.scene_battle_init")
+--Global.SetVariable("FirstRoom", "Overworld.scene_ow_main_0")
 Global.SetVariable("MainColor", {1, 1, 1})
 --Global.SetVariable("MainColor", SE.tools.hexColor("#C14949"))
 Global.SetVariable("EnableFriskDance", false)
@@ -52,5 +49,5 @@ Global.SetVariable("SE_MEMORY_SAFETY", true)    -- DANGEROUS
 Global.SetVariable("OPT_COUNT_SPRITES", 2000)
 Global.SetVariable("OPT_COUNT_TYPERS", 300)
 Global.SetVariable("OPT_MEMORY_MAXSIZE", 0.8)
-Global.SetVariable("OPT_LRU_SPRITES", {true, 180})      -- Unit: seconds. If this time is exceeded without using the texture, it will be removed from the cache according to the LRU algorithm to free up space.
+Global.SetVariable("OPT_LRU_SPRITES", {false, 180})      -- Unit: seconds. If this time is exceeded without using the texture, it will be removed from the cache according to the LRU algorithm to free up space.
 Guard = ImportFile("Engine.MemorySafety")

@@ -18,6 +18,29 @@ local cool_down = 5
 local cd_timer = 5
 local bullets = {}
 
+-- Bigshot effects currently on screen: the orbiting charge particles and the
+-- "fully charged" shadow heart. Keeping them in one registry is what makes the
+-- whole charge wipeable in one call - on a soul switch the file is re-executed,
+-- so anything not named here would be orphaned on screen forever.
+local bs_parts = {}
+local bs_shadow = nil
+
+---Removes every bigshot effect that is still on screen.
+local function clear_bigshot()
+    for i = #bs_parts, 1, -1 do
+        local part = bs_parts[i]
+        bs_parts[i] = nil
+        if (part) then
+            part:Destroy()
+        end
+    end
+
+    if (bs_shadow) then
+        bs_shadow:Destroy()
+        bs_shadow = nil
+    end
+end
+
 -- Init: the contract lives in _temp.lua. Binding, tint and state reset belong
 -- to the soul, so the engine never pokes these fields from outside.
 ---@param sprite table|nil The player sprite driven by this soul.
@@ -35,7 +58,21 @@ function action.Init(sprite, can_move, args)
     end
     control_mode = 1
 
+    -- A new run starts from nothing: drop the effects the previous run left
+    -- behind and re-arm the charge. The file is re-executed on every switch, so
+    -- without this the old particles would never be found again.
+    clear_bigshot()
+    bigshot_timer = 0
+    bs_begin = false
+    bs_ready = false
+
     return action
+end
+
+---Wipes the bigshot effects (particles + charged shadow) from the screen,
+---without touching the charge counters. Useful when a wave wants them gone.
+function action.ClearBigshot()
+    clear_bigshot()
 end
 
 function action.Bullet(spr, layer)
@@ -148,17 +185,47 @@ function action.Update(dt)
                             )
                             part:Scale(0.1, 0.1)
                             part.Step = function (self)
-                                self.alpha = self.alpha + 0.02
+                                -- Released: fade out, then leave. The button is
+                                -- read here, on the sprite itself, so an effect
+                                -- can never be stranded: the soul stops updating
+                                -- the moment Player.canMove goes false, but this
+                                -- Step keeps running either way.
+                                if (self._dying) then
+                                    self.alpha = self.alpha - 0.06
+                                    if (self.alpha <= 0) then
+                                        LuaEX.rmVarTable(bs_parts, self)
+                                        self:Destroy()
+                                        return
+                                    end
+
+                                    self:Scale(
+                                        math.max(0, self.xscale - 0.12),
+                                        math.max(0, self.yscale - 0.12)
+                                    )
+                                    return
+                                end
+
                                 self._offset = self._offset + 3
                                 self._radius = math.max(0, self._radius - 1)
+
+                                -- Fade in and grow while it spirals in, then hold
+                                -- at full size on the heart.
+                                local grow = (30 - self._radius) / 30
+                                self.alpha = math.min(1, self.alpha + 0.02)
+                                --self:Scale(0.1 + grow, 0.1 + grow)
                                 self:MoveTo(
                                     sprite.x + self._radius * math.cos(math.rad(self._offset)),
                                     sprite.y + self._radius * math.sin(math.rad(self._offset))
                                 )
-                                if (Controller.GetState("confirm") == -1) then
-                                    self:Destroy()
+
+                                -- `<= 0` covers both the release frame (-1) and
+                                -- every frame after it (0), so a single missed
+                                -- frame no longer keeps the effect alive forever.
+                                if (Controller.GetState("confirm") <= 0) then
+                                    self._dying = true
                                 end
                             end
+                            table.insert(bs_parts, part)
                         end
                     end
 
@@ -170,16 +237,43 @@ function action.Update(dt)
                         heart.rotation = sprite.rotation
                         heart.color = {1, 1, 0}
                         heart.alpha = 0.5
-                        heart:Scale(1.4, 1.4)
+                        heart:Scale(1.0, 1.0)
                         heart:MoveTo(sprite:GetPosition())
+                        heart._time = 0
                         heart.Step = function (self)
-                            if (Controller.GetState("confirm") == -1) then
-                                self:Destroy()
+                            -- Ride along with the heart, so the "charged" marker
+                            -- stays on the player instead of at the cast spot.
+                            self._time = self._time + 1
+                            if (bs_shadow == self) then
+                                self:MoveTo(sprite:GetPosition())
+                                self.rotation = sprite.rotation
+                                self:Scale(
+                                    1.3 - 0.2 * math.cos(math.rad(self._time) * 4),
+                                    1.3 - 0.2 * math.cos(math.rad(self._time) * 4)
+                                )
+                            end
+
+                            if (Controller.GetState("confirm") <= 0) then
+                                self.alpha = self.alpha - 0.05
+                                if (self.alpha <= 0) then
+                                    if (bs_shadow == self) then
+                                        bs_shadow = nil
+                                    end
+                                    self:Destroy()
+                                end
                             end
                         end
+                        bs_shadow = heart
                     end
                 end
-                if (Controller.GetState("confirm") == -1 and bs_ready) then
+
+                -- Any release ends the charge, however far it got. The old code
+                -- only reset when the bar was already full, so letting go early
+                -- left `bigshot_timer` running and `bs_begin` stuck true: the
+                -- next hold spawned no particles at all and jumped straight to a
+                -- full charge. The effects are not destroyed here - each one
+                -- fades itself out (see the Steps above).
+                if (Controller.GetState("confirm") == -1) then
                     bigshot_timer = 0
                     bs_begin = false
                     bs_ready = false

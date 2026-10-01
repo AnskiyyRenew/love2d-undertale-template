@@ -58,8 +58,8 @@ local encounter = {
         },
     },
 
-    state = "DEFENDING",
-    wave = "bones.wave1",
+    state = "ACTIONSELECT",
+    wave = "wave",
 
     player = {
         name = "end",

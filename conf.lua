@@ -19,6 +19,12 @@ _INFO = {
 LOGICAL_WIDTH, LOGICAL_HEIGHT = 640, 480
 CANVAS_WIDTH, CANVAS_HEIGHT = 640, 480
 
+-- The Border art's native size. The frame's inner opening is the canvas
+-- centred inside this rectangle (default opening ox=(BW-CW)/2, oy=(BH-CH)/2).
+-- Used by BORDER_MODE (see below) and by the Border library when aligning the
+-- frame to the canvas.
+BORDER_WIDTH, BORDER_HEIGHT = 960, 540
+
 -- How much the GAME SCREEN (the CANVAS_WIDTH x CANVAS_HEIGHT canvas) is scaled.
 -- It is ALWAYS kept dead-centre, and the Border frame is locked to it, so the
 -- frame's opening can never drift away from the game screen:
@@ -27,11 +33,20 @@ CANVAS_WIDTH, CANVAS_HEIGHT = 640, 480
 --                 1920x1080 → 2x). Shrinks proportionally for smaller windows.
 --     "auto"    → fill as much of the window / screen as possible (fractional)
 --     false/nil → 1:1, no scaling
-SCREEN_SCALE = "integer"
+SCREEN_SCALE = "auto"
 
 -- Legacy switch, only used when SCREEN_SCALE is nil: true = "auto" while
 -- fullscreen and 1:1 otherwise. Prefer SCREEN_SCALE.
 FILL_SCREEN = true
+
+-- BORDER_MODE: when true, instead of fitting the 640x480 canvas to the window,
+-- the 960x540 Border art is fit to the window and the canvas drops into the
+-- frame's inner opening (so the frame can wrap the game screen without
+-- overflowing). The canvas uses the SAME scale as the frame, and its top-left
+-- is locked to the opening's top-left. When false, the canvas is fit to the
+-- window on its own and the Border frame is NOT drawn (the previous "auto"
+-- behaviour). Has no effect unless SCREEN_SCALE is "auto" / true / "integer".
+BORDER_MODE = true
 
 -- Enable error handler to show custom error screen
 -- If you don't know which error crashed the game. Then you need to set it to false.
@@ -51,8 +66,11 @@ function love.conf(t)
 
     t.window.title = _INFO.TITLE        -- The window title (string)
     t.window.icon = "icon.png"          -- File path to the image used as the window icon (string)
-    t.window.width = LOGICAL_WIDTH      -- The window width (number)
-    t.window.height = LOGICAL_HEIGHT    -- The window height (number)
+    -- The window opens at the Border art's native size when BORDER_MODE is on
+    -- (960x540, so the frame fits 1:1 at startup), otherwise at the canvas
+    -- size (640x480) -- the game screen with no frame around it.
+    t.window.width = BORDER_MODE and BORDER_WIDTH or LOGICAL_WIDTH
+    t.window.height = BORDER_MODE and BORDER_HEIGHT or LOGICAL_HEIGHT
     t.window.borderless = false         -- Remove the window border (boolean)
     t.window.resizable = false          -- Let the user resize the window (boolean)
     t.window.minwidth = 1               -- Minimum window width, if the window is resizable (number)

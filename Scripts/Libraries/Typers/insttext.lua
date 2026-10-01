@@ -182,6 +182,11 @@ function typers.New(text, position, layer, size)
     typer.outline = nil
     typer.align = "left"
     typer.effect = {}
+    -- Word-aware automatic line breaking (same semantics as EText/NText):
+    -- off by default, enabled by setting `typer.auto_wrap = true` together with
+    -- a box width in `typer.size[1]`. Off means every existing caller keeps
+    -- laying text out on a single line.
+    typer.auto_wrap = false
 
     -- Helper: rebuild letter data from typer.text
     local function rebuildLetters()
@@ -202,20 +207,64 @@ function typers.New(text, position, layer, size)
         local relative_y = 0
         local line_start = 1
         local i = 1
+
+        -- Close the line currently being built and move the pen down one row.
+        local function endLine()
+            local line_width = offset_x
+            for j = line_start, #typer.letters do
+                typer.letters[j].line_width = line_width
+            end
+            line_start = #typer.letters + 1
+            offset_x = 0
+            offset_y = offset_y + getFont(typer.bondfont.engfont.font, typer.bondfont.engfont.size):getHeight()
+        end
+
+        -- Box width in pixels; 0 (or auto_wrap off) means "never wrap".
+        local function wrapWidth()
+            if (not typer.auto_wrap) then return 0 end
+            return (typer.size and typer.size[1]) or 640
+        end
+
+        -- Width of the word starting at `from`, stopping at the next break
+        -- opportunity (space / newline / tab). Lets a whole word be pushed to
+        -- the next line instead of being cut in half.
+        local function wordWidth(from)
+            local total = 0
+            local j = from
+            while (j <= #typer.text) do
+                local b = typer.text:sub(j, j)
+                local l = charlen(b)
+                local c = typer.text:sub(j, j + l - 1)
+                if (c == " " or c == "\n" or c == "\t") then break end
+
+                local font
+                if (l == 1) then
+                    if (typer.bondfont) then typer.bondfont.engfunc() end
+                    font = getFont(typer.bondfont.engfont.font, typer.bondfont.engfont.size)
+                else
+                    if (typer.bondfont) then typer.bondfont.non_engfunc() end
+                    font = getFont(typer.bondfont.non_engfont.font, typer.bondfont.non_engfont.size)
+                end
+                total = total + font:getWidth(c) * typer.scale
+                j = j + l
+            end
+            return total
+        end
+
         while (i <= #typer.text) do
             local byte = typer.text:sub(i, i)
             local len = charlen(byte)
             local char = typer.text:sub(i, i + len - 1)
+            local max_width = wrapWidth()
 
             if (char == "\n") then
                 -- End current line: compute its total width
-                local line_width = offset_x
-                for j = line_start, #typer.letters do
-                    typer.letters[j].line_width = line_width
-                end
-                line_start = #typer.letters + 1
-                offset_x = 0
-                offset_y = offset_y + getFont(typer.bondfont.engfont.font, typer.bondfont.engfont.size):getHeight()
+                endLine()
+                i = i + 1
+            elseif (max_width > 0 and char == " " and offset_x > 0
+                    and offset_x + wordWidth(i + 1) > max_width) then
+                -- Word wrap: swallow the space and start the word on a new line.
+                endLine()
                 i = i + 1
             elseif (len == 1) then
                 -- English character
@@ -225,6 +274,10 @@ function typers.New(text, position, layer, size)
                 local font = getFont(typer.bondfont.engfont.font, typer.bondfont.engfont.size)
                 relative_y = 0
                 local w = font:getWidth(char) * typer.scale
+                -- Hard break: only reached by a single word wider than the box.
+                if (max_width > 0 and offset_x > 0 and offset_x + w > max_width) then
+                    endLine()
+                end
                 table.insert(typer.letters, {
                     char = char,
                     font = font,
@@ -249,8 +302,12 @@ function typers.New(text, position, layer, size)
                 local font = getFont(typer.bondfont.non_engfont.font, typer.bondfont.non_engfont.size)
                 relative_x = 0
                 relative_y = 4  -- +4 y-offset for CJK
-                offset_x = offset_x + 2
                 local w = font:getWidth(char) * typer.scale
+                -- CJK has no spaces, so every glyph is a break opportunity.
+                if (max_width > 0 and offset_x > 0 and offset_x + 2 + w > max_width) then
+                    endLine()
+                end
+                offset_x = offset_x + 2
                 table.insert(typer.letters, {
                     char = char,
                     font = font,

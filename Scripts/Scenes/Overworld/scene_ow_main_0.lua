@@ -144,6 +144,10 @@ function scene.update(dt)
         local _s = ow.FindObject("save", 1)
         ow.SaveInteract({"* 测试存档。", "* 看到这是个测试存档点，这\n  使你充满了决心。"}, "真实验室 - 地下1层", {_s.x, _s.y - 20}, "down")
     end)
+
+    if (Controller.GetState("i") == 1) then
+        ow.ChestInteract("chest")
+    end
 end
 
 function scene.draw()
