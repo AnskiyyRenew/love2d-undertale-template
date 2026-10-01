@@ -1,0 +1,3298 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../index.html">
+      
+      
+        <link rel="next" href="../010_map/index.html">
+      
+      
+        
+          <link rel="alternate" href="../../../index.html" hreflang="en">
+        
+          <link rel="alternate" href="./index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>初始化与场景骨架 - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              初始化与场景骨架
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门优先
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    入门优先
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    环境配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发之前
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua 速通
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速上手
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    快速上手
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修改游戏信息
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    新建与跳转场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打字机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图层系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    画布与屏幕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    边框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game 区与资源覆盖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    战斗系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗初始化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家与灵魂
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    攻击模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合脚本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗场景与回调
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld 主世界系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld 主世界系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最小场景
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        图层
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        载入地图
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全局变量
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DATA：存档数据
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ITEMS：物品数据库
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overworld" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overworld 总控方法速查
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调试
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 地图与对象层
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI 与图块集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    角色
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    交互与对话
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    菜单 · 存档 · 箱子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遇敌
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    商店
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy 转化库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学教程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    与LOVE开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    与LOVE开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像绘制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    辅助开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    辅助开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景辅助工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对象调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    变量调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    本地化
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    本地化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目录与语言文件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    查词与替换
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    网络开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    网络开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock 联机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    导出与发布
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    导出与发布
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最小场景
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        图层
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        载入地图
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全局变量
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DATA：存档数据
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ITEMS：物品数据库
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overworld" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overworld 总控方法速查
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调试
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>初始化与场景骨架</h1>
+
+<p>一个主世界场景非常薄——它只负责三件事：载地图、放音乐、每帧把 <code>Overworld</code> 推一把。</p>
+<p>路径： <code>Scripts/Scenes/Overworld/</code> 。引擎自带 <code>scene_sol.lua</code> 可以直接照抄。</p>
+<p>和别的场景一样，<code>Game/Scenes/Overworld/&lt;同名&gt;.lua</code> 会<strong>盖掉</strong>引擎那份，详见 <a href="../../020_basic/010_scene/index.html">基础开发 → 场景</a> 。</p>
+<hr />
+<h2 id="_1">最小场景<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">scene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">ow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ImportFile</span><span class="p">(</span><span class="s2">&quot;Overworld&quot;</span><span class="p">)</span>
+
+<span class="nv">ow</span><span class="p">.</span><span class="nf">Init</span><span class="p">(</span><span class="s2">&quot;Maps/main_scene/sol.lua&quot;</span><span class="p">)</span>
+<span class="nv">ow</span><span class="p">.</span><span class="nf">SetMusic</span><span class="p">(</span><span class="s2">&quot;Start.ogg&quot;</span><span class="p">)</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">ow</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">draw</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">ow</span><span class="p">.</span><span class="nf">Draw</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">clear</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">ow</span><span class="p">.</span><span class="nf">Clear</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">Layers</span><span class="p">.</span><span class="nf">clear</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="nv">scene</span>
+</code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title"><code>scene.clear</code> 里两行都不能少</p>
+<p><code>ow.Clear()</code> 实际做的事： <code>Map.Destroy()</code> 销毁地图的所有碰撞体与贴图 → <code>Camera:unBounds()</code> 解开镜头边界 → 清掉整棵 <code>Scripts.Libraries.Overworld</code> 的模块缓存 → <code>Camera:reset()</code> 。<br>
+<code>Layers.clear()</code> 清图层。少写前者会导致第二次进主世界时拿到上一局的残留状态。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><code>Overworld</code> 也是 Game 区可覆盖的那一类</p>
+<p><code>Overworld</code> 属于 <code>Scripts.Libraries.Overworld</code> 这棵模块树，<code>Game/</code> 区<strong>不覆盖</strong>它（能覆盖的是 <code>Encounter</code> / <code>Animations</code> / <code>Waves</code> / <code>Souls</code> / <code>Sprites</code> / <code>Fonts</code> 这些）。<br>
+想改主世界的行为，走 <code>Game/Hacks/</code> 里的 hack 脚本，见 <a href="../../020_basic/110_game_area/index.html">基础开发 → Game 区与资源覆盖</a> 。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title"><code>World.Destroy()</code> 目前没人调</p>
+<p><code>World.Destroy()</code> 是存在的，但全库里<strong>没有任何调用点</strong>——<code>ow.Clear()</code> 走的是 <code>Map.Destroy()</code> ，物理世界本身会随模块缓存一起被丢掉。<br>
+自己写扩展时别误以为它已经被调过。</p>
+</div>
+<p><img alt="OW-01" src="../../img/040_overworld/ow_01_overworld_scene.png" /></p>
+<hr />
+<h2 id="_2">图层<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><code>Overworld</code> 在被导入时会<strong>自动</strong>建立下面这些图层，顺序即遮挡顺序：</p>
+<table>
+<thead>
+<tr>
+<th>图层</th>
+<th>值</th>
+<th>放什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Background</code></td>
+<td>-100</td>
+<td>背景</td>
+</tr>
+<tr>
+<td><code>Map</code></td>
+<td>0</td>
+<td>地图本身（由引擎绘制，不要手动往里塞东西）</td>
+</tr>
+<tr>
+<td><code>BelowPlayer</code></td>
+<td>49</td>
+<td>玩家身后能挡住他的东西（箱子、告示牌）</td>
+</tr>
+<tr>
+<td><code>Player</code></td>
+<td>50</td>
+<td>玩家</td>
+</tr>
+<tr>
+<td><code>UponPlayer</code></td>
+<td>51</td>
+<td>玩家身前的东西</td>
+</tr>
+<tr>
+<td><code>GUI</code></td>
+<td>80</td>
+<td>对话框、菜单、存档页</td>
+</tr>
+<tr>
+<td><code>TOP</code></td>
+<td>100</td>
+<td>全屏黑幕（切换场景淡入淡出）</td>
+</tr>
+<tr>
+<td><code>DEBUG</code></td>
+<td>200</td>
+<td>调试绘制</td>
+</tr>
+</tbody>
+</table>
+<p>箱子、告示牌这类"有时在前有时在后"的物件，引擎会<strong>每帧</strong>按玩家位置自动在 <code>BelowPlayer</code> 与 <code>UponPlayer</code> 之间切换，你不用管。</p>
+<hr />
+<h2 id="_3">载入地图<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<div class="admonition example">
+<p class="admonition-title">初始化方法</p>
+<ul>
+<li><code>Overworld.Init(lua_file)</code> 载入一张地图。<ul>
+<li><code>lua_file</code> 地图文件相对项目根的路径，例如 <code>"Maps/main_scene/sol.lua"</code> 。</li>
+</ul>
+</li>
+<li><code>Overworld.ResolveMapPath(lua_file)</code> 返回实际会交给 STI 的路径（Game 区优先）。一般不用手动调。</li>
+<li><code>Overworld.AutoCameraBounds()</code> 按地图实际覆盖范围重算镜头边界。 <code>Init</code> 里已经自动调过一次。</li>
+<li><code>Overworld.SetMusic(mpath)</code> 播放背景音乐，已经在放的同名音乐不会重复播放。</li>
+</ul>
+</div>
+<p>地图的 Game 区覆盖规则： <code>Maps/main_scene/sol.lua</code> 会先找 <code>Game/Maps/main_scene/sol.lua</code> ，有就用它。</p>
+<div class="admonition warning">
+<p class="admonition-title">覆盖地图要连图块一起带</p>
+<p>STI 是按<strong>地图文件的相对路径</strong>去找图块的（ <code>.lua</code> 里写的是 <code>../images/...</code> ）。<br>
+所以 Game 区那份地图旁边必须也有对应的 <code>../images/</code> 目录树，否则图块会整片丢失。</p>
+</div>
+<hr />
+<h2 id="_4">全局变量<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p><code>Overworld</code> 被导入时会挂一批全局变量出来，写场景逻辑时直接用：</p>
+<table>
+<thead>
+<tr>
+<th>全局</th>
+<th>是什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Overworld</code></td>
+<td>主世界总控表</td>
+</tr>
+<tr>
+<td><code>Map</code></td>
+<td>地图模块（= <code>Overworld.map</code> ）</td>
+</tr>
+<tr>
+<td><code>World</code></td>
+<td>物理世界（= <code>Map.world</code> ）</td>
+</tr>
+<tr>
+<td><code>Char</code></td>
+<td>玩家（= <code>Map.char</code> ）</td>
+</tr>
+<tr>
+<td><code>Stat</code></td>
+<td>菜单</td>
+</tr>
+<tr>
+<td><code>Save</code></td>
+<td>存档页（= <code>Overworld._pages.save</code> ）</td>
+</tr>
+<tr>
+<td><code>Chest</code></td>
+<td>箱子页（= <code>Overworld._pages.chest</code> ）</td>
+</tr>
+<tr>
+<td><code>Step</code></td>
+<td>遇敌步数计数器</td>
+</tr>
+<tr>
+<td><code>DATA</code></td>
+<td>存档数据（见下）</td>
+</tr>
+<tr>
+<td><code>FLAG</code></td>
+<td>= <code>DATA.flags</code></td>
+</tr>
+<tr>
+<td><code>CHEST</code></td>
+<td>= <code>DATA.chests</code></td>
+</tr>
+<tr>
+<td><code>ITEMS</code></td>
+<td>物品数据库</td>
+</tr>
+</tbody>
+</table>
+<p>另外还有两个全局函数：</p>
+<div class="admonition example">
+<p class="admonition-title">全局函数</p>
+<ul>
+<li><code>GetRelativePos(x, y)</code> 把"屏幕坐标"换算成"跟着镜头走的世界坐标"。自己做 UI 时必用。</li>
+<li><code>SpawnBlock(x, y, width, height, thickness)</code> 画一个白边黑底的框，返回带 <code>Destroy()</code> 的块对象。</li>
+</ul>
+</div>
+<hr />
+<h2 id="data">DATA：存档数据<a class="headerlink" href="#data" title="Permanent link">&para;</a></h2>
+<p><code>DATA</code> 就是存档本身。它来自 <code>Game/Logics/init.lua</code> ，如果之前存过档则直接用存档那份。</p>
+<p>下面是引擎默认值（ <code>Game/Logics/init.lua</code> 的原始内容）：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">logic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">                  </span><span class="c1">-- 游玩时长（秒）</span>
+<span class="w">    </span><span class="nv">room_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;--&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1">-- 存档点显示的地名</span>
+<span class="w">    </span><span class="nv">room</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Overworld&quot;</span><span class="p">,</span><span class="w">        </span><span class="c1">-- 当前场景名</span>
+<span class="w">    </span><span class="nv">marker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">                </span><span class="c1">-- 进入下一张地图时用第几个 mark</span>
+<span class="w">    </span><span class="nv">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w">         </span><span class="c1">-- 存档位置</span>
+<span class="w">    </span><span class="nv">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;down&quot;</span><span class="p">,</span><span class="w">        </span><span class="c1">-- 存档朝向</span>
+<span class="w">    </span><span class="nv">savedpos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">          </span><span class="c1">-- 是否有&quot;读档位置&quot;待消费</span>
+
+<span class="w">    </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Chara&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">maxhp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">gold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">atk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">watk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">def</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">edef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">weapon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;stick&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">armor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bandage&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">items</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w">              </span><span class="c1">-- 背包（存物品 id 字符串）</span>
+<span class="w">            </span><span class="s2">&quot;ButterscotchPie&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;PunchCard&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nv">getcell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">       </span><span class="c1">-- 是否开放 CELL 菜单</span>
+<span class="w">        </span><span class="nv">cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w">              </span><span class="c1">-- 电话联系人</span>
+<span class="w">            </span><span class="p">{</span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Toriel_1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;叫妈妈&quot;</span><span class="p">},</span>
+<span class="w">            </span><span class="c1">-- ...</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">玩家落点是怎么定的（三步覆盖）</p>
+<p><code>Map.Init</code> 里对玩家的位置连着写了三次，<strong>后面的盖前面的</strong>：</p>
+<ol>
+<li>先放到<strong>第一个</strong> mark（ <code>map.objects.marks[1]</code> ）；</li>
+<li>再用 <code>Overworld.FindObject("mark", DATA.marker)</code> 找 <code>id</code> 等于 <code>DATA.marker</code> 的 mark，找到就挪过去——<strong>找不到就保持在第一步的位置</strong>，不会报错；</li>
+<li>最后如果 <code>DATA.savedpos</code> 为 <code>true</code> ，直接放到 <code>DATA.position</code> （读档 / 从战斗回来走的就是这条）。</li>
+</ol>
+<p>所以 <code>marker = 2</code> 只在这张地图里真的有个 <code>id = 2</code> 的 mark 时才有意义。</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">DATA 上的其它字段</p>
+<ul>
+<li><code>flags</code> 自定义开关表，通过全局 <code>FLAG</code> 访问。 <code>FLAG["test_killed"] = 1</code> 这样用。</li>
+<li><code>chests</code> 箱子里有什么，通过全局 <code>CHEST</code> 访问，格式是 <code>CHEST["chest"] = {"Spider"}</code> 。</li>
+<li><code>lv_data</code> 等级表，20 级，每级有 <code>hp</code> / <code>at</code> / <code>df</code> / <code>totalExp</code> 。<strong>升级结算与菜单显示都读它</strong>。</li>
+</ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title"><code>Game/Logics/</code> 有专门一页</p>
+<p>世界规则（等级曲线怎么定、满级怎么扩、剧情开关、箱子内容）统一写在 <strong><a href="../../020_basic/120_game_logics/index.html">游戏逻辑与世界规则</a></strong> ，本页只讲 <code>DATA</code> 在运行时怎么用。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>Game/Logics/init.lua</code> 是硬 require，没有兜底</p>
+<p><code>DATA</code> 的来源写死成 <code>require("Game.Logics")</code> （ <code>Scripts/Libraries/Overworld/init.lua</code> 第 85 行）。<br>
+引擎自己没有这份文件，<strong>删掉或改名会直接崩</strong>。想重置存档就先删存档变量，别删文件。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">改了 Logics 没生效？</p>
+<p><code>Game/Logics/init.lua</code> 的最后有一段：如果 <code>Global.GetSaveVariable("Overworld")</code> 存在，就整个把 <code>logic</code> 换成存档那份——你改的默认值会被完全跳过。<br>
+调试时把那两行注释掉，或者先删掉存档变量。</p>
+</div>
+<hr />
+<h2 id="items">ITEMS：物品数据库<a class="headerlink" href="#items" title="Permanent link">&para;</a></h2>
+<p>物品表的查找顺序是 <code>Game.Logics.items</code> → <code>Scripts.Logics.items</code> （ <code>Scripts.Libraries.Overworld/init.lua</code> 里的 <code>owRequireGameFirst</code> ）。</p>
+<div class="admonition warning">
+<p class="admonition-title"><code>Scripts/Logics/</code> 这个兜底目录目前并不存在</p>
+<p>引擎侧<strong>根本没有</strong> <code>Scripts/Logics/items.lua</code> ，所以列表里那一档永远命中不了，物品表<strong>事实上只有 <code>Game/Logics/items.lua</code> 一个来源</strong>。<br>
+两份都找不到时会打印 <code>[Overworld] WARNING: items table not found under Game.Logics or Scripts.Logics.</code> ，随后一用到 <code>ITEMS.FindItemByID</code> 就会因索引 <code>nil</code> 而崩。</p>
+</div>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;MonsterCandy&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Monster Candy&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span><span class="w">       </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}},</span>
+<span class="w">    </span><span class="c1">-- ...</span>
+<span class="p">}</span>
+
+<span class="nv">db</span><span class="p">.</span><span class="py">_actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">use</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* You ate the Spider...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;* I CAN&#39;T UNDERSTAND.&quot;</span><span class="p">},</span>
+<span class="w">        </span><span class="nv">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* A spider.&quot;</span><span class="p">},</span>
+<span class="w">        </span><span class="nv">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* You dropped the Spider...</span><span class="se">\n</span><span class="s2">* But nothing happened.&quot;</span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">ITEMS 方法</p>
+<ul>
+<li><code>ITEMS.FindItemByID(id)</code> 按 id 取物品定义，返回含 <code>id</code> / <code>name</code> / <code>_color</code> 的表。</li>
+<li><code>ITEMS.GetActionByID(id, action)</code> 取某物品的一段文本。<ul>
+<li><code>action</code> <code>"use"</code> / <code>"info"</code> / <code>"drop"</code> 。</li>
+</ul>
+</li>
+</ul>
+</div>
+<p>背包里存的<strong>只是 id 字符串</strong>，显示时再 <code>FindItemByID</code> 查名字和颜色。</p>
+<hr />
+<h2 id="overworld">Overworld 总控方法速查<a class="headerlink" href="#overworld" title="Permanent link">&para;</a></h2>
+<div class="admonition example">
+<p class="admonition-title">Overworld 方法</p>
+<ul>
+<li><code>Overworld.Init(lua_file)</code> 载入地图。</li>
+<li><code>Overworld.Update(dt)</code> 每帧推进（菜单 → 地图 → 存档页 → 箱子页 → 遇敌计数）。</li>
+<li><code>Overworld.Draw()</code> 绘制，目前是空实现，留给你自己画 HUD。</li>
+<li><code>Overworld.Clear()</code> 全部销毁并清缓存。</li>
+<li><code>Overworld.SetMusic(mpath)</code> 放音乐。</li>
+<li><code>Overworld.CalcNextEXP()</code> 返回距离下一级还差多少 EXP。</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Overworld 属性</p>
+<ul>
+<li><code>Overworld.map</code> 地图模块。</li>
+<li><code>Overworld.stat</code> 菜单模块。</li>
+<li><code>Overworld.debug</code> 是否开启调试绘制，默认 <code>false</code> 。</li>
+<li><code>Overworld.follow_player</code> 镜头是否自动跟随玩家，默认 <code>true</code> 。</li>
+<li><code>Overworld.ui_prefer</code> 对话框默认出现在上还是下， <code>"down"</code> （默认）或 <code>"up"</code> 。</li>
+</ul>
+</div>
+<hr />
+<h2 id="_5">调试<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>把 <code>Overworld.debug</code> 设为 <code>true</code> ：</p>
+<ul>
+<li>所有 Tiled 对象的碰撞体会被画出来（按类型分颜色）。</li>
+<li>按 <strong>空格</strong> 可以把镜头瞬移到鼠标所指的世界坐标，方便对坐标。</li>
+</ul>
+<p>详见 <a href="../010_map/index.html">地图与对象层 → 调试</a> 。</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

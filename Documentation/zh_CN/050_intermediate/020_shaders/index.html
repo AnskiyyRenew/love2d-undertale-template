@@ -1,0 +1,3623 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../010_shadertoy/index.html">
+      
+      
+        <link rel="next" href="../030_collision/index.html">
+      
+      
+        
+          <link rel="alternate" href="../../../index.html" hreflang="en">
+        
+          <link rel="alternate" href="./index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>着色器 - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#shader" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              着色器
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门优先
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    入门优先
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    环境配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发之前
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua 速通
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速上手
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    快速上手
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修改游戏信息
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    新建与跳转场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打字机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图层系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    画布与屏幕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    边框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game 区与资源覆盖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    战斗系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗初始化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家与灵魂
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    攻击模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合脚本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗场景与回调
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld 主世界系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld 主世界系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 地图与对象层
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI 与图块集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    角色
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    交互与对话
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    菜单 · 存档 · 箱子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遇敌
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    商店
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy 转化库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#shader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最小的一个 Shader
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="最小的一个 Shader">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#effect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        effect 的四个参数
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        想改的不是颜色，而是形状？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uniform-lua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uniform：让 Lua 把参数喂进去
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="uniform：让 Lua 把参数喂进去">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        类型对照
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三种用法，由小到大
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最快写出第一个案例
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="最快写出第一个案例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scriptsshadersmywaveglsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第一步：新建 Scripts/Shaders/MyWave.glsl
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scriptsscenestestscene_my_shaderlua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第二步：新建测试场景 Scripts/Scenes/TEST/scene_my_shader.lua
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第三步：让它一启动就跑
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        引擎自带的 7 个着色器
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        后续怎么练
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="后续怎么练">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段一：改常数（几乎不用懂数学）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段二：改公式（开始碰数学）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段三：从零写小效果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段四：组合与进阶
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推荐资源
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        性能与坑
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学教程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    与LOVE开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    与LOVE开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像绘制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    辅助开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    辅助开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景辅助工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对象调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    变量调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    本地化
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    本地化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目录与语言文件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    查词与替换
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    网络开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    网络开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock 联机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    导出与发布
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    导出与发布
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#shader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最小的一个 Shader
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="最小的一个 Shader">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#effect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        effect 的四个参数
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        想改的不是颜色，而是形状？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uniform-lua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uniform：让 Lua 把参数喂进去
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="uniform：让 Lua 把参数喂进去">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        类型对照
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三种用法，由小到大
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最快写出第一个案例
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="最快写出第一个案例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scriptsshadersmywaveglsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第一步：新建 Scripts/Shaders/MyWave.glsl
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scriptsscenestestscene_my_shaderlua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第二步：新建测试场景 Scripts/Scenes/TEST/scene_my_shader.lua
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第三步：让它一启动就跑
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        引擎自带的 7 个着色器
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        后续怎么练
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="后续怎么练">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段一：改常数（几乎不用懂数学）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段二：改公式（开始碰数学）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段三：从零写小效果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段四：组合与进阶
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推荐资源
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        性能与坑
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>着色器</h1>
+
+<p><strong>着色器（Shader）</strong> 是跑在显卡上的一小段 GLSL 程序。引擎把画面交给它，它就按你写的规则，<strong>逐像素</strong>决定每个点最终是什么颜色。</p>
+<p>在 LÖVE 里，绝大多数时候你只需要写一个 <strong>片元着色器</strong>（<code>effect</code> 函数）就够了 —— 它就像一张"每个像素都要过一遍的滤镜"。</p>
+<p>本篇讲的是 <strong>引擎里常规的 Shader 写法</strong>。如果你想直接搬运网上现成的效果，看 <a href="../010_shadertoy/index.html">ShaderToy 转化库</a> ；如果你想了解屏幕着色器"乒乓法"的绘制流程，看 <a href="../../020_basic/070_screen/index.html">画布与屏幕</a> ；底层的 LÖVE 绘图 API 清单在 <a href="../../060_with_love/000_graphics/index.html">与LOVE开发 → 图像绘制</a> 。</p>
+<hr />
+<h2 id="shader">最小的一个 Shader<a class="headerlink" href="#shader" title="Permanent link">&para;</a></h2>
+<p>一个能跑的最小 Shader 就是这么一个函数：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">vec4</span><span class="w"> </span><span class="n">effect</span><span class="p">(</span><span class="kt">vec4</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">Image</span><span class="w"> </span><span class="n">tex</span><span class="p">,</span><span class="w"> </span><span class="kt">vec2</span><span class="w"> </span><span class="n">tex_coords</span><span class="p">,</span><span class="w"> </span><span class="kt">vec2</span><span class="w"> </span><span class="n">screen_coords</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">vec4</span><span class="w"> </span><span class="n">pixel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Texel</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span><span class="w"> </span><span class="n">tex_coords</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">pixel</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">color</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这段代码的效果是 <strong>什么都不做</strong> —— 它把贴图原样取出来、乘上绘制颜色、再返回。理解这一句，就理解了 Shader 的全部骨架。</p>
+<h3 id="effect"><code>effect</code> 的四个参数<a class="headerlink" href="#effect" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>color</code></td>
+<td><code>vec4</code></td>
+<td>当前的绘制颜色，来自 <code>setColor</code> 或贴图的 <code>color</code> / <code>alpha</code></td>
+</tr>
+<tr>
+<td><code>tex</code></td>
+<td><code>Image</code></td>
+<td>正在被绘制的纹理 —— 通常就是那张图本身</td>
+</tr>
+<tr>
+<td><code>tex_coords</code></td>
+<td><code>vec2</code></td>
+<td>纹理 UV，范围 <code>0~1</code> ，<strong>按被绘制图形计算</strong></td>
+</tr>
+<tr>
+<td><code>screen_coords</code></td>
+<td><code>vec2</code></td>
+<td>屏幕坐标，单位是像素</td>
+</tr>
+</tbody>
+</table>
+<p>它的 <strong>返回值</strong> 就是这个像素的最终颜色（包含 alpha），直接决定屏幕上看到的东西。</p>
+<div class="admonition warning">
+<p class="admonition-title">采样纹理必须用 Texel</p>
+<p>LÖVE 里取纹理颜色的函数是 <code>Texel(tex, uv)</code> ，不是标准 GLSL 的 <code>texture()</code> 。写错了编译会直接失败。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>tex_coords</code> 是图形自己的 UV，不是屏幕坐标</p>
+<p>一张铺满全屏的图，<code>tex_coords</code> 才刚好等于"屏幕坐标归一化后的值"。
+把它挂在一张 32×32 的小图上，<code>tex_coords</code> 依然只在 <code>0~1</code> 之间跑
+—— 效果会被"压缩进那 32×32 的区域"，而不是铺满屏幕。
+这一点和 ShaderToy 的 <code>fragCoord</code> 有本质区别（详见 ShaderToy 那篇的说明）。</p>
+</div>
+<h3 id="_1">想改的不是颜色，而是形状？<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>那要用 <strong>顶点着色器</strong> 入口 <code>position</code> ，它决定每个顶点画到哪：</p>
+<div class="highlight"><pre><span></span><code><span class="kt">vec4</span><span class="w"> </span><span class="n">position</span><span class="p">(</span><span class="kt">mat4</span><span class="w"> </span><span class="n">transform_projection</span><span class="p">,</span><span class="w"> </span><span class="kt">vec4</span><span class="w"> </span><span class="n">vertex_position</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">transform_projection</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vertex_position</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>顶点入口用得少得多。日常做特效，先盯着 <code>effect</code> 就够了。</p>
+<hr />
+<h2 id="uniform-lua">uniform：让 Lua 把参数喂进去<a class="headerlink" href="#uniform-lua" title="Permanent link">&para;</a></h2>
+<p>着色器本身是"死"的，想让它动起来，就得靠 <strong>uniform</strong> —— 外部每帧送进去的参数。</p>
+<p>GLSL 侧用 <code>extern</code> 声明：</p>
+<div class="highlight"><pre><span></span><code><span class="kr">extern</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">time</span><span class="p">;</span><span class="w">        </span><span class="c1">// LÖVE 里 number 等价于 float</span>
+<span class="kr">extern</span><span class="w"> </span><span class="kt">vec2</span><span class="w"> </span><span class="n">amplitude</span><span class="p">;</span>
+<span class="kr">extern</span><span class="w"> </span><span class="n">Image</span><span class="w"> </span><span class="n">mask</span><span class="p">;</span>
+</code></pre></div>
+<p>Lua 侧用 <code>send</code> 赋值：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">shader</span><span class="p">:</span><span class="nf">send</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">)</span>
+<span class="nv">shader</span><span class="p">:</span><span class="nf">send</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05</span><span class="p">})</span>
+<span class="nv">shader</span><span class="p">:</span><span class="nf">send</span><span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">someImage</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="_2">类型对照<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>GLSL 声明</th>
+<th>Lua 里 <code>send</code> 的值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>extern number x;</code></td>
+<td>一个数字</td>
+</tr>
+<tr>
+<td><code>extern vec2 / vec3 / vec4 v;</code></td>
+<td><code>{1, 2}</code> / <code>{1, 2, 3}</code> / <code>{1, 2, 3, 4}</code></td>
+</tr>
+<tr>
+<td><code>extern Image img;</code></td>
+<td>一张 Image / Canvas</td>
+</tr>
+<tr>
+<td><code>extern mat4 m;</code></td>
+<td>矩阵（少见）</td>
+</tr>
+<tr>
+<td><code>extern bool b;</code></td>
+<td><code>true</code> / <code>false</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title"><code>number</code> 就是 <code>float</code></p>
+<p>LÖVE 里 <code>number</code> 是 <code>float</code> 的别名，引擎自带的着色器两种写法都在用。写 <code>float</code> 也完全没问题。</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">先查再发，避免静默失败</p>
+<p><code>shader:hasUniform("time")</code> 可以判断某个 uniform 是否存在。
+名字拼错时 LÖVE 不一定报错，效果却"纹丝不动" —— 先用它自检一下最省事：</p>
+<div class="highlight"><pre><span></span><code><span class="kr">if</span><span class="w"> </span><span class="nv">shader</span><span class="p">:</span><span class="nf">hasUniform</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">shader</span><span class="p">:</span><span class="nf">send</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">t</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+</div>
+<hr />
+<h2 id="_3">三种用法，由小到大<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>用法</th>
+<th>怎么写</th>
+<th>适合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>贴图级</strong></td>
+<td><code>spr:SetShaders({shader})</code></td>
+<td>给某一张图 / 某个 sprite 加特效</td>
+</tr>
+<tr>
+<td><strong>全局屏幕</strong></td>
+<td><code>Global.SetVariable("ScreenShaders", {shader})</code></td>
+<td>整屏滤镜（做画面氛围）</td>
+</tr>
+<tr>
+<td><strong>完全自定义</strong></td>
+<td><code>SE.graphics.setShader(shader)</code> + 自己 <code>setCanvas</code></td>
+<td>想要完全控制绘制时机与目标</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>贴图级的方法清单（ <code>SetShaders</code> / <code>AddShader</code> / <code>InsertShader</code> / <code>RemoveShader</code> / <code>ClearShaders</code> ）见 <a href="../../020_basic/020_sprites/index.html">贴图 → 常用方法</a> 。
+  挂多个着色器时，引擎会在两张和贴图同尺寸的临时画布之间 <strong>乒乓</strong> ，逐个叠加，所以效果会按列表顺序依次作用。</li>
+<li>全局屏幕的 <code>ScreenShaders</code> 走的是主画布 ↔ 中间画布的乒乓流程，原理在 <a href="../../020_basic/070_screen/index.html">画布与屏幕</a> 里讲透了。</li>
+<li>最底层的 <code>newShader</code> / <code>setShader</code> / <code>validateShader</code> 全部包在 <code>SE.graphics</code> 下，清单见 <a href="../../060_with_love/000_graphics/index.html">图像绘制</a> 。</li>
+</ul>
+<hr />
+<h2 id="_4">最快写出第一个案例<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>三步：<strong>写一个 <code>.glsl</code> 文件 → 写一个测试场景 → 把它设成启动场景</strong>。</p>
+<h3 id="scriptsshadersmywaveglsl">第一步：新建 <code>Scripts/Shaders/MyWave.glsl</code><a class="headerlink" href="#scriptsshadersmywaveglsl" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kr">extern</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
+<span class="kr">extern</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">amplitude</span><span class="p">;</span>
+
+<span class="kt">vec4</span><span class="w"> </span><span class="n">effect</span><span class="p">(</span><span class="kt">vec4</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">Image</span><span class="w"> </span><span class="n">tex</span><span class="p">,</span><span class="w"> </span><span class="kt">vec2</span><span class="w"> </span><span class="n">tex_coords</span><span class="p">,</span><span class="w"> </span><span class="kt">vec2</span><span class="w"> </span><span class="n">screen_coords</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 按 y 轴做正弦横向偏移：越往下，横向扭动越明显</span>
+<span class="w">    </span><span class="kt">vec2</span><span class="w"> </span><span class="n">uv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tex_coords</span><span class="p">;</span>
+<span class="w">    </span><span class="n">uv</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">uv</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">12.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">3.0</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">amplitude</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">vec4</span><span class="w"> </span><span class="n">pixel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Texel</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span><span class="w"> </span><span class="n">uv</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">pixel</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">color</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="scriptsscenestestscene_my_shaderlua">第二步：新建测试场景 <code>Scripts/Scenes/TEST/scene_my_shader.lua</code><a class="headerlink" href="#scriptsscenestestscene_my_shaderlua" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">scene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="c1">-- 编译一次，缓存住。千万别每帧 newShader（那等于每帧重新编译）</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">shader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">newShader</span><span class="p">(</span><span class="s2">&quot;Scripts/Shaders/MyWave.glsl&quot;</span><span class="p">)</span>
+
+<span class="c1">-- 一张铺满屏幕的白图，用来&quot;承载&quot;整屏特效</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">bg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;px.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">bg</span><span class="p">:</span><span class="nf">Scale</span><span class="p">(</span><span class="nv">CANVAS_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">CANVAS_HEIGHT</span><span class="p">)</span>
+<span class="nv">bg</span><span class="p">:</span><span class="nf">SetShaders</span><span class="p">({</span><span class="nv">shader</span><span class="p">})</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">dt</span>
+<span class="w">    </span><span class="nv">shader</span><span class="p">:</span><span class="nf">send</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">t</span><span class="p">)</span><span class="w">          </span><span class="c1">-- 每帧喂时间，动画才会动</span>
+<span class="w">    </span><span class="nv">shader</span><span class="p">:</span><span class="nf">send</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.02</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">draw</span><span class="p">()</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">clear</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">Layers</span><span class="p">.</span><span class="nf">clear</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="nv">scene</span>
+</code></pre></div>
+<h3 id="_5">第三步：让它一启动就跑<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>在 <code>conf_pure.lua</code> 里把 <code>FirstRoom</code> 指向它：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;FirstRoom&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TEST.scene_my_shader&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>进游戏应该能看到整个屏幕在轻微地左右摆动。<strong>把 <code>amplitude</code> 从 <code>0.02</code> 改成 <code>0.2</code></strong> ，效果立刻放大十倍 —— 这就是调 Shader 最爽的地方：改一个数，立刻看到结果。</p>
+<div class="admonition tip">
+<p class="admonition-title">两种加载方式</p>
+<ul>
+<li><code>SE.graphics.newShader("Scripts/Shaders/MyWave.glsl")</code> —— 直接给文件路径。</li>
+<li><code>ImportFile("MyWave", "shader")</code> —— 只给名字，引擎会自己去 <code>Scripts/Shaders/</code> 找 <code>.glsl</code> ，并且 <strong>编译失败时抛出带路径的明确报错</strong>，排错更方便。</li>
+</ul>
+<p>也可以直接把 GLSL 代码当字符串传进去，省掉一个文件（<a href="../010_shadertoy/index.html">ShaderToy 转化库</a> 就是这么干的）。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">编译失败是抛错，不是返回 nil</p>
+<p>Shader 语法错会让 <code>newShader</code> <strong>直接抛错</strong>。加载不确定来源的着色器时包一层 <code>pcall</code> ，
+否则整个场景都起不来。想提前单独检查语法，用 <code>SE.graphics.validateShader(code)</code> 。</p>
+</div>
+<hr />
+<h2 id="7">引擎自带的 7 个着色器<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<p><code>Scripts/Shaders/</code> 里已经躺着 7 个能直接用的着色器。<strong>练习的最省力起点，就是把它们拆开改。</strong></p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>做什么</th>
+<th>关键 uniform</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ColorFilter.glsl</code></td>
+<td>灰度 + 染色（<code>mix</code> 控制灰度程度）</td>
+<td><code>grayscale</code> <code>tint_color</code></td>
+</tr>
+<tr>
+<td><code>Gradiant.glsl</code></td>
+<td>四角颜色渐变，可旋转角度</td>
+<td><code>topLeftColor</code> 等四角 + <code>angle</code></td>
+</tr>
+<tr>
+<td><code>WaveDistort.glsl</code></td>
+<td>正弦波形扭曲，横竖两个方向</td>
+<td><code>time</code> <code>amplitude</code> <code>frequency</code> <code>speed</code> <code>tex_size</code></td>
+</tr>
+<tr>
+<td><code>Glow.glsl</code></td>
+<td>采四周邻居算亮度差，边缘发光</td>
+<td><code>glow_color</code> <code>glow_intensity</code> <code>threshold</code> <code>tex_size</code></td>
+</tr>
+<tr>
+<td><code>Dust.glsl</code></td>
+<td>扫描线溶解淡出（用了 <code>if</code> 分支与噪声）</td>
+<td><code>dt</code> <code>scan_y</code> 等</td>
+</tr>
+<tr>
+<td><code>FourPoint.glsl</code></td>
+<td>四点形变，用逆双线性插值解 UV，越界 <code>discard</code></td>
+<td><code>p1</code> ~ <code>p4</code></td>
+</tr>
+<tr>
+<td><code>PixelSmooth.glsl</code></td>
+<td>用 <code>dFdx/dFdy</code> 做像素平滑，专治旋转锯齿</td>
+<td><code>texture_pixel_size</code></td>
+</tr>
+</tbody>
+</table>
+<p>读它们的顺序建议：<code>ColorFilter</code> → <code>WaveDistort</code> → <code>Glow</code> → <code>FourPoint</code> 。
+前三个是"改颜色 / 改 UV / 采邻居"，覆盖了 90% 的日常需求；<code>FourPoint</code> 是几何级别的，当数学题看。</p>
+<hr />
+<h2 id="_6">后续怎么练<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>Shader 的学习曲线是"开头陡、后面平"：<strong>先抄、再改、最后自己写公式</strong>。</p>
+<h3 id="_7">阶段一：改常数（几乎不用懂数学）<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>把现成着色器的 uniform 推到极端，看现象：</p>
+<ul>
+<li>把 <code>ColorFilter</code> 的 <code>grayscale</code> 从 <code>0</code> 慢慢调到 <code>1</code> ，看画面变灰。</li>
+<li>把 <code>Glow</code> 的 <code>threshold</code> 调高 / 调低，看发光区域变大变小。</li>
+<li>把 <code>WaveDistort</code> 的 <code>amplitude</code> 从 <code>0</code> 拉到 <code>0.5</code> ，看画面被拧成什么样。</li>
+</ul>
+<h3 id="_8">阶段二：改公式（开始碰数学）<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li>把 <code>sin(...)</code> 换成 <code>cos(...)</code> 、<code>abs(sin(...))</code> 、<code>sqrt(...)</code> ，看波形怎么变。</li>
+<li>把 <code>WaveDistort</code> 里两条轴的 <code>sin</code> 频率改成不同的数，做出"水波"和"抖动"的差别。</li>
+<li>把 <code>uv.x +=</code> 改成 <code>uv.y +=</code> ，理解"横向扭曲"和"纵向扭曲"的对称性。</li>
+</ul>
+<h3 id="_9">阶段三：从零写小效果<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>每个都只做 <strong>一件事</strong>，挂在全屏白图上跑：</p>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>思路提示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>染色</td>
+<td><code>pixel.rgb * vec3(1.0, 0.5, 0.5)</code></td>
+</tr>
+<tr>
+<td>灰度</td>
+<td><code>dot(pixel.rgb, vec3(0.299, 0.587, 0.114))</code></td>
+</tr>
+<tr>
+<td>反色</td>
+<td><code>1.0 - pixel.rgb</code></td>
+</tr>
+<tr>
+<td>亮度 / 对比度</td>
+<td><code>(pixel.rgb - 0.5) * contrast + 0.5 + brightness</code></td>
+</tr>
+<tr>
+<td>扫描线</td>
+<td>用 <code>tex_coords.y</code> 配合 <code>sin</code> 或 <code>step</code> 做条纹</td>
+</tr>
+<tr>
+<td>径向暗角</td>
+<td>用 <code>distance(tex_coords, vec2(0.5))</code> 做中心亮、四周暗</td>
+</tr>
+<tr>
+<td>波纹</td>
+<td>用 <code>sin(distance(uv, center) * k - time)</code> 做同心圆</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_10">阶段四：组合与进阶<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<ul>
+<li>用 <code>SetShaders</code> 一次挂多个着色器，体会它们 <strong>按顺序叠加</strong> 的效果。</li>
+<li>开始接触 <strong>采样邻域</strong>（像 <code>Glow</code> 那样取上下左右的像素）和 <strong>多次采样</strong>（模糊、描边）。</li>
+<li>想做大场面，就看 <a href="../010_shadertoy/index.html">ShaderToy 转化库</a> ，借社区现成的代码，再回头拆解。</li>
+</ul>
+<h3 id="_11">推荐资源<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>《The Book of Shaders》</strong> （ <code>thebookofshaders.com</code> ）—— 讲概念最好的免费教程，重点看"颜色 / 形状 / 随机 / 噪声"几章。注意它的示例是 WebGL 写法，搬到 LÖVE 时要换成 <code>effect</code> + <code>Texel</code> 。</li>
+<li><strong><a href="https://www.shadertoy.com/">ShaderToy</a></strong> —— 海量现成效果，配合引擎的转化库直接用。</li>
+<li><strong>引擎自带的 7 个着色器</strong> —— 最好的"本地范本"，因为它们的写法就是本项目要长期维护的风格。</li>
+</ul>
+<hr />
+<h2 id="_12">性能与坑<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<div class="admonition danger">
+<p class="admonition-title">千万别每帧创建着色器</p>
+<p><code>newShader</code> 会触发 <strong>GPU 编译</strong>，非常贵。正确做法是在场景加载时编译一次、模块顶层缓存住，
+每帧只 <code>send</code> uniform。<code>send</code> 很便宜，随便调。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">画完记得还原</p>
+<p><code>SE.graphics.setShader(shader)</code> 会一直生效到下一次 <code>setShader()</code> 为止。
+用完立刻还原，否则会污染后面所有绘制：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setShader</span><span class="p">(</span><span class="nv">shader</span><span class="p">)</span>
+<span class="c1">-- ... 你的绘制 ...</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setShader</span><span class="p">()</span><span class="w">      </span><span class="c1">-- 还原</span>
+</code></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">全屏 + 邻域采样 = 贵</p>
+<p><code>effect</code> 是 <strong>每个像素都要跑一遍</strong> 的。<code>Glow</code> 这种一次采 5 个点的着色器，
+在整屏像素上就是 5 倍采样量；再叠几个 pass 就是乘法级增长。
+手机上尤其要克制 —— 这也是引擎给 <code>PixelSmooth</code> 做了缓存优化、而不是每帧 <code>setFilter</code> 的原因。</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">只认 GLSL ES 1.0</p>
+<p>没有 <code>switch</code> 、没有 <code>#version 300 es</code> 、不能动态索引数组 uniform。
+从网上抄代码时先确认版本，具体限制与"哪些写法一定编译失败"列在 <a href="../010_shadertoy/index.html">ShaderToy 转化库</a> 的坑一节。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">关于 Y 轴</p>
+<p>屏幕坐标 y 向下为正。写"从下往上"的数学时，第一反应对不上是正常的 ——
+把公式里的符号翻一下，或先画一条参考线确认方向。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">用 validateShader 提前查错</p>
+<p>改完 GLSL 不必每次都进游戏才发现错误：<code>SE.graphics.validateShader(code)</code> 只做编译检查、
+不真正替换当前着色器，适合在工具或启动时先跑一遍。</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3320 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../000_gamejolt/index.html">
+      
+      
+        <link rel="next" href="../020_sock/index.html">
+      
+      
+        
+          <link rel="alternate" href="../../../index.html" hreflang="en">
+        
+          <link rel="alternate" href="./index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Discord RPC - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#discord-rpc-game-sdk" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Discord RPC
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门优先
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    入门优先
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    环境配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发之前
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua 速通
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速上手
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    快速上手
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修改游戏信息
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    新建与跳转场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打字机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图层系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    画布与屏幕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    边框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game 区与资源覆盖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    战斗系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗初始化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家与灵魂
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    攻击模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合脚本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗场景与回调
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld 主世界系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld 主世界系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 地图与对象层
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI 与图块集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    角色
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    交互与对话
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    菜单 · 存档 · 箱子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遇敌
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    商店
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy 转化库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学教程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    与LOVE开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    与LOVE开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像绘制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    辅助开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    辅助开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景辅助工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对象调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    变量调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    本地化
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    本地化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目录与语言文件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    查词与替换
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    网络开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    网络开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#discord-rpc-game-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么用 discord-rpc 而不是 Game SDK
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        依赖与可用条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        引擎默认就接好了
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#activity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        activity 表可以填什么
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三个实际用法
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        坑汇总
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock 联机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    导出与发布
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    导出与发布
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#discord-rpc-game-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么用 discord-rpc 而不是 Game SDK
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        依赖与可用条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        引擎默认就接好了
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#activity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        activity 表可以填什么
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三个实际用法
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        坑汇总
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Discord RPC</h1>
+
+<p><code>Scripts/Libraries/DiscordRPC.lua</code> 让玩家在 Discord 上的个人资料显示成"正在玩 XX"，也就是 <strong>Rich Presence</strong>：</p>
+<div class="highlight"><pre><span></span><code>SoulEngine
+Fighting Sans
+Route: Genocide
+已玩 12 分钟
+</code></pre></div>
+<p>和小图标、大厅人数、加入按钮这些，都来自这一个库。</p>
+<hr />
+<h2 id="discord-rpc-game-sdk">为什么用 <code>discord-rpc</code> 而不是 Game SDK<a class="headerlink" href="#discord-rpc-game-sdk" title="Permanent link">&para;</a></h2>
+<p>文件头的注释写得很清楚，这里复述一遍，因为<strong>你不要去"升级"它</strong>：</p>
+<div class="admonition quote">
+<p class="admonition-title"><code>DiscordRPC.lua:12-18</code></p>
+<p>Why not the Discord Game SDK (discord_game_sdk.dll)?
+The Game SDK proved unstable / unusable through a direct LuaJIT FFI binding:
+<code>DiscordCreate</code> succeeds, but <code>get_activity_manager()</code> etc. return NULL no
+matter what (any flags/version/app-id), so calling any activity method
+dereferences a NULL pointer and hard-crashes the game.</p>
+</div>
+<p>也就是说：<strong>Discord Game SDK 走 FFI 会直接把游戏搞崩</strong>（拿到的是 NULL 管理器指针），
+而老的 <code>discord-rpc</code> 库只有几个平铺的 C 函数（<code>Discord_Initialize</code> / <code>Discord_UpdatePresence</code>），
+没有 vtable、没有 manager getter，是 LÖVE 里验证过能用的路子。</p>
+<div class="admonition note">
+<p class="admonition-title">DiscordGameSDK 目录不是空的，只是没人用</p>
+<p>这个目录<strong>没被删掉</strong>， <code>x64/</code> 与 <code>x86/</code> 子目录下躺着 7 个文件（ <code>discord_game_sdk.dll</code> / <code>.dll.lib</code> / <code>.so</code> / <code>.dylib</code> / <code>.bundle</code> ），都还在版本控制里。</p>
+<p>留着它们只是"当年试过这条路"的痕迹，<strong>引擎代码没有引用任何一个</strong>。
+真正加载的是隔壁 <code>Resources/Libs/DiscordRPC/discord-rpc-x64.dll</code> 。
+<strong>别因为它们在里面就去改代码调 Game SDK</strong> —— 上面那段注释说的崩溃是实测过的。</p>
+</div>
+<hr />
+<h2 id="_1">依赖与可用条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LuaJIT 的 <code>ffi</code></td>
+<td>LÖVE 的 LuaJIT 构建才有。纯 Lua 构建下整个库退化成空操作</td>
+</tr>
+<tr>
+<td>原生库文件</td>
+<td><code>Resources/Libs/DiscordRPC/discord-rpc-x64.dll</code> / <code>discord-rpc-x86.dll</code></td>
+</tr>
+<tr>
+<td>Discord 客户端在运行</td>
+<td>没开 Discord 就只是显示不出来，不会报错</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">目前只有 Windows 的库</p>
+<p><code>Resources/Libs/DiscordRPC/</code> 下<strong>只有两个 .dll</strong> ，没有 Linux 的 <code>.so</code> 、也没有 macOS 的 <code>.dylib</code> 。
+源码里虽然写好了这两个平台的候选文件名，但文件没随引擎分发。
+要上其它平台得自己去 <a href="https://github.com/discord/discord-rpc/releases">discord-rpc releases</a> 下载并放进那个目录。</p>
+</div>
+<p>拿不到依赖时的行为：<strong>不报错</strong>。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">init</span><span class="p">()</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">err</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span><span class="w">   </span><span class="c1">-- 只是打印一句，游戏继续跑</span>
+</code></pre></div>
+<p>无 <code>ffi</code> 时 <code>init</code> / <code>setActivity</code> / <code>on*</code> 全部被替换成同一个 <code>unavailable()</code> ，返回 <code>false, "DiscordRPC: LuaJIT FFI is unavailable..."</code> ；
+<code>update</code> / <code>shutdown</code> / <code>isAvailable</code> 则变成安全的空函数。</p>
+<hr />
+<h2 id="_2">引擎默认就接好了<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><code>main.lua</code> 已经把整套流程走完了：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- love.load()</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="py">application_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">)</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">init</span><span class="p">()</span>
+
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span>
+<span class="w">    </span><span class="nv">details</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Fighting Sans&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">state</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Route: Genocide&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;qq20250220-225345&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_text</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;It&#39;s a bad time.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">start</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">timestamp</span><span class="p">(),</span><span class="w">   </span><span class="c1">-- 开始计时的时间戳</span>
+<span class="p">})</span>
+
+<span class="c1">-- love.update(dt)</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+
+<span class="c1">-- love.quit()</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">shutdown</span><span class="p">()</span>
+</code></pre></div>
+<p>所以<strong>最常见的用法只有一步</strong>：把 <code>Game/conf_pure.lua</code> 里的 ID 换成你自己的。</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1234567890123456789&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">写在 <code>Game/conf_pure.lua</code> 里，不要写进根目录那份</p>
+<p><code>conf_pure.lua</code> 有<strong>两份并且是叠加的</strong>：根目录那份是引擎默认值， <code>Game/conf_pure.lua</code> 那份盖在上面。
+你的改动应该写在 <strong><code>Game/conf_pure.lua</code></strong> —— 改根目录那份会在引擎更新时被冲掉。
+两份的对照见 <a href="../../010_quick_start/000_conf/index.html">配置文件</a> 。</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">App ID 必须是字符串</p>
+<p>19 位数字<strong>超过 2^53</strong>，Lua 的 number 是 double，写成数字字面量会丢精度，Discord 会拒绝连接。</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1342517648348680202&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 对</span>
+<span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1342517648348680202</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 错：精度丢失</span>
+</code></pre></div>
+<p>库内部会 <code>tostring(client_id)</code> ，但<strong>在你写进配置那一刻精度就已经丢了</strong>。</p>
+</div>
+<hr />
+<h2 id="_3">方法<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<div class="admonition example">
+<p class="admonition-title">生命周期</p>
+<ul>
+<li><code>init(client_id, options)</code> 连接 Discord。省略 <code>client_id</code> 就用 <code>Discord.application_id</code> 。<ul>
+<li><code>options.auto_register</code> 传 <code>true</code> 时尝试注册协议（一般不用）。</li>
+<li><code>options.steam_id</code> 关联 Steam（可选）。</li>
+</ul>
+</li>
+<li><code>update(dt)</code> <strong>必须每帧调用</strong>，内部跑 <code>Discord_RunCallbacks()</code> 。引擎已在 <code>love.update(dt)</code> 里调了。</li>
+<li><code>shutdown()</code> 断开连接，<code>love.quit()</code> 里调（引擎已调）。</li>
+<li><code>isAvailable()</code> 是否已成功初始化。</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">设置 Presence</p>
+<ul>
+<li><code>setActivity(activity)</code> 设置/更新显示内容，参数是一张表（字段见下）。</li>
+<li><code>clearActivity()</code> 清空显示（玩家回到"什么都没玩"的状态）。</li>
+<li><code>timestamp(seconds)</code> 取当前 unix 时间戳（秒），可传入偏移量，用于 <code>start</code> / <code>finish</code>。</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">回调</p>
+<ul>
+<li><code>onReady(callback)</code> Discord 接受连接时触发，回调收到 <code>user</code> 表（ <code>userId</code> / <code>username</code> / <code>discriminator</code> / <code>avatar</code> ）或 <code>nil</code> 。</li>
+<li><code>onDisconnected(callback)</code> 断开时触发，回调收到 <code>(errorCode, message)</code> 。</li>
+<li><code>onError(callback)</code> 报错时触发，回调收到 <code>(errorCode, message)</code> 。<strong>App ID 填错通常在这里体现</strong>。</li>
+<li><code>onJoin(callback)</code> 别人通过邀请加入时触发，回调收到 <code>joinSecret</code> 字符串。</li>
+<li><code>onSpectate(callback)</code> 观战时触发，回调收到 <code>spectateSecret</code> 字符串。</li>
+<li><code>onJoinRequest(callback)</code> 有人申请加入时触发，回调收到 <code>user</code> 表。</li>
+<li><code>respond(user_id, reply)</code> 回应加入请求，<code>reply</code> 取 <code>Discord.JoinReply.No</code> / <code>.Yes</code> / <code>.Ignore</code> 。</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">常量与状态</p>
+<ul>
+<li><code>Discord.JoinReply</code> = <code>{ No = 0, Yes = 1, Ignore = 2 }</code> 。</li>
+<li><code>Discord.VERSION</code> 库版本，当前 <code>"2.1.0"</code> 。</li>
+<li><code>Discord.application_id</code> 你的 App ID（字符串）。</li>
+<li><code>Discord.available</code> 是否已初始化。</li>
+<li><code>Discord.last_error</code> 最近一次失败的原因。</li>
+</ul>
+</div>
+<hr />
+<h2 id="activity">activity 表可以填什么<a class="headerlink" href="#activity" title="Permanent link">&para;</a></h2>
+<p>两种命名风格都收，<strong>优先用下划线那一列</strong>（Game SDK 风格）：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>等价写法</th>
+<th>含义</th>
+<th>字节上限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>details</code></td>
+<td>—</td>
+<td>第一行文字（"Fighting Sans"）</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>—</td>
+<td>第二行文字（"Route: Genocide"）</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>start</code></td>
+<td><code>startTimestamp</code></td>
+<td>开始时间戳 → 显示"已玩 xx:xx"</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>finish</code> / <code>end</code></td>
+<td><code>endTimestamp</code></td>
+<td>结束时间戳 → 显示"剩余 xx:xx"</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>large_image</code></td>
+<td><code>largeImageKey</code></td>
+<td>大图资源 key</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>large_text</code></td>
+<td><code>largeImageText</code></td>
+<td>鼠标悬停大图的文字</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>small_image</code></td>
+<td><code>smallImageKey</code></td>
+<td>小图（叠在大图右下角）资源 key</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>small_text</code></td>
+<td><code>smallImageText</code></td>
+<td>悬停小图的文字</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>party_id</code></td>
+<td><code>partyId</code></td>
+<td>队伍/房间标识</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>party_size</code></td>
+<td>—</td>
+<td>传 <code>{当前人数, 上限}</code> 或 <code>{current=, max=}</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>partySize</code> / <code>partyMax</code></td>
+<td>—</td>
+<td>直接给两个数（没用 <code>party_size</code> 时生效）</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>match_secret</code></td>
+<td><code>matchSecret</code></td>
+<td>匹配密钥</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>join_secret</code></td>
+<td><code>joinSecret</code></td>
+<td>邀请加入用的密钥</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>spectate_secret</code></td>
+<td><code>spectateSecret</code></td>
+<td>观战密钥</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>instance</code></td>
+<td>—</td>
+<td>是否可被加入，默认 <code>true</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span>
+<span class="w">    </span><span class="nv">details</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;探索废墟&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">state</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;LV &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; · HP &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">hp</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ruins&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_text</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Ruins&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">small_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;frisk&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">small_text</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Frisk&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">start</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">timestamp</span><span class="p">(),</span><span class="w">      </span><span class="c1">-- 从现在开始计时</span>
+<span class="w">    </span><span class="nv">party_size</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span><span class="w">                   </span><span class="c1">-- 显示 (2 of 4)</span>
+<span class="p">})</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">字节上限不是字数上限</p>
+<p><code>state</code> / <code>details</code> 是 <strong>128 字节</strong>，UTF-8 下一个中文占 3 字节 —— <strong>最多约 42 个汉字</strong>，超了会被 Discord 直接丢弃整条 Presence。
+长文案请自己截断。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">图片 key 要在后台上传过</p>
+<p><code>large_image</code> / <code>small_image</code> 填的是 <strong>Discord Developer Portal → 你的应用 → Rich Presence → Art Assets</strong> 里上传图片后得到的 key（文件名去掉扩展名），
+不是文件路径也不是 URL。没上传过的 key 会静默不显示图片。
+引擎默认的 <code>qq20250220-225345</code> 是 SoulEngine 自己应用下的资源，<strong>换成你的 App ID 后它就不存在了</strong>，记得一并换掉。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>start</code> / <code>finish</code> 是秒级 unix 时间戳</p>
+<p><code>Discord.timestamp()</code> 返回 <code>os.time()</code> 。传毫秒会被当成公元 5 万年，计时显示会乱。</p>
+</div>
+<hr />
+<h2 id="_4">三个实际用法<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p><strong>① 随场景切换 Presence</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">SceneBattle</span><span class="p">:</span><span class="nf">load</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span>
+<span class="w">        </span><span class="nv">details</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;与 &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">Battle</span><span class="p">.</span><span class="py">enemies</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">name</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; 战斗&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">state</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;LV &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">start</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">timestamp</span><span class="p">(),</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p><strong>② 用 <code>onReady</code> 确认 App ID 有没有填对</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nv">Discord</span><span class="p">.</span><span class="nf">onReady</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">user</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">user</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] 已连接:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">user</span><span class="p">.</span><span class="py">username</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">else</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] 已连接（未拿到用户信息）&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">onError</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] 错误&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 大概率是 App ID 不对</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>③ 邀请好友加入</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 房主</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="nv">party_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">room</span><span class="p">.</span><span class="py">id</span><span class="p">,</span><span class="w"> </span><span class="nv">party_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nv">n</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span><span class="w"> </span><span class="nv">join_secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">room</span><span class="p">.</span><span class="py">secret</span><span class="w"> </span><span class="p">})</span>
+
+<span class="c1">-- 房主这边收到申请</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">onJoinRequest</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">user</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- 自己决定要不要放人进来</span>
+<span class="w">    </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">respond</span><span class="p">(</span><span class="nv">user</span><span class="p">.</span><span class="py">userId</span><span class="p">,</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="py">JoinReply</span><span class="p">.</span><span class="py">Yes</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="_5">坑汇总<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title"><code>Discord.update(dt)</code> 必须每帧调用</p>
+<p>它内部是 <code>Discord_RunCallbacks()</code> 。漏掉的话：Presence <strong>不会刷新</strong>、所有回调<strong>不会触发</strong>。
+引擎已经在 <code>love.update(dt)</code> 里调了，除非你自己建了独立的 <code>love.update</code> 分支，否则别重复也别删。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">别动那句 <code>jit.off(discord.update)</code></p>
+<p><code>Discord_RunCallbacks()</code> 会从 C 通过 FFI 回调<strong>重新进入 Lua</strong>。在 JIT 编译过的代码里这么做，
+LuaJIT 会抛 <code>unprotected error in call to Lua API</code> —— 而且是在连上 Discord 约 2 秒、ready 事件触发的那一刻。
+库里专门对 <code>update</code> 关掉了 JIT，让它永远走解释器：<strong>删掉这行会在你最想不到的时候崩游戏。</strong></p>
+</div>
+<details class="quote">
+<summary>那段注释与代码</summary>
+<div class="highlight"><pre><span></span><code><span class="c1">-- CRITICAL for LuaJIT: `discord.update` calls Discord_RunCallbacks, which</span>
+<span class="c1">-- re-enters Lua through the FFI callback trampolines above. ... Disable JIT</span>
+<span class="c1">-- for this function so it always runs in the interpreter. NOTE: `jit` is a</span>
+<span class="c1">-- LuaJIT builtin that must be loaded explicitly; the previous</span>
+<span class="c1">-- `local jit = nil` shadowed the global and silently broke this.</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">ok_jit</span><span class="p">,</span><span class="w"> </span><span class="nv">jit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">pcall</span><span class="p">(</span><span class="nb">require</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;jit&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">ok_jit</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">jit</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">jit</span><span class="p">.</span><span class="py">off</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">jit</span><span class="p">.</span><span class="nf">off</span><span class="p">(</span><span class="nv">discord</span><span class="p">.</span><span class="py">update</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+</details>
+<div class="admonition warning">
+<p class="admonition-title">Presence 有更新频率限制</p>
+<p>Discord 服务端会限流（大致 5 次 / 20 秒），超了更新会被静默丢弃并可能触发 <code>onError</code> 。
+<strong>不要每帧 <code>setActivity</code></strong> ，只在状态真的变了的时候调（切场景、升级、进战斗）。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">连上要等一两秒</p>
+<p><code>init()</code> 返回 <code>true</code> 只代表本地调用成功，不代表 Discord 已经接受。
+要确认就挂 <code>onReady</code> ；Presence 一般 1~2 秒后才出现在客户端上。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">回调里抛异常不会崩游戏</p>
+<p>用户在回调里写错代码时，库会 <code>pcall</code> 住并打印 <code>[DiscordRPC] callback error: ...</code> 。
+因为这些回调是从 C 侧进来的，普通 <code>pcall</code> 拦不住，所以库自己在每个代理里包了一层。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><code>instance</code> 默认是开着的</p>
+<p><code>p.instance = (t.instance ~= false) and 1 or 0</code> —— 只有<strong>显式写 <code>instance = false</code></strong> 才关。
+没配 <code>join_secret</code> 的话它开着也没用，不会凭空出现邀请按钮。</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

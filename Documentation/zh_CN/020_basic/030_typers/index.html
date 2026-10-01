@@ -1,0 +1,3169 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../020_sprites/index.html">
+      
+      
+        <link rel="next" href="../040_layers/index.html">
+      
+      
+        
+          <link rel="alternate" href="../../../index.html" hreflang="en">
+        
+          <link rel="alternate" href="./index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>打字机 - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              打字机
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门优先
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    入门优先
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    环境配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发之前
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua 速通
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速上手
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    快速上手
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修改游戏信息
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    新建与跳转场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打字机
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打字机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        创建打字机
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="创建打字机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ntext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#insttext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        InstText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图层系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    画布与屏幕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    边框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game 区与资源覆盖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    战斗系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗初始化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家与灵魂
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    攻击模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合脚本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗场景与回调
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld 主世界系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld 主世界系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 地图与对象层
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI 与图块集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    角色
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    交互与对话
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    菜单 · 存档 · 箱子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遇敌
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    商店
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy 转化库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学教程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    与LOVE开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    与LOVE开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像绘制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    辅助开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    辅助开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景辅助工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对象调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    变量调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    本地化
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    本地化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目录与语言文件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    查词与替换
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    网络开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    网络开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock 联机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    导出与发布
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    导出与发布
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        创建打字机
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="创建打字机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ntext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#insttext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        InstText 打字机
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>打字机</h1>
+
+<p>打字机位置： <code>Scripts/Libraries/Typers/</code> 文件夹。</p>
+<p>打字机一共分为四种： <code>InstText</code> 只负责把整段文字直接画出来，剩下三种 <code>EText</code> / <code>NText</code> / <code>SText</code> 都可以正常逐个打字。</p>
+<p>屏幕上所有文本均可以通过打字机进行绘制，但我们也有额外方式，在下一页会说。</p>
+<hr />
+<h2 id="_1">创建打字机<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>三种<strong>逐字打字</strong>的打字机是按"标签怎么处理"来分的，分别是 <code>EText</code> 、 <code>NText</code> 和 <code>SText</code> 。</p>
+<p>第四种 <code>InstText</code> 不带打字动画，用法和它们差别较大，单独放在本节最后。</p>
+<hr />
+<h3 id="etext">EText 打字机<a class="headerlink" href="#etext" title="Permanent link">&para;</a></h3>
+<p><code>EText</code> 全称 <code>Easy Text</code> ，特点是样式写在文本中，类似于 <code>bbcode</code> 。</p>
+<p>使用 <code>Typers.EText.New(text, position, layer, size, mode)</code> 来创建一个 <code>etext</code> 模式的打字机。</p>
+<ul>
+<li><code>text</code> 要打的文本，可以使用字符串或表，若使用表则会将文本分开为可翻页类型。</li>
+<li><code>position</code> 打字机第一个字符所处的位置。</li>
+<li><code>layer</code> 打字机的图层。</li>
+<li><code>size</code> 打字机有显示的对话框的大小。</li>
+<li><code>mode</code> 打字机的模式： <code>manual</code> 手动切换到下一句、 <code>none</code> 无法手动干预，仅通过代码切换到下一句。若创建时没有给出参数，默认为 <code>manual</code> 模式。</li>
+</ul>
+<div class="admonition example">
+<p class="admonition-title">创建示例</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">EText</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="s2">&quot;这是第一句话&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;这是第二句话&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<p><strong>修改样式：</strong></p>
+<p>通过在句子中添加带方括号 <code>[]</code> 的标签来设置样式。</p>
+<div class="admonition example">
+<p class="admonition-title">使用案例</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">EText</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="s2">&quot;[colorHEX:ff0000]这是一句红色的话。&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<details class="example">
+<summary>所有标签</summary>
+<ul>
+<li><code>[wait:x]</code> 让打字机等待 <code>x</code> 秒，只允许直接输入数字，不允许输入算式例如 <code>1 / 2</code> 。<ul>
+<li>等待走的是<strong>自己的计时器</strong>，所以后面再出现 <code>[speed:]</code> 也吞不掉这段暂停。</li>
+<li>玩家按取消键快进，或者这一句带 <code>[skip]</code> 时，等待会被直接跳过，剩下的字立刻打出来。</li>
+</ul>
+</li>
+<li><code>[speed:x]</code> 将打字机的打字间隔设置为 <code>x</code> 秒，只允许直接输入数字，不允许输入算式。默认此值为 <code>1/15=0.0667</code> 秒。</li>
+<li><code>[size:x]</code> 把<strong>后面</strong>的文字字号改成 <code>x</code> ，只允许直接输入数字。已经打出来的字会保持创建时的字号，所以屏幕上的文本不会"回溯"着变小变大。bondfont 不会因此关闭，每个字的缩放与字距依旧生效。</li>
+<li><code>[colorRGB:r, g, b]</code> 使用RGB格式设置字符颜色 <code>（0 ~ 255）</code> 。</li>
+<li><code>[colorHEX:rrggbb]</code> 使用十六进制设置字符颜色 <code>（00 ~ ff）</code> 。</li>
+<li><code>[font:x]</code> 将字体设置为 <code>x</code> 。路径从 <code>Resources/Fonts/</code> 开始算，但<strong>会先查 <code>Game/Resources/Fonts/</code></strong> ，同名文件 Game 区优先。设置字体会顺手关掉 bondfont，想恢复得自己再开。</li>
+<li><code>[effect:name, int]</code> 设置字符的特效。<ul>
+<li><code>name</code> 特效的名字： <code>shake</code> 原地颤动、 <code>rotate</code> 进行轻微旋转，其他名字等于没有特效。</li>
+<li><code>int</code> 特效强度，默认 <code>1</code> ，数字越大强度越大。</li>
+</ul>
+</li>
+<li><code>[outline:r, g, b, a, t]</code> 设置文本的外边框。<ul>
+<li><code>r, g, b, a</code> 边框的颜色与透明度。</li>
+<li><code>t</code> 边框的厚度。</li>
+</ul>
+</li>
+<li><code>[voice:name]</code> 设置打字音效，文件在 <code>Resources/Sounds/Voices/</code> 里，写文件名即可。</li>
+<li><code>[portrait:frames|interval|mode]</code> 设置打字时同时播放的动画，一般为说话时有一个角色播放说话动画。<ul>
+<li><code>frames</code> 帧图片，<strong>用英文逗号分隔</strong>，例如 <code>a.png, b.png</code> 。</li>
+<li><code>interval</code> 每帧多少秒，默认 <code>1/30</code> 。</li>
+<li><code>mode</code> 播放模式，默认 <code>looponce</code> （播完一轮回到第一帧）。</li>
+<li>三段之间都用 <code>|</code> 分隔，只有 <code>frames</code> 是必填的： <code>[portrait:a.png, b.png|0.05|looponce]</code> 。</li>
+</ul>
+</li>
+<li><code>[portrait:remove]</code> 移除说话动画（写 <code>hide</code> / <code>clear</code> / <code>none</code> 效果一样）。</li>
+<li><code>[skip]</code> 本句话进行快进，不需要值。快进会跳过所有 <code>[wait:]</code> 等待。</li>
+<li><code>[noskip]</code> 禁止这一句被取消键快进，和 <code>[skip]</code> 正好相反。</li>
+<li><code>[next]</code> 这句打完立刻翻到下一句，不用等玩家按确认键， <code>manual</code> 模式下同样生效。<ul>
+<li>气泡属于"显示它的那一句"，所以 <code>[next]</code> 会把气泡和文本一起清掉；下一句想继续用气泡得重新 <code>[showbubble:]</code> 。</li>
+</ul>
+</li>
+<li><code>[showbubble:dir, pos]</code> 显示气泡对话框。 <code>dir</code> 是尾巴朝向，可取 <code>left</code> / <code>right</code> / <code>up</code> / <code>down</code> （默认 <code>left</code> ）； <code>pos</code> 是尾巴沿着边框的位置 <code>0 ~ 1</code> ，默认 <code>0.5</code> 。</li>
+<li><code>[hidebubble]</code> 隐藏气泡对话框。</li>
+<li><code>[func:name]</code> 调用名为 <code>name</code> 的 <strong>全局函数</strong> ，如果函数面前拥有 <code>local</code> 无法调用。</li>
+<li><code>[func:name|a, b, c]</code> 调用名为 <code>name</code> 的全局函数，并可以进行传参操作，使用英文逗号进行分割。</li>
+<li><code>^</code> 可以使用此符号直接将所有样式重置到默认值。</li>
+</ul>
+</details>
+<div class="admonition tip">
+<p class="admonition-title">标签可以连着写</p>
+<p><code>[font:x][colorHEX:ffff00][effect:shake, 2]</code> 这样连着排是没问题的，效果依次叠加。</p>
+</div>
+<hr />
+<h3 id="ntext">NText 打字机<a class="headerlink" href="#ntext" title="Permanent link">&para;</a></h3>
+<p><code>NText</code> 全称 <code>Neutral Text</code> ，特点是样式写在样式表中，和文本单独分割开来，这样会更方便进行文本的修改。</p>
+<p>使用 <code>Typers.NText.New(text, position, layer, size, opts, mode)</code> 来创建一个 <code>ntext</code> 模式的打字机。</p>
+<ul>
+<li><code>text</code> 要打的文本，可以使用字符串或表，若使用表则会将文本分开为可翻页类型。</li>
+<li><code>position</code> 打字机第一个字符所处的位置。</li>
+<li><code>layer</code> 打字机的图层。</li>
+<li><code>size</code> 打字机有显示的对话框的大小。</li>
+<li><code>opts</code> 样式表，内部放独立样式设置。</li>
+<li><code>mode</code> 打字机的模式： <code>manual</code> 手动切换到下一句、 <code>none</code> 无法手动干预，仅通过代码切换到下一句。若创建时没有给出参数，默认为 <code>manual</code> 模式。</li>
+</ul>
+<div class="admonition example">
+<p class="admonition-title">使用案例</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="nf">NText</span><span class="p">(</span><span class="s2">&quot;&amp;* 这&amp;是一句话^...&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<span class="w">        </span><span class="nv">outline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">},</span><span class="w"> </span><span class="s2">&quot;manual&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<p><strong>修改样式：</strong></p>
+<p>通过在句子中添加 <code>&amp;</code> 和 <code>^</code> 符号来进行样式修改。</p>
+<details class="example">
+<summary>所有样式</summary>
+<ul>
+<li><code>font</code> 所用字体，在设置时会自动解除 <code>bondfont</code> 。</li>
+<li><code>size</code> 字号大小。</li>
+<li><code>color</code> 文本的颜色，使用 <code>{r, g, b}</code> 。</li>
+<li><code>alpha</code> 文本的透明度 <code>(0 ~ 1)</code> 。</li>
+<li><code>outline</code> 文本的外边框，使用 <code>{r, g, b, a, t}</code> 格式。</li>
+<li><code>scale</code> 文本的放大倍数，默认为 <code>1</code> 。中文之类的宽字符由 <code>bondfont</code> 自动处理，会以 <code>2</code> 倍绘制。</li>
+<li><code>autowrap</code> 是否自动换行。</li>
+<li><code>wait</code> 暂停多少秒再继续。和 <code>[wait:x]</code> 一样走<strong>独立计时器</strong>，后续样式盖不掉它，快进时会被跳过。</li>
+<li><code>effect</code> 字符特效，格式 <code>{name = "shake", intensity = 3}</code> 。</li>
+<li><code>voice</code> 单个打字音效文件名，放在 <code>Resources/Sounds/Voices/</code> 下。</li>
+<li><code>voices</code> 打字音效列表，每个字符随机挑一个播。</li>
+<li><code>skip</code> 快进设置表，可填 <code>canskip</code> （能不能被取消键快进）、<code>skipping</code> （当前是否正在快进）、<code>skipcount</code> （一次快进几个字）、<code>absolute</code> 。</li>
+<li><code>portrait</code> 角色说话表情切换，支持三种写法：</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 1. 完整形式</span>
+<span class="nv">portrait</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;a.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;b.png&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="nv">interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.02</span><span class="p">,</span><span class="w">        </span><span class="c1">-- 每帧多少秒，默认 1/30</span>
+<span class="w">    </span><span class="nv">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;looponce&quot;</span><span class="w">       </span><span class="c1">-- 默认 looponce：播完一轮回到第一帧</span>
+<span class="p">}</span>
+
+<span class="c1">-- 2. 直接给一串图片路径（interval 与 mode 用默认值）</span>
+<span class="nv">portrait</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;a.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;b.png&quot;</span><span class="p">}</span>
+
+<span class="c1">-- 3. 移除说话动画</span>
+<span class="nv">portrait</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;remove&quot;</span><span class="w">         </span><span class="c1">-- 写 &quot;hide&quot; / &quot;clear&quot; / &quot;none&quot; 效果一样</span>
+</code></pre></div>
+</details>
+<hr />
+<h3 id="stext">SText 打字机<a class="headerlink" href="#stext" title="Permanent link">&para;</a></h3>
+<p><code>SText</code> 全称 <code>Sequence Text</code> 序列打字机，特点是文本是在打字过程中逐渐拼接起来的，非常适合 <strong>有多个检测条件</strong> 的情况。</p>
+<div class="admonition example">
+<p class="admonition-title">使用案例</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">SText</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">:</span><span class="nf">addText</span><span class="p">(</span><span class="s2">&quot;你好&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">:</span><span class="nf">nextSentence</span><span class="p">()</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">hp</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">self</span><span class="p">:</span><span class="nf">addText</span><span class="p">(</span><span class="s2">&quot;现在血量有&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;点。&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">else</span>
+<span class="w">        </span><span class="nv">self</span><span class="p">:</span><span class="nf">addText</span><span class="p">(</span><span class="s2">&quot;我是盲人看不见血量。&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">80</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">})</span>
+</code></pre></div>
+</div>
+<p>下面是所有构建过程中可用的函数：</p>
+<div class="admonition example">
+<p class="admonition-title">构建函数</p>
+<ul>
+<li><code>self:addText(text)</code> 给当前句子添加文本。</li>
+<li><code>self:addSkipText(text)</code> 添加需要被<strong>瞬间打出</strong>的文本（快进时立刻出现）。</li>
+<li><code>self:setFont(name)</code> 设置字体。设置字体会顺手关掉 <code>bondfont</code> ，想恢复得自己再开。</li>
+<li><code>self:setWaitTime(time)</code> 暂停多少秒再继续。走<strong>独立计时器</strong>，后面的 <code>setSpeed</code> 吞不掉它，快进时会被跳过。</li>
+<li><code>self:setSpeed(interval)</code> 设置打字间隔时间（秒）。</li>
+<li><code>self:setEffect(name, intensity)</code> 设置字符特效， <code>name</code> 填 <code>shake</code> 或 <code>rotate</code> ， <code>intensity</code> 默认 <code>1</code> 。</li>
+<li><code>self:setColor(r, g, b)</code> 设置颜色， <code>0 ~ 1</code> 或 <code>0 ~ 255</code> 引擎会自动识别。</li>
+<li><code>self:setColorHEX(hex)</code> 以十六进制形式设置颜色，例如 <code>"ff0000"</code> 。</li>
+<li><code>self:setOutline(r, g, b, a, t)</code> 文本边框，会以 8 个方向的偏移副本画在字后面。</li>
+<li><code>self:setVoices(voices)</code> 设置打字音效，可以传一个文件名，也可以传一串。</li>
+<li><code>self:setPortrait(frames, interval, mode)</code> 设置角色说话动画。 <code>frames</code> 是图片路径串（也可以只给一个文件名）， <code>interval</code> 默认 <code>1/30</code> ， <code>mode</code> 默认 <code>looponce</code> 。</li>
+<li><code>self:removePortrait()</code> 移除说话动画。</li>
+<li><code>self:showBubble(visible, dir, pos)</code> 显示 / 隐藏气泡（ <code>visible</code> 为 <code>false</code> 时隐藏）。</li>
+<li><code>self:nextSentence()</code> 结束当前句并等待玩家确认；确认后清空文本，开始下一句。</li>
+</ul>
+</div>
+<hr />
+<h3 id="insttext">InstText 打字机<a class="headerlink" href="#insttext" title="Permanent link">&para;</a></h3>
+<p><code>InstText</code> 全称 <code>Instant Text</code> ，特点是<strong>没有打字动画</strong>：创建的一瞬间整段文字就已经画在屏幕上了。</p>
+<p>它适合<strong>长期存在、又不需要逐字出现</strong>的文字——战斗菜单按钮、商店里的金钱读数、状态栏这类。因为它把每个字符预先渲染成一张贴图并<strong>跨实例缓存</strong>，同一段字画多久都不额外花性能，比每帧跑一次 <code>printf</code> 划算。</p>
+<p>使用 <code>Typers.InstText.New(text, position, layer, size)</code> 创建。</p>
+<ul>
+<li><code>text</code> 要显示的文本。传表只会取<strong>第 <code>1</code> 项</strong>；想换行得自己写 <code>\n</code> （或者打开自动换行）。</li>
+<li><code>position</code> 文本<strong>左上角</strong>的位置。</li>
+<li><code>layer</code> 图层。</li>
+<li><code>size</code> <code>{宽, 0}</code> ，第一项是<strong>自动换行的盒子宽度</strong>，默认 <code>{640, 0}</code> ；第二项目前没有用处。</li>
+</ul>
+<div class="admonition example">
+<p class="admonition-title">创建示例</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">InstText</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span>
+<span class="w">    </span><span class="s2">&quot;* &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.Spare&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">90</span><span class="p">,</span><span class="w"> </span><span class="mi">270</span><span class="p">},</span>
+<span class="w">    </span><span class="s2">&quot;UponArena&quot;</span>
+<span class="p">)</span>
+<span class="nv">label</span><span class="p">:</span><span class="nf">SetAlign</span><span class="p">(</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+<span class="nv">label</span><span class="p">.</span><span class="py">fontsize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span>
+</code></pre></div>
+</div>
+<div class="admonition example">
+<p class="admonition-title">实例方法</p>
+<ul>
+<li><code>SetText(new_text)</code> 换文字。会重新预渲染，<strong>不会</strong>动颜色。</li>
+<li><code>SetAlign(mode)</code> 对齐方式， <code>"left"</code> （默认） / <code>"center"</code> / <code>"right"</code> 。对齐是按整行宽度相对 <code>position</code> 算的。</li>
+<li><code>Rebuild()</code> 强制重排一次。手动改了 <code>size</code> 或 <code>auto_wrap</code> 之后要自己调它。</li>
+<li><code>SetColor(r, g, b)</code> 改颜色， <code>0 ~ 1</code> 或 <code>0 ~ 255</code> 都认。</li>
+<li><code>UseBondFont(config)</code> 换一套中英字体配置，结构同 <code>EText</code> 的 bondfont。</li>
+<li><code>Destroy()</code> / <code>Remove()</code> 销毁。会把字符从缓存里减一次引用，<strong>可以重复调用</strong>。</li>
+<li><code>t.font</code> / <code>t.fontsize</code> 这两个属性是直接写的，写上去会顺手重排一次，不用自己 <code>Rebuild()</code> 。</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">颜色是烤进字符里的：先改色，再改字</p>
+<p><code>InstText</code> 把每个字符预先渲染成贴图，绘制时不再重新上色。所以顺序必须是
+<code>SetColor</code> → <code>SetText</code> （或 <code>SetColor</code> → <code>Rebuild()</code> ）。
+反过来先换字再改色，屏幕上不会有任何变化。</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">自动换行</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">InstText</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s2">&quot;一段很长很长、肯定放不下的文字……&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">})</span>
+<span class="nv">t</span><span class="p">.</span><span class="py">auto_wrap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="nv">t</span><span class="p">:</span><span class="nf">Rebuild</span><span class="p">()</span><span class="w">          </span><span class="c1">-- ← 改完 auto_wrap / size 必须自己重排</span>
+</code></pre></div>
+<ul>
+<li>默认<strong>关</strong>。不打开就永远只排一行，所以引擎里已有的调用一个字都不会跑版。</li>
+<li>打开后按 <code>size[1]</code> 折行，规则和 <code>EText</code> / <code>NText</code> 一致：英文<strong>按单词</strong>折（整个单词推到下一行，不会切一半），中文等宽字符<strong>逐字</strong>折；单个词本身比盒子还宽时才会硬断。</li>
+<li>它和 <code>EText</code> 一样<strong>不认方括号标签</strong>， <code>[wait:]</code> 之类会原样画成文字。</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">它不需要每帧更新</p>
+<p><code>InstText</code> 把自己注册进图层，由 <code>Layers</code> 直接绘制，<strong>不走 <code>Typers.Update</code></strong>，
+所以 <code>love.update</code> 里不用管它——改完内容它自己会重画。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">记得自己销毁</p>
+<p><code>Layers.clear()</code> / <code>Typers.ClearAll()</code> 会把它一起清掉，但<strong>随手 <code>Destroy()</code> 最保险</strong>。
+反复创建却不销毁，缓存里的字符贴图只会一直涨。
+<code>Typers.InstText.ClearCache()</code> 能一刀清空全部字符缓存——但正在画的实例也会被一起释放，慎用。</p>
+</div>
+<hr />
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

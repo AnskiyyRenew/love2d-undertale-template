@@ -1,0 +1,3254 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../110_game_area/index.html">
+      
+      
+        <link rel="next" href="../130_beat/index.html">
+      
+      
+        
+          <link rel="alternate" href="../../../index.html" hreflang="en">
+        
+          <link rel="alternate" href="./index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>游戏逻辑与世界规则 - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              游戏逻辑与世界规则
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门优先
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    入门优先
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    环境配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发之前
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua 速通
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速上手
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    快速上手
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修改游戏信息
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    新建与跳转场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打字机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图层系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    画布与屏幕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    边框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game 区与资源覆盖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        它是怎么被加载的
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        文件的骨架
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lv_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lv_data：成长曲线
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="lv_data：成长曲线">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        升级是怎么结算的
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lv-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        想扩到 LV 30？直接加行就行
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flags：世界的开关
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chests：箱子里有什么
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        加字段时要想的两件事
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么单独有这一层
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    战斗系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗初始化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家与灵魂
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    攻击模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合脚本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗场景与回调
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld 主世界系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld 主世界系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 地图与对象层
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI 与图块集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    角色
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    交互与对话
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    菜单 · 存档 · 箱子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遇敌
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    商店
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy 转化库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学教程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    与LOVE开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    与LOVE开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像绘制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    辅助开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    辅助开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景辅助工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对象调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    变量调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    本地化
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    本地化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目录与语言文件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    查词与替换
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    网络开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    网络开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock 联机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    导出与发布
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    导出与发布
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        它是怎么被加载的
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        文件的骨架
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lv_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lv_data：成长曲线
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="lv_data：成长曲线">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        升级是怎么结算的
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lv-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        想扩到 LV 30？直接加行就行
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flags：世界的开关
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chests：箱子里有什么
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        加字段时要想的两件事
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么单独有这一层
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>游戏逻辑与世界规则</h1>
+
+<p><code>Game/Logics/</code> 是<strong>只有你这一个游戏才有的那部分</strong>：世界一开始长什么样、等级怎么涨、剧情开关叫什么、箱子里装了什么。改这里<strong>不需要动引擎</strong>。</p>
+<p>路径： <code>Game/Logics/init.lua</code> （世界的初始状态与规则表）、 <code>Game/Logics/items.lua</code> （物品表）。</p>
+<blockquote>
+<p>本页讲的是"世界规则"这一层。<br>
+<code>DATA</code> 每个字段在运行时怎么用见 <a href="../../040_overworld/000_init/index.html">Overworld → 初始化与场景骨架</a> ；<br>
+物品表怎么用也在这篇的 <code>ITEMS</code> 一节；<br>
+Game 区的覆盖顺序见 <a href="../110_game_area/index.html">Game 区与资源覆盖</a> 。</p>
+</blockquote>
+<hr />
+<h2 id="_1">它是怎么被加载的<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Scripts/Libraries/Overworld/init.lua</span>
+<span class="nv">DATA</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;Game.Logics&quot;</span><span class="p">)</span>
+<span class="nv">FLAG</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">flags</span>
+<span class="nv">CHEST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">chests</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">这个文件没有引擎兜底</p>
+<p>引擎是<strong>硬 require</strong> <code>Game.Logics</code> 的 —— 不像贴图、波次那样"Game 区没有就回退到 <code>Scripts/</code> "。<br>
+<code>Game/Logics/init.lua</code> 缺失就是整个主世界起不来。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">这张表就是存档</p>
+<p>存档页执行的是 <code>Global.SetSaveVariable("Overworld", DATA)</code> —— <strong>整张 <code>DATA</code> 直接写盘</strong>。<br>
+所以在 Logics 里加一个字段，等于给存档加一个字段。</p>
+</div>
+<p><code>items.lua</code> 是例外，它走 Game 优先： <code>Game.Logics.items</code> → <code>Scripts.Logics.items</code> （当前工程里引擎那份并不存在，实际只有 Game 区这份）。</p>
+<hr />
+<h2 id="_2">文件的骨架<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(...):</span><span class="nf">match</span><span class="p">(</span><span class="s2">&quot;(.-)[^%.]+$&quot;</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">logic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;FUN&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">math.random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">))</span><span class="w">   </span><span class="c1">-- ① 顶层就能设全局变量</span>
+
+<span class="nv">logic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w">            </span><span class="c1">-- ② 世界的默认状态（玩家、位置、背包…）</span>
+<span class="nv">logic</span><span class="p">.</span><span class="py">flags</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w">    </span><span class="c1">-- ③ 剧情开关</span>
+<span class="nv">logic</span><span class="p">.</span><span class="py">chests</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w">    </span><span class="c1">-- ④ 箱子里有什么</span>
+<span class="nv">logic</span><span class="p">.</span><span class="py">lv_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w">    </span><span class="c1">-- ⑤ 世界规则：等级曲线</span>
+
+<span class="c1">-- Global.DeleteSaveVariable(&quot;Overworld&quot;)          -- ⑥ 调试时强制开新档</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetSaveVariable</span><span class="p">(</span><span class="s2">&quot;Overworld&quot;</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">logic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetSaveVariable</span><span class="p">(</span><span class="s2">&quot;Overworld&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">-- ⑦ 存过档就用存档那份</span>
+<span class="kr">end</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="nv">logic</span>
+</code></pre></div>
+<ul>
+<li><strong>①</strong> 顶层可以直接设全局变量。 <code>FUN</code> 就是 UNDERTALE 里那个"有趣度"，每次开新档重新随机。</li>
+<li><strong>⑦</strong> 有存档就整份替换掉默认值 —— 所以<strong>改了 Logics 却没生效</strong>是它造成的，见 <a href="../../040_overworld/000_init/index.html">Overworld → 初始化与场景骨架</a> 里的 <code>DATA</code> 一节。调试时把那句注释掉，或者用 <strong>⑥</strong> 直接删存档。</li>
+</ul>
+<hr />
+<h2 id="lv_data">lv_data：成长曲线<a class="headerlink" href="#lv_data" title="Permanent link">&para;</a></h2>
+<p>这是最典型的一条"世界规律" —— 满级多少、每级多少血、多少经验升一级，全在这一张表里。</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lv</code></td>
+<td>等级</td>
+</tr>
+<tr>
+<td><code>hp</code></td>
+<td>升到这一级时的<strong>最大血量</strong>（直接覆盖 <code>maxhp</code> ）</td>
+</tr>
+<tr>
+<td><code>at</code></td>
+<td>攻击力 → 写进 <code>DATA.player.atk</code></td>
+</tr>
+<tr>
+<td><code>df</code></td>
+<td>防御力 → 写进 <code>DATA.player.def</code></td>
+</tr>
+<tr>
+<td><code>totalExp</code></td>
+<td>升到这一级所需的<strong>累计</strong> EXP（不是"这一级要多少"）</td>
+</tr>
+</tbody>
+</table>
+<details class="example">
+<summary>引擎自带的 20 级表</summary>
+<div class="highlight"><pre><span></span><code><span class="nv">logic</span><span class="p">.</span><span class="py">lv_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w">     </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="w">     </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">70</span><span class="w">     </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">36</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">120</span><span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">44</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">22</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">300</span><span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">500</span><span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w">  </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">52</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">26</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">800</span><span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">56</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1200</span><span class="w">   </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1700</span><span class="w">   </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2500</span><span class="w">   </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">68</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">34</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3500</span><span class="w">   </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">72</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">36</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5000</span><span class="w">   </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">76</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">38</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7000</span><span class="w">   </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10000</span><span class="w">  </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">17</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">84</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">15000</span><span class="w">  </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">88</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">44</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">25000</span><span class="w">  </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">19</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">92</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">46</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50000</span><span class="w">  </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99</span><span class="p">,</span><span class="w">  </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">  </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99999</span><span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</details>
+<h3 id="_3">升级是怎么结算的<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>战斗结束时， <code>Scripts/Scenes/Battle/scene_battle_ow.lua</code> 的 <code>ReturnData()</code> 会把结果写回 <code>DATA</code> ：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">exp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">exp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">Battle</span><span class="p">.</span><span class="py">EXP</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">gold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">gold</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">Battle</span><span class="p">.</span><span class="py">GOLD</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">math.min</span><span class="p">(</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">maxhp</span><span class="p">,</span><span class="w"> </span><span class="nv">Player</span><span class="p">.</span><span class="py">hp</span><span class="p">))</span>
+
+<span class="kr">while</span><span class="w"> </span><span class="p">(</span><span class="nv">DATA</span><span class="p">.</span><span class="py">lv_data</span><span class="p">[</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="ow">and</span>
+<span class="w">       </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">exp</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">lv_data</span><span class="p">[</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">].</span><span class="nv">totalExp</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">old_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">maxhp</span>
+<span class="w">    </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">lv_data</span><span class="p">[</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="p">]</span>
+<span class="w">    </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">maxhp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">row</span><span class="p">.</span><span class="py">hp</span>
+<span class="w">    </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">atk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">row</span><span class="p">.</span><span class="py">at</span>
+<span class="w">    </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">def</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">row</span><span class="p">.</span><span class="py">df</span>
+
+<span class="w">    </span><span class="c1">-- UNDERTALE 的规则：最大血量涨多少，当前血量也跟着涨多少</span>
+<span class="w">    </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.min</span><span class="p">(</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">maxhp</span><span class="p">,</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">hp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">maxhp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">old_max</span><span class="p">))</span>
+<span class="kr">end</span>
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">结算规则小结</p>
+<ul>
+<li>一次战斗可以<strong>连升多级</strong>（是 <code>while</code> 不是 <code>if</code> ）。</li>
+<li><code>maxhp</code> / <code>atk</code> / <code>def</code> 是<strong>按表覆盖</strong>，不是累加；表里写多少就是多少。</li>
+<li>涨的那部分最大血量会<strong>同时加到当前血量</strong>上（升级即回血）。</li>
+<li><code>weapon</code> / <code>armor</code> / <code>gold</code> / <code>exp</code> 不归等级表管。</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>watk</code> / <code>edef</code> 目前只是显示用</p>
+<p><code>player.watk</code> （武器攻击）与 <code>player.edef</code> （防具防御）只出现在 STAT 菜单的显示里，引擎<strong>没有</strong>把它们加到 <code>atk</code> / <code>def</code> 上。<br>
+想让装备真的生效，得自己在结算或伤害计算处加上。</p>
+</div>
+<hr />
+<h3 id="lv-30">想扩到 LV 30？直接加行就行<a class="headerlink" href="#lv-30" title="Permanent link">&para;</a></h3>
+<p>封顶完全由<strong>表长</strong>决定 —— 循环条件是 <code>DATA.lv_data[lv + 1]</code> 存在，所以：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">21</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">106</span><span class="p">,</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">150000</span><span class="w"> </span><span class="p">},</span>
+<span class="p">{</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">22</span><span class="p">,</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">113</span><span class="p">,</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">52</span><span class="p">,</span><span class="w"> </span><span class="nv">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="nv">totalExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">220000</span><span class="w"> </span><span class="p">},</span>
+<span class="c1">-- ... 一直加到 30</span>
+</code></pre></div>
+<p>加完不用改任何引擎代码，菜单、升级结算、经验显示会一起跟着走。</p>
+<div class="admonition warning">
+<p class="admonition-title">满级时打开 STAT 菜单会崩</p>
+<p><code>Overworld.CalcNextEXP()</code> 是这样写的：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">next_total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">lv_data</span><span class="p">[</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">].</span><span class="nv">totalExp</span><span class="w">   </span><span class="c1">-- 没有判空</span>
+</code></pre></div>
+<p>满级时 <code>lv_data[lv + 1]</code> 是 <code>nil</code> ，<strong>直接索引 nil 会报错</strong> —— 表现是升到满级后一打开 STAT 页面就崩。<br>
+两个办法：把等级表<strong>多写一行</strong>（比如满级是 20 就写到 21，让 <code>totalExp</code> 保持一个够大的值），或者自己给 <code>CalcNextEXP</code> 补个判空（返回 0 或 <code>"--"</code> ）。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">经验阈值别写反</p>
+<p><code>totalExp</code> 是<strong>累计</strong>经验，不是"这一级需要多少"。第 20 级的 <code>99999</code> 意思是"总共攒够 99999 EXP 才能到 20 级"，不是"再打 99999"。</p>
+</div>
+<hr />
+<h2 id="flags">flags：世界的开关<a class="headerlink" href="#flags" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nv">logic</span><span class="p">.</span><span class="py">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">test_killed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>引擎会把它挂成全局 <code>FLAG</code> ，直接用即可：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">FLAG</span><span class="p">[</span><span class="s2">&quot;test_killed&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">FLAG</span><span class="p">[</span><span class="s2">&quot;test_killed&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="c1">-- 剧情分支</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>因为整张 <code>DATA</code> 都会进存档， <code>flags</code> 天然就是<strong>会存档的剧情开关</strong>，不需要额外操作。</p>
+<h2 id="chests">chests：箱子里有什么<a class="headerlink" href="#chests" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nv">logic</span><span class="p">.</span><span class="py">chests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">chest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="c1">-- 键名对应箱子的 id</span>
+<span class="w">    </span><span class="nv">chest1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>同样会挂成全局 <code>CHEST</code> 。开箱子时按 id 取这里的列表，取完记得清空，否则能反复开（详见 <a href="../../040_overworld/040_menu/index.html">菜单 · 存档 · 箱子</a> ）。</p>
+<hr />
+<h2 id="_4">加字段时要想的两件事<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">老存档没有新字段</p>
+<p>存档是按<strong>整张表</strong>存的。你给 <code>player</code> 加了 <code>sanity = 100</code> 之后，之前存的档里这个字段是 <code>nil</code> 。<br>
+读的时候要么给默认值（ <code>DATA.player.sanity or 100</code> ），要么开发期直接删存档重开。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>getcell</code> 被引擎强制打开了</p>
+<p><code>player.getcell</code> 在 Logics 里写的是 <code>false</code> ，但 <code>Scripts/Libraries/Overworld/stat.lua</code> 顶层有一句 <code>DATA.player.getcell = true</code> 会把它覆盖掉。<br>
+结果是 CELL（电话）菜单默认就是开着的，改 Logics 不生效。</p>
+</div>
+<hr />
+<h2 id="_5">为什么单独有这一层<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>把"世界规律"收在一个文件里，好处是<strong>调数值不用碰引擎</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>想改什么</th>
+<th>改哪儿</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>满级是 20 还是 30</td>
+<td><code>lv_data</code> 加/删行</td>
+</tr>
+<tr>
+<td>每级多少血、多少攻防</td>
+<td><code>lv_data</code> 的 <code>hp</code> / <code>at</code> / <code>df</code></td>
+</tr>
+<tr>
+<td>升级要多快</td>
+<td><code>lv_data</code> 的 <code>totalExp</code></td>
+</tr>
+<tr>
+<td>开局叫什么、拿什么、在哪出生</td>
+<td><code>player</code> 与 <code>room</code> / <code>marker</code> / <code>position</code></td>
+</tr>
+<tr>
+<td>剧情分支记在哪</td>
+<td><code>flags</code></td>
+</tr>
+<tr>
+<td>箱子里给什么</td>
+<td><code>chests</code></td>
+</tr>
+<tr>
+<td>物品有哪些</td>
+<td>同目录的 <code>items.lua</code></td>
+</tr>
+</tbody>
+</table>
+<p>也就是说，世界观层面的设定（这是个"20 级封顶的世界"还是"30 级的世界"）在 <code>Game/Logics/</code> 里就能定完，引擎完全不用动。</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

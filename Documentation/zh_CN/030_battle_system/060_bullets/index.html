@@ -1,0 +1,3247 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../050_waves/index.html">
+      
+      
+        <link rel="next" href="../070_scene/index.html">
+      
+      
+        
+          <link rel="alternate" href="../../../index.html" hreflang="en">
+        
+          <link rel="alternate" href="./index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>弹幕库 - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#bones" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              弹幕库
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门优先
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    入门优先
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    环境配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发之前
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua 速通
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速上手
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    快速上手
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修改游戏信息
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    新建与跳转场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打字机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图层系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    画布与屏幕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    边框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game 区与资源覆盖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    战斗系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗初始化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家与灵魂
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    攻击模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合脚本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        骨头 Bones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="骨头 Bones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        普通骨头
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3D 骨头
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        骨头墙
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blasters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        追踪炮 Blasters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        追踪炮的资源位置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        收尾
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗场景与回调
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld 主世界系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld 主世界系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 地图与对象层
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI 与图块集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    角色
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    交互与对话
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    菜单 · 存档 · 箱子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遇敌
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    商店
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy 转化库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学教程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    与LOVE开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    与LOVE开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像绘制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    辅助开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    辅助开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景辅助工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对象调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    变量调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    本地化
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    本地化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目录与语言文件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    查词与替换
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    网络开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    网络开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock 联机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    导出与发布
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    导出与发布
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        骨头 Bones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="骨头 Bones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        普通骨头
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3D 骨头
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        骨头墙
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blasters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        追踪炮 Blasters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        追踪炮的资源位置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        收尾
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>弹幕库</h1>
+
+<p>弹幕库就是把原版里那些骨头、墙、追踪炮封装好的现成零件。</p>
+<p>路径： <code>Scripts/Libraries/Attacks/</code> 。<br>
+在波次里用 <code>wave.Import("Attacks.Bones")</code> 之类的方式导入（详见 <a href="../050_waves/index.html">回合脚本</a> ）。</p>
+<p>导入之后<strong>必须每帧手动调用它的 <code>Update</code></strong> ，否则弹幕不会动也不会判定。</p>
+<hr />
+<h2 id="bones">骨头 <code>Bones</code><a class="headerlink" href="#bones" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">bones</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">wave</span><span class="p">.</span><span class="nf">Import</span><span class="p">(</span><span class="s2">&quot;Attacks.Bones&quot;</span><span class="p">)</span>
+<span class="nv">bones</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="_1">普通骨头<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<div class="admonition example">
+<p class="admonition-title">创建方法</p>
+<ul>
+<li><code>bones.New2D(whose, length, position, angle, velocity)</code> 创建一根骨头，返回骨头对象。<ul>
+<li><code>whose</code> 谁的骨头， <code>"sans"</code> 或 <code>"papyrus"</code> ，决定贴图与粗细。写错会打印警告并退回 <code>"sans"</code> 。</li>
+<li><code>length</code> 骨身长度（像素）。</li>
+<li><code>position</code> 中心坐标 <code>{x, y}</code> ，默认 <code>{320, 240}</code> 。</li>
+<li><code>angle</code> 角度（度），默认 <code>0</code> 。</li>
+<li><code>velocity</code> 每帧位移 <code>{x, y}</code> ，默认 <code>{0, 0}</code> 。</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">骨头属性</p>
+<ul>
+<li><code>x</code> / <code>y</code> / <code>rotation</code> / <code>length</code> 位置、角度、长度，可直接改。</li>
+<li><code>velocity</code> 每帧位移。</li>
+<li><code>isBullet</code> 是否参与玩家碰撞，默认 <code>true</code> 。</li>
+<li><code>layer</code> 所在图层，默认 <code>"Bullets"</code> 。</li>
+<li><code>width</code> 骨头粗细， <code>sans</code> 为 <code>10</code> 、 <code>papyrus</code> 为 <code>13</code> 。</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">骨头与像素吸附</p>
+<p>一根骨头是头 / 身 / 尾三张贴图拼出来的组合体，如果逐张去吸整像素，接缝会抖。<br>
+引擎的做法是：<strong>三张部件都设 <code>pixel_snap = false</code></strong> （见 <code>Bones.lua</code> 的 <code>New2D</code> ），然后在 <code>bones.Update</code> 里对三张共享的那个锚点<strong>只取整一次</strong>（ <code>Sprites.SnapEdge(ax + dx, half_x)</code> ，<code>half_x</code> 是旋转感知后的 AABB 半宽），再由这个整数锚点算出三张的坐标。<br>
+所以你<strong>不需要</strong>、也<strong>不应该</strong>手动去改骨头的 <code>pixel_snap</code> ；想整体关掉吸附就设全局 <code>Sprites.pixel_snap = false</code> ，细节见 <a href="../../020_basic/020_sprites/index.html">基础开发 → 精灵 → 像素吸附</a> 。</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">骨头方法</p>
+<ul>
+<li><code>SetLayer(layer)</code> 换图层（骨头由头、身、尾三张贴图拼成，换层要整体换）。</li>
+<li><code>SetPivot(xp, yp)</code> 设置锚点，取值 <code>0 ~ 1</code> 。<ul>
+<li><code>xp</code> 横向， <code>0</code> 与 <code>1</code> 分别是宽度的两边， <code>0.5</code> 居中。</li>
+<li><code>yp</code> 纵向， <code>0</code> 是头端、 <code>1</code> 是尾端， <code>0.5</code> 是整根骨头的中心。</li>
+</ul>
+</li>
+<li><code>SetStencils(stencils)</code> 套遮罩，一般用 <code>bone:SetStencils({mask})</code> 。</li>
+<li><code>ToDown(arena)</code> / <code>ToUp(arena)</code> / <code>ToLeft(arena)</code> / <code>ToRight(arena)</code> 把骨头贴到战斗框的某一条边上（方便做"从边上长出来"）。</li>
+<li><code>SetMode(mode, color)</code> 设置伤害模式与颜色。<ul>
+<li><code>mode</code> 写进贴图的 <code>HurtMode</code> ，取值见 <a href="../030_player/index.html">玩家与灵魂 → 弹幕颜色</a> 。</li>
+<li><code>color</code> 骨头颜色，省略则不变。</li>
+</ul>
+</li>
+<li><code>SetColor(color)</code> 只改颜色，省略时改回 <code>MainColor</code> 。</li>
+<li><code>Destroy()</code> 销毁。这个方法是<strong>幂等</strong>的，重复调用不会出错。</li>
+</ul>
+</div>
+<p><img alt="BA-06" src="../../img/030_battle_system/ba_06_bone_modes.png" /></p>
+<h3 id="3d">3D 骨头<a class="headerlink" href="#3d" title="Permanent link">&para;</a></h3>
+<p>给一组三维顶点，引擎负责投影成二维并把它们连成骨头，适合做旋转的立体框架。</p>
+<div class="admonition example">
+<p class="admonition-title">创建方法</p>
+<ul>
+<li><code>bones.New3D(points, percent, mode)</code> 创建一个 3D 骨架，返回骨架对象。<ul>
+<li><code>points</code> 三维点列表，每个点是 <code>{x, y, z}</code> 。少于三个分量的点会被自动补 <code>0</code> 。</li>
+<li><code>percent</code> 连线长度占整条边的比例，默认 <code>0.5</code> 。</li>
+<li><code>mode</code> 投影方式， <code>"orthographic"</code> （正交，默认）或 <code>"perspective"</code> （透视）。</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">骨架属性</p>
+<ul>
+<li><code>x</code> / <code>y</code> / <code>z</code> 中心点坐标。<strong>直接赋值即可整体平移所有顶点</strong>（内部用元表实现）。</li>
+<li><code>points</code> 原始三维点列表。</li>
+<li><code>bulge</code> 正交模式下的"膨胀"系数， <code>0</code> 为纯正交；大于 <code>0</code> 时越靠近观察者越大。</li>
+<li><code>xscale</code> / <code>yscale</code> 投影后的二维缩放，纯视觉，不影响三维数据。</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">骨架方法</p>
+<ul>
+<li><code>MoveTo(x, y, z)</code> 把中心移动到指定位置。</li>
+<li><code>Move(x, y, z)</code> 按增量平移。</li>
+<li><code>Rotate(axis, angle)</code> 绕中心旋转。<ul>
+<li><code>axis</code> <code>"x"</code> / <code>"y"</code> / <code>"z"</code> 。</li>
+<li><code>angle</code> 角度（度）。</li>
+</ul>
+</li>
+<li><code>Link(whose, point_1, point_2, percent_)</code> 在两个顶点之间连一根 2D 骨头。<ul>
+<li><code>point_1</code> / <code>point_2</code> 顶点在 <code>points</code> 里的<strong>从 1 开始</strong>的序号。</li>
+<li><code>percent_</code> 这一根的长度比例，省略则用创建时的 <code>percent</code> 。</li>
+</ul>
+</li>
+<li><code>Scale(sx, sy)</code> 设置二维缩放。</li>
+<li><code>SetLayer(layer)</code> 换图层（作用于所有连出来的骨头）。</li>
+</ul>
+</div>
+<details class="example">
+<summary>一个旋转的立方体骨架</summary>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">bones</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">wave</span><span class="p">.</span><span class="nf">Import</span><span class="p">(</span><span class="s2">&quot;Attacks.Bones&quot;</span><span class="p">)</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">cube</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">bones</span><span class="p">.</span><span class="nf">New3D</span><span class="p">({</span>
+<span class="w">    </span><span class="p">{</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">,</span><span class="w">  </span><span class="mi">50</span><span class="p">},</span>
+<span class="p">},</span><span class="w"> </span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;perspective&quot;</span><span class="p">)</span>
+
+<span class="nv">cube</span><span class="p">:</span><span class="nf">MoveTo</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">-- 8 个顶点，连 12 条棱</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span>
+<span class="nv">cube</span><span class="p">:</span><span class="nf">Link</span><span class="p">(</span><span class="s2">&quot;sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">wave</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">cube</span><span class="p">:</span><span class="nf">Rotate</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">cube</span><span class="p">:</span><span class="nf">Rotate</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">bones</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+</details>
+<h3 id="_2">骨头墙<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>一整面从边上推过来的骨墙，带预警条闪烁。</p>
+<div class="admonition example">
+<p class="admonition-title">墙方法</p>
+<ul>
+<li><code>bones.Wall(arena, whose, warntime, staytime, length, direction, rotation, interval, animation)</code></li>
+<li><code>bones.WallComplex(arena, whose, warntime, staytime, length, direction, rotation, interval, animation)</code><ul>
+<li><code>arena</code> 参照的战斗框（一般传 <code>Battle.mainarena</code> ）。</li>
+<li><code>whose</code> <code>"Sans"</code> 或 <code>"Papyrus"</code> 。</li>
+<li><code>warntime</code> 预警条闪烁多少帧。</li>
+<li><code>staytime</code> 完全展开后停留多少帧。</li>
+<li><code>length</code> 墙的长度。</li>
+<li><code>direction</code> 从哪一边来： <code>"up"</code> / <code>"down"</code> / <code>"left"</code> / <code>"right"</code> 。</li>
+<li><code>rotation</code> 角度（度）。</li>
+<li><code>interval</code> 骨间距（ <code>WallComplex</code> 专用）。</li>
+<li><code>animation</code> 缓动表，见下。</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">墙对象方法</p>
+<ul>
+<li><code>SetStencils(masks)</code> 给预警条和所有骨头套遮罩。</li>
+<li><code>Destroy()</code> 提前拆掉这面墙。</li>
+</ul>
+</div>
+<p><code>Wall</code> 是一整张长条贴图滑进来； <code>WallComplex</code> 则是每边 20 根骨头分别伸长，两者参数完全一致。</p>
+<p><code>animation</code> 表的写法：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nv">In</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;SineOut&quot;</span><span class="p">,</span><span class="w">   </span><span class="c1">-- 进场缓动名</span>
+<span class="w">    </span><span class="nv">Out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;BackIn&quot;</span><span class="p">,</span><span class="w">    </span><span class="c1">-- 退场缓动名</span>
+<span class="w">    </span><span class="nv">It</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w">          </span><span class="c1">-- 进场用多少帧</span>
+<span class="w">    </span><span class="nv">Ot</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span><span class="w">           </span><span class="c1">-- 退场用多少帧</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">缓动名会被拼成小写</p>
+<p>Tween 内部是按 <code>("" .. In):lower()</code> 去解析的，所以 <code>"SineOut"</code> 实际查的是 <code>sineout</code> 。写 <code>"Sine"</code> + <code>"Out"</code> 两段拼接的形式即可，不要写成 <code>"sineOut"</code> 这种。</p>
+</div>
+<p><img alt="BA-07" src="../../img/030_battle_system/ba_07_bone_wall_warning.png" /></p>
+<hr />
+<h2 id="blasters">追踪炮 <code>Blasters</code><a class="headerlink" href="#blasters" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nv">Blasters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ImportFile</span><span class="p">(</span><span class="s2">&quot;Attacks.Blasters&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">追踪炮要由场景驱动</p>
+<p><code>Blasters</code> 不挂在波次上，<code>Blasters.Update(dt)</code> <strong>必须写在战斗场景的 <code>scene.update</code> 里</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">Battle</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">Blasters</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>只写在波次的 <code>Update</code> 里的话，离开这个回合后追踪炮就停住了。</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">创建方法</p>
+<ul>
+<li><code>Blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_sprites, gb_sounds)</code> 创建一门追踪炮。<ul>
+<li><code>start_pos</code> 出现位置 <code>{x, y}</code> ，默认 <code>{320, -100}</code> 。</li>
+<li><code>final_pos</code> 移动到哪儿（开火位置），默认 <code>{320, 240}</code> 。</li>
+<li><code>angles</code> <code>{初始角度, 最终角度}</code> ，默认 <code>{180, 0}</code> 。</li>
+<li><code>wait_time</code> 移动到位的帧数，默认 <code>40</code> 。</li>
+<li><code>fire_time</code> 开火持续帧数，默认 <code>20</code> 。</li>
+<li><code>gb_sprites</code> 贴图文件夹名（可选）。</li>
+<li><code>gb_sounds</code> 音效文件夹名（可选）。</li>
+</ul>
+</li>
+<li><code>Blasters.NewTween(pos_tween, angles_tween, move_time, fire_time, gb_sprites, gb_sounds)</code> 用补间版本，可以指定缓动曲线。<ul>
+<li><code>pos_tween</code> <code>{起始坐标, 终点坐标, 缓动名}</code> ，默认 <code>{{320, -100}, {320, 240}, "QuartOut"}</code> 。</li>
+<li><code>angles_tween</code> <code>{起始角度, 终点角度, 缓动名}</code> ，默认 <code>{180, 0, "QuartOut"}</code> 。</li>
+<li><code>move_time</code> 移动帧数，默认 <code>30</code> 。</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">追踪炮方法</p>
+<ul>
+<li><code>Beam(angle)</code> 手动发射一道光束（相对炮身角度）。默认会在 <code>wait_time</code> 到达时自动发一发。</li>
+<li><code>Destroy()</code> 提前销毁这门炮和它的所有光束。</li>
+</ul>
+</div>
+<p>引擎会自动播放 <code>snd_intro.wav</code> （出场）与 <code>snd_fire.wav</code> （开火）。</p>
+<p><img alt="BA-08" src="../../img/030_battle_system/ba_08_blaster_fire.png" /></p>
+<hr />
+<h2 id="_3">追踪炮的资源位置<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>贴图与音效分开放，两边都是 <strong>Game 区优先</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>Game 区</th>
+<th>引擎目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>贴图</td>
+<td><code>Game/Resources/Sprites/Blaster/&lt;文件夹&gt;/</code></td>
+<td><code>Resources/Sprites/Blaster/&lt;文件夹&gt;/</code></td>
+</tr>
+<tr>
+<td>音效</td>
+<td><code>Game/Resources/Sounds/Blaster/&lt;文件夹&gt;/</code></td>
+<td><code>Resources/Sounds/Blaster/&lt;文件夹&gt;/</code></td>
+</tr>
+</tbody>
+</table>
+<p>文件夹内的文件名是<strong>固定</strong>的，不能改：</p>
+<ul>
+<li><code>spr_gasterblaster_0.png</code> ~ <code>spr_gasterblaster_5.png</code> —— 出场到开火的 6 帧</li>
+<li><code>beam.png</code> —— 光束</li>
+<li><code>snd_intro.wav</code> —— 出场音</li>
+<li><code>snd_fire.wav</code> —— 开火音</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">找不到会静默退回默认</p>
+<p>指定的文件夹里没有 <code>spr_gasterblaster_0.png</code> 时，引擎会打印一条警告然后退回 <code>Default</code> 文件夹。<br>
+音效那边多一层兼容：子文件夹里找不到时，会先试试老式的平铺布局（ <code>Blaster/snd_intro.wav</code> ），再退回 <code>Default</code> 。</p>
+<div class="highlight"><pre><span></span><code>[Attacks - Blasters] WARNING: blaster sprites &#39;MyBlaster&#39; not found at Blaster/MyBlaster/spr_gasterblaster_0.png, using &#39;Default&#39; instead.
+</code></pre></div>
+</div>
+<hr />
+<h2 id="_4">收尾<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="admonition example">
+<p class="admonition-title">全局清理</p>
+<ul>
+<li><code>bones.Clear()</code> 销毁所有墙与 2D 骨头。</li>
+<li><code>bones.Update(dt)</code> 推进所有骨头、骨架与墙。</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>bones.Clear()</code> 不会自己跑</p>
+<p>全库里 <code>bones.Clear()</code> <strong>只有定义、没有调用者</strong>——引擎不会在回合结束时替你调它。<br>
+平时看不出来，是因为你把骨头塞进了 <code>wave.objects</code> ， <code>EndWave()</code> 会把那个表里的东西逐个销毁（骨头对象自己的 <code>Destroy()</code> 会连带拆掉部件）。<br>
+但如果你<strong>没</strong>把骨头塞进 <code>wave.objects</code> ，或者有长期存活的墙，就需要在合适时机自己 <code>bones.Clear()</code> 。它只清这一份库自己的内部列表，不会碰别的库。</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
