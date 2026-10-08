@@ -1333,4 +1333,187 @@ function se.tools.hexColor(hexcode)
     return { r / 255, g / 255, b / 255 }
 end
 
+-- ---------------------------------------------------------------------------
+-- Resource preloading (DIY)
+-- ---------------------------------------------------------------------------
+-- SE.Preload("Sprites/Test", "Music", "Sounds/ui") loads every file under
+-- those Game folders (recursive) into the matching engine cache, so the first
+-- real use later is instant instead of paying a decode / IO hitch on the hot
+-- path. ONLY the Game tree (Game/Resources/...) is walked: the main
+-- Resources/ copy is deliberately skipped, because it can hold thousands of
+-- files and preloading it would freeze the frame for tens of seconds.
+--
+-- Path shape (leading "Game/Resources/" optional, trailing slash ignored):
+--   "<Type>"               whole tree, e.g. "Music"           -> Game/Resources/Music/**
+--   "<Type>/<Sub>"         one subfolder, e.g. "Sprites/Test" -> Game/Resources/Sprites/Test/**
+--   "<Type>/<Sub>/<Sub2>"  nested paths work too.
+--   Type = Sprites | Sounds | Music | Fonts
+--
+-- SE.PreloadAll() walks the entire Game/Resources/ tree in one call.
+-- Both functions return the number of files handed to a loader.
+
+se.preload = {}
+
+local PRELOAD_GAME_ROOT = "Game/Resources/"
+
+-- extension -> category, used to route a file when its folder does not already
+-- say what it is, and as a tie-breaker when folder and extension disagree.
+local PRELOAD_EXTS = {
+    png = "image", jpg = "image", jpeg = "image", bmp = "image",
+    tga = "image", hdr = "image", dds = "image",
+    wav = "sound", ogg = "sound", mp3 = "sound", flac = "sound",
+    aiff = "sound", it = "sound", xm = "sound", mod = "sound", s3m = "sound",
+    ttf = "font", ttc = "font", otf = "font", fnt = "font",
+}
+
+-- Top-level type name -> kind of resource. "Music" is streamed, "Sounds" is
+-- static; both go through Audio.PreloadFile with a kind flag.
+local PRELOAD_TYPE_KIND = {
+    Sprites = "image",
+    Sounds = "sound",
+    Music = "music",
+    Fonts = "font",
+}
+
+--- Walk a love.filesystem directory recursively and collect every file path.
+--- Order does not matter (each file is independent) and getDirectoryItems
+--- ordering is not guaranteed anyway. Missing / unreadable dirs return empty.
+---@param dir string love-fs directory to walk.
+---@return table files List of full love-fs file paths.
+local function collectPreloadFiles(dir)
+    local files = {}
+    local stack = { dir }
+    while #stack > 0 do
+        local current = table.remove(stack)
+        local ok, items = pcall(function()
+            return SE.filesystem.getDirectoryItems(current)
+        end)
+        if (ok and items) then
+            for _, name in ipairs(items) do
+                local sep = (current:sub(-1) == "/") and "" or "/"
+                local full = current .. sep .. name
+                local info = SE.filesystem.getInfo(full)
+                if (info) then
+                    if (info.type == "directory" or info.type == "symlink") then
+                        table.insert(stack, full)
+                    elseif (info.type == "file") then
+                        table.insert(files, full)
+                    end
+                end
+            end
+        end
+    end
+    return files
+end
+
+--- Route one file to the matching engine cache. The folder kind wins when it
+--- agrees with the extension; when they disagree the extension is trusted (a
+--- .wav sitting inside Sprites/ is still a sound). Files with no known
+--- extension (README, .md, .txt, ...) are silently skipped.
+---@param full_path string Full love-fs file path.
+---@param kind string|nil "image" | "sound" | "music" | "font" hint from the folder.
+local function preloadOneFile(full_path, kind)
+    local ext = full_path:match("%.([%w]+)$")
+    local ext_kind = ext and PRELOAD_EXTS[ext:lower()] or nil
+
+    local resolved = kind or ext_kind
+    if (not resolved and not ext_kind) then return end
+    if (kind and ext_kind and kind ~= ext_kind) then
+        resolved = ext_kind
+    end
+
+    if (resolved == "image") then
+        local Sprites = _G.Sprites
+        if (Sprites and Sprites.PreloadFile) then
+            Sprites.PreloadFile(full_path)
+        end
+    elseif (resolved == "sound") then
+        local Audio = _G.Audio
+        if (Audio and Audio.PreloadFile) then
+            Audio.PreloadFile(full_path, "sound")
+        end
+    elseif (resolved == "music") then
+        local Audio = _G.Audio
+        if (Audio and Audio.PreloadFile) then
+            Audio.PreloadFile(full_path, "music")
+        end
+    elseif (resolved == "font") then
+        local Fonts = _G.Fonts
+        if (Fonts and Fonts.PreloadFile) then
+            Fonts.PreloadFile(full_path)
+        end
+    end
+end
+
+--- Normalise one caller path into a Game directory to walk + its resource kind.
+--- Returns nil for empty paths or unknown top-level type names.
+---@param p string Caller-supplied path, e.g. "Sprites/Test/" or "Music".
+---@return string|nil game_dir
+---@return string|nil kind
+local function resolvePreloadPath(p)
+    if (type(p) ~= "string") then return nil end
+    p = p:gsub("\\", "/")
+    p = p:gsub("^Game/Resources/", "")
+    p = p:gsub("^Game/", "")
+    p = p:gsub("^/+", "")
+    p = p:gsub("/+$", "")
+    if (p == "") then return nil end
+
+    local first = p:match("^([^/]+)")
+    local kind = PRELOAD_TYPE_KIND[first]
+    if (not kind) then
+        print("[SE.Preload] Unknown resource type '" .. tostring(first) ..
+            "'. Expected one of: Sprites, Sounds, Music, Fonts.")
+        return nil
+    end
+
+    return PRELOAD_GAME_ROOT .. p, kind
+end
+
+--- Preload every file under one or more Game resource folders.
+---   SE.Preload("Sprites/Test")        -> Game/Resources/Sprites/Test/**
+---   SE.Preload("Music", "Sounds/ui")  -> both trees
+---   SE.Preload("Sprites/")            -> whole Game sprite tree
+--- Only the Game area is walked; the main Resources/ tree is never touched.
+---@param ... string One or more paths shaped "<Type>[/<Sub>][/]".
+---@return integer total_files Number of files handed to a loader.
+function se.preload.Preload(...)
+    local total = 0
+    local seen = {}
+    for i = 1, select("#", ...) do
+        local p = select(i, ...)
+        local dir, kind = resolvePreloadPath(p)
+        if (dir and not seen[dir]) then
+            seen[dir] = true
+            local files = collectPreloadFiles(dir)
+            for _, f in ipairs(files) do
+                preloadOneFile(f, kind)
+                total = total + 1
+            end
+        end
+    end
+    return total
+end
+
+--- Preload the entire Game/Resources/ tree. Equivalent to passing every
+--- top-level subfolder of it to SE.Preload, but discovered at call time so a
+--- game does not have to name them all.
+---@return integer total_files
+function se.preload.PreloadAll()
+    local files = collectPreloadFiles(PRELOAD_GAME_ROOT)
+    for _, f in ipairs(files) do
+        preloadOneFile(f, nil)
+    end
+    return #files
+end
+
+-- Top-level convenience aliases so callers can write SE.Preload(...) /
+-- SE.PreloadAll() the same way they already write SE.tools.hexColor(...).
+se.Preload = function(...)
+    return se.preload.Preload(...)
+end
+se.PreloadAll = function()
+    return se.preload.PreloadAll()
+end
+
 return se

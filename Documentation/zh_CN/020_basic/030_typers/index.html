@@ -16,7 +16,7 @@
       
       
         
-          <link rel="alternate" href="../../../index.html" hreflang="en">
+          <link rel="alternate" href="../../../020_basic/030_typers/index.html" hreflang="en">
         
           <link rel="alternate" href="./index.html" hreflang="zh_CN">
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>打字机 - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ 打字机 - SoulEngine Documentation (3.0.0)</title>
       
     
     
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              打字机
+              ❕️ 打字机
             
           </span>
         </div>
@@ -163,7 +163,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../index.html" hreflang="en" class="md-select__link">
+            <a href="../../../020_basic/030_typers/index.html" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -649,6 +649,8 @@
       
         
       
+        
+      
     
     
     
@@ -803,7 +805,7 @@
   <span class="md-ellipsis">
     
   
-    打字机
+    ❕️ 打字机
   
 
     
@@ -821,7 +823,7 @@
   <span class="md-ellipsis">
     
   
-    打字机
+    ❕️ 打字机
   
 
     
@@ -1237,6 +1239,34 @@
     
   
     输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../160_gui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI 库
   
 
     
@@ -2244,6 +2274,8 @@
       
         
       
+        
+      
     
     
     
@@ -2392,6 +2424,34 @@
     
   
     引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/040_preload/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 资源预加载
   
 
     
@@ -2866,7 +2926,7 @@
 
 
 
-  <h1>打字机</h1>
+  <h1>❕️ 打字机</h1>
 
 <p>打字机位置： <code>Scripts/Libraries/Typers/</code> 文件夹。</p>
 <p>打字机一共分为四种： <code>InstText</code> 只负责把整段文字直接画出来，剩下三种 <code>EText</code> / <code>NText</code> / <code>SText</code> 都可以正常逐个打字。</p>
@@ -2938,11 +2998,29 @@
 </li>
 <li><code>[showbubble:dir, pos]</code> 显示气泡对话框。 <code>dir</code> 是尾巴朝向，可取 <code>left</code> / <code>right</code> / <code>up</code> / <code>down</code> （默认 <code>left</code> ）； <code>pos</code> 是尾巴沿着边框的位置 <code>0 ~ 1</code> ，默认 <code>0.5</code> 。</li>
 <li><code>[hidebubble]</code> 隐藏气泡对话框。</li>
-<li><code>[func:name]</code> 调用名为 <code>name</code> 的 <strong>全局函数</strong> ，如果函数面前拥有 <code>local</code> 无法调用。</li>
-<li><code>[func:name|a, b, c]</code> 调用名为 <code>name</code> 的全局函数，并可以进行传参操作，使用英文逗号进行分割。</li>
+<li><code>[func:name]</code> 调用名为 <code>name</code> 的函数。<strong>查表顺序</strong>：先查本打字机的 <code>funcs</code> 注册表（用 <code>typer:SetFunc</code> 注册过），未命中再回退到 <code>_G[name]</code> 全局。所以 local / 闭包 / upvalue 函数，只要先用 <code>:SetFunc</code> 注册过，也能从文本里调到，不必再挂到全局污染命名空间。</li>
+<li><code>[func:name|a, b, c]</code> 调用名为 <code>name</code> 的函数，并可以进行传参操作，使用英文逗号进行分割。查表顺序同上。<ul>
+<li>数字字符串会自动 <code>tonumber</code> 转成数字；其他参数按字符串原样传入。</li>
+<li>函数执行报错会被 <code>pcall</code> 包住，只打印 <code>[EText] func callback error: ...</code> 不会中断打字。</li>
+<li>找不到时打印 <code>[EText] function not found in typer.funcs or _G: &lt;name&gt;</code> 并跳过。</li>
+</ul>
+</li>
 <li><code>^</code> 可以使用此符号直接将所有样式重置到默认值。</li>
 </ul>
 </details>
+<div class="admonition example">
+<p class="admonition-title">实例方法</p>
+<ul>
+<li><code>typer:SetFunc(name, fn)</code> 注册函数 <code>fn</code> 到本打字机的 <code>funcs</code> 表里，让 <code>[func:name]</code> 能调到 local / 闭包 / upvalue。<ul>
+<li><code>name</code> 字符串名（与文本里 <code>[func:name]</code> 对应）；空串或非字符串直接返回。</li>
+<li><code>fn</code> 是 <code>function</code> 时注册；传 <code>nil</code> 时<strong>清掉</strong>该名字的条目。</li>
+<li>返回 typer 自身，支持链式： <code>t:SetFunc("shake", shake):SetFunc("heal", heal)</code>。</li>
+<li><strong>注册时机</strong>：必须在文本扫到 <code>[func:]</code> 标签<strong>之前</strong>完成——通常建完 typer 立即注册即可。</li>
+<li>旧的全局函数写法仍兼容（<code>_G[name]</code> 兜底），既有文本不用改。</li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">标签可以连着写</p>
 <p><code>[font:x][colorHEX:ffff00][effect:shake, 2]</code> 这样连着排是没问题的，效果依次叠加。</p>

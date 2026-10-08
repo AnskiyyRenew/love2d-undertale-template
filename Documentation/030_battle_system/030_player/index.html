@@ -1,0 +1,3395 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../020_arena/index.html">
+      
+      
+        <link rel="next" href="../040_attack/index.html">
+      
+      
+        
+          <link rel="alternate" href="./index.html" hreflang="en">
+        
+          <link rel="alternate" href="../../zh_CN/030_battle_system/030_player/index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Player and Soul - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#player" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Player and Soul
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh_CN/030_battle_system/030_player/index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before You Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Before You Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua Crash Course
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modifying Game Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating and Switching Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basic Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Typers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canvas & Screen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mask
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Border
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tween
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Area and Asset Override
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Logic and World Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input and Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/160_gui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle System
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Battle System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player and Soul
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player and Soul
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#player" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Player
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#soul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soul
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Soul">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#soul-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soul Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-four-built-in-souls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Four Built-in Souls
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Four Built-in Souls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#red-red" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red red
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orange-orange" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Orange orange
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blue-blue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blue blue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yellow-yellow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yellow yellow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#one-way-platforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One-Way Platforms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#damage-collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Damage Collision
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Turn Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bullet Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Scene and Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization and Scene Skeleton
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 Maps and Object Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI and Tilesets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Character
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interaction and Dialogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Menu · Save · Chest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encounter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intermediate Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Intermediate Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy Conversion Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collision Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Math Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with LÖVE
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with LÖVE
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Graphics Drawing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Tools
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variable Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine Hotkeys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/040_preload/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Localization
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Localization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directories and Language Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lookup and Substitution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Networking
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Export & Release
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Export & Release
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#player" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Player
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#soul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soul
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Soul">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#soul-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soul Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-four-built-in-souls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Four Built-in Souls
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Four Built-in Souls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#red-red" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red red
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orange-orange" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Orange orange
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blue-blue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blue blue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yellow-yellow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yellow yellow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#one-way-platforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One-Way Platforms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#damage-collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Damage Collision
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Player and Soul</h1>
+
+<p>This page covers two things: the <strong>Player itself</strong> (HP, taking damage, KR), and the <strong>Soul</strong> (which decides how the player moves).</p>
+<p>Path: <code>Scripts/Libraries/Battle/Player/</code>.<br>
+It appears in the battle scene as the global variable <code>Player</code>.</p>
+<hr />
+<h2 id="player">Player<a class="headerlink" href="#player" title="Permanent link">&para;</a></h2>
+<p><code>Player</code> holds the player's battle data and also owns the Soul's sprite.</p>
+<div class="admonition example">
+<p class="admonition-title">Player Properties</p>
+<ul>
+<li><code>name</code> The player's name.</li>
+<li><code>lv</code> Level.</li>
+<li><code>maxhp</code> / <code>hp</code> Maximum HP / current HP.</li>
+<li><code>kr</code> The current <code>KR</code> (karma, i.e. the purple damage that keeps draining HP over time) value.</li>
+<li><code>canMove</code> Whether the player can control the Soul right now.</li>
+<li><code>sprite</code> The Soul's sprite object.</li>
+<li><code>action</code> <strong>The Soul module itself</strong> (see the next section).</li>
+<li><code>soul</code> The current Soul's name, e.g. <code>"red"</code>, <code>"blue"</code>.</li>
+<li><code>souls</code> The list of extra Souls created via <code>NewSoul</code>.</li>
+<li><code>platforms</code> The one-way platform list (built by <code>Player.BluePlatform</code>). <strong>Any Soul can use it</strong> — see "One-Way Platforms" at the end of this page.</li>
+<li><code>platform_ground</code> Whether the player is currently standing on a one-way platform.</li>
+<li><code>hurt_time</code> Remaining time of the invincibility frames after taking damage.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Player Methods</p>
+<ul>
+<li><code>Player.SetSoul(id, args, use_sound)</code> Switch Soul.<ul>
+<li><code>id</code> The Soul's name, or numeric shortcut: <code>1</code> = <code>"red"</code>, <code>2</code> = <code>"orange"</code>, <code>6</code> = <code>"blue"</code>.</li>
+<li><code>args</code> Extra parameters passed to the Soul's <code>Init</code>.</li>
+<li><code>use_sound</code> When <code>true</code>, plays <code>snd_ding.wav</code>.</li>
+</ul>
+</li>
+<li><code>Player.NewSoul(id, args, use_sound)</code> Create an extra <strong>independent</strong> Soul (its own sprite, its own state), commonly used for effects like twin Souls.<ul>
+<li><code>args</code> Also passed to <code>Init</code>.</li>
+</ul>
+</li>
+<li><code>Player.SetHitBox(width, height, soul)</code> Set the Soul's collision box, default <code>{4, 4}</code>.<ul>
+<li><code>soul</code> When omitted, changes the main Soul; when a Soul table is passed, changes that one.</li>
+<li>Passing <code>0</code> or a negative number is silently changed to <code>1</code>; to "disable collision" you must skip the collision loop yourself.</li>
+</ul>
+</li>
+<li><code>Player.SetPerfectPixel(enabled)</code> Switch the main Soul and every extra Soul in <code>Player.souls</code> to <strong>perfect-pixel collision</strong> (judged by the sprite's actual pixels rather than the <code>_hitbox</code> rectangle), returns <code>(available, rectangle count)</code>.<ul>
+<li>For a <code>16×16</code> heart, enabling it makes the hit area <strong>larger than the default <code>4×4</code></strong> — a feel tradeoff; choose between this and <code>SetHitBox</code>.</li>
+</ul>
+</li>
+<li><code>Player.Heal(amount, use_sound)</code> Heal; won't exceed <code>maxhp</code>.</li>
+<li><code>Player.Hurt(amount, time, use_sound)</code> Deduct HP.<ul>
+<li><code>amount</code> How much to deduct (a negative value heals).</li>
+<li><code>time</code> Invincibility-frame duration, default <code>60</code>; during this time the Soul flickers and no longer collides.</li>
+</ul>
+</li>
+<li><code>Player.AddKR(kramount)</code> Increase <code>KR</code>. Only takes effect when <code>KR</code> is enabled, and won't directly drop HP below <code>0</code>.</li>
+<li><code>Player.AddParticle()</code> Generate a Soul afterimage at the current position.</li>
+<li><code>Player.Update(dt)</code> Called by the engine every frame; normally you don't need to call it manually.</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">HP Reaching Zero Switches Scene Directly</p>
+<p>Inside <code>Player.Update</code> it is hardcoded: when <code>hp + kr &lt;= 0</code>, it immediately <code>Scenes.switchTo("scene_gameover")</code>.<br>
+To make a "locked-HP, can't-die" story battle, manage <code>hp</code> yourself, or clamp the damage inside the <code>OnHit</code> callback.</p>
+</div>
+<p><img alt="BA-03" src="../../img/030_battle_system/ba_03_souls.png" /></p>
+<hr />
+<h2 id="soul">Soul<a class="headerlink" href="#soul" title="Permanent link">&para;</a></h2>
+<p><strong>A Soul is simply a Lua module</strong> that must contain at least one <code>Update(dt)</code>.</p>
+<p>Soul path: <code>Game/Souls/</code> (Game area, priority), <code>Scripts/Libraries/Battle/Player/Souls/</code> (engine default, fallback).</p>
+<div class="admonition danger">
+<p class="admonition-title"><code>Player.action</code> IS the Soul Module Itself</p>
+<p><code>SetSoul</code> does <strong>not</strong> copy the Soul module; it directly mounts the module table onto <code>Player.action</code>.<br>
+This means all <code>self.xxx</code> written inside the Soul stay in the module table. The engine <strong>re-executes the file</strong> every time it loads a Soul, precisely to avoid the previous battle's state leaking into the next — <strong>so do not cache things in the Soul that "should only be initialized once"; write every <code>Update</code> as if it's a fresh game</strong>.</p>
+</div>
+<h3 id="soul-template">Soul Template<a class="headerlink" href="#soul-template" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">sprite</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">can_move</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">is_moving</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="c1">-- use_platforms = true,   -- optional: caught by Player.BluePlatform&#39;s one-way platforms</span>
+<span class="p">}</span>
+
+<span class="c1">-- Default vars.</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">speed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="c1">-- Called once each time we switch to this Soul: bind sprite, color, reset state.</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">action</span><span class="p">.</span><span class="nf">Init</span><span class="p">(</span><span class="nv">sprite</span><span class="p">,</span><span class="w"> </span><span class="nv">can_move</span><span class="p">,</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">action</span><span class="p">.</span><span class="py">sprite</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">sprite</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">can_move</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">action</span><span class="p">.</span><span class="py">can_move</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">can_move</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">sprite</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">sprite</span><span class="p">.</span><span class="py">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span><span class="w">   </span><span class="c1">-- delete this line if you don&#39;t want to color it</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nv">speed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w">                       </span><span class="c1">-- your own counter / switch is also reset here</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">action</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">action</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">action</span><span class="p">.</span><span class="py">sprite</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="c1">-- TODO: your movement logic</span>
+<span class="kr">end</span>
+
+<span class="kr">return</span><span class="w"> </span><span class="nv">action</span>
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">Soul Available Fields</p>
+<ul>
+<li><code>sprite</code> The player sprite handed to the Soul by the engine inside <code>Init</code>.</li>
+<li><code>can_move</code> Copied in by the engine from <code>Player.canMove</code> at the moment of switching Souls; when <code>false</code> it should not move. Note it is not written back every frame — changing <code>Player.canMove</code> at runtime is the engine clamping movement inside <code>Player.Update</code> itself; you don't need to sync this field.</li>
+<li><code>is_moving</code> Maintained by yourself, used to decide whether to play a movement animation.</li>
+<li><code>use_platforms</code> <strong>Optional field, omitted by default</strong>. Only when written as <code>true</code> will it be caught by <code>Player.BluePlatform</code>'s one-way platforms; if not written, it passes straight through. See "One-Way Platforms" at the end of this page.</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Initialization Is Written Inside the Soul (the Engine No Longer Does It for You)</p>
+<p><code>SetSoul</code> only does three things: resolve the name, call <code>Init(sprite, can_move, args)</code>, and record the name into <code>Player.soul</code>.<br>
+What color the sprite gets, what the starting speed is, which direction it faces — all decided by the Soul itself inside <code>Init</code>. To change these <strong>only edit the Soul file</strong>; don't touch the engine.<br>
+Old Souls without <code>Init</code> still run fine: the engine will stuff <code>sprite</code> / <code>can_move</code> in itself and remind you once in the console.</p>
+</div>
+<p>When writing your own Soul, read input uniformly with <code>Controller.GetState("left")</code> and the like, not <code>Keyboard</code> — only gamepads respond.</p>
+<hr />
+<h2 id="the-four-built-in-souls">The Four Built-in Souls<a class="headerlink" href="#the-four-built-in-souls" title="Permanent link">&para;</a></h2>
+<p>These four Souls all color their own sprite inside their <code>Init</code> (red <code>{1, 0, 0}</code>, orange <code>{1, 0.5, 0}</code>, blue <code>{0, 0, 1}</code>, yellow <code>{1, 1, 0}</code>); to change the color, edit the Soul file.</p>
+<h3 id="red-red">Red <code>red</code><a class="headerlink" href="#red-red" title="Permanent link">&para;</a></h3>
+<p>The most ordinary eight-directional free movement. Holding <code>cancel</code> halves the speed (the original's "slow walk").</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="nf">SetSoul</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">   </span><span class="c1">-- or &quot;red&quot;</span>
+</code></pre></div>
+<h3 id="orange-orange">Orange <code>orange</code><a class="headerlink" href="#orange-orange" title="Permanent link">&para;</a></h3>
+<p>Also eight-directional movement, but can <strong>only move along the eight directions</strong> (diagonals are also strictly 45°), and leaves a trail of afterimages behind while moving.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="nf">SetSoul</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">   </span><span class="c1">-- or &quot;orange&quot;</span>
+</code></pre></div>
+<h3 id="blue-blue">Blue <code>blue</code><a class="headerlink" href="#blue-blue" title="Permanent link">&para;</a></h3>
+<p>A Soul with gravity; falls downward and can jump. Among the engine's built-in Souls, <strong>only it</strong> writes <code>use_platforms = true</code>, so only it can stand on one-way platforms by default — other Souls can too if they add this field.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="nf">SetSoul</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w">   </span><span class="c1">-- or &quot;blue&quot;</span>
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">Blue Soul Methods</p>
+<p>These methods hang on the Soul module, and <code>Player.action</code> <strong>is</strong> the Soul module itself, so call them all with a <strong>dot</strong>, without passing <code>self</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="py">action</span><span class="p">.</span><span class="nf">SlamAuto</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div>
+<p>Writing <code>Player.action:SlamAuto(...)</code> would error on the spot.</p>
+<ul>
+<li><code>Angle(angle)</code> Only rotates the sprite, <strong>does not change</strong> the gravity direction.</li>
+<li><code>AngleDir(direction, angle)</code> Sets both the gravity direction and the sprite angle.</li>
+<li><code>AngleAuto(angle)</code> Sets the sprite angle; the gravity direction is auto-derived from the angle (<code>0</code> = down, <code>90</code> = left, <code>180</code> = up, <code>270</code> = right).</li>
+<li><code>Slam(angle, hp, inv)</code> Slam toward the current gravity direction. On landing, calls <code>Player.Hurt</code> with <code>hp</code> / <code>inv</code>.</li>
+<li><code>SlamDir(direction, angle, hp, inv)</code> Specify the gravity direction then slam.</li>
+<li><code>SlamAuto(angle, hp, inv)</code> Derive the gravity direction from the angle then slam.</li>
+<li><code>GetDirection()</code> Returns the current gravity direction.</li>
+<li><code>SetDirection(direction)</code> Only changes the gravity direction, leaves the sprite angle alone.</li>
+<li><code>GetSpeed()</code> Returns the current vertical speed (positive = falling).</li>
+<li><code>SetSpeed(value)</code> Directly change the vertical speed.</li>
+<li><code>SetCanJump(value)</code> Lock / unlock jumping.</li>
+<li><code>SetJumping(value)</code> Force enter / exit the "jumping" state.</li>
+<li><code>Land()</code> Land: zero the speed and restore jumping ability.</li>
+<li><code>Reset()</code> Restore all state to default.</li>
+<li><code>Init(sprite, can_move, args)</code> Called by the engine when switching to this Soul: colors blue, rotates sprite back to <code>0</code>, then <code>Reset()</code>.</li>
+<li><code>Update(dt)</code> Called by the engine every frame.</li>
+</ul>
+</div>
+<p>The <code>hp</code> / <code>inv</code> of the three <code>Slam</code> functions are for "self-damage from slamming": fill them in if you want a "slamming costs you" mechanic; if not, fill <code>0</code> or omit.</p>
+<h3 id="yellow-yellow">Yellow <code>yellow</code><a class="headerlink" href="#yellow-yellow" title="Permanent link">&para;</a></h3>
+<p>Also eight-directional movement, but pressing <code>confirm</code> fires a <strong>heart-shaped bullet</strong>. The bullet has a bit of gravity, grows as it flies, and disappears off-screen or when it hits another bullet; to catch your own bullet, just add a <code>HitCall</code> function to the target bullet.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="nf">SetSoul</span><span class="p">(</span><span class="s2">&quot;yellow&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- no numeric shortcut, must write the name</span>
+</code></pre></div>
+<ul>
+<li>Firing cooldown is 5 frames; sound is <code>snd_shoot.wav</code>.</li>
+<li>Bullet image is <code>Soul Library Sprites/spr_heartbullet_1.png</code>.</li>
+<li>Holding <code>cancel</code> also halves the movement speed.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">The Charge Performance Is Hooked Up, but the Big Bullet Itself Isn't Yet</p>
+<p>Holding <code>confirm</code> starts charging (total duration <code>60</code> frames), with two staged performances:</p>
+<ol>
+<li>At 1/3 charged, four small dots spiral inward from the surroundings onto the Soul;</li>
+<li>When fully charged, a <strong>semi-transparent, pulsing yellow shadow</strong> overlays the Soul (the "charge complete" marker, which follows the Soul every frame).</li>
+</ol>
+<p>Any <strong>release</strong> clears the charge to zero, and the two effect layers fade out on their own — so releasing midway leaves no residue.</p>
+<p>But <strong>releasing won't actually fire a big bullet</strong>: that bullet pattern isn't written yet. So this part is currently just a "visible" performance.</p>
+<p>To actively clear the residual charge effects on screen (e.g. on wave switch), call:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="py">action</span><span class="p">.</span><span class="nf">ClearBigshot</span><span class="p">()</span>
+</code></pre></div>
+<p>It only clears the effects, not the charge counter. It's already auto-cleared once in <code>Init</code> when switching Souls.</p>
+</div>
+<hr />
+<h2 id="one-way-platforms">One-Way Platforms<a class="headerlink" href="#one-way-platforms" title="Permanent link">&para;</a></h2>
+<p>A set of platforms that <strong>only catch the player from above</strong>: the player can jump up through them from below, and won't get mysteriously sucked up when standing beneath them.</p>
+<p>The platform itself is <strong>Soul-independent</strong>; the <code>Player.BluePlatform</code> function name is a historical leftover (it was originally written only for the blue Soul).</p>
+<div class="admonition example">
+<p class="admonition-title">Platform Methods</p>
+<ul>
+<li><code>Player.BluePlatform(x, y, width, args)</code> Create a platform, returns the platform object.<ul>
+<li><code>x</code> / <code>y</code> Center coordinates, default <code>320, 320</code>.</li>
+<li><code>width</code> Width (pixels), default <code>50</code>.</li>
+<li><code>args</code> Optional settings table:<ul>
+<li><code>mode</code> <code>"none"</code> (static) or <code>"move"</code> (auto-moving), default <code>"none"</code>.</li>
+<li><code>speed</code> <code>{x = n, y = n}</code>, the per-frame displacement when <code>mode</code> is <code>"move"</code>.</li>
+<li><code>rotation</code> Platform angle, default <code>0</code>.</li>
+<li><code>color</code> Platform color, default <code>{1, 0.3, 1}</code>.</li>
+<li><code>layer</code> The layer it sits on, default <code>"BelowBullets"</code>.</li>
+<li><code>active</code> Whether it participates in collision, default <code>true</code>.</li>
+<li><code>surface_offset</code> Extra offset of the collision surface relative to the top edge, default <code>0</code>.</li>
+<li><code>surface_tolerance</code> Half-thickness of the collision band, default <code>2</code>.</li>
+<li><code>line_color</code> / <code>line_alpha</code> The color and alpha of the top highlight line.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>Player.ClearPlatforms()</code> Destroy all platforms.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Platform Object Methods</p>
+<ul>
+<li><code>MoveTo(x, y)</code> Move the platform (the highlight line auto-follows).</li>
+<li><code>SetRotation(angle)</code> Set the angle.</li>
+<li><code>SetWidth(w)</code> Set the width.</li>
+<li><code>Sync()</code> Manually sync the highlight line; normally not needed.</li>
+<li><code>Destroy()</code> / <code>Delete()</code> Destroy this platform.</li>
+</ul>
+</div>
+<details class="example">
+<summary>A Platform That Moves Left and Right</summary>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Player</span><span class="p">.</span><span class="nf">BluePlatform</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">350</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">mode</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;move&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">speed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<span class="w">    </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">}</span>
+<span class="p">})</span>
+
+<span class="c1">-- You can also push it yourself in the wave&#39;s Update</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">wave</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">p</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">320</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">40</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nb">math.rad</span><span class="p">(</span><span class="nv">Battle</span><span class="p">.</span><span class="py">TIME_F</span><span class="p">))</span>
+<span class="kr">end</span>
+</code></pre></div>
+</details>
+<div class="admonition tip">
+<p class="admonition-title">To Be Caught, the Soul Must Write a <code>use_platforms</code> Line Itself</p>
+<p>Platforms are <strong>opt-in</strong>: only a Soul table that writes <code>use_platforms = true</code> gets caught; <strong>without it, it passes straight through</strong>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">sprite</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">can_move</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">use_platforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">   </span><span class="c1">-- &lt;- add this line, and Player.BluePlatform will catch it</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>Among the engine's built-in Souls, currently <strong>only blue</strong> has this field — so the default behavior is the same as before: switch to red/orange/yellow and you fall through the platform.</li>
+<li>The field only falls back to the old check (<code>Player.soul == "blue"</code>) <strong>when missing</strong>, so your own <code>Game/Souls/blue.lua</code> without the field still walks the platform fine; no need to change it.</li>
+<li>The collision itself (<code>Player.BluePlatformCollide(sprite, vertical speed)</code>) only looks at the sprite and vertical speed, <strong>Soul-independent</strong>.<br>
+  Souls created via <code>Player.NewSoul</code> are not auto-collided by the engine; if you want its own <code>Update</code> to stand on a platform, call once yourself:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="nf">BluePlatformCollide</span><span class="p">(</span><span class="nv">soul</span><span class="p">.</span><span class="py">sprite</span><span class="p">,</span><span class="w"> </span><span class="nv">soul</span><span class="p">.</span><span class="nf">GetSpeed</span><span class="p">())</span>
+</code></pre></div>
+</div>
+<hr />
+<h2 id="damage-collision">Damage Collision<a class="headerlink" href="#damage-collision" title="Permanent link">&para;</a></h2>
+<p>Collision is not computed by the Soul itself, but uniformly by <code>Player.Update</code>:</p>
+<ol>
+<li>During invincibility frames (<code>hurt_time &gt; 0</code>), skip all collision directly.</li>
+<li>Otherwise, iterate over all sprites with <code>isBullet</code>, first use <code>Sprites.GetHitbox</code> to get the Soul's hit box (with <code>_hitbox</code> override), and do a rectangular broad-phase check.</li>
+<li>After a broad-phase hit, use <code>Sprites.PPCollide(bullet, Player.sprite)</code> for a fine check:<ul>
+<li>Returns <code>true</code> / <code>false</code> and that is authoritative (meaning either the bullet or the Soul has <strong>perfect pixel enabled on either side</strong>);</li>
+<li>Returns <code>nil</code> meaning neither side enabled it, falling back to the rectangular conclusion from step 2.</li>
+</ul>
+</li>
+<li>If the final judgment is a hit, call <code>Battle.OnHit(bullet)</code> — <strong>this one you write yourself in the scene</strong>, see <a href="../070_scene/index.html">Battle Scene and Callbacks</a>.</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">To Judge by Real Pixels, Enable Like This</p>
+<p><div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="nf">SetPerfectPixel</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">          </span><span class="c1">-- switch main Soul + all extra Souls at once</span>
+<span class="nv">bullet</span><span class="p">:</span><span class="nf">SetPPCollision</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">           </span><span class="c1">-- or just let certain bullets use pixel collision</span>
+</code></pre></div>
+The per-sprite-level switch is <code>sprite:SetPPCollision(enabled)</code> / <code>sprite:IsPPCollision()</code>; details in <a href="../../020_basic/020_sprites/index.html">Sprites → Perfect Pixel Collision</a>.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Bullet Color</p>
+<p>The <code>HurtMode</code> field on the bullet object decides whether it counts as damage; common values:</p>
+<ul>
+<li><code>"normal"</code> Take damage on contact.</li>
+<li><code>"blue"</code> / <code>"cyan"</code> Take damage <strong>only while moving</strong>; standing still is safe.</li>
+<li><code>"orange"</code> Take damage <strong>only while standing still</strong>; moving is safe.</li>
+<li><code>"safe"</code> Completely harmless.</li>
+</ul>
+<p>How you write this field into the scene's <code>OnHit</code> is up to you; the engine only hangs it on the sprite and passes it along.</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

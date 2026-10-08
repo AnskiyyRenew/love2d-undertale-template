@@ -1,0 +1,3593 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../index.html">
+      
+      
+        <link rel="next" href="../010_discord/index.html">
+      
+      
+        
+          <link rel="alternate" href="./index.html" hreflang="en">
+        
+          <link rel="alternate" href="../../zh_CN/090_network/000_gamejolt/index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>GameJolt API - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#preparation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GameJolt API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh_CN/090_network/000_gamejolt/index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before You Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Before You Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua Crash Course
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modifying Game Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating and Switching Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basic Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Typers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canvas & Screen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mask
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Border
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tween
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Area and Asset Override
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Logic and World Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input and Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/160_gui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle System
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Battle System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player and Soul
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Turn Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bullet Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Scene and Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization and Scene Skeleton
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 Maps and Object Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI and Tilesets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Character
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interaction and Dialogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Menu · Save · Chest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encounter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intermediate Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Intermediate Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy Conversion Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collision Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Math Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with LÖVE
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with LÖVE
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Graphics Drawing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Tools
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variable Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine Hotkeys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/040_preload/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Localization
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Localization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directories and Language Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lookup and Substitution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Networking
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preparation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Preparation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-get-the-app-id-and-private-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Get the App ID and Private Key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-initialize-the-engine-wont-do-it-for-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Initialize (the engine won't do it for you)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-check-whether-it-can-be-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Check whether it can be used
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-signature-is-computed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the signature is computed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How the signature is computed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unified-return-value-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unified return-value convention
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#method-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Method overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trophies-achievements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trophies (achievements)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sessions-playtime-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sessions (playtime / status)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-storage-cloud-save-global-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data storage (cloud save / global data)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#score-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Score tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-login-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A complete login flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfall-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfall summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Export & Release
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Export & Release
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preparation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Preparation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-get-the-app-id-and-private-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Get the App ID and Private Key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-initialize-the-engine-wont-do-it-for-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Initialize (the engine won't do it for you)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-check-whether-it-can-be-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Check whether it can be used
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-signature-is-computed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the signature is computed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How the signature is computed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unified-return-value-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unified return-value convention
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#method-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Method overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trophies-achievements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trophies (achievements)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sessions-playtime-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sessions (playtime / status)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-storage-cloud-save-global-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data storage (cloud save / global data)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#score-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Score tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-login-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A complete login flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfall-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfall summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>GameJolt API</h1>
+
+<p><code>Scripts/Libraries/GamejoltAPI.lua</code> wraps the common endpoints of the <a href="https://gamejolt.com/game-api/doc">GameJolt Game API v1.2</a>: users, trophies, sessions, data storage, and score tables.</p>
+<p>All requests use <strong>HTTPS + MD5 signing</strong> and go through the native module <code>Resources/Libs/https.dll</code>.</p>
+<hr />
+<h2 id="preparation">Preparation<a class="headerlink" href="#preparation" title="Permanent link">&para;</a></h2>
+<h3 id="1-get-the-app-id-and-private-key">1. Get the App ID and Private Key<a class="headerlink" href="#1-get-the-app-id-and-private-key" title="Permanent link">&para;</a></h3>
+<p>After creating your game on GameJolt, go to the game's <strong>Manage → Game API</strong> page, where you'll find two things:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Where to put it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>game_id</code></td>
+<td>The game ID, usually 6–7 digits</td>
+<td><code>GamejoltID</code> in <code>Game/conf_pure.lua</code></td>
+</tr>
+<tr>
+<td><code>private_key</code></td>
+<td>The private key. <strong>Do not</strong> let anyone other than the players see it</td>
+<td><code>GamejoltPK</code> in <code>Game/conf_pure.lua</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Game/conf_pure.lua</span>
+<span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltID&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">123456</span><span class="p">)</span>
+<span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltPK&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;abcdef0123456789abcdef0123456789&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">The two <code>conf_pure.lua</code> files are layered</p>
+<p>The one in the root directory holds the engine defaults, and the one in <code>Game/conf_pure.lua</code> overrides it.
+Put your configuration in <strong><code>Game/conf_pure.lua</code></strong>; see <a href="../../010_quick_start/000_conf/index.html">Configuration file</a>.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">The private key is baked into the game package</p>
+<p>GameJolt's <code>private_key</code> is not "absolutely secret" — it is designed to be distributed with the client (every player's copy contains one).
+But <strong>do not</strong> treat it as access control — anyone who unpacks the game can get it. Real write permission relies on <code>username + user_token</code> validation.</p>
+</div>
+<h3 id="2-initialize-the-engine-wont-do-it-for-you">2. Initialize (the engine won't do it for you)<a class="headerlink" href="#2-initialize-the-engine-wont-do-it-for-you" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltID&quot;</span><span class="p">),</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltPK&quot;</span><span class="p">))</span>
+</code></pre></div>
+<p><code>init</code> only does three things: converts <code>app_id</code> to a number, stores <code>private_key</code>, and builds <code>base_url</code>.</p>
+<details class="quote">
+<summary>Source of <code>init</code></summary>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">app_id</span><span class="p">,</span><span class="w"> </span><span class="nv">private_key</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">tonumber</span><span class="p">(</span><span class="nv">app_id</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">private_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">private_key</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://api.gamejolt.com/api/game/v1_2&quot;</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="p">(</span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">private_key</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+</details>
+<div class="admonition warning">
+<p class="admonition-title">You must init first</p>
+<p><code>base_url</code> is only assigned inside <code>init()</code>. If you call <code>fetchUser()</code> and other methods without initializing,
+URL building will throw an error because it concatenates <code>nil</code> — and it happens <strong>when that line runs</strong>, not at load time.</p>
+</div>
+<h3 id="3-check-whether-it-can-be-used">3. Check whether it can be used<a class="headerlink" href="#3-check-whether-it-can-be-used" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">isAvailable</span><span class="p">()</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">err</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
+</code></pre></div>
+<p>When the <code>https</code> module cannot be obtained, it returns <code>false</code> and an explanation (which includes the current platform name from <code>SE.system.getOS()</code>).</p>
+<hr />
+<h2 id="how-the-signature-is-computed">How the signature is computed<a class="headerlink" href="#how-the-signature-is-computed" title="Permanent link">&para;</a></h2>
+<p>Every request must carry a <code>signature</code> parameter, whose value is:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">md5</span><span class="p">.</span><span class="nf">sumhexa</span><span class="p">(</span><span class="nv">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">request_path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">private_key</span><span class="p">)</span>
+</code></pre></div>
+<p>Here <code>request_path</code> is the <strong>full path + parameters excluding the signature itself</strong>. Each method in the library assembles it itself, so you don't need to worry about it.</p>
+<details class="quote">
+<summary><code>generateSignature</code> and <code>apiRequest</code></summary>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">generateSignature</span><span class="p">(</span><span class="nv">request_path</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">request_path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">private_key</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">md5</span><span class="p">.</span><span class="nf">sumhexa</span><span class="p">(</span><span class="nv">input</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">https</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="nv">https</span><span class="p">.</span><span class="py">request</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;function&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">SE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="p">.</span><span class="py">getOS</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="p">.</span><span class="nf">getOS</span><span class="p">())</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;Unknown&quot;</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">reason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">https_error</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;missing native https module&quot;</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;GameJolt API unavailable on &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">platform</span><span class="p">)..</span><span class="s2">&quot;: &quot;</span><span class="o">..</span><span class="nv">reason</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="c1">-- lua-https (https.dll) API: returns code, body, headers</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">response</span><span class="p">,</span><span class="w"> </span><span class="nv">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">https</span><span class="p">.</span><span class="nf">request</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">code</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTP error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">code</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="p">,</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">json</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">response</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">data</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;JSON decode error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">err</span><span class="p">)..</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Response: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">response</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="p">.</span><span class="py">success</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="p">.</span><span class="py">message</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;API error&quot;</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span>
+<span class="kr">end</span>
+</code></pre></div>
+</details>
+<h3 id="unified-return-value-convention">Unified return-value convention<a class="headerlink" href="#unified-return-value-convention" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Success</td>
+<td><code>data.response</code> (a table), <strong>no second return value</strong></td>
+</tr>
+<tr>
+<td>Failure</td>
+<td><code>false, error message string</code></td>
+</tr>
+</tbody>
+</table>
+<p>So when calling, either check <code>false</code> first, or wrap it yourself like some methods do:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">res</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">fetchUser</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;somebody&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">res</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;failed:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="p">)</span>
+<span class="kr">else</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">users</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">username</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<div class="admonition bug">
+<p class="admonition-title">On success the second return value is also nil — don't treat it as an error code</p>
+<p>For example, <code>fetchUser</code> returns only <code>data.response</code> on success, and the second return value is <code>nil</code>.
+Writing <code>local res, err = ...; if err then ...</code> is safe, but <code>if (not res) then</code> can also misfire when
+some interface returns an empty table — using <code>res == false</code> uniformly is the safest.</p>
+</div>
+<hr />
+<h2 id="method-overview">Method overview<a class="headerlink" href="#method-overview" title="Permanent link">&para;</a></h2>
+<h3 id="general">General<a class="headerlink" href="#general" title="Permanent link">&para;</a></h3>
+<div class="admonition example">
+<p class="admonition-title">General</p>
+<ul>
+<li><code>init(app_id, private_key)</code> sets <code>app_id</code> / <code>private_key</code> / <code>base_url</code> and returns whether both are non-empty.</li>
+<li><code>isAvailable()</code> whether the native <code>https</code> module is ready. On failure the second return value is an explanation with the platform name.</li>
+<li><code>isLoggedIn()</code> whether <code>user_token</code> and <code>username</code> are both set (<strong>does not validate correctness</strong>, see warning below).</li>
+</ul>
+</div>
+<h3 id="users">Users<a class="headerlink" href="#users" title="Permanent link">&para;</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Users</p>
+<ul>
+<li><code>fetchUser(user_id, username)</code> looks up user info; pass either of the two parameters, <strong>login not required</strong>.</li>
+<li><code>authUser(username, user_token)</code> validates the username + token. On success, <code>gamejolt.username</code> / <code>gamejolt.user_token</code> are kept for later interfaces.</li>
+</ul>
+</div>
+<div class="admonition bug">
+<p class="admonition-title"><code>isLoggedIn()</code> is still true after <code>authUser</code> fails</p>
+<p>The source code <strong>stores the username/token first, then sends the request</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">username</span><span class="p">,</span><span class="w"> </span><span class="nv">user_token</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">username</span><span class="w">       </span><span class="c1">-- stored first</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">user_token</span>
+<span class="w">    </span><span class="o">..</span><span class="p">.</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>On network failure / wrong token it returns <code>false, err</code>, but the two fields <strong>have already been written</strong>,
+so <code>isLoggedIn()</code> still returns <code>true</code>, and all subsequent interfaces that need login will request with the wrong token.</p>
+<p>Wrap it yourself:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="kr">end</span>
+</code></pre></div>
+</div>
+<h3 id="trophies-achievements">Trophies (achievements)<a class="headerlink" href="#trophies-achievements" title="Permanent link">&para;</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Trophies</p>
+<ul>
+<li><code>fetchAchievements(achieved_only)</code> pulls the trophy list; pass <code>true</code> to <code>achieved_only</code> to return only unlocked ones, <strong>login required</strong>.</li>
+<li><code>unlockAchievement(trophy_id)</code> unlocks the specified trophy; <code>trophy_id</code> is the numeric ID assigned when the trophy was created in the GameJolt backend, <strong>login required</strong>.</li>
+</ul>
+</div>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">fetchAchievements</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">res</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">res</span><span class="p">.</span><span class="py">achievements</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">achievements</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="nv">a</span><span class="p">.</span><span class="py">id</span><span class="p">,</span><span class="w"> </span><span class="nv">a</span><span class="p">.</span><span class="py">title</span><span class="p">,</span><span class="w"> </span><span class="nv">a</span><span class="p">.</span><span class="py">achieved</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+
+<span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">unlockAchievement</span><span class="p">(</span><span class="mi">1047</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title"><code>trophy_id</code> is not an array index</p>
+<p>The ID shown in the backend when creating a trophy is a global number (e.g. 1047), not "the nth one". Filling it wrong returns an API error.</p>
+</div>
+<h3 id="sessions-playtime-status">Sessions (playtime / status)<a class="headerlink" href="#sessions-playtime-status" title="Permanent link">&para;</a></h3>
+<p>GameJolt uses this to track "who is playing, and for how long".</p>
+<div class="admonition example">
+<p class="admonition-title">Sessions</p>
+<ul>
+<li><code>sessionOpen()</code> opens a session once. In manual mode you just call this line yourself.</li>
+<li><code>sessionUpdate(interval, status)</code> <strong>recommended</strong>. Opens a session once and starts the auto heartbeat. <code>interval</code> is in <strong>seconds</strong> (default 30, minimum 1); <code>status</code> defaults to <code>"active"</code>.</li>
+<li><code>sessionPing(status)</code> pings manually once, and can switch the status (<code>"active"</code> / <code>"idle"</code>).</li>
+<li><code>sessionClose()</code> closes the session and stops the auto heartbeat.</li>
+<li><code>update(dt)</code> the timer for the auto heartbeat. The engine already calls it every frame inside <code>love.update(dt)</code>, so <strong>you don't call it again</strong> (calling it would double the frequency).</li>
+</ul>
+</div>
+<div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">sessionUpdate</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">)</span>
+<span class="c1">-- afterwards, Gamejolt.update(dt) accumulates dt each frame and auto-pings every 30 seconds</span>
+</code></pre></div>
+<p>The auto state is stored in <code>Gamejolt._session_auto</code>; you can read it:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>whether the auto heartbeat is on</td>
+</tr>
+<tr>
+<td><code>interval</code></td>
+<td>interval (seconds)</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>the currently reported status</td>
+</tr>
+<tr>
+<td><code>elapsed</code></td>
+<td>seconds accumulated since the last ping</td>
+</tr>
+<tr>
+<td><code>last_error</code></td>
+<td>the error message from the last ping (set to nil on success)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title"><code>interval</code> is seconds, not milliseconds</p>
+<p><code>state.elapsed = state.elapsed + dt</code>, and <code>dt</code> is in seconds. Writing <code>30000</code> would give a heartbeat every 30000 seconds.</p>
+</div>
+<h3 id="data-storage-cloud-save-global-data">Data storage (cloud save / global data)<a class="headerlink" href="#data-storage-cloud-save-global-data" title="Permanent link">&para;</a></h3>
+<p>A simple key-value store.</p>
+<div class="admonition example">
+<p class="admonition-title">Data storage</p>
+<ul>
+<li><code>dataStore(key, data, user_data)</code> writes.<ul>
+<li>when <code>user_data</code> is <code>true</code>, it is stored under <strong>that user</strong> (requires login); otherwise it is stored under <strong>game global</strong>.</li>
+</ul>
+</li>
+<li><code>dataFetch(key, user_data)</code> reads one key.</li>
+<li><code>dataFetchAll(user_data)</code> reads all keys.</li>
+<li><code>dataDelete(key, user_data)</code> deletes one key.</li>
+<li><code>dataGetKeys(user_data)</code> pulls only the key-name list.</li>
+</ul>
+</div>
+<div class="highlight"><pre><span></span><code><span class="c1">-- The player&#39;s own save (requires authUser first)</span>
+<span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">dataStore</span><span class="p">(</span><span class="s2">&quot;slot1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">json</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">mySave</span><span class="p">),</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">dataFetch</span><span class="p">(</span><span class="s2">&quot;slot1&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">res</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">res</span><span class="p">.</span><span class="py">data</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="nv">mySave</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">json</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">data</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="c1">-- A game-global announcement (no login required)</span>
+<span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">dataStore</span><span class="p">(</span><span class="s2">&quot;motd&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Server maintenance today&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title"><code>key</code> and <code>data</code> are not URL-encoded at all</p>
+<p>The source code concatenates raw strings:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;/data-store/set/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
+<span class="w">            </span><span class="s2">&quot;&amp;key=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&amp;data=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
+<p>If <code>key</code> or <code>data</code> contains <code>&amp;</code>, <code>=</code>, <code>#</code>, spaces, or Chinese characters, the URL will be truncated / misparsed,
+and since <strong>the signature is computed from the assembled string</strong>, the server won't match it and returns a signature error directly.</p>
+<p>Workarounds:</p>
+<ul>
+<li>use only <code>[A-Za-z0-9_-]</code> for the key</li>
+<li><code>json.encode</code> the data first, then apply your <strong>own</strong> percent-encoding (or base64) before sending</li>
+<li>in short, don't put player-entered text in directly</li>
+</ul>
+</div>
+<h3 id="score-tables">Score tables<a class="headerlink" href="#score-tables" title="Permanent link">&para;</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Score tables</p>
+<ul>
+<li><code>fetchScoresLocal(table_id)</code> pulls the top N entries, <strong>no login required</strong>. If <code>table_id</code> is omitted, it takes the game's main table.</li>
+<li><code>fetchScoresGlobal(table_id)</code> requests with <code>username + user_token</code>; the result includes the player's own rank / neighbors, <strong>login required</strong>.</li>
+<li><code>submitScore(score, table_id, sort, extra_data)</code> submits a score. <code>sort</code> is the value used for display; <code>extra_data</code> is extra text (e.g. time used, level).</li>
+</ul>
+</div>
+<div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">submitScore</span><span class="p">(</span><span class="mi">12345</span><span class="p">,</span><span class="w"> </span><span class="mi">535</span><span class="p">,</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;LV19|Genocide&quot;</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">fetchScoresLocal</span><span class="p">(</span><span class="mi">535</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">res</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">res</span><span class="p">.</span><span class="py">scores</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">scores</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">s</span><span class="p">.</span><span class="py">score</span><span class="p">,</span><span class="w"> </span><span class="nv">s</span><span class="p">.</span><span class="py">user</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<div class="admonition bug">
+<p class="admonition-title"><code>submitScore</code> does not carry username/token — it submits a guest score</p>
+<p>When assembling the URL, <code>username</code> / <code>user_token</code> are <strong>not</strong> appended (compare <code>fetchScoresGlobal</code>, which does attach them),
+so even if you have called <code>authUser</code>, the score is submitted as a <strong>guest</strong> and won't be attached to the player's account.</p>
+<p>To submit an authenticated score, write your own credentialed version following the library's approach, or modify this library.</p>
+</div>
+<hr />
+<h2 id="a-complete-login-flow">A complete login flow<a class="headerlink" href="#a-complete-login-flow" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="c1">-- The scene&#39;s load / some one-time initialization point</span>
+<span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltID&quot;</span><span class="p">),</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltPK&quot;</span><span class="p">))</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">username</span><span class="p">,</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">sessionUpdate</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">)</span><span class="w">      </span><span class="c1">-- auto heartbeat afterwards</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">fetchAchievements</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">res</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">res</span><span class="p">.</span><span class="py">achievements</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="c1">-- sync local achievement state</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">true</span>
+<span class="kr">end</span>
+</code></pre></div>
+<hr />
+<h2 id="pitfall-summary">Pitfall summary<a class="headerlink" href="#pitfall-summary" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">All requests are <strong>synchronously blocking</strong></p>
+<p><code>https.request(url)</code> blocks until the server responds. Connecting to GameJolt from within China is usually a few hundred milliseconds to a few seconds,
+and <strong>the whole game is frozen for that frame</strong>.</p>
+<ul>
+<li>Never send a request every frame inside <code>love.update</code></li>
+<li>One-off requests are acceptable (e.g. a brief freeze when submitting a score)</li>
+<li>If you want non-blocking behavior you must set up coroutines / threads yourself; the library provides no async version</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Failures don't throw — they only return <code>false</code></p>
+<p>If you don't check the return value, failures are silently ignored. All calls are recommended to be written as <code>if (res == false) then ...</code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">The <code>success</code> returned by GameJolt is a string</p>
+<p>The library checks <code>data.response.success == "false"</code> — note it is the string <code>"false"</code>, not a boolean.
+This follows the actual return of the GameJolt API, so don't "fix" it.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Unavailable directly on non-Windows platforms</p>
+<p><code>https.dll</code> is a Windows dynamic library. <code>isAvailable()</code> returns <code>false</code>, and all requests return the unified unavailable message.
+When packaging for Android, it's safest to wrap GameJolt-related logic in <code>if Gamejolt.isAvailable() then</code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><code>app_id</code> is converted to a number</p>
+<p><code>gamejolt.app_id = tonumber(app_id)</code>. Passing the string <code>"123456"</code> works, but don't pass a value with spaces or letters.</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3380 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../000_gamejolt/index.html">
+      
+      
+        <link rel="next" href="../020_sock/index.html">
+      
+      
+        
+          <link rel="alternate" href="./index.html" hreflang="en">
+        
+          <link rel="alternate" href="../../zh_CN/090_network/010_discord/index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Discord RPC - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#why-discord-rpc-instead-of-the-game-sdk" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Discord RPC
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh_CN/090_network/010_discord/index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before You Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Before You Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua Crash Course
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modifying Game Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating and Switching Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basic Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Typers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canvas & Screen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mask
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Border
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tween
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Area and Asset Override
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Logic and World Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input and Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/160_gui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle System
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Battle System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player and Soul
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Turn Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bullet Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Scene and Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization and Scene Skeleton
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 Maps and Object Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI and Tilesets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Character
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interaction and Dialogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Menu · Save · Chest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encounter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intermediate Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Intermediate Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy Conversion Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collision Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Math Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with LÖVE
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with LÖVE
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Graphics Drawing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Tools
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variable Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine Hotkeys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/040_preload/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Localization
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Localization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directories and Language Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lookup and Substitution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Networking
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-discord-rpc-instead-of-the-game-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why discord-rpc instead of the Game SDK
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencies-and-availability-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies and availability conditions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-engine-already-wires-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The engine already wires it up
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-can-go-in-the-activity-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What can go in the activity table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#three-practical-usages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three practical usages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfall-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfall summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Export & Release
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Export & Release
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-discord-rpc-instead-of-the-game-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why discord-rpc instead of the Game SDK
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencies-and-availability-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies and availability conditions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-engine-already-wires-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The engine already wires it up
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-can-go-in-the-activity-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What can go in the activity table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#three-practical-usages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three practical usages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfall-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfall summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Discord RPC</h1>
+
+<p><code>Scripts/Libraries/DiscordRPC.lua</code> makes the Player's Discord profile show "Playing XX" — that is <strong>Rich Presence</strong>:</p>
+<div class="highlight"><pre><span></span><code>SoulEngine
+Fighting Sans
+Route: Genocide
+Played for 12 minutes
+</code></pre></div>
+<p>Small icons, lobby player count, join buttons, etc. all come from this single library.</p>
+<hr />
+<h2 id="why-discord-rpc-instead-of-the-game-sdk">Why <code>discord-rpc</code> instead of the Game SDK<a class="headerlink" href="#why-discord-rpc-instead-of-the-game-sdk" title="Permanent link">&para;</a></h2>
+<p>The comment at the top of the file is very clear; restated here because <strong>you should not "upgrade" it</strong>:</p>
+<div class="admonition quote">
+<p class="admonition-title"><code>DiscordRPC.lua:12-18</code></p>
+<p>Why not the Discord Game SDK (discord_game_sdk.dll)?
+The Game SDK proved unstable / unusable through a direct LuaJIT FFI binding:
+<code>DiscordCreate</code> succeeds, but <code>get_activity_manager()</code> etc. return NULL no
+matter what (any flags/version/app-id), so calling any activity method
+dereferences a NULL pointer and hard-crashes the game.</p>
+</div>
+<p>In other words: <strong>the Discord Game SDK crashes the game outright through FFI</strong> (it gets a NULL manager pointer),
+whereas the old <code>discord-rpc</code> library has only a few flat C functions (<code>Discord_Initialize</code> / <code>Discord_UpdatePresence</code>),
+with no vtable and no manager getter — the path proven to work in LÖVE.</p>
+<div class="admonition note">
+<p class="admonition-title">The DiscordGameSDK directory isn't empty, it's just unused</p>
+<p>This directory <strong>was not deleted</strong>; its <code>x64/</code> and <code>x86/</code> subdirectories contain 7 files (<code>discord_game_sdk.dll</code> / <code>.dll.lib</code> / <code>.so</code> / <code>.dylib</code> / <code>.bundle</code>), all still under version control.</p>
+<p>They remain only as traces of "someone tried this path before" — <strong>the engine code references none of them</strong>.
+The one actually loaded is <code>Resources/Libs/DiscordRPC/discord-rpc-x64.dll</code> next door.
+<strong>Don't change the code to call the Game SDK just because they're there</strong> — the crash described above was measured.</p>
+</div>
+<hr />
+<h2 id="dependencies-and-availability-conditions">Dependencies and availability conditions<a class="headerlink" href="#dependencies-and-availability-conditions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LuaJIT's <code>ffi</code></td>
+<td>Only present in LÖVE's LuaJIT build. In a pure Lua build the whole library degrades to a no-op</td>
+</tr>
+<tr>
+<td>Native library files</td>
+<td><code>Resources/Libs/DiscordRPC/discord-rpc-x64.dll</code> / <code>discord-rpc-x86.dll</code></td>
+</tr>
+<tr>
+<td>Discord client running</td>
+<td>If Discord isn't open it just won't show, but won't error</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Only the Windows library exists for now</p>
+<p>Under <code>Resources/Libs/DiscordRPC/</code> there are <strong>only two .dlls</strong>, no Linux <code>.so</code>, and no macOS <code>.dylib</code>.
+Although the source code has the candidate filenames for those two platforms written out, the files are not shipped with the engine.
+To support other platforms you must download from <a href="https://github.com/discord/discord-rpc/releases">discord-rpc releases</a> and put them in that directory.</p>
+</div>
+<p>Behavior when dependencies are missing: <strong>no error</strong>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">init</span><span class="p">()</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">err</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span><span class="w">   </span><span class="c1">-- just prints a line, the game keeps running</span>
+</code></pre></div>
+<p>Without <code>ffi</code>, <code>init</code> / <code>setActivity</code> / <code>on*</code> are all replaced with the same <code>unavailable()</code>, returning <code>false, "DiscordRPC: LuaJIT FFI is unavailable..."</code>;
+<code>update</code> / <code>shutdown</code> / <code>isAvailable</code> become safe empty functions.</p>
+<hr />
+<h2 id="the-engine-already-wires-it-up">The engine already wires it up<a class="headerlink" href="#the-engine-already-wires-it-up" title="Permanent link">&para;</a></h2>
+<p><code>main.lua</code> has already run the whole flow:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- love.load()</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="py">application_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">)</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">init</span><span class="p">()</span>
+
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span>
+<span class="w">    </span><span class="nv">details</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Fighting Sans&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">state</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Route: Genocide&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;qq20250220-225345&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_text</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;It&#39;s a bad time.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">start</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">timestamp</span><span class="p">(),</span><span class="w">   </span><span class="c1">-- timestamp to start counting</span>
+<span class="p">})</span>
+
+<span class="c1">-- love.update(dt)</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+
+<span class="c1">-- love.quit()</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">shutdown</span><span class="p">()</span>
+</code></pre></div>
+<p>So <strong>the most common usage is only one step</strong>: replace the ID in <code>Game/conf_pure.lua</code> with your own.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1234567890123456789&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Write it in <code>Game/conf_pure.lua</code>, not the root one</p>
+<p>There are <strong>two</strong> <code>conf_pure.lua</code> files and they are layered: the root one holds engine defaults, and the <code>Game/conf_pure.lua</code> one overrides it.
+Your changes should go in <strong><code>Game/conf_pure.lua</code></strong> — editing the root one will be overwritten on engine update.
+For a comparison of the two, see <a href="../../010_quick_start/000_conf/index.html">Configuration file</a>.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">App ID must be a string</p>
+<p>A 19-digit number <strong>exceeds 2^53</strong>; Lua's number is a double, so writing it as a numeric literal loses precision and Discord will reject the connection.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1342517648348680202&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- correct</span>
+<span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1342517648348680202</span><span class="p">)</span><span class="w">     </span><span class="c1">-- wrong: precision loss</span>
+</code></pre></div>
+<p>The library internally does <code>tostring(client_id)</code>, but <strong>the precision is already lost at the moment you write it into the config</strong>.</p>
+</div>
+<hr />
+<h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h2>
+<div class="admonition example">
+<p class="admonition-title">Lifecycle</p>
+<ul>
+<li><code>init(client_id, options)</code> connects to Discord. If <code>client_id</code> is omitted, it uses <code>Discord.application_id</code>.<ul>
+<li><code>options.auto_register</code> tries to register the protocol when <code>true</code> (usually not needed).</li>
+<li><code>options.steam_id</code> links Steam (optional).</li>
+</ul>
+</li>
+<li><code>update(dt)</code> <strong>must be called every frame</strong>; internally runs <code>Discord_RunCallbacks()</code>. The engine already calls it inside <code>love.update(dt)</code>.</li>
+<li><code>shutdown()</code> disconnects, called inside <code>love.quit()</code> (already done by the engine).</li>
+<li><code>isAvailable()</code> whether it has been initialized successfully.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Setting Presence</p>
+<ul>
+<li><code>setActivity(activity)</code> sets/updates the displayed content; the parameter is a table (fields below).</li>
+<li><code>clearActivity()</code> clears the display (the Player returns to the "playing nothing" state).</li>
+<li><code>timestamp(seconds)</code> gets the current unix timestamp (seconds); an offset can be passed, used for <code>start</code> / <code>finish</code>.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Callbacks</p>
+<ul>
+<li><code>onReady(callback)</code> fires when Discord accepts the connection; the callback receives a <code>user</code> table (<code>userId</code> / <code>username</code> / <code>discriminator</code> / <code>avatar</code>) or <code>nil</code>.</li>
+<li><code>onDisconnected(callback)</code> fires on disconnect; the callback receives <code>(errorCode, message)</code>.</li>
+<li><code>onError(callback)</code> fires on error; the callback receives <code>(errorCode, message)</code>. <strong>A wrong App ID usually shows up here.</strong></li>
+<li><code>onJoin(callback)</code> fires when someone joins via an invite; the callback receives a <code>joinSecret</code> string.</li>
+<li><code>onSpectate(callback)</code> fires on spectating; the callback receives a <code>spectateSecret</code> string.</li>
+<li><code>onJoinRequest(callback)</code> fires when someone requests to join; the callback receives a <code>user</code> table.</li>
+<li><code>respond(user_id, reply)</code> responds to a join request; <code>reply</code> takes <code>Discord.JoinReply.No</code> / <code>.Yes</code> / <code>.Ignore</code>.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Constants and state</p>
+<ul>
+<li><code>Discord.JoinReply</code> = <code>{ No = 0, Yes = 1, Ignore = 2 }</code>.</li>
+<li><code>Discord.VERSION</code> the library version, currently <code>"2.1.0"</code>.</li>
+<li><code>Discord.application_id</code> your App ID (string).</li>
+<li><code>Discord.available</code> whether it has been initialized.</li>
+<li><code>Discord.last_error</code> the reason for the most recent failure.</li>
+</ul>
+</div>
+<hr />
+<h2 id="what-can-go-in-the-activity-table">What can go in the activity table<a class="headerlink" href="#what-can-go-in-the-activity-table" title="Permanent link">&para;</a></h2>
+<p>Both naming styles are accepted, <strong>prefer the underscore column</strong> (Game SDK style):</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Equivalent</th>
+<th>Meaning</th>
+<th>Byte limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>details</code></td>
+<td>—</td>
+<td>first line of text ("Fighting Sans")</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>—</td>
+<td>second line of text ("Route: Genocide")</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>start</code></td>
+<td><code>startTimestamp</code></td>
+<td>start timestamp → shows "played xx:xx"</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>finish</code> / <code>end</code></td>
+<td><code>endTimestamp</code></td>
+<td>end timestamp → shows "remaining xx:xx"</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>large_image</code></td>
+<td><code>largeImageKey</code></td>
+<td>large image asset key</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>large_text</code></td>
+<td><code>largeImageText</code></td>
+<td>text shown when hovering the large image</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>small_image</code></td>
+<td><code>smallImageKey</code></td>
+<td>small image (overlaid on bottom-right of large image) asset key</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>small_text</code></td>
+<td><code>smallImageText</code></td>
+<td>text shown when hovering the small image</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>party_id</code></td>
+<td><code>partyId</code></td>
+<td>party/room identifier</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>party_size</code></td>
+<td>—</td>
+<td>pass <code>{current count, limit}</code> or <code>{current=, max=}</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>partySize</code> / <code>partyMax</code></td>
+<td>—</td>
+<td>give the two numbers directly (takes effect when <code>party_size</code> is not used)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>match_secret</code></td>
+<td><code>matchSecret</code></td>
+<td>match secret</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>join_secret</code></td>
+<td><code>joinSecret</code></td>
+<td>secret for invite-join</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>spectate_secret</code></td>
+<td><code>spectateSecret</code></td>
+<td>spectate secret</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>instance</code></td>
+<td>—</td>
+<td>whether it can be joined, defaults to <code>true</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span>
+<span class="w">    </span><span class="nv">details</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Exploring the ruins&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">state</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;LV &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; · HP &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">hp</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ruins&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">large_text</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Ruins&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">small_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;frisk&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">small_text</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Frisk&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">start</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">timestamp</span><span class="p">(),</span><span class="w">      </span><span class="c1">-- count from now</span>
+<span class="w">    </span><span class="nv">party_size</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span><span class="w">                   </span><span class="c1">-- shows (2 of 4)</span>
+<span class="p">})</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">The byte limit is not a character limit</p>
+<p><code>state</code> / <code>details</code> are <strong>128 bytes</strong>; under UTF-8 one Chinese character takes 3 bytes — <strong>at most about 42 Chinese characters</strong>; exceeding it causes Discord to silently drop the whole Presence.
+Truncate long text yourself.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Image keys must be uploaded in the backend</p>
+<p><code>large_image</code> / <code>small_image</code> holds the key obtained after uploading an image in <strong>Discord Developer Portal → your app → Rich Presence → Art Assets</strong> (filename without extension),
+not a file path and not a URL. A key that was never uploaded will silently not show the image.
+The engine default <code>qq20250220-225345</code> is an asset under SoulEngine's own app — <strong>once you switch to your own App ID it no longer exists</strong>, so remember to change it too.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>start</code> / <code>finish</code> are second-level unix timestamps</p>
+<p><code>Discord.timestamp()</code> returns <code>os.time()</code>. Passing milliseconds would be treated as the year 50000, and the timer display would break.</p>
+</div>
+<hr />
+<h2 id="three-practical-usages">Three practical usages<a class="headerlink" href="#three-practical-usages" title="Permanent link">&para;</a></h2>
+<p><strong>① Switch Presence with the scene</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">SceneBattle</span><span class="p">:</span><span class="nf">load</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span>
+<span class="w">        </span><span class="nv">details</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Fighting &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">Battle</span><span class="p">.</span><span class="py">enemies</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">name</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">state</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;LV &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">lv</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">start</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">timestamp</span><span class="p">(),</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p><strong>② Use <code>onReady</code> to confirm the App ID is correct</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nv">Discord</span><span class="p">.</span><span class="nf">onReady</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">user</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">user</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] connected:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">user</span><span class="p">.</span><span class="py">username</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">else</span>
+<span class="w">        </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] connected (no user info obtained)&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">onError</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] error&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span><span class="p">)</span><span class="w">   </span><span class="c1">-- most likely the App ID is wrong</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>③ Invite a friend to join</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- host</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="nv">party_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">room</span><span class="p">.</span><span class="py">id</span><span class="p">,</span><span class="w"> </span><span class="nv">party_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nv">n</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span><span class="w"> </span><span class="nv">join_secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">room</span><span class="p">.</span><span class="py">secret</span><span class="w"> </span><span class="p">})</span>
+
+<span class="c1">-- host receives the request</span>
+<span class="nv">Discord</span><span class="p">.</span><span class="nf">onJoinRequest</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">user</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- decide for yourself whether to let them in</span>
+<span class="w">    </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">respond</span><span class="p">(</span><span class="nv">user</span><span class="p">.</span><span class="py">userId</span><span class="p">,</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="py">JoinReply</span><span class="p">.</span><span class="py">Yes</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="pitfall-summary">Pitfall summary<a class="headerlink" href="#pitfall-summary" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title"><code>Discord.update(dt)</code> must be called every frame</p>
+<p>Internally it is <code>Discord_RunCallbacks()</code>. If you skip it: Presence <strong>won't refresh</strong> and all callbacks <strong>won't fire</strong>.
+The engine already calls it inside <code>love.update(dt)</code>; unless you built your own separate <code>love.update</code> branch, don't duplicate it or delete it.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Don't touch that <code>jit.off(discord.update)</code> line</p>
+<p><code>Discord_RunCallbacks()</code> re-enters Lua through the FFI callback <strong>from C</strong>. Doing this inside JIT-compiled code,
+LuaJIT throws <code>unprotected error in call to Lua API</code> — and it happens about 2 seconds after connecting to Discord, at the moment the ready event fires.
+The library specifically turns off JIT for <code>update</code> so it always runs in the interpreter: <strong>deleting this line will crash the game when you least expect it.</strong></p>
+</div>
+<details class="quote">
+<summary>That comment and code</summary>
+<div class="highlight"><pre><span></span><code><span class="c1">-- CRITICAL for LuaJIT: `discord.update` calls Discord_RunCallbacks, which</span>
+<span class="c1">-- re-enters Lua through the FFI callback trampolines above. ... Disable JIT</span>
+<span class="c1">-- for this function so it always runs in the interpreter. NOTE: `jit` is a</span>
+<span class="c1">-- LuaJIT builtin that must be loaded explicitly; the previous</span>
+<span class="c1">-- `local jit = nil` shadowed the global and silently broke this.</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">ok_jit</span><span class="p">,</span><span class="w"> </span><span class="nv">jit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">pcall</span><span class="p">(</span><span class="nb">require</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;jit&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">ok_jit</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">jit</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">jit</span><span class="p">.</span><span class="py">off</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">jit</span><span class="p">.</span><span class="nf">off</span><span class="p">(</span><span class="nv">discord</span><span class="p">.</span><span class="py">update</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+</details>
+<div class="admonition warning">
+<p class="admonition-title">Presence has an update rate limit</p>
+<p>The Discord server rate-limits (roughly 5 times / 20 seconds); exceeding it silently drops updates and may trigger <code>onError</code>.
+<strong>Don't call <code>setActivity</code> every frame</strong> — only call it when the state actually changes (switch scene, level up, enter Battle).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Connecting takes one or two seconds</p>
+<p><code>init()</code> returning <code>true</code> only means the local call succeeded, not that Discord has accepted it.
+To confirm, hook <code>onReady</code>; Presence generally appears in the client 1–2 seconds later.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Exceptions in callbacks don't crash the game</p>
+<p>When a user writes wrong code in a callback, the library catches it with <code>pcall</code> and prints <code>[DiscordRPC] callback error: ...</code>.
+Because these callbacks come in from the C side, a normal <code>pcall</code> can't catch them, so the library wraps one layer in each proxy itself.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><code>instance</code> is on by default</p>
+<p><code>p.instance = (t.instance ~= false) and 1 or 0</code> — only <strong>explicitly writing <code>instance = false</code></strong> turns it off.
+If <code>join_secret</code> isn't configured, leaving it on does nothing; no invite button appears out of nowhere.</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3273 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../010_scene/index.html">
+      
+      
+        <link rel="next" href="../030_typers/index.html">
+      
+      
+        
+          <link rel="alternate" href="./index.html" hreflang="en">
+        
+          <link rel="alternate" href="../../zh_CN/020_basic/020_sprites/index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Sprites - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#creating-a-sprite" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sprites
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh_CN/020_basic/020_sprites/index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before You Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Before You Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua Crash Course
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modifying Game Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating and Switching Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basic Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprites
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-sprite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating a Sprite
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprite-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprite Properties
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#library-level-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library-level Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pixel-snapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pixel Snapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#perfect-pixel-collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perfect Pixel Collision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#about-color" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        About Color
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="About Color">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#light-and-dark-colors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Light and Dark Colors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rainbow-color" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rainbow Color
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Typers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canvas & Screen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mask
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Border
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tween
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Area and Asset Override
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Logic and World Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input and Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../160_gui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle System
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Battle System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player and Soul
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Turn Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bullet Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Scene and Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization and Scene Skeleton
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 Maps and Object Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI and Tilesets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Character
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interaction and Dialogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Menu · Save · Chest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encounter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intermediate Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Intermediate Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy Conversion Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collision Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Math Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with LÖVE
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with LÖVE
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Graphics Drawing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Tools
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variable Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine Hotkeys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/040_preload/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Localization
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Localization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directories and Language Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lookup and Substitution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Networking
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Export & Release
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Export & Release
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-sprite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating a Sprite
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprite-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprite Properties
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#library-level-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library-level Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pixel-snapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pixel Snapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#perfect-pixel-collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perfect Pixel Collision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#about-color" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        About Color
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="About Color">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#light-and-dark-colors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Light and Dark Colors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rainbow-color" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rainbow Color
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Sprites</h1>
+
+<p>All art assets are handled through the Sprite library.</p>
+<p><u>Some people may be used to calling a Sprite a "sprite sheet"; in fact they mean the same thing.</u></p>
+<p>Path of all sprites: <code>Resources/Sprites/</code><br>
+Sprite library path: <code>Scripts/Libraries/Sprites.lua</code></p>
+<p>If you want to <strong>override</strong> an engine-built-in sprite (e.g. replace the default <code>px.png</code>), just put your own same-named image into <code>Game/Resources/Sprites/</code>; the Game region takes priority, with the main directory as fallback.</p>
+<hr />
+<h2 id="creating-a-sprite">Creating a Sprite<a class="headerlink" href="#creating-a-sprite" title="Permanent link">&para;</a></h2>
+<p>Use <code>Sprites.CreateSprite(path, layer)</code> to create a sprite:</p>
+<ul>
+<li><code>path</code> The sprite's path; lookup starts from <code>Resources/Sprites/</code> as the root directory, and you need to add the <code>.png</code> extension when creating.</li>
+<li><code>layer</code> The sprite's Layer, which can be a <code>number</code> or a <code>string</code>. If the corresponding Layer is not found via the string, it will not error; instead it automatically sets the layer to 0.</li>
+</ul>
+<div class="admonition example">
+<p class="admonition-title">Creating an image</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<p>By default, this image is generated at the exact center of the screen, i.e. position <code>(320, 240)</code>.</p>
+<hr />
+<h2 id="sprite-properties">Sprite Properties<a class="headerlink" href="#sprite-properties" title="Permanent link">&para;</a></h2>
+<p>Properties are set in two types: <code>direct properties</code> and <code>method calls</code>.</p>
+<p>In <code>direct properties</code>, we use a dot (<code>.</code>) to set properties;<br>
+In <code>method calls</code>, we use syntactic sugar, using a colon (<code>:</code>) to set properties.</p>
+<div class="admonition tip">
+<p class="admonition-title">Direct properties</p>
+<ul>
+<li><code>x</code> Horizontal coordinate of the image; larger means further right.</li>
+<li><code>y</code> Vertical coordinate of the image; larger means further down.</li>
+<li><code>rotation</code> Rotation angle of the image, in <code>degrees</code>; the image rotates clockwise as the angle increases.</li>
+<li><code>xscale</code> Horizontal scaling factor of the image, default <code>1</code>, meaning original size.</li>
+<li><code>yscale</code> Vertical scaling factor of the image, default <code>1</code>, meaning original size.</li>
+<li><code>layer</code> The image's Layer; a larger number means a higher Layer.</li>
+<li><code>velocity</code> The image's velocity; setting it once lets the image keep moving at that speed:<ul>
+<li><code>x</code> Horizontal speed.</li>
+<li><code>y</code> Vertical speed.</li>
+<li><code>r</code> Rotation speed.</li>
+</ul>
+</li>
+<li><code>xpivot</code> Horizontal pivot point of the image, default <code>0.5</code>, representing the horizontal center.</li>
+<li><code>ypivot</code> Vertical pivot point of the image, default <code>0.5</code>, representing the vertical center.</li>
+<li><code>xpivot_px</code> Horizontal pivot point of the image, set by pixels.</li>
+<li><code>ypivot_px</code> Vertical pivot point of the image, set by pixels.</li>
+<li><code>xanchor</code> Adjusts the horizontal offset relative to the parent object, when it has a parent.</li>
+<li><code>yanchor</code> Adjusts the vertical offset relative to the parent object, when it has a parent.</li>
+<li><code>color</code> The image's color, made of a table of three numbers <code>0 ~ 1</code>. For example <code>{1, 0, 0}</code>, representing red, green, blue respectively.</li>
+<li><code>alpha</code> The image's transparency, made of a number <code>0 ~ 1</code>; the smaller the number, the more transparent the image.</li>
+<li><code>visible</code> Whether the image is visible, default <code>true</code>.</li>
+<li><code>pixel_snap</code> Whether this image does pixel snapping. Defaults to following the global switch <code>sprites.pixel_snap</code> (default <code>true</code>); writing <code>true</code> / <code>false</code> directly overrides only this one. See "Pixel Snapping" below.</li>
+<li><code>outline</code> The image's outline color and thickness, made of five parameters <code>{r, g, b, a, thickness}</code>, representing <code>{red, green, blue, alpha, thickness}</code> respectively.</li>
+<li><code>follow_mode</code> Settings for following the parent object, supporting two: <code>position</code>: follow position only, parent rotation does not interfere; the second is <code>full</code>: follow both the parent's position and rotation.</li>
+<li><code>isBullet</code> Whether it is a damageable type (bullet type); a sprite becomes a bullet through this variable, default <code>false</code>.</li>
+<li><code>HurtMode</code> What type of damage the bullet deals, e.g.: orange, blue, red, green...</li>
+</ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Method calls</p>
+<ul>
+<li><code>GetPivotOffset()</code> Gets the current anchor's pixel offset.</li>
+<li><code>GetFilter()</code> Gets the rendering method currently used by the image.</li>
+<li><code>Dust(sound, remove, time)</code> Turns an image into dust.<ul>
+<li><code>sound</code> Whether to play a sound effect.</li>
+<li><code>remove</code> Whether to remove the image after the dust animation finishes.</li>
+<li><code>time</code> How many seconds the dust animation plays.</li>
+</ul>
+</li>
+<li><code>Outline(r, g, b, a, t)</code> Sets the sprite's border.<ul>
+<li><code>r, g, b, a</code> Color and alpha, all values <code>0 ~ 1</code>.</li>
+<li><code>t</code> Border thickness; normally you can use <code>2</code>, thickening as needed.</li>
+</ul>
+</li>
+<li><code>SetFourPointMode(enabled)</code> Whether to enable four-corner vertex mode, i.e. the common <code>leg stretch</code> deformation.</li>
+<li><code>SetFourPoint(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y)</code> The coordinates of the four points in four-corner vertex mode; just fill them in order.</li>
+<li><code>SetFourPointP(index, x, y)</code> Sets the coordinate of the <code>index</code>-th point among the four to <code>(x, y)</code>.</li>
+<li><code>Move(x, y)</code> Moves the sprite at speed <code>(x, y)</code>.</li>
+<li><code>MoveTo(x, y)</code> Moves the sprite to position <code>(x, y)</code>.</li>
+<li><code>Set(p)</code> Sets the sprite's image to the image at path <code>p</code>. (Include the <code>.png</code> extension)</li>
+<li><code>SetAnimation(frames, interval, mode)</code> Sets the image's animation; animations are all composed of individual images.<ul>
+<li><code>frames</code> The image sequence used by the animation.</li>
+<li><code>interval</code> How many seconds between each switch.</li>
+<li><code>mode</code> What mode the animation plays in, supporting <code>loop</code> loop, <code>oneshot</code> play once, <code>empty</code> play once and clear.</li>
+</ul>
+</li>
+<li><code>Scale(x, y)</code> Sets the sprite's scaling size in horizontal and vertical directions to <code>(x, y)</code>.</li>
+<li><code>Pivot(x, y)</code> Sets the sprite's anchor offset in horizontal and vertical directions to <code>(x, y)</code>.</li>
+<li><code>PivotPixel(x, y)</code> Sets the sprite's anchor pixel offset in horizontal and vertical directions to <code>(x, y)</code>.</li>
+<li><code>Anchor(x, y)</code> With a parent object, sets the sprite's anchor offset in horizontal and vertical directions to <code>(x, y)</code>.</li>
+<li><code>AnchorPixel(x, y)</code> With a parent object, sets the sprite's anchor pixel offset in horizontal and vertical directions to <code>(x, y)</code>.</li>
+<li><code>SetParent(spr)</code> Sets a certain sprite as the current sprite's parent object; <code>spr</code> is a created sprite object.</li>
+<li><code>SetChildren(children)</code> Sets multiple sprite objects as the current sprite's child objects.</li>
+<li><code>AddChild(child)</code> Adds an additional child object <code>child</code> to the child group.</li>
+<li><code>RemoveChild(child)</code> Removes <code>child</code> sprite object from the child group.</li>
+<li><code>GetPosition()</code> Gets the image's coordinates, returns <code>x, y</code>, normally can be caught with two variables.</li>
+<li><code>GetPositionParent()</code> Gets the parent object's coordinates, returns <code>x, y</code>, normally can be caught with two variables.</li>
+<li><code>SetStencils(stencils)</code> Sets the sprite's Mask, multiple masks can be used.</li>
+<li><code>SetShaders(shaders)</code> Sets the sprite's Shader to <code>shaders</code>, multiple shaders can be used.</li>
+<li><code>GetShaders()</code> Gets the shaders in use.</li>
+<li><code>ClearShaders()</code> Clears all shaders of the sprite.</li>
+<li><code>AddShader(shader)</code> Adds an additional shader at the end.</li>
+<li><code>InsertShader(index, shader)</code> Inserts a shader at position <code>index</code>.</li>
+<li><code>RemoveShader(shader)</code> Removes the <code>shader</code> shader from the shader list.</li>
+<li><code>Solid(axis, box)</code> Adds a collision body to the sprite.<ul>
+<li><code>axis</code> Can be <code>x</code> direction, <code>y</code> direction, or <code>xy</code> direction, representing having a collision volume only in this direction.</li>
+<li><code>box</code> Can fill <code>width</code> and <code>height</code> parameters, e.g.: <code>{width = 1, height = 1}</code>, this is a <code>1*1</code> collision box.</li>
+</ul>
+</li>
+<li><code>UnSolid()</code> Removes the collision body from the sprite.</li>
+<li><code>IsSolid()</code> Returns whether the sprite currently has a collision body.</li>
+<li><code>GetImagePath()</code> Returns the image path currently used by this sprite (the resolved real path).</li>
+<li><code>GetAnimationPath()</code> Returns the current animation's frame sequence path, returns <code>nil</code> when there is no animation.</li>
+<li><code>SetPPCollision(enabled)</code> Toggles this image's <strong>perfect pixel collision</strong>, returns <code>(success, rectangle count)</code>. See "Perfect Pixel Collision" below.</li>
+<li><code>IsPPCollision()</code> Returns whether this image has perfect pixel collision on.</li>
+<li><code>Destroy() / Remove()</code> Deletes the sprite.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Setting color and position</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">a</span><span class="p">.</span><span class="py">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
+<span class="nv">a</span><span class="p">:</span><span class="nf">MoveTo</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+<p>You will most likely see a red poseur with only its legs left at the top of the screen.</p>
+</div>
+<hr />
+<h2 id="library-level-methods">Library-level Methods<a class="headerlink" href="#library-level-methods" title="Permanent link">&para;</a></h2>
+<p>All the above are methods of "a certain sprite"; the following are attached to the <code>Sprites</code> library itself:</p>
+<div class="admonition tip">
+<p class="admonition-title">Library-level methods</p>
+<ul>
+<li><code>Sprites.CreateSpriteQuad(path, quad, layer)</code> Creates a sprite taking only the block specified by <code>quad</code> from the image; <code>quad</code> is filled as <code>{x = , y = , width = , height = }</code>. Useful for tileset cropping.</li>
+<li><code>Sprites.MultiDust(sprs, sound, remove, time)</code> Turns a <strong>whole group</strong> of sprites into dust together, diffusing across the bounding box, more natural than calling <code>Dust</code> one by one.</li>
+<li><code>Sprites.ShakeSprite(sprite, magnitude, duration, speed)</code> Shakes the sprite for a period of time. <code>magnitude</code> can be a number or <code>{x = , y = }</code>.</li>
+<li><code>Sprites.ShadowSprite(sprite, target_scale, duration, speed)</code> Generates a shadow that follows the sprite and scales up while fading out; returns that shadow sprite object.</li>
+<li><code>Sprites.GetCacheInfo()</code> Returns <code>(cache count, detail list)</code>, useful to see who is currently in the image cache.</li>
+<li><code>Sprites.CleanupCache()</code> Manually runs an LRU cleanup (under the normal flow the engine runs it automatically per <code>OPT_LRU_SPRITES</code>).</li>
+</ul>
+</div>
+<hr />
+<h2 id="pixel-snapping">Pixel Snapping<a class="headerlink" href="#pixel-snapping" title="Permanent link">&para;</a></h2>
+<p>Pixel art most fears "half-pixel jitter": the sprite coordinate carries a decimal, and the sampled edges flicker bright and dark. The engine does this for you by default.</p>
+<p>The global switch is <code>sprites.pixel_snap</code> (default <code>true</code>), and can also be changed with <code>Sprites.SetPixelSnap(enabled)</code>; a single image can override it itself:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">sprites</span><span class="p">.</span><span class="py">pixel_snap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w">      </span><span class="c1">-- turn off globally</span>
+<span class="nv">Sprites</span><span class="p">.</span><span class="nf">SetPixelSnap</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">      </span><span class="c1">-- turn on globally</span>
+<span class="nv">spr</span><span class="p">.</span><span class="py">pixel_snap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w">          </span><span class="c1">-- let only this one through</span>
+</code></pre></div>
+<p>The snapping rule is <strong>snap the edges, not the center</strong>: what actually gets rounded to an integer is the coordinate of the four <strong>edges</strong> of the quad, not the image's center point. These two only coincide exactly when the image size is even, so odd-sized sprites would be off by half a pixel if you just rounded the center.</p>
+<p>For composite bodies (like bones made of head / body / tail pieced together) you must <strong>round the shared anchor only once</strong>: set each part to <code>pixel_snap = false</code>, then use <code>Sprites.SnapEdge(centre, offset)</code> to snap the anchor, then place the parts according to the anchor. If you let each part round on its own, the seams will misalign.</p>
+<ul>
+<li><code>Sprites.SnapCoord(v)</code> Rounds a single number, equivalent to <code>math.floor(v + 0.5)</code>.</li>
+<li><code>Sprites.SnapEdge(centre, offset)</code> Snaps the "edge" to an integer: <code>centre</code> is the center coordinate, <code>offset</code> is this edge's offset relative to the center (e.g. half-width), returns the snapped center coordinate.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Rotated sprites don't recognize 'edges'</p>
+<p>Once a sprite is rotated, the quad is no longer parallel to the axes, so that <code>SnapEdge</code> stuff becomes meaningless. The correct approach for rotated parts is "don't snap", as long as you ensure its geometry is exactly the same as when snapping is off.</p>
+</div>
+<hr />
+<h2 id="perfect-pixel-collision">Perfect Pixel Collision<a class="headerlink" href="#perfect-pixel-collision" title="Permanent link">&para;</a></h2>
+<p>The default collision judgment uses a bounding box: a 32×32 heart-shaped image is judged as a 32×32 square. To make the judgment follow the sprite's real pixel shape, turn this on for that image:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">spr</span><span class="p">:</span><span class="nf">SetPPCollision</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">    </span><span class="c1">-- returns ok, rectangle count</span>
+<span class="nv">spr</span><span class="p">:</span><span class="nf">SetPPCollision</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span><span class="w">   </span><span class="c1">-- back to normal bounding box</span>
+<span class="nv">spr</span><span class="p">:</span><span class="nf">IsPPCollision</span><span class="p">()</span><span class="w">         </span><span class="c1">-- query current state</span>
+</code></pre></div>
+<p>The judgment itself uses <code>Sprites.PPCollide(a, b)</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">PPCollide</span><span class="p">(</span><span class="nv">bullet</span><span class="p">,</span><span class="w"> </span><span class="nv">Player</span><span class="p">.</span><span class="py">sprite</span><span class="p">)</span>
+<span class="c1">-- true  = really collided</span>
+<span class="c1">-- false = did not collide</span>
+<span class="c1">-- nil   = neither side has perfect pixel on; use the bounding box conclusion</span>
+</code></pre></div>
+<p>That is, it <strong>only gives an answer when at least one side is on</strong>; when it returns <code>nil</code>, do not treat it as "did not collide".</p>
+<div class="admonition warning">
+<p class="admonition-title">Judgment gets bigger once turned on</p>
+<p>Perfect pixel judges using the sprite's <strong>opaque pixels</strong>. A 16×16 heart-shaped image with perfect pixel on will have a judgment range <strong>much larger</strong> than the default centered <code>{4, 4}</code> small box. If you want to "graze" use <code>_hitbox</code>; only turn this on when you want "shape-following" — pick one of the two.</p>
+</div>
+<p>Related helpers:</p>
+<ul>
+<li><code>Sprites.GetPPRects(sprite)</code> Gets all rectangles of this image in local coordinates.</li>
+<li><code>Sprites.GetPPShapes(sprite)</code> Gets the shapes after converting to world coordinates.</li>
+<li><code>Sprites.GetHitbox(sprite)</code> Gets "bounding box + <code>_hitbox</code> override" in one step; the battle uses this for the Soul judgment.</li>
+<li><code>Sprites.ClearPPCache()</code> Clears the rectangle cache. Call once after hot-reloading the library or sprite.</li>
+</ul>
+<p>The underlying rectification algorithm is in <code>Scripts/Libraries/PerfectPixel/</code>, with two versions: a C backend (<code>cpp.dll</code>) and a pure Lua version (<code>pure.lua</code>); the former is about 10× faster and auto-enables when available. To turn on the F7 collision-box overlay to see the judgment shapes, see <a href="../../030_battle_system/070_scene/index.html">Battle System → Battle Scene</a>.</p>
+<hr />
+<h2 id="about-color">About Color<a class="headerlink" href="#about-color" title="Permanent link">&para;</a></h2>
+<p>Here, color is divided into three basic colors <code>red, green, blue</code>, and all subsequent colors are mixed from these three.</p>
+<p>Some commonly used colors are introduced below:</p>
+<ul>
+<li><code>{1, 0, 1}</code> KR's big pink, mixed from red and blue in equal proportions.</li>
+<li><code>{0.4, 0, 1}</code> Purple, but slightly deep blue.</li>
+<li><code>{0, 1, 1}</code> Cyan bone color of blue attacks.</li>
+<li><code>{1, 0.5, 0}</code> Orange attack.</li>
+<li><code>{1, 1, 0}</code> Yellow confirm.</li>
+</ul>
+<h3 id="light-and-dark-colors">Light and Dark Colors<a class="headerlink" href="#light-and-dark-colors" title="Permanent link">&para;</a></h3>
+<p>When it comes to light and dark, we generally mix by adding white or black into a color, so we can do this:</p>
+<p>Red is <code>{1, 0, 0}</code>, if you want a dark color, what should you do?<br>
+The answer is to add <code>black</code> to this color, and black is <code>{0, 0, 0}</code>.</p>
+<p>We start adding and taking the average:<br></p>
+<ul>
+<li><code>(1 + 0) / 2 = 0.5</code> The first color becomes 0.5.</li>
+<li><code>(0 + 0) / 2 = 0</code> The second color becomes 0.</li>
+<li><code>(0 + 0) / 2 = 0</code> The third color becomes 0.</li>
+</ul>
+<p>Finally the dark red is: <code>{0.5, 0, 0}</code>.</p>
+<p>We do the same for light colors:</p>
+<ul>
+<li><code>(1 + 1) / 2 = 1</code> The first color becomes 1.</li>
+<li><code>(0 + 1) / 2 = 0.5</code> The second color becomes 0.5.</li>
+<li><code>(0 + 1) / 2 = 0.5</code> The third color becomes 0.5.</li>
+</ul>
+<p>Finally the light red is: <code>{1, 0.5, 0.5}</code>.</p>
+<p><strong>But normally, this mixing method may go too far, so you can change the added 1 to 0.5 etc.</strong></p>
+<h3 id="rainbow-color">Rainbow Color<a class="headerlink" href="#rainbow-color" title="Permanent link">&para;</a></h3>
+<p>Applying a periodic trigonometric transformation to <code>{r, g, b}</code>, and adjusting the phase, you can make a rainbow color effect.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nv">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nv">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span>
+<span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nv">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span>
+</code></pre></div>
+<p>If you apply rgb to the color of an image, that image will start a rainbow color transformation.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

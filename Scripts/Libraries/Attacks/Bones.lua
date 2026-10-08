@@ -230,20 +230,38 @@ function bones.New2D(whose, length, position, angle, velocity)
     end
 
 
+    -- Pivot-aware edge offset: the bone's anchor sits `offL` away from the
+    -- bone's centre along its length (toward the head = positive). At the
+    -- default pivot (0.5) this is 0 and the formulas below reduce to the
+    -- original centred placement. With any other pivot the anchor is shifted,
+    -- so the anchor is re-centred by the opposite amount to keep the bone
+    -- itself flush against the arena edge — only the anchor moves.
+    --
+    -- Note: these To* helpers assume a straight (0/90 deg) bone, so only
+    -- ypivot matters here; xpivot shifts across the bone's width and does not
+    -- affect the flush-edge placement.
+    local function _pivotAlong(bone)
+        return (bone.ypivot - 0.5) * bone.length
+    end
+
     function bone:ToDown(arena)
-        self.y = arena.y + arena.height / 2 - (self.length + 12) / 2
+        local offL = _pivotAlong(self)
+        self.y = arena.y + arena.height / 2 - (self.length + 12) / 2 + offL
     end
 
     function bone:ToUp(arena)
-        self.y = arena.y - arena.height / 2 + (self.length + 12) / 2
+        local offL = _pivotAlong(self)
+        self.y = arena.y - arena.height / 2 + (self.length + 12) / 2 + offL
     end
 
     function bone:ToLeft(arena)
-        self.x = arena.x - arena.width / 2 + (self.length + 12) / 2
+        local offL = _pivotAlong(self)
+        self.x = arena.x - arena.width / 2 + (self.length + 12) / 2 + offL
     end
 
     function bone:ToRight(arena)
-        self.x = arena.x + arena.width / 2 - (self.length + 12) / 2
+        local offL = _pivotAlong(self)
+        self.x = arena.x + arena.width / 2 - (self.length + 12) / 2 + offL
     end
 
     function bone:SetMode(mode, color)

@@ -2,406 +2,954 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>./</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href=""/>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/"/>
     </url>
     <url>
+        <loc>000_before/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/"/>
+    </url>
+    <url>
+        <loc>000_before/000_download/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/000_download/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/000_download/"/>
+    </url>
+    <url>
+        <loc>000_before/010_getready/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/010_getready/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/010_getready/"/>
+    </url>
+    <url>
+        <loc>000_before/020_lua/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/020_lua/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/020_lua/"/>
+    </url>
+    <url>
+        <loc>010_quick_start/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/"/>
+    </url>
+    <url>
+        <loc>010_quick_start/000_conf/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/000_conf/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/000_conf/"/>
+    </url>
+    <url>
+        <loc>010_quick_start/010_scene/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/010_scene/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/010_scene/"/>
+    </url>
+    <url>
+        <loc>010_quick_start/020_sprites/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/020_sprites/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/020_sprites/"/>
+    </url>
+    <url>
+        <loc>020_basic/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/"/>
+    </url>
+    <url>
+        <loc>020_basic/000_conf/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/000_conf/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/000_conf/"/>
+    </url>
+    <url>
+        <loc>020_basic/010_scene/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/010_scene/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/010_scene/"/>
+    </url>
+    <url>
+        <loc>020_basic/020_sprites/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/020_sprites/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/020_sprites/"/>
+    </url>
+    <url>
+        <loc>020_basic/030_typers/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/030_typers/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/030_typers/"/>
+    </url>
+    <url>
+        <loc>020_basic/040_layers/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/040_layers/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/040_layers/"/>
+    </url>
+    <url>
+        <loc>020_basic/050_audio/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/050_audio/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/050_audio/"/>
+    </url>
+    <url>
+        <loc>020_basic/060_global/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/060_global/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/060_global/"/>
+    </url>
+    <url>
+        <loc>020_basic/070_screen/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/070_screen/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/070_screen/"/>
+    </url>
+    <url>
+        <loc>020_basic/080_mask/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/080_mask/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/080_mask/"/>
+    </url>
+    <url>
+        <loc>020_basic/090_border/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/090_border/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/090_border/"/>
+    </url>
+    <url>
+        <loc>020_basic/100_tween/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/100_tween/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/100_tween/"/>
+    </url>
+    <url>
+        <loc>020_basic/110_game_area/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/110_game_area/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/110_game_area/"/>
+    </url>
+    <url>
+        <loc>020_basic/120_game_logics/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/120_game_logics/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/120_game_logics/"/>
+    </url>
+    <url>
+        <loc>020_basic/130_beat/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/130_beat/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/130_beat/"/>
+    </url>
+    <url>
+        <loc>020_basic/140_timer/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/140_timer/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/140_timer/"/>
+    </url>
+    <url>
+        <loc>020_basic/150_controller/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/150_controller/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/150_controller/"/>
+    </url>
+    <url>
+        <loc>020_basic/160_gui/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/160_gui/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/160_gui/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/000_init/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/000_init/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/000_init/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/010_ui/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/010_ui/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/010_ui/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/020_arena/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/020_arena/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/020_arena/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/030_player/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/030_player/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/030_player/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/040_attack/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/040_attack/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/040_attack/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/050_waves/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/050_waves/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/050_waves/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/060_bullets/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/060_bullets/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/060_bullets/"/>
+    </url>
+    <url>
+        <loc>030_battle_system/070_scene/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/070_scene/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/070_scene/"/>
+    </url>
+    <url>
+        <loc>040_overworld/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/"/>
+    </url>
+    <url>
+        <loc>040_overworld/000_init/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/000_init/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/000_init/"/>
+    </url>
+    <url>
+        <loc>040_overworld/010_map/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/010_map/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/010_map/"/>
+    </url>
+    <url>
+        <loc>040_overworld/015_sti/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/015_sti/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/015_sti/"/>
+    </url>
+    <url>
+        <loc>040_overworld/020_char/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/020_char/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/020_char/"/>
+    </url>
+    <url>
+        <loc>040_overworld/030_interact/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/030_interact/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/030_interact/"/>
+    </url>
+    <url>
+        <loc>040_overworld/040_menu/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/040_menu/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/040_menu/"/>
+    </url>
+    <url>
+        <loc>040_overworld/050_encounter/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/050_encounter/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/050_encounter/"/>
+    </url>
+    <url>
+        <loc>040_overworld/060_shop/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/060_shop/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/060_shop/"/>
+    </url>
+    <url>
+        <loc>050_intermediate/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/"/>
+    </url>
+    <url>
+        <loc>050_intermediate/000_dkjson/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/000_dkjson/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/000_dkjson/"/>
+    </url>
+    <url>
+        <loc>050_intermediate/010_shadertoy/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/010_shadertoy/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/010_shadertoy/"/>
+    </url>
+    <url>
+        <loc>050_intermediate/020_shaders/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/020_shaders/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/020_shaders/"/>
+    </url>
+    <url>
+        <loc>050_intermediate/030_collision/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/030_collision/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/030_collision/"/>
+    </url>
+    <url>
+        <loc>050_intermediate/040_math/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/040_math/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/040_math/"/>
+    </url>
+    <url>
+        <loc>060_with_love/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="060_with_love/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/060_with_love/"/>
+    </url>
+    <url>
+        <loc>060_with_love/000_graphics/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="060_with_love/000_graphics/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/060_with_love/000_graphics/"/>
+    </url>
+    <url>
+        <loc>060_with_love/010_audio/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="060_with_love/010_audio/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/060_with_love/010_audio/"/>
+    </url>
+    <url>
+        <loc>070_develop/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/"/>
+    </url>
+    <url>
+        <loc>070_develop/000_toolscenes/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/000_toolscenes/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/000_toolscenes/"/>
+    </url>
+    <url>
+        <loc>070_develop/010_debugger/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/010_debugger/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/010_debugger/"/>
+    </url>
+    <url>
+        <loc>070_develop/020_devtool/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/020_devtool/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/020_devtool/"/>
+    </url>
+    <url>
+        <loc>070_develop/030_hotkeys/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/030_hotkeys/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/030_hotkeys/"/>
+    </url>
+    <url>
+        <loc>070_develop/040_preload/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/040_preload/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/040_preload/"/>
+    </url>
+    <url>
+        <loc>080_l10n/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="080_l10n/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/080_l10n/"/>
+    </url>
+    <url>
+        <loc>080_l10n/000_files/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="080_l10n/000_files/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/080_l10n/000_files/"/>
+    </url>
+    <url>
+        <loc>080_l10n/010_usage/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="080_l10n/010_usage/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/080_l10n/010_usage/"/>
+    </url>
+    <url>
+        <loc>090_network/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/"/>
+    </url>
+    <url>
+        <loc>090_network/000_gamejolt/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/000_gamejolt/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/000_gamejolt/"/>
+    </url>
+    <url>
+        <loc>090_network/010_discord/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/010_discord/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/010_discord/"/>
+    </url>
+    <url>
+        <loc>090_network/020_sock/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/020_sock/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/020_sock/"/>
+    </url>
+    <url>
+        <loc>100_export/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="100_export/"/>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/100_export/"/>
+    </url>
+    <url>
         <loc>zh_CN/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/"/>
         <xhtml:link rel="alternate" hreflang="en" href=""/>
     </url>
     <url>
         <loc>zh_CN/000_before/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/"/>
     </url>
     <url>
         <loc>zh_CN/000_before/000_download/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/000_download/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/000_download/"/>
     </url>
     <url>
         <loc>zh_CN/000_before/010_getready/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/010_getready/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/010_getready/"/>
     </url>
     <url>
         <loc>zh_CN/000_before/020_lua/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/000_before/020_lua/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="000_before/020_lua/"/>
     </url>
     <url>
         <loc>zh_CN/010_quick_start/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/"/>
     </url>
     <url>
         <loc>zh_CN/010_quick_start/000_conf/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/000_conf/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/000_conf/"/>
     </url>
     <url>
         <loc>zh_CN/010_quick_start/010_scene/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/010_scene/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/010_scene/"/>
     </url>
     <url>
         <loc>zh_CN/010_quick_start/020_sprites/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/010_quick_start/020_sprites/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="010_quick_start/020_sprites/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/000_conf/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/000_conf/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/000_conf/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/010_scene/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/010_scene/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/010_scene/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/020_sprites/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/020_sprites/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/020_sprites/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/030_typers/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/030_typers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/030_typers/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/040_layers/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/040_layers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/040_layers/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/050_audio/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/050_audio/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/050_audio/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/060_global/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/060_global/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/060_global/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/070_screen/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/070_screen/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/070_screen/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/080_mask/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/080_mask/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/080_mask/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/090_border/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/090_border/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/090_border/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/100_tween/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/100_tween/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/100_tween/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/110_game_area/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/110_game_area/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/110_game_area/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/120_game_logics/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/120_game_logics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/120_game_logics/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/130_beat/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/130_beat/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/130_beat/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/140_timer/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/140_timer/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/140_timer/"/>
     </url>
     <url>
         <loc>zh_CN/020_basic/150_controller/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/150_controller/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/150_controller/"/>
+    </url>
+    <url>
+        <loc>zh_CN/020_basic/160_gui/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/020_basic/160_gui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="020_basic/160_gui/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/000_init/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/000_init/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/000_init/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/010_ui/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/010_ui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/010_ui/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/020_arena/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/020_arena/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/020_arena/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/030_player/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/030_player/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/030_player/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/040_attack/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/040_attack/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/040_attack/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/050_waves/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/050_waves/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/050_waves/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/060_bullets/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/060_bullets/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/060_bullets/"/>
     </url>
     <url>
         <loc>zh_CN/030_battle_system/070_scene/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/030_battle_system/070_scene/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="030_battle_system/070_scene/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/000_init/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/000_init/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/000_init/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/010_map/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/010_map/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/010_map/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/015_sti/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/015_sti/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/015_sti/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/020_char/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/020_char/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/020_char/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/030_interact/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/030_interact/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/030_interact/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/040_menu/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/040_menu/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/040_menu/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/050_encounter/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/050_encounter/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/050_encounter/"/>
     </url>
     <url>
         <loc>zh_CN/040_overworld/060_shop/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/040_overworld/060_shop/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="040_overworld/060_shop/"/>
     </url>
     <url>
         <loc>zh_CN/050_intermediate/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/"/>
     </url>
     <url>
         <loc>zh_CN/050_intermediate/000_dkjson/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/000_dkjson/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/000_dkjson/"/>
     </url>
     <url>
         <loc>zh_CN/050_intermediate/010_shadertoy/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/010_shadertoy/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/010_shadertoy/"/>
     </url>
     <url>
         <loc>zh_CN/050_intermediate/020_shaders/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/020_shaders/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/020_shaders/"/>
     </url>
     <url>
         <loc>zh_CN/050_intermediate/030_collision/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/030_collision/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/030_collision/"/>
     </url>
     <url>
         <loc>zh_CN/050_intermediate/040_math/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/050_intermediate/040_math/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="050_intermediate/040_math/"/>
     </url>
     <url>
         <loc>zh_CN/060_with_love/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/060_with_love/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="060_with_love/"/>
     </url>
     <url>
         <loc>zh_CN/060_with_love/000_graphics/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/060_with_love/000_graphics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="060_with_love/000_graphics/"/>
     </url>
     <url>
         <loc>zh_CN/060_with_love/010_audio/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/060_with_love/010_audio/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="060_with_love/010_audio/"/>
     </url>
     <url>
         <loc>zh_CN/070_develop/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/"/>
     </url>
     <url>
         <loc>zh_CN/070_develop/000_toolscenes/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/000_toolscenes/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/000_toolscenes/"/>
     </url>
     <url>
         <loc>zh_CN/070_develop/010_debugger/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/010_debugger/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/010_debugger/"/>
     </url>
     <url>
         <loc>zh_CN/070_develop/020_devtool/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/020_devtool/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/020_devtool/"/>
     </url>
     <url>
         <loc>zh_CN/070_develop/030_hotkeys/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/030_hotkeys/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/030_hotkeys/"/>
+    </url>
+    <url>
+        <loc>zh_CN/070_develop/040_preload/</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/070_develop/040_preload/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="070_develop/040_preload/"/>
     </url>
     <url>
         <loc>zh_CN/080_l10n/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/080_l10n/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="080_l10n/"/>
     </url>
     <url>
         <loc>zh_CN/080_l10n/000_files/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/080_l10n/000_files/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="080_l10n/000_files/"/>
     </url>
     <url>
         <loc>zh_CN/080_l10n/010_usage/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/080_l10n/010_usage/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="080_l10n/010_usage/"/>
     </url>
     <url>
         <loc>zh_CN/090_network/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/"/>
     </url>
     <url>
         <loc>zh_CN/090_network/000_gamejolt/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/000_gamejolt/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/000_gamejolt/"/>
     </url>
     <url>
         <loc>zh_CN/090_network/010_discord/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/010_discord/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/010_discord/"/>
     </url>
     <url>
         <loc>zh_CN/090_network/020_sock/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/090_network/020_sock/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="090_network/020_sock/"/>
     </url>
     <url>
         <loc>zh_CN/100_export/</loc>
-        <lastmod>2026-10-01</lastmod>
+        <lastmod>2026-10-08</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh_CN" href="zh_CN/100_export/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="100_export/"/>
     </url>
 </urlset>

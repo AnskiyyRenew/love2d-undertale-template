@@ -412,7 +412,17 @@ end
 function audio.PlaySound(sound, volume, loop)
     local inst = {}
     local resolved_path = audio.ResolvePath("sound", sound)
-    local source = SE.audio.newSource(resolved_path, "static")
+    -- Reuse a preloaded template Source when one exists (SE.Preload warm-up):
+    -- cloning shares the decoded buffer, so this skips the per-call decode.
+    local source
+    local template = audio.cache[resolved_path] or audio.cache[sound]
+    if (template) then
+        local ok, clone = pcall(function() return template:clone() end)
+        if (ok and clone) then source = clone end
+    end
+    if (not source) then
+        source = SE.audio.newSource(resolved_path, "static")
+    end
     source:setVolume(volume or Global.GetVariable("Volume").Master * Global.GetVariable("Volume").Sounds)
     source:setLooping(loop or false)
     source:play()
@@ -437,7 +447,17 @@ end
 function audio.PlayMusic(music, volume, loop)
     local inst = {}
     local resolved_path = audio.ResolvePath("music", music)
-    local source = SE.audio.newSource(resolved_path, "stream")
+    -- Reuse a preloaded template Source when one exists (SE.Preload warm-up):
+    -- cloning shares the stream handle, so this skips the per-call decoder setup.
+    local source
+    local template = audio.cache[resolved_path] or audio.cache[music]
+    if (template) then
+        local ok, clone = pcall(function() return template:clone() end)
+        if (ok and clone) then source = clone end
+    end
+    if (not source) then
+        source = SE.audio.newSource(resolved_path, "stream")
+    end
     source:setVolume(volume or Global.GetVariable("Volume").Master * Global.GetVariable("Volume").Music)
     source:setLooping(loop ~= false)
     source:play()
@@ -532,6 +552,43 @@ function audio.Update(dt)
             end
         end
     end
+end
+
+--- Preload a sound/music file into the audio cache as a template Source.
+--- PlaySound/PlayMusic clone from this template instead of re-decoding the
+--- file every call. "sound" (static) decodes the whole file into memory once;
+--- "music" (stream) keeps it on disk and just opens the handle, so the first
+--- PlayMusic still has to stream but no longer pays the decoder setup cost.
+--- Re-entering with the same path is a no-op (the existing template is kept).
+---
+--- The template is keyed by both the raw caller path and by its resolved
+--- form, so PlaySound / PlayMusic always find the cache regardless of how the
+--- caller wrote the name (bare "foo.wav", "Resources/Sounds/foo.wav", ...).
+---@param full_path string Full love-fs audio path.
+---@param kind string "sound" (static) or "music" (stream).
+---@return boolean loaded
+function audio.PreloadFile(full_path, kind)
+    if (not full_path) then return false end
+    if (audio.cache[full_path]) then return true end
+
+    local source_type = (kind == "music") and "stream" or "static"
+    local ok, source = pcall(function()
+        return SE.audio.newSource(full_path, source_type)
+    end)
+    if (not ok or not source) then
+        print("[Audio.Preload] Failed to preload: " .. tostring(full_path))
+        return false
+    end
+
+    -- Key by the raw path AND by every resolved form ResolvePath would
+    -- produce for this name, so PlaySound / PlayMusic find it either way.
+    audio.cache[full_path] = source
+    local resolved = audio.ResolvePath(kind, full_path)
+    if (resolved and resolved ~= full_path) then
+        audio.cache[resolved] = source
+    end
+
+    return true
 end
 
 return audio

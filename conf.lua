@@ -46,7 +46,7 @@ FILL_SCREEN = true
 -- is locked to the opening's top-left. When false, the canvas is fit to the
 -- window on its own and the Border frame is NOT drawn (the previous "auto"
 -- behaviour). Has no effect unless SCREEN_SCALE is "auto" / true / "integer".
-BORDER_MODE = true
+BORDER_MODE = false
 
 -- Enable error handler to show custom error screen
 -- If you don't know which error crashed the game. Then you need to set it to false.

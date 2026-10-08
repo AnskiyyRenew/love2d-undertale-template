@@ -1,0 +1,3454 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../150_controller/index.html">
+      
+      
+        <link rel="next" href="../../030_battle_system/index.html">
+      
+      
+        
+          <link rel="alternate" href="../../../020_basic/160_gui/index.html" hreflang="en">
+        
+          <link rel="alternate" href="./index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>❕️ GUI 库 - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ❕️ GUI 库
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../020_basic/160_gui/index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    入门优先
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    入门优先
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    环境配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发之前
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua 速通
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速上手
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    快速上手
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修改游戏信息
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    新建与跳转场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基础开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    基础开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    贴图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 打字机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图层系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    全局变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    画布与屏幕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遮罩
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    边框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    缓动
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game 区与资源覆盖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    游戏逻辑与世界规则
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    节拍
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计时器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    输入与控制器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI 库
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        坐标与图层约定
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        字体约定
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生命周期
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guiinput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        鼠标输入助手 GUI.Input
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        组件
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="组件">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#window" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#label" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Label
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#button" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Button
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#textinput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TextInput
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dropdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dropdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        陷阱
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        相关
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    战斗系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗初始化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗框
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    玩家与灵魂
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    攻击模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    回合脚本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    弹幕库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    战斗场景与回调
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld 主世界系统
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld 主世界系统
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    初始化与场景骨架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 地图与对象层
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI 与图块集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    角色
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    交互与对话
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    菜单 · 存档 · 箱子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    遇敌
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    商店
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    高阶开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    高阶开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy 转化库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    着色器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    碰撞库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学教程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    与LOVE开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    与LOVE开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像绘制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    音频系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    辅助开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    辅助开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    场景辅助工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对象调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    变量调试器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    引擎热键
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/040_preload/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 资源预加载
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../080_l10n/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    本地化
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    本地化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目录与语言文件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../080_l10n/010_usage/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    查词与替换
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    网络开发
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    网络开发
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock 联机
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    导出与发布
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    导出与发布
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        坐标与图层约定
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        字体约定
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生命周期
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guiinput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        鼠标输入助手 GUI.Input
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        组件
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="组件">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#window" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#label" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Label
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#button" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Button
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#textinput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TextInput
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dropdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dropdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        陷阱
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        相关
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>❕️ GUI 库</h1>
+
+<p>引擎自带的 UNDERTALE 风格图形界面库，提供窗口、文字、按钮、滑块、文本输入框、下拉框等组件，以及一个把鼠标坐标从窗口空间换算到画布空间的输入助手。</p>
+<p>库路径： <code>Scripts/Libraries/GUI/</code> （文件夹形式， <code>init.lua</code> 为入口）。</p>
+<p>加载：在 <code>main.lua</code> 中 <code>GUI = ImportFile("GUI")</code>，<strong>必须在 Typers 之后</strong>（Label 包装了 Typers.InstText）。加载后即可在任意场景直接用全局 <code>GUI</code> 调用。</p>
+<p>依赖：</p>
+<ul>
+<li><a href="../030_typers/index.html">Typers</a> —— Label / Button / Slider / TextInput / Dropdown 的文字都走 <code>Typers.InstText</code>，中英文自动分流。</li>
+<li><a href="../040_layers/index.html">图层系统</a> —— 所有绘制经 <code>Layers.add_external</code> 注册，不建贴图。</li>
+</ul>
+<hr />
+<h2 id="_1">坐标与图层约定<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>约定</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>坐标语义</td>
+<td><strong>左上角 (x, y) + 宽高 (w, h)</strong>；<code>Window:SetCenter</code> 切中心点（兼容战斗框语义）。</td>
+</tr>
+<tr>
+<td>默认图层</td>
+<td><code>1000</code>（高于战斗元素）；可用 <code>:SetLayer</code> 调整，或在 <code>New</code> 时传 <code>layer</code>。</td>
+</tr>
+<tr>
+<td>鼠标坐标</td>
+<td>love 鼠标坐标是<strong>窗口屏幕空间</strong>，GUI 在 <strong>640×480 画布空间</strong>。两者经 <code>GUI.Input.ScreenToCanvas</code> 换算（见下文）。</td>
+</tr>
+<tr>
+<td>像素吸附</td>
+<td>内部 <code>math.floor(v + 0.5)</code> 吸附，与 <code>Sprites.snapCoord</code> 一致。</td>
+</tr>
+<tr>
+<td>颜色还原</td>
+<td>每次绘制完还原白色，颜色不会泄漏到同帧其他图层（陷阱 #7）。</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_2">字体约定<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>经实测，仅下列字号渲染清晰，GUI 库直接复用 <code>Typers.InstText</code> 的 bondfont 机制，<strong>调用方无需自行处理字体</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>语种</th>
+<th>字体</th>
+<th>字号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>英文</td>
+<td><code>Resources/Fonts/determination_mono.ttf</code></td>
+<td><code>27</code> 或 <code>13</code></td>
+</tr>
+<tr>
+<td>中文</td>
+<td><code>Resources/Fonts/simsun.ttc</code></td>
+<td>仅 <code>13</code>；画 27 号须 <code>scale=2</code> 放大</td>
+</tr>
+</tbody>
+</table>
+<p>中英混排由 <code>Typers.InstText</code> 按字符字节自动分流（<code>charlen</code> 判 <code>1</code>=英 / <code>&gt;1</code>=中），<code>GUI.Label</code> 是它的薄封装。</p>
+<hr />
+<h2 id="_3">生命周期<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>调用方持有组件引用，在 <code>scene.clear</code> 时逐个 <code>:Destroy()</code>。<code>Layers.clear()</code> 会停止 <code>external</code> 绘制，但<strong>不释放</strong> Label 的 InstText 文本缓存引用（InstText 用引用计数），所以必须显式 <code>Destroy</code>，否则会泄漏并可能触发"Cannot use object after it has been released"。</p>
+<p><code>TextInput.Focus</code> 会打开系统文本输入（<code>love.keyboard.setTextInput</code>）；<code>Blur</code> / <code>Destroy</code> 必须关闭它，否则离开场景后仍在接收输入。</p>
+<hr />
+<h2 id="guiinput">鼠标输入助手 <code>GUI.Input</code><a class="headerlink" href="#guiinput" title="Permanent link">&para;</a></h2>
+<p><strong>关键点：love 的鼠标坐标是窗口屏幕空间的，GUI 组件在画布空间，必须换算才能命中。</strong></p>
+<p><code>GUI.Input</code> 用全局 <code>DrawX</code> / <code>DrawY</code> / <code>ScreenScale</code>（由 <code>main.lua</code> 的 <code>updateScreenScale</code> 设置）做换算，并做按键边沿检测，让场景每帧轮询 <code>IsPressed</code> / <code>IsReleased</code> / <code>IsDown</code> 即可，语义和键盘的手写 <code>prev</code> 表一致。</p>
+<p>状态模型：</p>
+<ul>
+<li><code>held</code> 实时—— <code>OnPressed</code> / <code>OnReleased</code> 直接改，<code>IsDown</code> 反映此刻状态。</li>
+<li><code>pressed</code> / <code>released</code> / <code>wheel</code> 每帧冻结——异步事件先进 <code>pending</code>，<code>Update()</code> 开头换入 <code>state</code> 并清 <code>pending</code>，所以 <code>IsPressed</code> / <code>IsReleased</code> 恰好为下一帧 <code>true</code>。</li>
+</ul>
+<p>场景接线（<code>main.lua</code> 已把全部鼠标回调转发到场景，非 <code>pausing</code> 时）：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 四个 love 回调转发给助手</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">mousepressed</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">,</span><span class="w"> </span><span class="nv">button</span><span class="p">)</span><span class="w">  </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">OnPressed</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">,</span><span class="w"> </span><span class="nv">button</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">mousereleased</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">,</span><span class="w"> </span><span class="nv">button</span><span class="p">)</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">OnReleased</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">,</span><span class="w"> </span><span class="nv">button</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">mousemoved</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w">            </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">OnMoved</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">wheelmoved</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w">            </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">OnWheel</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">scene</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">Update</span><span class="p">()</span><span class="w">   </span><span class="c1">-- 必须放在 scene.update 最前面，冻结本帧状态</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">mx</span><span class="p">,</span><span class="w"> </span><span class="nv">my</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">GetCanvasMouse</span><span class="p">()</span><span class="w">   </span><span class="c1">-- 画布空间坐标</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">IsPressed</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span><span class="w">            </span><span class="c1">-- 左键 = 1；本帧刚按下</span>
+<span class="w">        </span><span class="c1">-- 命中检测 / 触发组件</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">wheel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">GetWheel</span><span class="p">()</span><span class="w">          </span><span class="c1">-- +1 上 / -1 下 / 0</span>
+<span class="kr">end</span>
+</code></pre></div>
+<details class="example">
+<summary>GUI.Input 接口一览</summary>
+<ul>
+<li><code>ScreenToCanvas(sx, sy)</code> 纯换算：<code>(sx-DrawX)/ScreenScale, (sy-DrawY)/ScreenScale</code>。</li>
+<li><code>GetCanvasMouse()</code> 当前画布空间光标位置。</li>
+<li><code>IsDown(button)</code> 是否按住（实时）。</li>
+<li><code>IsPressed(button)</code> 本帧是否刚按下（边沿）。</li>
+<li><code>IsReleased(button)</code> 本帧是否刚松开（边沿）。</li>
+<li><code>GetWheel()</code> 本帧滚轮增量（<code>+1</code> / <code>-1</code> / <code>0</code>）。</li>
+<li><code>OnPressed(sx, sy, btn)</code> / <code>OnReleased(...)</code> / <code>OnMoved(sx, sy)</code> / <code>OnWheel(x, y)</code> 在 love 回调里调。</li>
+<li><code>Update()</code> 在 <code>scene.update</code> 开头调。</li>
+<li><code>Reset()</code> 在 <code>scene.clear</code> 调——防鼠标按下后切场景，love 可能不给新场景发 <code>mousereleased</code> 导致 <code>IsDown</code> 卡死。</li>
+</ul>
+</details>
+<hr />
+<h2 id="_4">组件<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="window">Window<a class="headerlink" href="#window" title="Permanent link">&para;</a></h3>
+<p>视觉窗口：两个矩形堆叠（粗外边框 + 内填充），纯视觉、无碰撞、无玩家约束。动画用和战斗框一样的"限速逼近目标"方式（<code>smooth_value</code>）。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">win</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Window</span><span class="p">.</span><span class="py">New</span><span class="p">{</span>
+<span class="w">    </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nv">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">240</span><span class="p">,</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">120</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">thickness</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="nv">layer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="nv">win</span><span class="p">:</span><span class="nf">ResizeWithSpeed</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="mi">150</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 平滑缩放（须在 scene.update 调 win:Update(dt)）</span>
+<span class="nv">win</span><span class="p">:</span><span class="nf">SetCenter</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">)</span><span class="w">                 </span><span class="c1">-- 切中心点语义</span>
+<span class="nv">win</span><span class="p">:</span><span class="nf">SetVisible</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="c1">-- scene.clear: win:Destroy()</span>
+</code></pre></div>
+<details class="example">
+<summary>Window 接口</summary>
+<ul>
+<li><code>New{x, y, w, h, thickness, outer, inner, layer, visible}</code> 外层色默认 MainColor，内层默认黑。</li>
+<li><code>:MoveTo(x, y, imm)</code> / <code>:SetCenter(cx, cy, imm)</code> 移动；<code>imm=true</code> 立即同步不动画。</li>
+<li><code>:Resize(w, h, imm)</code> / <code>:ResizeWithSpeed(w, h, sw, sh)</code> 缩放。</li>
+<li><code>:SetThickness(t, imm)</code> 边框厚度。</li>
+<li><code>:SetOuterColor(c)</code> / <code>:SetInnerColor(c)</code> / <code>:SetOuterAlpha(a)</code> / <code>:SetInnerAlpha(a)</code>。</li>
+<li><code>:SetVisible(v)</code> / <code>:SetLayer(layer)</code>。</li>
+<li><code>:Update(dt)</code> 平滑动画驱动（静态菜单可不调）。</li>
+<li><code>:GetCenter()</code> / <code>:ContainsPoint(x, y)</code> 中心点 / 命中检测。</li>
+<li><code>:Destroy()</code> 幂等。</li>
+</ul>
+</details>
+<h3 id="label">Label<a class="headerlink" href="#label" title="Permanent link">&para;</a></h3>
+<p>文字标签，薄封装 <code>Typers.InstText</code>，中英文混排自动分流。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">lbl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Label</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s2">&quot;Hello 世界&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">})</span>
+<span class="nv">lbl</span><span class="p">:</span><span class="nf">SetAlign</span><span class="p">(</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+<span class="nv">lbl</span><span class="p">:</span><span class="nf">SetText</span><span class="p">(</span><span class="s2">&quot;新文字&quot;</span><span class="p">)</span>
+<span class="nv">lbl</span><span class="p">:</span><span class="nf">SetColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 黄</span>
+<span class="nv">lbl</span><span class="p">:</span><span class="nf">SetAlpha</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nv">lbl</span><span class="p">:</span><span class="nf">SetWrapWidth</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 自动换行（传 nil/0 关闭）</span>
+<span class="c1">-- scene.clear: lbl:Destroy()</span>
+</code></pre></div>
+<details class="example">
+<summary>Label 接口</summary>
+<ul>
+<li><code>New(text, pos, layer, size)</code> <code>pos={x,y}</code>；<code>size={boxWidth,_}</code> 开自动换行。</li>
+<li><code>:SetText(t)</code> / <code>:SetAlign(mode)</code> （<code>"left"</code> / <code>"center"</code> / <code>"right"</code>）/ <code>:SetColor(r,g,b)</code> / <code>:SetAlpha(a)</code>。</li>
+<li><code>:SetPosition(x, y)</code> / <code>:SetWrapWidth(w)</code> （改宽度后内部自动 <code>Rebuild</code>）/ <code>:Rebuild()</code>。</li>
+<li><code>:Inst()</code> 直接取底层 InstText（高级用途，慎用）。</li>
+</ul>
+</details>
+<div class="admonition warning">
+<p class="admonition-title">改 auto_wrap / size 不会自动重排</p>
+<p><code>InstText</code> 的 <code>auto_wrap</code> 和 <code>size</code> 改了之后<strong>必须</strong> <code>:Rebuild()</code>，否则行不会重排。<code>Label.SetWrapWidth</code> 内部已调，直接改 <code>inst.auto_wrap</code> 则要手动 <code>Rebuild</code>。</p>
+</div>
+<h3 id="button">Button<a class="headerlink" href="#button" title="Permanent link">&para;</a></h3>
+<p>按钮，UNDERTALE 风格选中态。键盘选中 = 前缀 <code>"&gt; "</code> + 黄色；鼠标 hover = 黄色无前缀（两种状态视觉区分开）；未选中用 2 空格等宽占位防文字抖动。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">btn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Button</span><span class="p">.</span><span class="py">New</span><span class="p">{</span>
+<span class="w">    </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">150</span><span class="p">,</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FIGHT&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">            </span><span class="c1">-- 鼠标命中区</span>
+<span class="w">    </span><span class="nv">onSelect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="nv">btn</span><span class="p">:</span><span class="nf">SetSelected</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">          </span><span class="c1">-- 键盘选中</span>
+<span class="nv">btn</span><span class="p">:</span><span class="nf">SetHovered</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">           </span><span class="c1">-- 鼠标 hover</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">confirm</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="nv">btn</span><span class="p">:</span><span class="nf">Trigger</span><span class="p">()</span><span class="w"> </span><span class="kr">end</span>
+</code></pre></div>
+<details class="example">
+<summary>Button 接口</summary>
+<ul>
+<li><code>New{x, y, w, h, text, selected, onSelect, layer, prefix, pad, colorNormal, colorSelected}</code>。</li>
+<li><code>:SetSelected(v)</code> / <code>:SetHovered(v)</code> / <code>:SetText(t)</code> / <code>:SetPosition(x, y)</code> / <code>:SetOnSelect(fn)</code>。</li>
+<li><code>:ContainsPoint(x, y)</code> 命中检测。</li>
+<li><code>:Trigger()</code> 触发 <code>onSelect</code> 回调。</li>
+<li>颜色逻辑：<code>selected or hovered</code> → <code>colorSelected</code>（黄），否则 <code>colorNormal</code>（白）。</li>
+</ul>
+</details>
+<h3 id="slider">Slider<a class="headerlink" href="#slider" title="Permanent link">&para;</a></h3>
+<p>水平滑块：track + knob 两矩形。纯组件不读输入，场景调 <code>:Move</code> / <code>:SetValue</code> / <code>:DragTo</code> / <code>:Wheel</code> 驱动。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Slider</span><span class="p">.</span><span class="py">New</span><span class="p">{</span>
+<span class="w">    </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="nv">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">240</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="nv">step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">focused</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">             </span><span class="c1">-- knob 变黄</span>
+<span class="p">}</span>
+<span class="c1">-- 键盘：:Move(1) / :Move(-1)</span>
+<span class="c1">-- 鼠标：:DragTo(mx, my) 拖拽 / :Wheel(dir) 滚轮 / :ContainsPoint 命中</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">s</span><span class="p">:</span><span class="nf">GetValue</span><span class="p">()</span>
+</code></pre></div>
+<details class="example">
+<summary>Slider 接口</summary>
+<ul>
+<li><code>New{x, y, w, min, max, value, step, trackH, knobSize, trackColor, knobColor, focusedColor, focused, showLabel, layer}</code>。</li>
+<li><code>:Move(dir)</code> <code>+1</code> / <code>-1</code> 个 step；<code>:SetValue(v)</code> / <code>:SetRange(min, max)</code> / <code>:GetValue()</code>。</li>
+<li><code>:DragTo(cx, cy)</code> 画布空间 x → value（拖拽时调）。</li>
+<li><code>:Wheel(dir)</code> 滚轮（同 <code>:Move</code>）。</li>
+<li><code>:SetFocused(v)</code> knob 高亮。</li>
+<li><code>:ContainsPoint(x, y)</code> 命中（带 4px 余量）。</li>
+<li><code>step</code> 网格吸附防连续 <code>Move</code> 的浮点漂移。</li>
+</ul>
+</details>
+<h3 id="textinput">TextInput<a class="headerlink" href="#textinput" title="Permanent link">&para;</a></h3>
+<p>单行文本输入框：窗口式细边框 + 文字 + 闪烁光标。<code>Focus</code> 打开系统文本输入（<code>love.keyboard.setTextInput</code>），让 OS 发字符事件；场景把 <code>textinput</code> / <code>keypressed</code> 路由进来。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ti</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">TextInput</span><span class="p">.</span><span class="py">New</span><span class="p">{</span>
+<span class="w">    </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nv">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">240</span><span class="p">,</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">placeholder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">maxLen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">onSubmit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">self</span><span class="p">:</span><span class="nf">GetText</span><span class="p">())</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="c1">-- 场景路由：</span>
+<span class="c1">--   scene.textinput(t)  -&gt; ti:HandleTextInput(t)</span>
+<span class="c1">--   scene.keypressed(k) -&gt; ti:HandleKeyPressed(k)</span>
+<span class="c1">--   scene.update(dt)    -&gt; ti:Update(dt)        -- 光标闪烁</span>
+<span class="c1">-- 点击聚焦：if (ti:ContainsPoint(mx,my)) then ti:Focus() else ti:Blur() end</span>
+</code></pre></div>
+<details class="example">
+<summary>TextInput 接口</summary>
+<ul>
+<li><code>New{x, y, w, h, thickness, placeholder, maxLen, layer, onSubmit}</code>。</li>
+<li><code>:Focus()</code> / <code>:Blur()</code> / <code>:SetFocused(v)</code> —— 开关系统文本输入 + <code>setKeyRepeat</code>（backspace 长按重复）。</li>
+<li><code>:HandleTextInput(text)</code> 追加字符（滤换行，按 <code>maxLen</code> 截断）。</li>
+<li><code>:HandleKeyPressed(key)</code> 返回是否消费：<code>backspace</code> 删一个 UTF-8 码点、<code>escape</code> blur、<code>return</code> / <code>kpenter</code> 触发 <code>onSubmit</code>；其他键返回 <code>false</code>（不消费，键盘导航照常工作）。</li>
+<li><code>:SetText(t)</code> / <code>:GetText()</code> / <code>:ContainsPoint(x, y)</code> / <code>:Update(dt)</code> / <code>:SetPosition(x, y)</code>。</li>
+</ul>
+</details>
+<div class="admonition note">
+<p class="admonition-title">maxLen 按字符数计，不按字节</p>
+<p><code>maxLen</code> 数 UTF-8 码点，所以一个 CJK 字算 <code>1</code>。backspace 也删一个码点（不是一字节）。</p>
+</div>
+<h3 id="dropdown">Dropdown<a class="headerlink" href="#dropdown" title="Permanent link">&para;</a></h3>
+<p>下拉框：触发按钮显示当前选中项，点击展开选项列表。<code>w</code> 是菜单宽度，<code>buttonW</code>（可选，默认=<code>w</code>）是触发按钮宽度。<code>expand="up"|"down"</code> 指定展开方向。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Dropdown</span><span class="p">.</span><span class="py">New</span><span class="p">{</span>
+<span class="w">    </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="nv">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">180</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">buttonW</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">180</span><span class="p">,</span><span class="w">            </span><span class="c1">-- 可选，默认 = w</span>
+<span class="w">    </span><span class="nv">buttonH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="nv">itemH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">items</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Red&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Green&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Blue&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="nv">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">expand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;down&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1">-- &quot;up&quot; | &quot;down&quot;</span>
+<span class="w">    </span><span class="nv">layer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1001</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">onSelect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">self</span><span class="p">,</span><span class="w"> </span><span class="nv">idx</span><span class="p">,</span><span class="w"> </span><span class="nv">text</span><span class="p">)</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">idx</span><span class="p">,</span><span class="w"> </span><span class="nv">text</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="c1">-- 场景路由（scene.update，GUI.Input.Update() 之后）：</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">mx</span><span class="p">,</span><span class="w"> </span><span class="nv">my</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">GetCanvasMouse</span><span class="p">()</span>
+<span class="nv">dd</span><span class="p">:</span><span class="nf">SetHover</span><span class="p">(</span><span class="nv">mx</span><span class="p">,</span><span class="w"> </span><span class="nv">my</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">GUI</span><span class="p">.</span><span class="py">Input</span><span class="p">.</span><span class="nf">IsPressed</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">consumed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dd</span><span class="p">:</span><span class="nf">HandleClick</span><span class="p">(</span><span class="nv">mx</span><span class="p">,</span><span class="w"> </span><span class="nv">my</span><span class="p">)</span><span class="w">  </span><span class="c1">-- 点触发按钮=展开/收起；点选项=选中+收起；点外部=收起但不消费</span>
+<span class="kr">end</span>
+</code></pre></div>
+<details class="example">
+<summary>Dropdown 接口</summary>
+<ul>
+<li><code>New{x, y, w, buttonW, buttonH, itemH, thickness, gap, expand, items, selected, layer, onSelect}</code>。</li>
+<li><code>:SetHover(mx, my)</code> 每帧调，更新 hover 高亮。</li>
+<li><code>:HandleClick(mx, my)</code> 点击时调，返回是否消费。</li>
+<li><code>:SetExpanded(v)</code> / <code>:IsExpanded()</code> / <code>:GetSelected()</code> / <code>:GetSelectedText()</code> / <code>:SetItems(items)</code> / <code>:SetPosition(x, y)</code> / <code>:SetOnSelect(fn)</code> / <code>:ContainsAny(mx, my)</code>。</li>
+<li>选中项 = 黄 + 前缀 <code>"&gt; "</code>；hover 项 = 黄无前缀；其他 = 白（与 Button 一致）。</li>
+<li>触发按钮边框 hover / 展开时变黄；菜单边框始终白。</li>
+<li>菜单左对齐触发按钮；选项行位置 <code>New</code> 时定，展开只切 <code>alpha=0/1</code>。</li>
+</ul>
+</details>
+<hr />
+<h2 id="_5">陷阱<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">图层同层遮挡：背景不能与文字同层</p>
+<p>Layers 同层按 <code>_id</code>（注册顺序）排，<strong>后注册的后画</strong>（视觉在上）。若一个组件的背景（<code>drawWindow</code> 黑色内层）和文字 Label 同层，且背景后注册，黑色填充会盖住文字。</p>
+<p>解决：组件内部把背景放 <code>layer</code>、文字放 <code>layer+1</code>（光标再 <code>layer+2</code>）。<code>TextInput</code> 和 <code>Dropdown</code> 都这么做。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">闭包引用 local 必须先声明</p>
+<p>若一个组件的 <code>onSubmit</code> / <code>onSelect</code> 等回调闭包引用了某个 <code>local</code> 变量（如 <code>feedback_timer</code>），而该 <code>local</code> 声明在闭包<strong>之后</strong>，闭包会写<strong>全局</strong>而非那个 local（Lua 不会提升 local）。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 错：onSubmit 闭包写的是全局 feedback_timer，不是下面的 local</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">ti</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">TextInput</span><span class="p">.</span><span class="py">New</span><span class="p">{</span><span class="w"> </span><span class="nv">onSubmit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span><span class="w"> </span><span class="nv">feedback_timer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">120</span><span class="w"> </span><span class="kr">end</span><span class="w"> </span><span class="p">}</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">feedback_timer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="c1">-- 对：local 提到闭包之前</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">feedback_timer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">ti</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">GUI</span><span class="p">.</span><span class="py">TextInput</span><span class="p">.</span><span class="py">New</span><span class="p">{</span><span class="w"> </span><span class="nv">onSubmit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">()</span><span class="w"> </span><span class="nv">feedback_timer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">120</span><span class="w"> </span><span class="kr">end</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><code>luac -p</code> 查不出这个（运行时作用域问题，不是语法错）。</p>
+</div>
+<hr />
+<h2 id="_6">相关<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../030_typers/index.html">打字机 Typers</a> —— Label / Button 等文字的底层（InstText、bondfont、字符分流）。</li>
+<li><a href="../040_layers/index.html">图层系统</a> —— <code>add_external</code> / <code>remove_external</code> / <code>clear</code>。</li>
+<li><a href="../150_controller/index.html">输入与控制器</a> —— 键盘 / 手柄输入；GUI 的鼠标部分用 <code>GUI.Input</code>（见上文）。</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

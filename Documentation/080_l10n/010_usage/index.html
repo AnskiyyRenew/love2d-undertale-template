@@ -1,0 +1,3450 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../000_files/index.html">
+      
+      
+        <link rel="next" href="../../090_network/index.html">
+      
+      
+        
+          <link rel="alternate" href="./index.html" hreflang="en">
+        
+          <link rel="alternate" href="../../zh_CN/080_l10n/010_usage/index.html" hreflang="zh_CN">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Lookup and Substitution - SoulEngine Documentation (3.0.0)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#two-ways-to-write-the-key" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SoulEngine Documentation (3.0.0)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lookup and Substitution
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./index.html" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh_CN/080_l10n/010_usage/index.html" hreflang="zh_CN" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SoulEngine Documentation (3.0.0)
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../000_before/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before You Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Before You Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/000_download/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/010_getready/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Before Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../000_before/020_lua/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua Crash Course
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../010_quick_start/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modifying Game Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating and Switching Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../020_basic/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basic Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/000_conf/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/010_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/020_sprites/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Typers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/040_layers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/050_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/060_global/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/070_screen/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canvas & Screen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/080_mask/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mask
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/090_border/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Border
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/100_tween/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tween
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/110_game_area/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Area and Asset Override
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/120_game_logics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game Logic and World Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/130_beat/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/140_timer/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/150_controller/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input and Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/160_gui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../030_battle_system/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle System
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Battle System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/010_ui/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/020_arena/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/030_player/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player and Soul
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/040_attack/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/050_waves/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Turn Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/060_bullets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bullet Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../030_battle_system/070_scene/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battle Scene and Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../040_overworld/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overworld
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overworld
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/000_init/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization and Scene Skeleton
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/010_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 Maps and Object Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/015_sti/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 STI and Tilesets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/020_char/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Character
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/030_interact/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interaction and Dialogue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/040_menu/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Menu · Save · Chest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/050_encounter/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encounter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../040_overworld/060_shop/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../050_intermediate/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intermediate Development
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Intermediate Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/000_dkjson/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/010_shadertoy/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ShaderToy Conversion Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/020_shaders/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/030_collision/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collision Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../050_intermediate/040_math/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Math Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../060_with_love/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with LÖVE
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with LÖVE
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/000_graphics/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Graphics Drawing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../060_with_love/010_audio/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../070_develop/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Tools
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/000_toolscenes/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Scenes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/010_debugger/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variable Debugger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/030_hotkeys/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Engine Hotkeys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/040_preload/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Localization
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Localization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../000_files/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directories and Language Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lookup and Substitution
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./index.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lookup and Substitution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-ways-to-write-the-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two ways to write the key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#substitution-parameters-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Substitution parameters (formats)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Substitution parameters (formats)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multiple-placeholders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple placeholders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-single-value-doesnt-need-a-table-wrapper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A single value doesn't need a table wrapper
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-value-is-not-just-a-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return value is not just a string
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamically-joined-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dynamically joined keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-the-engine-looks-up-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the engine looks up keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-happens-when-a-key-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What happens when a key is missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typewriter-tags-pass-through-verbatim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typewriter tags pass through verbatim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#virtual-keyboards-special-channel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual keyboard's special channel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../090_network/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Networking
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/000_gamejolt/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameJolt API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/010_discord/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord RPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../090_network/020_sock/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sock networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../100_export/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Export & Release
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Export & Release
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-ways-to-write-the-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two ways to write the key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#substitution-parameters-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Substitution parameters (formats)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Substitution parameters (formats)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multiple-placeholders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple placeholders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-single-value-doesnt-need-a-table-wrapper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A single value doesn't need a table wrapper
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-value-is-not-just-a-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return value is not just a string
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamically-joined-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dynamically joined keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-the-engine-looks-up-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the engine looks up keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-happens-when-a-key-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What happens when a key is missing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typewriter-tags-pass-through-verbatim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typewriter tags pass through verbatim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#virtual-keyboards-special-channel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual keyboard's special channel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Lookup and Substitution</h1>
+
+<p>There is only one entry point for lookup:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="nv">key</span><span class="p">)</span>
+<span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="nv">key</span><span class="p">,</span><span class="w"> </span><span class="nv">substitution</span><span class="w"> </span><span class="nv">parameters</span><span class="p">)</span>
+</code></pre></div>
+<p><code>Localize</code> is global (imported at <code>main.lua</code> startup via <code>ImportFile("Localize")</code>), so it can be called directly anywhere.</p>
+<hr />
+<h2 id="two-ways-to-write-the-key">Two ways to write the key<a class="headerlink" href="#two-ways-to-write-the-key" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Style</th>
+<th>Example</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>String</td>
+<td><code>"Battle.Spare"</code></td>
+<td>Most common</td>
+</tr>
+<tr>
+<td>Table</td>
+<td><code>{"Battle", "Spare"}</code></td>
+<td>Joined internally with <code>.</code>, equivalent to the above</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.Spare&quot;</span><span class="p">)</span>
+<span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">({</span><span class="s2">&quot;Battle&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Spare&quot;</span><span class="p">})</span><span class="w">     </span><span class="c1">-- the same key</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Only string elements in the table get joined</p>
+<p>When joining, it's <code>if type(elements[i]) == "string"</code> that is collected; numbers and booleans are <strong>silently dropped</strong>. If the result is an empty table it returns <code>nil</code> and prints <code>Invalid localization key table.</code>.</p>
+</div>
+<hr />
+<h2 id="substitution-parameters-formats">Substitution parameters (formats)<a class="headerlink" href="#substitution-parameters-formats" title="Permanent link">&para;</a></h2>
+<p>The second parameter is handed to <code>string.format</code>, supporting all placeholders like <code>%s</code> <code>%d</code> <code>%f</code> <code>%x</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;Battle.HP.NotFull&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;* You recovered %s HP!&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.HP.NotFull&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">12</span><span class="p">})</span>
+<span class="c1">-- -&gt; &quot;* You recovered 12 HP!&quot;</span>
+</code></pre></div>
+<h3 id="multiple-placeholders">Multiple placeholders<a class="headerlink" href="#multiple-placeholders" title="Permanent link">&para;</a></h3>
+<p>Fill them in order; the wrong order makes the text come out wrong:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;Battle.WinTexts1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;* You won![wait:0.5]\n* You got %s XP and %s gold.\n&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.WinTexts1&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nv">exp</span><span class="p">,</span><span class="w"> </span><span class="nv">gold</span><span class="p">})</span>
+</code></pre></div>
+<h3 id="a-single-value-doesnt-need-a-table-wrapper">A single value doesn't need a table wrapper<a class="headerlink" href="#a-single-value-doesnt-need-a-table-wrapper" title="Permanent link">&para;</a></h3>
+<p>If what you pass isn't a table, the engine wraps it itself:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.HP.NotFull&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">)</span><span class="w">      </span><span class="c1">-- equivalent to {12}</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Mismatched parameters return the original text</p>
+<p>When <code>string.format</code> fails (not enough parameters, wrong type, extra <code>%</code>), the engine <strong>does not error</strong>, it only prints a line <code>[L10N WARNING] string.format failed for key: ...</code>, then <strong>returns the string with <code>%s</code> verbatim</strong>. The player will see the literal <code>%s</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.HP.NotFull&quot;</span><span class="p">)</span><span class="w">       </span><span class="c1">-- forgot to pass parameters</span>
+<span class="c1">-- -&gt; &quot;* You recovered %s HP!&quot;   ← comes out verbatim, placeholder not substituted</span>
+</code></pre></div>
+</div>
+<hr />
+<h2 id="return-value-is-not-just-a-string">Return value is not just a string<a class="headerlink" href="#return-value-is-not-just-a-string" title="Permanent link">&para;</a></h2>
+<p>The looked-up value has two legal types, with different return behavior:</p>
+<table>
+<thead>
+<tr>
+<th>Value in JSON</th>
+<th>Without formats</th>
+<th>With formats</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>String</td>
+<td>Return string after substitution</td>
+<td>Same as left</td>
+</tr>
+<tr>
+<td>Array</td>
+<td><strong>Return the whole array as-is</strong></td>
+<td><strong>Per-element</strong> substitution on each string element, return a new array</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;Overworld.Menu.Buttons&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Item&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Stat&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Phone&quot;</span><span class="p">],</span>
+<span class="nt">&quot;Battle.GameoverText&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;* Our fate\n  rests on you...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;* %s![wait:0.5]\n  Hold your determination...&quot;</span><span class="p">],</span>
+<span class="nt">&quot;Overworld.Menu.Interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">215</span><span class="p">,</span><span class="w"> </span><span class="mi">312</span><span class="p">,</span><span class="w"> </span><span class="mi">425</span><span class="p">]</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Overworld.Menu.Buttons&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="w">           </span><span class="c1">-- &quot;Item&quot;</span>
+<span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.GameoverText&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nv">Player</span><span class="p">.</span><span class="py">name</span><span class="p">})</span><span class="w">  </span><span class="c1">-- array, both lines had %s substituted</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">tonumber</span><span class="p">(</span><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Overworld.Menu.Interval&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span><span class="w">  </span><span class="c1">-- 215</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">The localization file is also used to store layout values</p>
+<p><code>Overworld.Menu.Interval</code> is a set of x coordinates, not text. Because buttons differ in length across languages, putting coordinates into the translation file is a reasonable usage.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Non-string elements in an array are kept as-is</p>
+<p>During per-element substitution <code>else result[i] = current[i]</code> — numbers are not processed by <code>string.format</code>.</p>
+</div>
+<hr />
+<h2 id="dynamically-joined-keys">Dynamically joined keys<a class="headerlink" href="#dynamically-joined-keys" title="Permanent link">&para;</a></h2>
+<p>Keys can be assembled at runtime; this is for "configuring different text per enemy / per action". The engine's Battle scene does exactly this:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Scripts/Scenes/Battle/scene_battle_init.lua:24</span>
+<span class="nv">Battle</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span>
+<span class="w">    </span><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.Actions.Texts.&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">enemy</span><span class="p">.</span><span class="py">id</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">action</span><span class="p">.</span><span class="py">id</span><span class="p">),</span>
+<span class="w">    </span><span class="s2">&quot;ACTIONSELECT&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The corresponding keys in JSON:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;Battle.Actions.Texts.Poseur.Check&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;* Poseur[wait:0.5] - 0 ATK 0 DEF...&quot;</span><span class="p">],</span>
+<span class="nt">&quot;Battle.Actions.Texts.Poseur.Pose&quot;</span><span class="p">:</span><span class="w">  </span><span class="p">[</span><span class="s2">&quot;* You and Poseur strike a pose...&quot;</span><span class="p">]</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">A joined key won't auto-find its parent</p>
+<p>If <code>Battle.Actions.Texts.Poseur.Pose</code> doesn't exist, it just doesn't exist; it <strong>won't</strong> fall back to <code>Battle.Actions.Texts.Poseur</code>. Miss one enemy and you miss a stretch of dialogue.</p>
+</div>
+<hr />
+<h2 id="where-the-engine-looks-up-keys">Where the engine looks up keys<a class="headerlink" href="#where-the-engine-looks-up-keys" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Keys used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Game/Encounter/*.lua</code></td>
+<td><code>Battle.Narration.Default</code>, <code>Battle.EnemiesName.*</code>, <code>Battle.Actions.Names.*</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Scenes/Battle/scene_battle*.lua</code></td>
+<td><code>Battle.Actions.Texts.&lt;enemy&gt;.&lt;action&gt;</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Scenes/scene_gameover.lua</code></td>
+<td><code>Battle.GameoverText</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Libraries/Overworld/stat.lua</code></td>
+<td><code>Overworld.Menu.Buttons</code> / <code>.Item</code> / <code>.Stat</code> / <code>.Interval</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Libraries/Overworld/shop.lua</code></td>
+<td><code>Overworld.Shop.Action.&lt;action&gt;</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Libraries/Overworld/Pages/save.lua</code></td>
+<td><code>Overworld.Save.Buttons</code> / <code>.Success</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Libraries/Overworld/Pages/chest.lua</code></td>
+<td><code>Overworld.Chest.Title</code> / <code>.Tip</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Waves/nobody_came.lua</code></td>
+<td><code>Overworld.Text.NobodyCame</code></td>
+</tr>
+<tr>
+<td><code>Scripts/Libraries/Controller/VirtualKeyboard.lua</code></td>
+<td><code>VirtualKeyboard.*</code></td>
+</tr>
+</tbody>
+</table>
+<p>For the full list of engine-bundled keys, see <code>Localization/zh_CN.json</code> directly, grouped by prefix:</p>
+<table>
+<thead>
+<tr>
+<th>Prefix</th>
+<th>Manages what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Battle.Narration.*</code></td>
+<td>The first narration line when entering Battle</td>
+</tr>
+<tr>
+<td><code>Battle.Spare</code> / <code>.Flee</code></td>
+<td>Battle buttons</td>
+</tr>
+<tr>
+<td><code>Battle.HP.*</code></td>
+<td>Heal prompt</td>
+</tr>
+<tr>
+<td><code>Battle.Items.Page</code> / <code>Battle.WinTexts*</code></td>
+<td>Item pagination, victory settlement</td>
+</tr>
+<tr>
+<td><code>Battle.GameoverText</code></td>
+<td>The two game-over lines</td>
+</tr>
+<tr>
+<td><code>Battle.EnemiesName.&lt;enemy id&gt;</code></td>
+<td>Enemy name</td>
+</tr>
+<tr>
+<td><code>Battle.Actions.Names.&lt;action id&gt;</code></td>
+<td>Action name in the ACT menu</td>
+</tr>
+<tr>
+<td><code>Battle.Actions.Texts.&lt;enemy id&gt;.&lt;action id&gt;</code></td>
+<td>The lines spoken after selecting an action</td>
+</tr>
+<tr>
+<td><code>Overworld.Menu.*</code></td>
+<td>Menu buttons, STAT panel layout</td>
+</tr>
+<tr>
+<td><code>Overworld.Save.*</code> / <code>Overworld.Chest.*</code></td>
+<td>Save page, chest page</td>
+</tr>
+<tr>
+<td><code>Overworld.Shop.Action.*</code></td>
+<td>Shop buy/sell/talk/leave</td>
+</tr>
+<tr>
+<td><code>VirtualKeyboard.*</code></td>
+<td>Virtual keyboard editor UI text</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition example">
+<p class="admonition-title">Adding translation for your own enemy</p>
+<ol>
+<li>Write <code>Localize.localizeText("Battle.EnemiesName.Sol")</code> in <code>Game/Encounter/&lt;your enemy&gt;.lua</code></li>
+<li>Add <code>"Battle.EnemiesName.Sol": "Sol"</code> in <code>Game/Localization/&lt;language&gt;.json</code></li>
+<li>Press F2 to reload</li>
+</ol>
+<p>The key name can be anything, as long as both sides match; but <strong>following the engine's prefixes</strong> is easier to maintain.</p>
+</div>
+<hr />
+<h2 id="what-happens-when-a-key-is-missing">What happens when a key is missing<a class="headerlink" href="#what-happens-when-a-key-is-missing" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kr">if</span><span class="w"> </span><span class="nv">current</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[L10N WARNING] Missing localization key: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">elements</span><span class="p">))</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>It doesn't error, it returns <code>nil</code>. But this <code>nil</code> is handed directly to the caller:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- In battle: nil goes straight into the typewriter</span>
+<span class="nv">Battle</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;...&quot;</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;ACTIONSELECT&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><code>Typers.EText.New(nil, ...)</code> will blow up later when iterating the text — the symptom is "crashes only after you press", rather than quietly showing blank. So when you see <code>Missing localization key</code> in the terminal, don't treat it as noise; it's a signal of <strong>impending crash or display glitch</strong>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Looking up keys every frame spams warnings</p>
+<p>Menu-type code redraws every frame and looks up keys every frame; miss one key and that's 60 lines of warnings per second. Either fill in the key, or cache the result yourself like the virtual keyboard does.</p>
+</div>
+<hr />
+<h2 id="typewriter-tags-pass-through-verbatim">Typewriter tags pass through verbatim<a class="headerlink" href="#typewriter-tags-pass-through-verbatim" title="Permanent link">&para;</a></h2>
+<p>The <code>[wait:0.5]</code>, <code>[speed:0.05]</code>, <code>\n</code> in translation text are <strong>not handled by the localization layer</strong>; <code>localizeText</code> only does <code>string.format</code>, and the tags are handed to the typewriter verbatim for interpretation.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;Battle.Narration.Default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;* Poseur struck[wait:0.5]\n  [speed:0.05]a pose!&quot;</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">When writing JSON, line breaks are <code>\n</code></p>
+<p>JSON can't have a direct line break; you must write the <code>\n</code> escape. The typewriter's layout (like two-space indentation) is achieved with spaces in the string, so preserve those spaces when translating.</p>
+</div>
+<hr />
+<h2 id="virtual-keyboards-special-channel">Virtual keyboard's special channel<a class="headerlink" href="#virtual-keyboards-special-channel" title="Permanent link">&para;</a></h2>
+<p>The virtual keyboard doesn't call <code>localizeText</code> directly, but goes through its own <code>VirtualKeyboard.L(key)</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">VirtualKeyboard</span><span class="p">.</span><span class="nf">L</span><span class="p">(</span><span class="nv">key</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- ① First look up &quot;VirtualKeyboard.&quot; .. key</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">full</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">VirtualKeyboard</span><span class="p">.</span><span class="py">l10nPrefix</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">key</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">pcall</span><span class="p">(</span><span class="nv">l</span><span class="p">.</span><span class="py">localizeText</span><span class="p">,</span><span class="w"> </span><span class="nv">full</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">cached</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">ok</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="nv">value</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">cached</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="nv">cached</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="c1">-- ② If not found, use the built-in word set</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">set</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">LABEL_SETS</span><span class="p">[</span><span class="nf">resolveLanguage</span><span class="p">()]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">LABEL_SETS</span><span class="p">.</span><span class="py">en</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">set</span><span class="p">[</span><span class="nv">key</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">LABEL_SETS</span><span class="p">.</span><span class="py">en</span><span class="p">[</span><span class="nv">key</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">key</span>
+<span class="kr">end</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field / function</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>VirtualKeyboard.useLocalize</code></td>
+<td>Default <code>true</code>; turn off to use only the built-in word set</td>
+</tr>
+<tr>
+<td><code>VirtualKeyboard.l10nPrefix</code></td>
+<td>Default <code>"VirtualKeyboard."</code></td>
+</tr>
+<tr>
+<td><code>VirtualKeyboard.SetLanguage("zh"/"en"/table)</code></td>
+<td>Force-specify; passing a table means a custom whole word set</td>
+</tr>
+<tr>
+<td><code>VirtualKeyboard.ClearLabelCache()</code></td>
+<td>Clear cache, <strong>must call after switching language at runtime</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">It's the only module with a built-in fallback word set</p>
+<p>Other modules get <code>nil</code> on a missing key; the virtual keyboard falls back to <code>LABEL_SETS.en</code> on a missing key, at most showing English, no crash. To change its text, add <code>VirtualKeyboard.&lt;key&gt;</code> to the JSON.</p>
+</div>
+<hr />
+<h2 id="pitfalls">Pitfalls<a class="headerlink" href="#pitfalls" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Value being number/boolean returns nil</p>
+<p>Only <code>string</code> and <code>table</code> are legal. Writing <code>"Battle.Foo": 123</code> prints <code>Invalid localization value for key: ...</code> and returns <code>nil</code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Don't write trailing commas or comments in JSON</p>
+<p>dkjson's tolerance for loose JSON is limited (it supports <code>//</code> and <code>/* */</code> comments, but not trailing commas). A parse failure falls back to <code>en</code> and prints position info:</p>
+<div class="highlight"><pre><span></span><code>[L10N WARNING] Invalid language file.
+               Using default language. (en)
+[L10N Error]   ... JSON parse error at position 123 in ...: ...
+</code></pre></div>
+<p>Use that <code>position</code> to locate the character directly.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Changed translation but it didn't take effect? Check in this order</p>
+<ol>
+<li>Does the terminal line <code>using language: xxx (path)</code> point to the file you edited</li>
+<li>Did you forget to press <strong>F2</strong> after editing</li>
+<li>Did the JSON fail to parse (there would be an <code>Invalid language file</code> warning)</li>
+<li>Is the key name misspelled (there would be a <code>Missing localization key</code> warning)</li>
+<li>Is the Chinese garbled (file encoding should be UTF-8)</li>
+</ol>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

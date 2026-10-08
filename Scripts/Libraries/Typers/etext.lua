@@ -46,10 +46,19 @@ Available tags:
                         [next] clears it together with the text (same as
                         [hidebubble]); the following sentence has to
                         [showbubble:] again.
-  [func:name]           Call function `name()` from _G (global scope).
+  [func:name]           Call function `name()`. Lookup order:
+                        1) this typer's funcs registry (set via typer:SetFunc)
+                        2) _G[ name ] (global scope, for backward compat)
+                        So [func:] can call local/upvalue functions that were
+                        registered with :SetFunc, not just globals.
   [func:name|a, b, c]   Call function `name(a, b, c)` with arguments separated by commas.
                         Use `|` to separate function name from arguments.
                         Numeric strings are auto-converted to numbers.
+  typer:SetFunc(name, fn)
+                        Register a function `fn` under string `name` in this
+                        typer's funcs table. Lets [func:name] reach closures
+                        and module-locals without polluting _G. A nil `fn`
+                        clears the entry. Chainable (returns typer).
 
 Tags can be chained consecutively: [font:x][colorHEX:ffff00][effect:shake, 2]
 
@@ -426,7 +435,16 @@ local function applyTag(typer, tag_name, tag_value)
             args_str = nil
         end
 
-        local fn = _G[func_name]
+        -- Lookup order: this typer's funcs registry first (so local/upvalue
+        -- functions registered via typer:SetFunc work), then _G as fallback
+        -- for backward compatibility with old global-function style.
+        local fn = nil
+        if (typer.funcs and typer.funcs[func_name]) then
+            fn = typer.funcs[func_name]
+        else
+            fn = _G[func_name]
+        end
+
         if (type(fn) == "function") then
             if (args_str) then
                 local args = {}
@@ -450,7 +468,7 @@ local function applyTag(typer, tag_name, tag_value)
                 end
             end
         else
-            print("[EText] function not found in _G: " .. tostring(func_name))
+            print("[EText] function not found in typer.funcs or _G: " .. tostring(func_name))
         end
         return true
     end
@@ -594,6 +612,11 @@ function typers.New(text, position, layer, size, mode)
     typer.has_star_prefix = false
     typer.auto_wrap = false
 
+    -- Per-typer function registry for [func:name]. Searched BEFORE _G so
+    -- local/upvalue/closure functions registered via :SetFunc can be called
+    -- from inside text without polluting the global namespace.
+    typer.funcs = {}
+
     typer.bondfont = {
         engfont = {font = "determination_mono.ttf", size = 27},
         non_engfont = {font = "simsun.ttc", size = 13},
@@ -709,6 +732,20 @@ function typers.New(text, position, layer, size, mode)
         typer.bondfont = config
         -- Re-setting bondfont re-enables the bondfont feature.
         typer.use_bondfont = true
+    end
+
+    ---Register a function under `name` in this typer's funcs registry.
+    ---[func:name] hits this table before _G, so closures / module-locals
+    ---can be called from text without polluting globals. Pass `nil` to clear.
+    ---Returns the typer for chaining: t:SetFunc("a", fa):SetFunc("b", fb).
+    function typer:SetFunc(name, fn)
+        if (type(name) ~= "string" or #name == 0) then return typer end
+        if (fn == nil) then
+            typer.funcs[name] = nil
+        elseif (type(fn) == "function") then
+            typer.funcs[name] = fn
+        end
+        return typer
     end
 
     function typer:SetupPortrait()

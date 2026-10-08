@@ -34,6 +34,9 @@ Scenes = ImportFile("SceneManager")
 Layers = ImportFile("Layers")
 Sprites = ImportFile("Sprites")
 Typers = ImportFile("Typers")
+-- GUI: UNDERTALE-style UI primitives (Window / Label / Button).
+-- Must load after Typers (Label wraps InstText) and Layers.
+GUI = ImportFile("GUI")
 -- Debugger / DevTool are development-only: skip loading them entirely in
 -- release builds (_RELEASED in conf.lua). The files themselves also bail out
 -- early on _RELEASED, and every call site below is nil-guarded.

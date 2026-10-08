@@ -2110,4 +2110,33 @@ function sprites.GetCacheInfo()
     return count, details
 end
 
+--- Preload an image into the sprite cache without creating a sprite instance.
+--- Used by SE.Preload to warm the cache for a whole folder at once. `full_path`
+--- is a love-fs path (typically Game/Resources/Sprites/...); it is normalised
+--- the same way CreateSprite normalises its own path, so a later
+--- CreateSprite("foo.png") whose Game copy lives at that path hits the cache
+--- instead of decoding the file again. Re-entering with the same path is a
+--- no-op (the existing cache entry is kept and its timestamp refreshed).
+---@param full_path string Full love-fs image path.
+---@return boolean loaded Whether the image actually loaded (false = placeholder).
+function sprites.PreloadFile(full_path)
+    if (not full_path) then return false end
+    local normalized = normalizeSpritePath(full_path)
+    if (not normalized) then return false end
+    local existing = sprites.cache[normalized]
+    if (existing) then
+        existing.last_used = os.time()
+        return existing.loaded
+    end
+    local img, imgData, loaded = loadImageSafe(normalized)
+    rememberImageData(img, imgData)
+    sprites.cache[normalized] = {
+        img = img,
+        imageData = imgData,
+        loaded = loaded,
+        last_used = os.time()
+    }
+    return loaded
+end
+
 return sprites
