@@ -131,6 +131,14 @@ end
 ---The engine's sprite pipeline (Sprites.lua) calls Draw -> Use -> draw ->
 ---Clear once per sprite, so each sprite re-writes its own masks and is
 ---unaffected.
+---
+---Second caveat (the "black canvas" bug): push("all") saves the stencil
+---state that was live when Clear was *entered* -- and Clear runs right
+---after Masks.Use(), so that saved state is "keep, greater, 0" (test ON).
+---pop() therefore resurrects a stencil test against the buffer we just
+---zeroed, which rejects every draw for the rest of the frame and turns the
+---whole canvas black. The setStencilState() AFTER pop re-disables the test
+---so Clear's contract ("leave the stencil disabled") actually holds.
 function masks.Clear()
     local ok, err = pcall(function()
         SE.graphics.push("all")
@@ -144,6 +152,10 @@ function masks.Clear()
         SE.graphics.setColorMask(true)
         SE.graphics.setStencilState()
         SE.graphics.pop()
+        -- pop("all") restores the stencil state saved at push time, which is
+        -- Masks.Use's "keep, greater, 0" (ON) since Clear is called after Use.
+        -- Re-disable the test here so it doesn't leak past Clear.
+        SE.graphics.setStencilState()
     end)
 
     if not ok then
