@@ -649,6 +649,8 @@
       
         
       
+        
+      
     
     
     
@@ -1161,6 +1163,34 @@
     
   
     ❕️ GUI 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 每帧回调
   
 
     
@@ -2337,6 +2367,8 @@
       
         
       
+        
+      
     
     
     
@@ -2513,6 +2545,34 @@
     
   
     ❕️ 资源预加载
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 密钥原生库
   
 
     
@@ -3244,8 +3304,8 @@
 <li><code>x</code> / <code>y</code> 中心坐标，默认 <code>320, 320</code> 。</li>
 <li><code>width</code> 宽度（像素），默认 <code>50</code> 。</li>
 <li><code>args</code> 可选设置表：<ul>
-<li><code>mode</code> <code>"none"</code> （静止）或 <code>"move"</code> （自动移动），默认 <code>"none"</code> 。</li>
-<li><code>speed</code> <code>{x = n, y = n}</code> ， <code>mode</code> 为 <code>"move"</code> 时的每帧位移。</li>
+<li><code>mode</code> <code>"none"</code> （静止）或 <code>"move"</code> （平台横移时带着玩家一起走），默认 <code>"none"</code> 。</li>
+<li><code>speed</code> <code>{x = n, y = n}</code> 每帧位移。<strong>只要填了就生效，与 <code>mode</code> 无关</strong> —— <code>mode</code> 已经不再管"平台动不动"这件事了。</li>
 <li><code>rotation</code> 平台角度，默认 <code>0</code> 。</li>
 <li><code>color</code> 平台颜色，默认 <code>{1, 0.3, 1}</code> 。</li>
 <li><code>layer</code> 所在图层，默认 <code>"BelowBullets"</code> 。</li>
@@ -3267,6 +3327,8 @@
 <li><code>SetRotation(angle)</code> 设置角度。</li>
 <li><code>SetWidth(w)</code> 设置宽度。</li>
 <li><code>Sync()</code> 手动同步高光线，一般不用调。</li>
+<li><code>SetStencils(stencils)</code> 给平台贴图<strong>和高光线</strong>一起套遮罩，一般写 <code>platform:SetStencils({Arena.mask})</code> 。</li>
+<li><code>Step</code> 约定字段，不是内置函数：写 <code>platform.Step = function (self) ... end</code> ， <code>Player.UpdatePlatforms(dt)</code> 每帧会调它一次——在平台移动并 <code>Sync()</code> 之后、落地判定之前。<strong>不传 <code>dt</code></strong>。详见 <a href="../../020_basic/170_step/index.html">基础开发 → Step 钩子</a> 。</li>
 <li><code>Destroy()</code> / <code>Delete()</code> 销毁这块平台。</li>
 </ul>
 </div>

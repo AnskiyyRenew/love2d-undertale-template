@@ -188,7 +188,7 @@ local Player = {
 Player.sprite = Sprites.CreateSprite(Player._spr_default, "Player")
 Player.sprite:MoveTo(999, 999)
 Player.sprite.color = {1, 0, 0}
-Player.sprite._hitbox = {4, 4}
+Player.sprite._hitbox = {2, 2}
 
 ---Switches the player's soul. The soul sets itself up through its own `Init`
 ---(sprite, tint, starting state) - see initSoul above.
@@ -284,6 +284,19 @@ function Player.SetHitBox(width, height, soul)
     end
 end
 
+---Pick the collision shape of a soul sprite: "ellipse" or "rect" (the default).
+---A round soul tested as an ellipse stops catching the four empty corners of
+---its box without paying for perfect-pixel collision. Synonyms work too
+---("circle" / "oval", "rectangle" / "box").
+---@param shape string|nil "ellipse" or "rect"; nil means "rect".
+---@param soul table|nil The soul object from Player.NewSoul; nil = main soul.
+---@return boolean ok False when `shape` is not a known shape name.
+function Player.SetHitboxShape(shape, soul)
+    local spr = soul and soul.sprite or Player.sprite
+    if (not spr) then return false end
+    return spr:SetHitboxShape(shape)
+end
+
 ---Switch the player soul sprite(s) to perfect-pixel collision, so the bullet
 ---test follows the heart's real pixels instead of the `_hitbox` box (see
 ---Sprites.SetPPCollision). Applies to the main soul and every extra soul sprite.
@@ -351,8 +364,10 @@ end
 ---@param width number|nil Visual width in pixels (default 50).
 ---@param args table|nil Optional settings:
 ---  rotation       (number)        platform angle, default 0
----  mode           (string)        "none" (static) or "move", default "none"
----  speed          ({x = n, y = n}) per-frame movement when mode is "move"
+---  mode           (string)        "none" or "move", default "none". Does NOT gate
+---                                 movement any more; it only decides whether a
+---                                 sideways drift carries the player along with it.
+---  speed          ({x = n, y = n}) per-frame movement, applied whenever it is set
 ---  color          ({r, g, b})     tint, default {1, 0.3, 1}
 ---  surface_offset (number)        extra offset from the top edge, default 0
 ---  surface_tolerance (number)     half-thickness of the catch band, default 2
@@ -449,6 +464,11 @@ function Player.BluePlatform(x, y, width, args)
         self:Sync()
     end
 
+    function platform:SetStencils(stencils)
+        self.image:SetStencils(stencils)
+        self.line:SetStencils(stencils)
+    end
+
     ---Removes the platform, its sprite and its highlight line from the scene.
     function platform:Destroy()
         if (self.line) then
@@ -511,9 +531,10 @@ function Player.BluePlatformCollide(sprite, vertical)
     local speed = sprite.speed or {x = 0, y = 0}
     local frame_dx, frame_dy = (speed.x or 0), (speed.y or 0)
 
-    -- The foot sits half the player's (16x16) height below its centre, along the
-    -- sprite's local "down".
-    local half_h = 8
+    -- The foot sits half the player's height below its centre, along the
+    -- sprite's local "down". Scales with yscale so a crouched soul (yscale < 1)
+    -- still lands correctly instead of floating above the platform.
+    local half_h = math.max(2, ((sprite.height or 16) * (sprite.yscale or 1)) / 2)
     local psin = math.sin(math.rad(sprite.rotation or 0))
     local pcos = math.cos(math.rad(sprite.rotation or 0))
     local cur_fx = sprite.x - psin * half_h
@@ -548,7 +569,7 @@ function Player.BluePlatformCollide(sprite, vertical)
                 local rel = math.rad((sprite.rotation or 0) - (img.rotation or 0))
                 local ext_x = half_h * (math.abs(math.cos(rel)) + math.abs(math.sin(rel)))
 
-                local overlaps = (clx + ext_x - 8 > -pw / 2) and (clx - ext_x + 8 < pw / 2)
+                local overlaps = (clx + ext_x - 4 > -pw / 2) and (clx - ext_x + 4 < pw / 2)
 
                 -- Treat the surface as a thin band instead of an exact line. The
                 -- foot is snapped with sin/cos, so on an angled platform it can end
@@ -565,8 +586,10 @@ function Player.BluePlatformCollide(sprite, vertical)
                     sprite:Move(-snap * sin, snap * cos)
 
                     -- ...and ride along if the platform moved sideways this frame.
-                    local carry = (img.x - last_x) * cos + (img.y - last_y) * sin
-                    sprite:Move(carry * cos, carry * sin)
+                    if (platform.mode == "move") then
+                        local carry = (img.x - last_x) * cos + (img.y - last_y) * sin
+                        sprite:Move(carry * cos, carry * sin)
+                    end
 
                     return true
                 end
@@ -632,11 +655,14 @@ function Player.UpdatePlatforms(dt)
     -- the collision below uses their new spot.
     for _, platform in ipairs(platforms) do
         local img = platform.image
-        if (img and img.image and platform.mode == "move" and platform.speed) then
+        if (img and img.image and platform.speed) then
             img:Move(platform.speed.x or 0, platform.speed.y or 0)
         end
         if (platform.Sync) then
             platform:Sync()
+        end
+        if (platform.Step) then
+            platform:Step()
         end
     end
 
@@ -686,7 +712,10 @@ function Player.Update(dt)
                 -- `_hitbox` when one is set (a 16x16 heart tested as a small box).
                 local coll_p = Sprites.GetHitbox(Player.sprite)
 
-                if (Collisions.RectangleWithRectangle(coll_b, coll_p)) then
+                -- Both shapes carry their own kind (`shape`), so a bullet set to
+                -- "ellipse" (bullet:SetHitboxShape("ellipse")) is tested as an
+                -- ellipse here instead of as the rectangle around it.
+                if (Collisions.ShapeWithShape(coll_b, coll_p)) then
                     -- Broad phase hit. When either side asked for perfect-pixel
                     -- collision (sprite:SetPPCollision(true)) the real answer
                     -- comes from the rectangulated shapes; nil means neither

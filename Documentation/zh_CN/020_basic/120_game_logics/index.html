@@ -651,6 +651,8 @@
       
         
       
+        
+      
     
     
     
@@ -1311,6 +1313,34 @@
     
   
     ❕️ GUI 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 每帧回调
   
 
     
@@ -2320,6 +2350,8 @@
       
         
       
+        
+      
     
     
     
@@ -2496,6 +2528,34 @@
     
   
     ❕️ 资源预加载
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 密钥原生库
   
 
     
@@ -3125,7 +3185,7 @@ Game 区的覆盖顺序见 <a href="../110_game_area/index.html">Game 区与资�
 </code></pre></div>
 </details>
 <h3 id="_3">升级是怎么结算的<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>战斗结束时， <code>Scripts/Scenes/Battle/scene_battle_ow.lua</code> 的 <code>ReturnData()</code> 会把结果写回 <code>DATA</code> ：</p>
+<p>战斗结束时，引擎的 <code>Battle.SyncToOverworld()</code> （在 <code>Scripts/Libraries/Battle/init.lua</code> ，由 <code>Battle.Clear()</code> 调用）会把结果写回 <code>DATA</code> ：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">exp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">exp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">Battle</span><span class="p">.</span><span class="py">EXP</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">gold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">gold</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">Battle</span><span class="p">.</span><span class="py">GOLD</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">math.min</span><span class="p">(</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">maxhp</span><span class="p">,</span><span class="w"> </span><span class="nv">Player</span><span class="p">.</span><span class="py">hp</span><span class="p">))</span>

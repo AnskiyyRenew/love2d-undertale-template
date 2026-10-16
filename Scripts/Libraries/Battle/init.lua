@@ -210,7 +210,13 @@ local battle = {
     GOLD = 0,
     room_end = "scene_end",
     _end = false,
-    _end_time = 0
+    _end_time = 0,
+
+    -- Overworld save-data bridge (see the block below SetEndRoom). True by
+    -- default; set it to false before Battle.SetGame() for a scripted fight
+    -- that sets its own Player.hp and must not touch DATA.
+    auto_overworld_sync = true,
+    _data_synced = false
 }
 
 ---Public wrapper so other Battle modules (e.g. UI states) can drop the wave
@@ -345,6 +351,94 @@ function battle.SetEndRoom(room)
     battle.room_end = room
 end
 
+-- ---------------------------------------------------------------------------
+-- Overworld save-data bridge
+--
+-- `Game/Logics` (the global `DATA`) is the overworld's live save data; an
+-- encounter module only defines *template* player stats. Without a bridge a
+-- battle starts on the template's HP and its EXP / GOLD never reach the
+-- overworld - the player's stats look frozen at whatever Game/Logics says.
+--
+-- This used to live in Scripts/Scenes/Battle/scene_battle_ow.lua only, so any
+-- game that wired its overworld to a different battle scene silently lost every
+-- stat change. It now runs for every battle while overworld data is loaded.
+--
+-- It is idempotent: a scene that still does its own hand-off (the old
+-- scene_battle_ow pattern) simply sees Battle.EXP / GOLD already consumed, so
+-- nothing is ever counted twice.
+-- ---------------------------------------------------------------------------
+
+---Is this battle linked to an overworld save?
+---
+---False for battle-only games: `DATA` comes from `require("Game.Logics")`,
+---which only the Overworld library performs, so it stays nil there and both
+---directions are skipped without any configuration.
+---@return boolean
+function battle.HasOverworldData()
+    if (battle.auto_overworld_sync == false) then return false end
+    return (type(DATA) == "table" and type(DATA.player) == "table")
+end
+
+---Start the battle with the stats the overworld is carrying.
+---
+---Runs at the end of SetGame(), so it overrides the encounter module's
+---template values instead of being overridden by them.
+---@return boolean synced
+function battle.SyncFromOverworld()
+    if (not battle.HasOverworldData()) then return false end
+
+    local p = DATA.player
+    Player.name  = (p.name  ~= nil) and p.name  or Player.name
+    Player.lv    = (p.lv    ~= nil) and p.lv    or Player.lv
+    Player.maxhp = (p.maxhp ~= nil) and p.maxhp or Player.maxhp
+    Player.hp    = (p.hp    ~= nil) and p.hp    or Player.hp
+    Player.kr    = 0
+
+    if (UI and UI.barUpdate) then UI.barUpdate() end
+    return true
+end
+
+---Write this battle's results back into the overworld save data.
+---
+---Carries the HP the battle ended on, adds the earned EXP / GOLD and applies
+---any level-ups from `DATA.lv_data`. The earnings are consumed (zeroed) so a
+---second write-back can never double-count them.
+---@return boolean synced
+function battle.SyncToOverworld()
+    if (not battle.HasOverworldData()) then return false end
+    if (battle._data_synced) then return false end
+    battle._data_synced = true
+
+    local p = DATA.player
+    p.exp  = (p.exp  or 0) + (battle.EXP  or 0)
+    p.gold = (p.gold or 0) + (battle.GOLD or 0)
+    p.hp   = math.max(0, math.min(p.maxhp or Player.maxhp, Player.hp))
+
+    -- Level up while the total EXP has reached the next threshold.
+    local lv_data = DATA.lv_data
+    if (lv_data) then
+        local lv = p.lv or 1
+        while (lv_data[lv + 1] and p.exp >= lv_data[lv + 1].totalExp) do
+            local old_max = p.maxhp
+            lv = lv + 1
+            p.lv = lv
+
+            local row = lv_data[lv]
+            p.maxhp = row.hp
+            p.atk   = row.at
+            p.def   = row.df
+
+            -- Undertale-style: the gained max HP is added to the current HP.
+            p.hp = math.min(p.maxhp, p.hp + (p.maxhp - old_max))
+        end
+    end
+
+    -- Consume the earnings so a second write-back can never double-count.
+    battle.EXP = 0
+    battle.GOLD = 0
+    return true
+end
+
 ---Plays the victory message. The base lines come from "Battle.WinTexts1"
 ---(EXP / GOLD); `extra_texts` are appended after them. When the typewriter
 ---finishes, `on_complete` runs and then the battle fades out (`_end = true`).
@@ -407,6 +501,10 @@ function battle.SetGame(file)
         if (player_data.maxhp) then Player.maxhp = player_data.maxhp end
         if (player_data.hp) then Player.hp = player_data.hp end
         if (game_.wave) then Battle.wave = game_.wave end
+
+        -- Overworld save data wins over the encounter module's template stats.
+        battle.SyncFromOverworld()
+
         Battle.ChangeState(game_.state or "ACTIONSELECT")
         UI.buttons.ResetButtons()
         if (Battle.state == "ACTIONSELECT") then
@@ -594,9 +692,11 @@ end
 -- One key (F7) toggles an overlay showing the collision shapes that are really
 -- tested each frame: every sprite flagged `isBullet` plus the player soul(s).
 -- A sprite with perfect-pixel collision on (sprite:SetPPCollision(true)) is
--- drawn as its individual rectangles, one without it as the single box it
--- actually collides with. The plain box is always outlined faintly underneath,
--- so the difference between "box" and "true shape" is visible at a glance.
+-- drawn as its individual rectangles, one without it as the single shape it
+-- actually collides with -- an ellipse for a sprite set to "ellipse"
+-- (sprite:SetHitboxShape("ellipse")), otherwise the box. The plain box is always
+-- outlined faintly underneath, so the difference between "box" and "true shape"
+-- is visible at a glance.
 --
 -- It is drawn through the layer system on the TOP layer, so it follows the
 -- camera and covers the gameplay. Nothing here is even reachable in a release
@@ -624,6 +724,29 @@ local function drawHitboxShape(shape)
         shape.x - hw * cos_a - hh * sin_a, shape.y - hw * sin_a + hh * cos_a)
 end
 
+--- Draw one (possibly rotated) ellipse as a closed outline. LÖVE has no rotated
+--- ellipse of its own, so the points come from here and go out as a polygon --
+--- which also keeps the overlay to one draw call per shape.
+---@param shape table {x, y, w, h, angle}
+---@param segments integer|nil Corner count of the approximation; 24 by default.
+local function drawEllipseShape(shape, segments)
+    segments = segments or 24
+
+    local rad = math.rad(shape.angle or 0)
+    local cos_a, sin_a = math.cos(rad), math.sin(rad)
+    local rx, ry = math.abs(shape.w) * 0.5, math.abs(shape.h) * 0.5
+
+    local points = {}
+    for i = 1, segments do
+        local t = (i - 1) / segments * (math.pi * 2)
+        local lx, ly = math.cos(t) * rx, math.sin(t) * ry
+        points[#points + 1] = shape.x + lx * cos_a - ly * sin_a
+        points[#points + 1] = shape.y + lx * sin_a + ly * cos_a
+    end
+
+    SE.graphics.polygon("line", points)
+end
+
 --- Outline one sprite: the faint box plus the shapes that really collide, in the
 --- colour of its role.
 ---@param sprite Sprite
@@ -647,7 +770,11 @@ local function drawSpriteHitbox(sprite, r, g, b)
     end
 
     SE.graphics.setColor(r, g, b, 1)
-    drawHitboxShape(box)
+    if (box.shape == "ellipse") then
+        drawEllipseShape(box)
+    else
+        drawHitboxShape(box)
+    end
     return 1
 end
 
@@ -814,6 +941,10 @@ function battle.UpdateRestore(dt)
 end
 
 function battle.Clear()
+    -- Overworld save-data bridge: hand HP / EXP / GOLD (and any level-ups)
+    -- back to DATA before the modules themselves are dropped.
+    battle.SyncToOverworld()
+
     -- Clear the game module tree so it re-queries Localize on next load
     if battle.gameName then
         ClearModuleTree(battle.gameName)

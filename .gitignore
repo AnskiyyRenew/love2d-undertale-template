@@ -22,3 +22,11 @@ soulengine-doc3/
 # Stray zero-byte file left behind by a mistyped shell redirect (`2>0`).
 # Local only.
 /0
+
+# Native secret store (Packager/Secrets).
+#   secrets.local.json  the plaintext keys -- this is the thing worth hiding
+#   build/              generated .c plus throwaway test harnesses
+#   Resources/Libs/Secrets/  compiled artifacts, rebuilt by build.py
+Packager/Secrets/secrets.local.json
+Packager/Secrets/build/
+Resources/Libs/Secrets/

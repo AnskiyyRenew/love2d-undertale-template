@@ -33,7 +33,11 @@ function collisions.FollowShape(sprite)
         y = y + dx * sinA + dy * cosA,
         w = math.abs(w),
         h = math.abs(h),
-        angle = angle
+        angle = angle,
+        -- Which kind of shape this sprite collides as: "ellipse" when the sprite
+        -- asked for one (sprites.SetHitboxShape), "rect" otherwise. Reading it
+        -- here keeps ShapeWithShape usable with nothing but two sprites' shapes.
+        shape = sprite._hitbox_shape or "rect"
     }
 
     return data_tab
@@ -287,6 +291,89 @@ function collisions.CircleWithCircle(circle1, circle2)
     end
 
     return true
+end
+
+-- ---------------------------------------------------------------------------
+-- Shape kinds: rectangle or ellipse
+--
+-- Every function above already speaks one fixed shape ("this is a rectangle",
+-- "this is an ellipse"), which forces the caller to know which one it holds.
+-- A shape table can instead carry its own kind in `shape`: "ellipse" makes it
+-- an ellipse, anything else (including the field being absent) is a rectangle.
+-- That is what sprites.SetHitboxShape writes and what FollowShape / GetHitbox
+-- read back, so a round bullet can be tested as a round bullet without paying
+-- for perfect-pixel collision.
+--
+-- The two dispatchers below are the only places that need to look at the kind.
+-- ---------------------------------------------------------------------------
+
+--- The two shape kinds a sprite / shape table can carry.
+collisions.SHAPE_RECT = "rect"
+collisions.SHAPE_ELLIPSE = "ellipse"
+
+local SHAPE_KINDS = {
+    rect = "rect", rectangle = "rect", box = "rect",
+    ellipse = "ellipse", oval = "ellipse", circle = "ellipse"
+}
+
+--- Normalise a shape name written by a user to "rect" / "ellipse".
+--- Accepts the obvious synonyms ("circle", "box", ...) and any casing.
+---@param name any
+---@return string|nil kind "rect" / "ellipse", or nil when unrecognised.
+function collisions.ShapeName(name)
+    if (type(name) ~= "string") then return nil end
+    return SHAPE_KINDS[name:lower()]
+end
+
+--- Whether a shape table describes an ellipse. A missing `shape` field means
+--- rectangle, so every shape table written before this existed still works.
+---@param shape table|nil
+---@return boolean
+function collisions.IsEllipse(shape)
+    return (type(shape) == "table" and shape.shape == "ellipse")
+end
+
+--- Overlap test between two shapes that each may be a rectangle or an ellipse.
+--- Dispatches to the matching pair test, so callers stop caring which kind of
+--- shape they were handed (a bullet set to "ellipse" against the soul's box,
+--- two ellipses, and the plain rectangle case all go through here).
+---
+--- `w` / `h` stay diameters in both kinds, exactly like the functions above.
+---@param a table Shape table `{x, y, w, h, angle, shape?}`.
+---@param b table Shape table `{x, y, w, h, angle, shape?}`.
+---@return boolean
+function collisions.ShapeWithShape(a, b)
+    local a_ellipse, b_ellipse = collisions.IsEllipse(a), collisions.IsEllipse(b)
+
+    if (a_ellipse and b_ellipse) then
+        return collisions.CircleWithCircle(a, b)
+    elseif (a_ellipse) then
+        return collisions.RectangleWithCircle(b, a)
+    elseif (b_ellipse) then
+        return collisions.RectangleWithCircle(a, b)
+    end
+
+    return collisions.RectangleWithRectangle(a, b)
+end
+
+--- Point test against a shape that may be a rectangle or an ellipse.
+--- The ellipse branch halves `w` / `h` before calling CircleWithPoint, because
+--- that one function reads them as radii while everything else reads them as
+--- diameters (see CircleWithPoint's warning) -- going through here instead of
+--- calling it directly keeps one unit across the whole library.
+---@param shape table Shape table `{x, y, w, h, angle, shape?}`.
+---@param point table `{x = , y = }`.
+---@return boolean
+function collisions.ShapeWithPoint(shape, point)
+    if (collisions.IsEllipse(shape)) then
+        return collisions.CircleWithPoint({
+            x = shape.x, y = shape.y, angle = shape.angle or 0,
+            w = math.abs(shape.w or 0) * 0.5,
+            h = math.abs(shape.h or 0) * 0.5
+        }, point)
+    end
+
+    return collisions.RectangleWithPoint(shape, point)
 end
 
 return collisions

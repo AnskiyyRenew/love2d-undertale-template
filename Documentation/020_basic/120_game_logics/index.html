@@ -651,6 +651,8 @@
       
         
       
+        
+      
     
     
     
@@ -1311,6 +1313,34 @@
     
   
     ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step Hook
   
 
     
@@ -2320,6 +2350,8 @@
       
         
       
+        
+      
     
     
     
@@ -2496,6 +2528,34 @@
     
   
     ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Native Secret Store
   
 
     
@@ -3125,7 +3185,7 @@ So adding a field in Logics is equivalent to adding a field to the save.</p>
 </code></pre></div>
 </details>
 <h3 id="how-leveling-is-settled">How Leveling Is Settled<a class="headerlink" href="#how-leveling-is-settled" title="Permanent link">&para;</a></h3>
-<p>When a battle ends, <code>ReturnData()</code> in <code>Scripts/Scenes/Battle/scene_battle_ow.lua</code> writes the results back into <code>DATA</code>:</p>
+<p>When a battle ends, <code>Battle.SyncToOverworld()</code> in <code>Scripts/Libraries/Battle/init.lua</code> (called from <code>Battle.Clear()</code>) writes the results back into <code>DATA</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">exp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">exp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">Battle</span><span class="p">.</span><span class="py">EXP</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">gold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">gold</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">Battle</span><span class="p">.</span><span class="py">GOLD</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">math.min</span><span class="p">(</span><span class="nv">DATA</span><span class="p">.</span><span class="py">player</span><span class="p">.</span><span class="py">maxhp</span><span class="p">,</span><span class="w"> </span><span class="nv">Player</span><span class="p">.</span><span class="py">hp</span><span class="p">))</span>

@@ -649,6 +649,8 @@
       
         
       
+        
+      
     
     
     
@@ -1161,6 +1163,34 @@
     
   
     ❕️ GUI 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 每帧回调
   
 
     
@@ -2270,6 +2300,8 @@
       
         
       
+        
+      
     
     
     
@@ -2446,6 +2478,34 @@
     
   
     ❕️ 资源预加载
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 密钥原生库
   
 
     
@@ -3017,12 +3077,22 @@
 <p><img alt="OW-08" src="../../img/040_overworld/ow_08_encounter.png" /></p>
 <hr />
 <h2 id="_4">与战斗场景的桥接<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>推荐用引擎自带的 <code>Scripts/Scenes/Battle/scene_battle_ow.lua</code> ，它比普通战斗场景多了两件事：</p>
+<p>这部分<strong>引擎已经替你做了</strong>。只要主世界加载过（也就是 <code>Game/Logics</code> 那份全局 <code>DATA</code> 存在），任何战斗场景都会：</p>
 <ol>
-<li><strong>进场</strong>时把 <code>DATA.player</code> 的真实数据推进 <code>Player</code> （名字、LV、最大血量、当前血量），并把 <code>kr</code> 清零。</li>
-<li><strong>出场</strong>时把 <code>Battle.EXP</code> / <code>Battle.GOLD</code> / 剩余血量写回 <code>DATA</code> ，并按 <code>DATA.lv_data</code> 结算升级（升级时最大血量按表提升，并把提升量加到当前血量上）。</li>
+<li><strong>进场</strong>时（ <code>Battle.SetGame()</code> ）把 <code>DATA.player</code> 的真实数据推进 <code>Player</code> （名字、LV、最大血量、当前血量）并把 <code>kr</code> 清零 —— 它会盖掉遭遇文件里的模板数值。</li>
+<li><strong>出场</strong>时（ <code>Battle.Clear()</code> ）把 <code>Battle.EXP</code> / <code>Battle.GOLD</code> / 剩余血量写回 <code>DATA</code> ，并按 <code>DATA.lv_data</code> 结算升级（升级时最大血量按表提升，并把提升量加到当前血量上）。</li>
 </ol>
-<p>它还会把结束场景设成 <code>DATA.room</code> ，也就是<strong>打完仗自动回到进战斗前的那张地图</strong>。</p>
+<p>两半都在 <code>Scripts/Libraries/Battle/init.lua</code> 里，叫 <code>Battle.SyncFromOverworld()</code> / <code>Battle.SyncToOverworld()</code> 。它们是幂等的：写回会把 <code>Battle.EXP</code> / <code>Battle.GOLD</code> 清零，所以场景自己再写一次也<strong>不会重复计数</strong>。</p>
+<div class="admonition warning">
+<p class="admonition-title">纯战斗游戏不受影响</p>
+<p><code>DATA</code> 只有主世界库会创建（ <code>require("Game.Logics")</code> ）。没有主世界的游戏 <code>DATA</code> 就是 <code>nil</code> ，两个方向都会跳过，不需要任何配置。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">脚本化战斗要自己关掉</p>
+<p>某场战斗如果要刻意覆盖 <code>Player.hp</code> 且不能碰 <code>DATA</code> ，在 <code>Battle.SetGame(...)</code> 之前写
+<code>Battle.auto_overworld_sync = false</code> 。</p>
+</div>
+<p>遇敌目标仍然推荐用 <code>Scripts/Scenes/Battle/scene_battle_ow.lua</code> ：它还负责把结束场景设成 <code>DATA.room</code> ，也就是<strong>打完仗自动回到进战斗前的那张地图</strong>。</p>
 <div class="admonition example">
 <p class="admonition-title">遇敌相关全局量</p>
 <ul>
@@ -3032,7 +3102,7 @@
 <li><code>Battle.EXP</code> / <code>Battle.GOLD</code> 本场战斗的收益，写回后会被清零。</li>
 </ul>
 </div>
-<p>想自己写桥接场景，照着 <code>scene_battle_ow.lua</code> 抄即可，关键是 <code>scene.clear</code> 里那次写回别漏了。</p>
+<p>想自己写战斗场景，照着 <code>scene_battle_ow.lua</code> 抄即可 —— 但"数据交接"这一环已经在引擎里了，漏不掉。</p>
 
 
 

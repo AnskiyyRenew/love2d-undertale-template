@@ -395,13 +395,53 @@ function sprites.GetPPShapes(sprite)
     return imageRectsToWorld(sprite, rectsForImage(sprite.image, sprite.path))
 end
 
+--- Choose the kind of shape this sprite collides as: `"ellipse"` or `"rect"`.
+---
+--- A round bullet tested as a rectangle "hits" on its four empty corners, and
+--- the usual fix -- turning on perfect-pixel collision -- costs far more per
+--- frame than an ellipse test. This is the middle option: one shape that follows
+--- the art's silhouette, at the price of a single analytic test.
+---
+--- Synonyms are accepted and any casing works: `"circle"` / `"oval"` mean
+--- `"ellipse"`, `"rectangle"` / `"box"` mean `"rect"`. An unrecognised name is
+--- refused (the sprite keeps the kind it already had) instead of silently
+--- falling back, so a typo cannot quietly change how a bullet behaves.
+---@param sprite Sprite
+---@param kind string|nil "ellipse" / "rect" (or a synonym). nil = "rect".
+---@return boolean ok False when `kind` is not a known shape name.
+function sprites.SetHitboxShape(sprite, kind)
+    if (type(sprite) ~= "table") then return false end
+
+    local name = (kind == nil) and "rect" or (Collisions and Collisions.ShapeName(kind))
+    if (not name) then
+        print("[Sprites] SetHitboxShape: unknown shape '" .. tostring(kind) ..
+            "' (use \"rect\" or \"ellipse\").")
+        return false
+    end
+
+    sprite._hitbox_shape = name
+    return true
+end
+
+--- The kind of shape this sprite collides as: `"ellipse"` or `"rect"`.
+---@param sprite Sprite
+---@return string "rect" when the sprite never chose one.
+function sprites.GetHitboxShape(sprite)
+    if (type(sprite) ~= "table") then return "rect" end
+    return sprite._hitbox_shape or "rect"
+end
+
 --- The plain collision box of a sprite in world space: the image rectangle with
 --- the sprite's own `_hitbox` override ({width, height}, centred on that box)
 --- applied when it has one -- the exact shape Battle's player/bullet test uses
 --- for a sprite without perfect pixels. Same maths as Collisions.FollowShape
 --- (see imageRectsToWorld), so both paths always describe the same box.
+---
+--- Carries `shape` (see sprites.SetHitboxShape) so the result can go straight
+--- into Collisions.ShapeWithShape and be tested as an ellipse when the sprite
+--- asked for one.
 ---@param sprite Sprite
----@return table|nil {x, y, w, h, angle}; nil only for an invalid sprite.
+---@return table|nil {x, y, w, h, angle, shape}; nil only for an invalid sprite.
 function sprites.GetHitbox(sprite)
     if (not sprite) then return nil end
 
@@ -413,6 +453,7 @@ function sprites.GetHitbox(sprite)
         box.w = hitbox[1] or box.w
         box.h = hitbox[2] or box.h
     end
+    box.shape = sprites.GetHitboxShape(sprite)
     return box
 end
 
@@ -1774,6 +1815,29 @@ local sprite_methods = {}
     ---@return boolean
     function sprite_methods:IsPPCollision()
         return self.pp_collision == true
+    end
+
+    --- Collide as an ellipse instead of a rectangle (see sprites.SetHitboxShape).
+    ---
+    --- For round art this is the cheap middle ground: a rectangle "hits" on the
+    --- four empty corners of a circle, while perfect-pixel collision costs a
+    --- whole rectangulation to fix the same thing. The ellipse is inscribed in
+    --- the same box (`_hitbox` / image size), so it only ever removes corners --
+    --- it never makes a hit area bigger.
+    ---
+    --- Perfect-pixel collision, when it is on, still decides: pixel shapes are
+    --- rectangles and replace this shape entirely.
+    ---@param kind string|nil "ellipse" (or "circle" / "oval"), "rect" (or
+    ---                       "rectangle" / "box"); nil means "rect".
+    ---@return boolean ok False when `kind` is not a known shape name.
+    function sprite_methods:SetHitboxShape(kind)
+        return sprites.SetHitboxShape(self, kind)
+    end
+
+    --- The kind of shape this sprite collides as: "ellipse" or "rect".
+    ---@return string
+    function sprite_methods:GetHitboxShape()
+        return sprites.GetHitboxShape(self)
     end
 
 ---@param path string Sprite path, relative to Resources/Sprites/ (no prefix).

@@ -5,21 +5,22 @@ local scene = {}
 --
 -- scene_battle_ow is only ever entered from the overworld, so DATA always
 -- exists here. The encounter Game module only defines *template* player stats,
--- so the real save data is pushed into the live Player on entry, and the battle
--- results (HP / EXP / GOLD and any level-ups) are written back into DATA when
--- the scene is left.
+-- so the real save data has to win, and the battle results (HP / EXP / GOLD and
+-- any level-ups) have to reach DATA again when the scene is left.
+--
+-- Both halves now live in the Battle library (Battle.SyncFromOverworld /
+-- Battle.SyncToOverworld) so EVERY battle scene gets them, not just this one -
+-- a game that wired its overworld to another scene used to lose every stat
+-- change. Battle.SetGame() already synced on entry and Battle.Clear() syncs on
+-- exit; the calls below are kept so this file stays a readable reference for a
+-- hand-written bridge scene, and both are idempotent (the engine consumes
+-- Battle.EXP / GOLD, so nothing is ever counted twice).
 -- ---------------------------------------------------------------------------
 
 ---Push the overworld save data into the live Player so the battle starts with
 ---the carried name / LV / HP instead of the Game module's template values.
 local function ApplyDataToPlayer()
-    Player.name = DATA.player.name
-    Player.lv = DATA.player.lv
-    Player.maxhp = DATA.player.maxhp
-    Player.hp = DATA.player.hp
-    Player.kr = 0
-
-    UI.barUpdate()
+    Battle.SyncFromOverworld()
 end
 
 local data_returned = false
@@ -29,31 +30,7 @@ local function ReturnData()
     if (data_returned) then return end
     data_returned = true
 
-    -- EXP / GOLD earned during the battle.
-    DATA.player.exp = DATA.player.exp + (Battle.EXP or 0)
-    DATA.player.gold = DATA.player.gold + (Battle.GOLD or 0)
-
-    -- Carry the HP the player finished the battle with.
-    DATA.player.hp = math.max(0, math.min(DATA.player.maxhp, Player.hp))
-
-    -- Level up while the total EXP has reached the next threshold.
-    while (DATA.lv_data[DATA.player.lv + 1] and
-           DATA.player.exp >= DATA.lv_data[DATA.player.lv + 1].totalExp) do
-        local old_max = DATA.player.maxhp
-        DATA.player.lv = DATA.player.lv + 1
-
-        local row = DATA.lv_data[DATA.player.lv]
-        DATA.player.maxhp = row.hp
-        DATA.player.atk = row.at
-        DATA.player.def = row.df
-
-        -- Undertale-style: the gained max HP is added to the current HP.
-        DATA.player.hp = math.min(DATA.player.maxhp, DATA.player.hp + (DATA.player.maxhp - old_max))
-    end
-
-    -- Consume the earnings so a second write-back can never double-count.
-    Battle.EXP = 0
-    Battle.GOLD = 0
+    Battle.SyncToOverworld()
 end
 
 -- Import battle module

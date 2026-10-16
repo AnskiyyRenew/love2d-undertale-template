@@ -647,6 +647,8 @@
       
         
       
+        
+      
     
     
     
@@ -1159,6 +1161,34 @@
     
   
     ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../020_basic/170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step Hook
   
 
     
@@ -2168,6 +2198,8 @@
       
         
       
+        
+      
     
     
     
@@ -2344,6 +2376,34 @@
     
   
     ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Native Secret Store
   
 
     
@@ -3322,7 +3382,8 @@ Run the compatibility check at <strong>strictness 3</strong> before packaging:</
 <div class="admonition danger">
 <p class="admonition-title">GameJolt's private key ships with the game package</p>
 <p><code>GamejoltPK</code> is written in plaintext in the code and <strong>anyone who unpacks it can see it</strong>.<br>
-It shouldn't be treated as a real secret key; see <a href="../090_network/000_gamejolt/index.html">Networking → GameJolt</a> for details.</p>
+It shouldn't be treated as a real secret key; see <a href="../090_network/000_gamejolt/index.html">Networking → GameJolt</a> for details.<br>
+To drop the plain text, compile the key into a native library (<a href="../070_develop/050_secrets/index.html">Developer Tools → Native Secret Store</a>) — the packager ships the artifact automatically: it copies <code>secrets.dll</code> beside the exe on Windows, and <code>libsecrets.so</code> into <code>jniLibs/&lt;abi&gt;/</code> on Android.</p>
 </div>
 
 

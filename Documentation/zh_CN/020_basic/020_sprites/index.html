@@ -651,6 +651,8 @@
       
         
       
+        
+      
     
     
     
@@ -845,6 +847,17 @@
     <span class="md-ellipsis">
       
         库级方法
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        每帧回调 Step
       
     </span>
   </a>
@@ -1300,6 +1313,34 @@
     
   
     ❕️ GUI 库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 每帧回调
   
 
     
@@ -2309,6 +2350,8 @@
       
         
       
+        
+      
     
     
     
@@ -2485,6 +2528,34 @@
     
   
     ❕️ 资源预加载
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 密钥原生库
   
 
     
@@ -2915,6 +2986,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        每帧回调 Step
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3130,6 +3212,14 @@
 <li><code>Sprites.CleanupCache()</code> 手动跑一次 LRU 清理（正常流程下引擎会按 <code>OPT_LRU_SPRITES</code> 自动跑）。</li>
 </ul>
 </div>
+<hr />
+<h2 id="step">每帧回调 Step<a class="headerlink" href="#step" title="Permanent link">&para;</a></h2>
+<p>想让某张贴图每帧自己干点事（飘动、跟随、计时自毁……），往它身上挂一个 <code>Step</code> 函数即可，引擎每帧会自动调用：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">spr</span><span class="p">.</span><span class="py">Step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">,</span><span class="w"> </span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- 每帧一次</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>骨头和蓝灵魂平台上也有同名的钩子（不过没有 <code>dt</code> ）。完整说明见 <a href="../170_step/index.html">Step 每帧回调</a> 。</p>
 <hr />
 <h2 id="_4">像素吸附<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>像素画最怕"半像素抖动"：贴图坐标带着小数，采样出来的边缘就会忽明忽暗。这件事引擎默认就帮你做了。</p>

@@ -282,7 +282,14 @@ end
 
 function love.draw()
     SE.graphics.setCanvas({MAIN_CANVAS, stencil = true})
-    SE.graphics.clear(0, 0, 0, 1)
+    -- Clear colour AND stencil: the main canvas carries a stencil buffer
+    -- (format = "stencil"), and Masks.Draw writes into it via
+    -- setStencilState("increment", ...). Without clearing stencil every frame
+    -- a mask written in one wave leaks into every later wave -- a large mask
+    -- in turn A keeps the whole region passing Masks.Use(0)'s "greater" test
+    -- in turn B, so bullets using a smaller mask still render across the
+    -- stale large-mask area. clearstencil = true zeroes the buffer per frame.
+    SE.graphics.clear(0, 0, 0, 1, true, false, true)
 
     Camera:apply()
     Layers.draw()

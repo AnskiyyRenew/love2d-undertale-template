@@ -33,6 +33,19 @@ local function clamp(value, min, max)
     return math.max(min, math.min(value, max))
 end
 
+-- Returns the half-extent (half-width, half-height) of a sprite based on its
+-- image size and current scale. The player heart is 16x16 at scale 1, so the
+-- default is (8, 8); when yscale shrinks (crouch), the y half shrinks with it.
+-- A floor of 2px keeps collision sane for very small scales.
+local function sprite_half(sprite)
+    if (not sprite) then return 8, 8 end
+    local bw = (sprite.width or 16)
+    local bh = (sprite.height or 16)
+    local sx = (sprite.xscale or 1)
+    local sy = (sprite.yscale or 1)
+    return math.max(2, (bw * sx) / 2), math.max(2, (bh * sy) / 2)
+end
+
 local function direction(x1, y1, x2, y2, offset)
     local dx = x2 - x1
     local dy = y2 - y1
@@ -42,6 +55,7 @@ end
 local function check_nearest_arena()
     local distance = math.huge
     local nearest
+    local half_x, half_y = sprite_half(Player.sprite)
 
     for i = 1, #arenas.insts
     do
@@ -53,8 +67,8 @@ local function check_nearest_arena()
                 local w, h = shell.width, shell.height
                 local vx, vy = 0, 0
 
-                vx = clamp(dx * cos + dy * sin, -w / 2 + 8, w / 2 - 8)
-                vy = clamp(dy * cos - dx * sin, -h / 2 + 8, h / 2 - 8)
+                vx = clamp(dx * cos + dy * sin, -w / 2 + half_x, w / 2 - half_x)
+                vy = clamp(dy * cos - dx * sin, -h / 2 + half_y, h / 2 - half_y)
 
                 local dist = math.sqrt(math.pow(vx - (dx * cos + dy * sin), 2) + math.pow(vy - (dy * cos - dx * sin), 2))
                 if (dist < distance) then
@@ -65,7 +79,7 @@ local function check_nearest_arena()
                 local dx, dy = Player.sprite.x - shell.black.x, Player.sprite.y - shell.black.y
                 local sin, cos = math.sin(math.rad(shell.black.rotation)), math.cos(math.rad(shell.black.rotation))
                 local w, h = shell.width, shell.height
-                local a, b = w / 2 - 8, h / 2 - 8
+                local a, b = w / 2 - half_x, h / 2 - half_y
                 local rx, ry = dx * cos + dy * sin, dy * cos - dx * sin
                 local vx, vy = 0, 0
 
@@ -86,11 +100,12 @@ local function check_nearest_arena()
 end
 
 -- Check if a world-space point is valid for the player to stand on:
---   1) Must be inside at least one active plus arena (shrunk by 8px for player size)
---   2) Must NOT be inside any active minus arena (expanded by 5+8=13px per side for visual margin + player size)
+--   1) Must be inside at least one active plus arena (shrunk by the player's half-size)
+--   2) Must NOT be inside any active minus arena (expanded by visual margin + player half-size)
 local function is_point_valid(px, py)
     -- Check if inside any active plus arena
     local in_plus = false
+    local half_x, half_y = sprite_half(Player.sprite)
 
     for _, a in ipairs(arenas.insts)
     do
@@ -102,12 +117,12 @@ local function is_point_valid(px, py)
             local ly = dy * cos - dx * sin
 
             if (a.shape == "rectangle") then
-                if (lx >= -w / 2 + 8 and lx <= w / 2 - 8 and ly >= -h / 2 + 8 and ly <= h / 2 - 8) then
+                if (lx >= -w / 2 + half_x and lx <= w / 2 - half_x and ly >= -h / 2 + half_y and ly <= h / 2 - half_y) then
                     in_plus = true
                     break
                 end
             elseif (a.shape == "circle" or a.shape == "ellipse") then
-                local a_axis, b_axis = w / 2 - 8, h / 2 - 8
+                local a_axis, b_axis = w / 2 - half_x, h / 2 - half_y
                 if ((lx * lx) / (a_axis * a_axis) + (ly * ly) / (b_axis * b_axis) <= 1) then
                     in_plus = true
                     break
@@ -118,7 +133,7 @@ local function is_point_valid(px, py)
 
     if (not in_plus) then return false end
 
-    -- Check if NOT inside any active minus arena (expanded by (w+10)/2 + 8 = w/2 + 13 per side)
+    -- Check if NOT inside any active minus arena (expanded by (w+10)/2 + player half-size per side)
     for _, a in ipairs(arenas.insts)
     do
         if (a.is_active and a.mode == "minus") then
@@ -129,11 +144,11 @@ local function is_point_valid(px, py)
             local ly = dy * cos - dx * sin
 
             if (a.shape == "rectangle") then
-                if (lx >= -(w + 10) / 2 - 8 and lx <= (w + 10) / 2 + 8 and ly >= -(h + 10) / 2 - 8 and ly <= (h + 10) / 2 + 8) then
+                if (lx >= -(w + 10) / 2 - half_x and lx <= (w + 10) / 2 + half_x and ly >= -(h + 10) / 2 - half_y and ly <= (h + 10) / 2 + half_y) then
                     return false
                 end
             elseif (a.shape == "circle" or a.shape == "ellipse") then
-                local a_axis, b_axis = w / 2 + 8, h / 2 + 8
+                local a_axis, b_axis = w / 2 + half_x, h / 2 + half_y
                 if ((lx * lx) / (a_axis * a_axis) + (ly * ly) / (b_axis * b_axis) <= 1) then
                     return false
                 end
@@ -208,10 +223,9 @@ local function side_touching(player, ox, oy)
             elseif (a.mode == "minus") then
                 -- Touching when the probe enters the range.
                 -- NOTE: the collision in Arenas.Update keeps the player's centre out of the
-                -- expanded forbidden zone (thickness*2 + 8 per side), so after the first frame
+                -- expanded forbidden zone (thickness*2 + player half-size per side), so after the first frame
                 -- the probe can never reach the raw [-w/2, w/2] x [-h/2, h/2] range. Expand the
-                -- detection zone by the player's half-size (8px) only - not by the arena's visual
-                -- thickness - so the probe poking 9px past the centre still counts as entering it.
+                -- detection zone by a fixed 4px margin (not the arena's visual thickness)
                 local half_w = w / 2 + 4
                 local half_h = h / 2 + 4
 
@@ -234,11 +248,13 @@ end
 function arenas.PlayerOnGround(player)
     local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
 
-    -- The player is a 16x16 square, so from its centre to the foot is 8px. The
-    -- foot is probed along the player's local "down" (its gravity direction),
-    -- so the same test works for every soul rotation:
-    -- down (0), left (90), up (180) and right (270).
-    return side_touching(player, -psin * 10, pcos * 10)
+    -- The probe distance is the player's half-height (along its local "down")
+    -- plus a 2px margin so the foot pokes slightly past the boundary. The
+    -- half-height scales with yscale, so a crouched soul (yscale < 1) probes a
+    -- shorter distance and no longer floats above the floor.
+    local _, half_y = sprite_half(player)
+    local dist = half_y + 2
+    return side_touching(player, -psin * dist, pcos * dist)
 end
 
 ---Like PlayerOnGround, but probes the player's local "up": true when the top of
@@ -248,9 +264,46 @@ end
 ---@return boolean
 function arenas.PlayerOnCeiling(player)
     local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
+    local _, half_y = sprite_half(player)
+    local dist = half_y + 2
+    return side_touching(player, psin * dist, -pcos * dist)
+end
 
-    -- Half the player's height plus a 2px margin, along the local "up" direction.
-    return side_touching(player, psin * 10, -pcos * 10)
+---True when the player's left side (local -x) touches an arena edge.
+---Used by wall-based souls (e.g. Celeste grab/slide/jump).
+---@param player table
+---@return boolean
+function arenas.PlayerOnWallLeft(player)
+    local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
+    local half_x = sprite_half(player)
+    local dist = half_x + 2
+    return side_touching(player, -pcos * dist, -psin * dist)
+end
+
+---True when the player's right side (local +x) touches an arena edge.
+---@param player table
+---@return boolean
+function arenas.PlayerOnWallRight(player)
+    local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
+    local half_x = sprite_half(player)
+    local dist = half_x + 2
+    return side_touching(player, pcos * dist, psin * dist)
+end
+
+---True when either wall side touches an arena edge.
+---@param player table
+---@return boolean
+function arenas.PlayerOnWall(player)
+    return arenas.PlayerOnWallLeft(player) or arenas.PlayerOnWallRight(player)
+end
+
+---Returns which wall the player is touching.
+---@param player table
+---@return integer 1 = right wall, -1 = left wall, 0 = neither
+function arenas.GetWallSide(player)
+    if (arenas.PlayerOnWallRight(player)) then return 1 end
+    if (arenas.PlayerOnWallLeft(player)) then return -1 end
+    return 0
 end
 
 function arenas.New(mode, shape, x, y, width, height, angle)
@@ -276,7 +329,7 @@ function arenas.New(mode, shape, x, y, width, height, angle)
         is_active = true,
         is_containing = false,
 
-        move_player = true,
+        move_player = false,
         followers = {}
     }
     local _target = {
@@ -507,6 +560,7 @@ end
 
 function arenas.Update(dt)
     local p = Player.sprite
+    local p_half_x, p_half_y = sprite_half(p)
 
     for _, arena in ipairs(arenas.insts)
     do
@@ -557,8 +611,8 @@ function arenas.Update(dt)
         if (mode == "plus") then
             if (shape == "rectangle") then
                 if (
-                    dx * cos + dy * sin >= -w / 2 + 8 and dx * cos + dy * sin <= w / 2 - 8 and
-                    dy * cos - dx * sin >= -h / 2 + 8 and dy * cos - dx * sin <= h / 2 - 8
+                    dx * cos + dy * sin >= -w / 2 + p_half_x and dx * cos + dy * sin <= w / 2 - p_half_x and
+                    dy * cos - dx * sin >= -h / 2 + p_half_y and dy * cos - dx * sin <= h / 2 - p_half_y
                 ) then
                     arena.is_containing = true
                 else
@@ -566,19 +620,19 @@ function arenas.Update(dt)
                 end
 
                 if (check_plus_amount() < 1 and check_nearest_arena() == arena) then
-                    while ((p.x - arena.x) * math.cos(math.rad(arena.rotation)) + (p.y - arena.y) * math.sin(math.rad(arena.rotation)) < -w / 2 + 8) do
+                    while ((p.x - arena.x) * math.cos(math.rad(arena.rotation)) + (p.y - arena.y) * math.sin(math.rad(arena.rotation)) < -w / 2 + p_half_x) do
                         cos, sin = math.cos(math.rad(arena.rotation)), math.sin(math.rad(arena.rotation))
                         p:Move(cos, sin)
                     end
-                    while ((p.x - arena.x) * math.cos(math.rad(arena.rotation)) + (p.y - arena.y) * math.sin(math.rad(arena.rotation)) > w / 2 - 8) do
+                    while ((p.x - arena.x) * math.cos(math.rad(arena.rotation)) + (p.y - arena.y) * math.sin(math.rad(arena.rotation)) > w / 2 - p_half_x) do
                         cos, sin = math.cos(math.rad(arena.rotation)), math.sin(math.rad(arena.rotation))
                         p:Move(-cos, -sin)
                     end
-                    while ((p.y - arena.y) * math.cos(math.rad(arena.rotation)) - (p.x - arena.x) * math.sin(math.rad(arena.rotation)) > h / 2 - 8) do
+                    while ((p.y - arena.y) * math.cos(math.rad(arena.rotation)) - (p.x - arena.x) * math.sin(math.rad(arena.rotation)) > h / 2 - p_half_y) do
                         cos, sin = math.cos(math.rad(arena.rotation)), math.sin(math.rad(arena.rotation))
                         p:Move(sin, -cos)
                     end
-                    while ((p.y - arena.y) * math.cos(math.rad(arena.rotation)) - (p.x - arena.x) * math.sin(math.rad(arena.rotation)) < -h / 2 + 8) do
+                    while ((p.y - arena.y) * math.cos(math.rad(arena.rotation)) - (p.x - arena.x) * math.sin(math.rad(arena.rotation)) < -h / 2 + p_half_y) do
                         cos, sin = math.cos(math.rad(arena.rotation)), math.sin(math.rad(arena.rotation))
                         p:Move(-sin, cos)
                     end
@@ -594,9 +648,9 @@ function arenas.Update(dt)
                 local lx = dx * cos + dy * sin
                 local ly = dy * cos - dx * sin
 
-                -- Expanded forbidden zone: minus rectangle + 8px on each side (player is 16x16)
-                local min_lx, max_lx = -(w + arena.thickness * 2) / 2 - 8, (w + arena.thickness * 2) / 2 + 8
-                local min_ly, max_ly = -(h + arena.thickness * 2) / 2 - 8, (h + arena.thickness * 2) / 2 + 8
+                -- Expanded forbidden zone: minus rectangle + player half-size on each side
+                local min_lx, max_lx = -(w + arena.thickness * 2) / 2 - p_half_x, (w + arena.thickness * 2) / 2 + p_half_x
+                local min_ly, max_ly = -(h + arena.thickness * 2) / 2 - p_half_y, (h + arena.thickness * 2) / 2 + p_half_y
 
                 -- Check if the player's centre is inside the forbidden zone
                 if (lx >= min_lx and lx <= max_lx and ly >= min_ly and ly <= max_ly) then
@@ -639,6 +693,14 @@ function arenas.Clear()
             a:Destroy()
         end
     end
+
+    -- Drop every mask the destroyed arenas registered. A plus arena pushes its
+    -- mask into arenas.stencils on New(); without this reset the array would
+    -- keep growing wave after wave, and Masks.Draw(arenas.stencils) would
+    -- re-write every stale mask into the stencil buffer every frame -- so a
+    -- large mask from a previous wave would keep clipping the current wave's
+    -- bullets long after that arena was gone.
+    arenas.stencils = {}
 end
 
 return arenas

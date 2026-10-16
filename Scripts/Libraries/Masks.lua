@@ -110,10 +110,40 @@ function masks.Use(value)
     end
 end
 
----Disable stencil test and restore normal rendering.
+---Disable stencil test and zero the stencil buffer.
+---
+---Merely calling setStencilState() (no args) only switches the test OFF --
+---the values already written into the buffer stay where they are. Because
+---Masks.Draw uses "increment" and Masks.Use defaults to "greater" than 0,
+---any pixel ever touched by a mask keeps passing the test forever, leaking
+---across frames and across waves (a large mask in turn A still lets bullets
+---render in its area during turn B even though turn B only set a small mask).
+---
+---To prevent that, Clear first overwrites the whole buffer with 0 using
+---setStencilState("replace", "always", 0) + a full-canvas rectangle, then
+---disables the test. The rectangle is drawn through push/origin so it covers
+---the canvas regardless of any camera transform the caller has active, and
+---setColorMask(false) keeps it from touching colour.
+---
+---Caveat: this zeroes the buffer for EVERYONE on this canvas, so a caller
+---that relied on the buffer persisting across multiple Draw/Use/Clear cycles
+---within the same frame would see later masks need to re-Draw themselves.
+---The engine's sprite pipeline (Sprites.lua) calls Draw -> Use -> draw ->
+---Clear once per sprite, so each sprite re-writes its own masks and is
+---unaffected.
 function masks.Clear()
     local ok, err = pcall(function()
+        SE.graphics.push("all")
+        SE.graphics.origin()
+        SE.graphics.setColorMask(false)
+        SE.graphics.setStencilState("replace", "always", 0)
+        local w, h = SE.graphics.getDimensions()
+        if (w and h and w > 0 and h > 0) then
+            SE.graphics.rectangle("fill", 0, 0, w, h)
+        end
+        SE.graphics.setColorMask(true)
         SE.graphics.setStencilState()
+        SE.graphics.pop()
     end)
 
     if not ok then

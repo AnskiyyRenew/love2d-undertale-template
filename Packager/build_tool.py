@@ -143,6 +143,10 @@ STRINGS = {
         "msg_android_gradle_fail": "Gradle 构建失败: {err}",
         "msg_android_gradle_ok": "Gradle 构建完成: {task}",
         "msg_android_apk_found": "产物: {path}",
+        "msg_secret_dll_copied": "已复制密钥库 DLL 到 exe 同目录: {name}（fused 后源码树不存在，必须随 exe 走）",
+        "msg_secret_dll_missing": "未找到 {path}，本次导出不带密钥库；游戏会回退到 conf_pure.lua 的明文值或禁用相关功能。",
+        "msg_secret_so_copied": "已复制密钥库 .so: {abi} -> {path}",
+        "msg_secret_so_missing": "未找到 Android 密钥库（{path}），本次 APK 不带 .so；请先运行 Packager/Secrets/build.py。",
         "help_title": "帮助",
         "help_text": (
             "使用方法:\n"
@@ -242,6 +246,10 @@ STRINGS = {
         "msg_android_gradle_fail": "Gradle build failed: {err}",
         "msg_android_gradle_ok": "Gradle build finished: {task}",
         "msg_android_apk_found": "Output: {path}",
+        "msg_secret_dll_copied": "Copied secret DLL next to the exe: {name} (a fused exe has no source tree, so the DLL must travel with it)",
+        "msg_secret_dll_missing": "No secret library at {path}; exporting without it. The game falls back to the plain-text value in conf_pure.lua or disables the feature.",
+        "msg_secret_so_copied": "Copied secret .so: {abi} -> {path}",
+        "msg_secret_so_missing": "No Android secret library ({path}); the APK will ship without the .so. Run Packager/Secrets/build.py first.",
         "help_title": "Help",
         "help_text": (
             "How to use:\n"
@@ -366,6 +374,49 @@ def android_assets_dir(template_root):
     if os.path.isdir(os.path.join(template_root, "app", "src", "embed")):
         return os.path.join(template_root, *ANDROID_EMBED_ASSETS)
     return os.path.join(template_root, *ANDROID_LEGACY_ASSETS)
+
+
+# Native secret store (Packager/Secrets). Two very different landing spots:
+#   Windows  -> next to the fused exe, because a fused exe has no source tree
+#               on disk for ffi.load to walk into.
+#   Android  -> app/src/main/jniLibs/<abi>/, because dlopen only searches the
+#               APK's extracted native library dir; a .so sitting inside
+#               game.love (a zip in assets) can never be loaded.
+SECRETS_DIR = ("Resources", "Libs", "Secrets")
+SECRET_DLL = "secrets.dll"
+SECRET_SO = "libsecrets.so"
+ANDROID_ABIS = ("arm64-v8a", "armeabi-v7a", "x86_64")
+
+
+def copy_secret_dll(project_dir, exe_dir, emit):
+    """Drop secrets.dll beside the exe. No-op when the library was never built."""
+    src = os.path.join(project_dir, *SECRETS_DIR, SECRET_DLL)
+    if not os.path.isfile(src):
+        emit("msg_secret_dll_missing", path=src)
+        return False
+    shutil.copy2(src, os.path.join(exe_dir, SECRET_DLL))
+    emit("msg_secret_dll_copied", name=SECRET_DLL)
+    return True
+
+
+def copy_secret_sos(project_dir, template_root, emit):
+    """Copy each built .so into the template's jniLibs/<abi>/ folder."""
+    base = os.path.join(project_dir, *SECRETS_DIR, "android")
+    found = False
+    for abi in ANDROID_ABIS:
+        src = os.path.join(base, abi, SECRET_SO)
+        if not os.path.isfile(src):
+            continue
+        dst_dir = os.path.join(template_root, "app", "src", "main", "jniLibs", abi)
+        os.makedirs(dst_dir, exist_ok=True)
+        dst = os.path.join(dst_dir, SECRET_SO)
+        shutil.copy2(src, dst)
+        emit("msg_secret_so_copied", abi=abi,
+             path=os.path.relpath(dst, template_root))
+        found = True
+    if not found:
+        emit("msg_secret_so_missing", path=base)
+    return found
 
 
 def iter_project_files(project_dir, exclude_dirs, exclude_exts, exclude_paths):
@@ -1050,6 +1101,10 @@ class PackagerApp:
                 if f.lower().endswith(".dll"):
                     shutil.copy2(os.path.join(love_dir, f), os.path.join(exe_dir, f))
                     self._emit("msg_dll_copied", name=f)
+            # The secret store is not in love_dir (it lives under
+            # Resources/Libs/Secrets), so the loop above cannot pick it up.
+            # A fused exe has no source tree, so it has to sit beside the exe.
+            copy_secret_dll(project_dir, exe_dir, self._emit)
 
         # ---- Android preparation ----
         if self.var_android.get():
@@ -1074,6 +1129,9 @@ class PackagerApp:
             self._emit("msg_android_assets", path=dest)
             if assets != os.path.join(target, *ANDROID_EMBED_ASSETS):
                 self._emit("msg_android_legacy", path=os.path.relpath(assets, target))
+            # Must happen before gradlew runs: the .so has to be in jniLibs or
+            # it never reaches the APK's lib/<abi>/ dir, and dlopen would fail.
+            copy_secret_sos(project_dir, target, self._emit)
             if self.var_android_build.get():
                 self._build_android_apk(target)
             else:

@@ -649,6 +649,8 @@
       
         
       
+        
+      
     
     
     
@@ -1161,6 +1163,34 @@
     
   
     ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step Hook
   
 
     
@@ -2170,6 +2200,8 @@
       
         
       
+        
+      
     
     
     
@@ -2346,6 +2378,34 @@
     
   
     ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Native Secret Store
   
 
     
@@ -3211,7 +3271,9 @@ Put your configuration in <strong><code>Game/conf_pure.lua</code></strong>; see 
 <div class="admonition danger">
 <p class="admonition-title">The private key is baked into the game package</p>
 <p>GameJolt's <code>private_key</code> is not "absolutely secret" — it is designed to be distributed with the client (every player's copy contains one).
-But <strong>do not</strong> treat it as access control — anyone who unpacks the game can get it. Real write permission relies on <code>username + user_token</code> validation.</p>
+But <strong>do not</strong> treat it as access control — anyone who unpacks the game can get it. Real write permission relies on <code>username + user_token</code> validation.<br>
+To keep it out of plain text, compile it into a native library and read it back through FFI — see <a href="../../070_develop/050_secrets/index.html">Developer Tools → Native Secret Store</a>.
+That is <strong>obfuscation, not encryption</strong>, and nothing in the engine calls it yet; you wire up <code>Secrets.gamejoltPK()</code> yourself.</p>
 </div>
 <h3 id="2-initialize-the-engine-wont-do-it-for-you">2. Initialize (the engine won't do it for you)<a class="headerlink" href="#2-initialize-the-engine-wont-do-it-for-you" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltID&quot;</span><span class="p">),</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltPK&quot;</span><span class="p">))</span>

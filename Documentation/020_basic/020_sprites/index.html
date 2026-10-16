@@ -651,6 +651,8 @@
       
         
       
+        
+      
     
     
     
@@ -845,6 +847,17 @@
     <span class="md-ellipsis">
       
         Library-level Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-frame-hook-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-Frame Hook: Step
       
     </span>
   </a>
@@ -1300,6 +1313,34 @@
     
   
     ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step Hook
   
 
     
@@ -2309,6 +2350,8 @@
       
         
       
+        
+      
     
     
     
@@ -2485,6 +2528,34 @@
     
   
     ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Native Secret Store
   
 
     
@@ -2915,6 +2986,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#per-frame-hook-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-Frame Hook: Step
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pixel-snapping" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3130,6 +3212,14 @@ In <code>method calls</code>, we use syntactic sugar, using a colon (<code>:</co
 <li><code>Sprites.CleanupCache()</code> Manually runs an LRU cleanup (under the normal flow the engine runs it automatically per <code>OPT_LRU_SPRITES</code>).</li>
 </ul>
 </div>
+<hr />
+<h2 id="per-frame-hook-step">Per-Frame Hook: Step<a class="headerlink" href="#per-frame-hook-step" title="Permanent link">&para;</a></h2>
+<p>To make a sprite do something on its own every frame (drift, follow, self-destruct on a timer, ...), attach a <code>Step</code> function to it — the engine calls it every frame:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">spr</span><span class="p">.</span><span class="py">Step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">,</span><span class="w"> </span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- once per frame</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Bones and blue-soul platforms carry a hook with the same name (though without <code>dt</code>). Full details in <a href="../170_step/index.html">Step Hook</a>.</p>
 <hr />
 <h2 id="pixel-snapping">Pixel Snapping<a class="headerlink" href="#pixel-snapping" title="Permanent link">&para;</a></h2>
 <p>Pixel art most fears "half-pixel jitter": the sprite coordinate carries a decimal, and the sampled edges flicker bright and dark. The engine does this for you by default.</p>

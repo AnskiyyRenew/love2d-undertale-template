@@ -649,6 +649,8 @@
       
         
       
+        
+      
     
     
     
@@ -1161,6 +1163,34 @@
     
   
     ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step Hook
   
 
     
@@ -2337,6 +2367,8 @@
       
         
       
+        
+      
     
     
     
@@ -2513,6 +2545,34 @@
     
   
     ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Native Secret Store
   
 
     
@@ -3244,8 +3304,8 @@ Old Souls without <code>Init</code> still run fine: the engine will stuff <code>
 <li><code>x</code> / <code>y</code> Center coordinates, default <code>320, 320</code>.</li>
 <li><code>width</code> Width (pixels), default <code>50</code>.</li>
 <li><code>args</code> Optional settings table:<ul>
-<li><code>mode</code> <code>"none"</code> (static) or <code>"move"</code> (auto-moving), default <code>"none"</code>.</li>
-<li><code>speed</code> <code>{x = n, y = n}</code>, the per-frame displacement when <code>mode</code> is <code>"move"</code>.</li>
+<li><code>mode</code> <code>"none"</code> (static) or <code>"move"</code> (carry the player along when the platform drifts sideways), default <code>"none"</code>.</li>
+<li><code>speed</code> <code>{x = n, y = n}</code> Per-frame displacement. <strong>It applies whenever it is set, whatever <code>mode</code> is</strong> — <code>mode</code> no longer gates movement.</li>
 <li><code>rotation</code> Platform angle, default <code>0</code>.</li>
 <li><code>color</code> Platform color, default <code>{1, 0.3, 1}</code>.</li>
 <li><code>layer</code> The layer it sits on, default <code>"BelowBullets"</code>.</li>
@@ -3267,6 +3327,8 @@ Old Souls without <code>Init</code> still run fine: the engine will stuff <code>
 <li><code>SetRotation(angle)</code> Set the angle.</li>
 <li><code>SetWidth(w)</code> Set the width.</li>
 <li><code>Sync()</code> Manually sync the highlight line; normally not needed.</li>
+<li><code>SetStencils(stencils)</code> Apply a mask to the platform image <strong>and</strong> its highlight line, usually <code>platform:SetStencils({Arena.mask})</code>.</li>
+<li><code>Step</code> A convention field, not a built-in function: assign <code>platform.Step = function (self) ... end</code> and <code>Player.UpdatePlatforms(dt)</code> calls it once per frame — after the platform moves and <code>Sync()</code>s, before the ground check. <strong>No <code>dt</code> argument.</strong> See <a href="../../020_basic/170_step/index.html">Basic Development → Step Hook</a>.</li>
 <li><code>Destroy()</code> / <code>Delete()</code> Destroy this platform.</li>
 </ul>
 </div>

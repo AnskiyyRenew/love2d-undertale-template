@@ -6,7 +6,6 @@ Player.canMove = true
 
 local mask = Masks.New("rectangle", 320, 320, 155, 130, 0, 0)
 local a = Arenas.New("minus", "rectangle", 320, 380, 50, 50, 0)
-Player.SetSoul("blue")
 
 local time = 0
 function wave.Update(dt)

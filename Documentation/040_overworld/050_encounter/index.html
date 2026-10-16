@@ -649,6 +649,8 @@
       
         
       
+        
+      
     
     
     
@@ -1161,6 +1163,34 @@
     
   
     ❕️ GUI Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../020_basic/170_step/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step Hook
   
 
     
@@ -2270,6 +2300,8 @@
       
         
       
+        
+      
     
     
     
@@ -2446,6 +2478,34 @@
     
   
     ❕️ Asset Preloading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/050_secrets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Native Secret Store
   
 
     
@@ -3017,12 +3077,21 @@ Putting it at the top level of the scene file, or guarding it with a flag on the
 <p><img alt="OW-08" src="../../img/040_overworld/ow_08_encounter.png" /></p>
 <hr />
 <h2 id="bridging-to-the-battle-scene">Bridging to the Battle Scene<a class="headerlink" href="#bridging-to-the-battle-scene" title="Permanent link">&para;</a></h2>
-<p>It is recommended to use the engine's <code>Scripts/Scenes/Battle/scene_battle_ow.lua</code>, which does two extra things beyond a normal Battle scene:</p>
+<p>The engine does this for you. While an overworld is loaded (that is, while the global <code>DATA</code> from <code>Game/Logics</code> exists), every Battle scene:</p>
 <ol>
-<li><strong>On entry</strong>, it pushes <code>DATA.player</code>'s real data into <code>Player</code> (name, LV, max HP, current HP), and clears <code>kr</code>.</li>
-<li><strong>On exit</strong>, it writes <code>Battle.EXP</code> / <code>Battle.GOLD</code> / remaining HP back into <code>DATA</code>, and settles the level-up according to <code>DATA.lv_data</code> (on level-up, max HP increases per the table, and the increase is added to current HP).</li>
+<li><strong>On entry</strong> — <code>Battle.SetGame()</code> pushes <code>DATA.player</code>'s real data into <code>Player</code> (name, LV, max HP, current HP) and clears <code>kr</code>, so it wins over the encounter module's template stats.</li>
+<li><strong>On exit</strong> — <code>Battle.Clear()</code> writes <code>Battle.EXP</code> / <code>Battle.GOLD</code> / remaining HP back into <code>DATA</code> and settles the level-up according to <code>DATA.lv_data</code> (on level-up, max HP is set per the table and the increase is added to current HP).</li>
 </ol>
-<p>It also sets the ending scene to <code>DATA.room</code>, meaning <strong>after the fight you automatically return to the map you entered the Battle from</strong>.</p>
+<p>Both halves live in <code>Scripts/Libraries/Battle/init.lua</code> as <code>Battle.SyncFromOverworld()</code> / <code>Battle.SyncToOverworld()</code>. They are idempotent: the write-back consumes <code>Battle.EXP</code> / <code>Battle.GOLD</code>, so a scene that also does its own hand-off can never double-count.</p>
+<div class="admonition warning">
+<p class="admonition-title">Battle-only games are untouched</p>
+<p><code>DATA</code> is only created by the Overworld library (<code>require("Game.Logics")</code>). A game without an overworld never gets one, so both directions are skipped — no configuration needed.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Scripted fights that set their own HP</p>
+<p>Set <code>Battle.auto_overworld_sync = false</code> before <code>Battle.SetGame(...)</code> for a battle that deliberately overrides <code>Player.hp</code> and must not touch <code>DATA</code>.</p>
+</div>
+<p>Use <code>Scripts/Scenes/Battle/scene_battle_ow.lua</code> as the encounter target anyway: it also sets the ending scene to <code>DATA.room</code>, meaning <strong>after the fight you automatically return to the map you entered the Battle from</strong>.</p>
 <div class="admonition example">
 <p class="admonition-title">Encounter-related globals</p>
 <ul>
@@ -3032,7 +3101,7 @@ Putting it at the top level of the scene file, or guarding it with a flag on the
 <li><code>Battle.EXP</code> / <code>Battle.GOLD</code> this Battle's earnings, cleared to zero after being written back.</li>
 </ul>
 </div>
-<p>To write your own bridge scene, copy <code>scene_battle_ow.lua</code>; the key is not to miss that write-back in <code>scene.clear</code>.</p>
+<p>To write your own battle scene, copy <code>scene_battle_ow.lua</code> — but the hand-off itself is no longer something you can forget; it runs in the engine.</p>
 
 
 
