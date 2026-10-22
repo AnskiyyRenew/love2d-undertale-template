@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2202,6 +2322,8 @@
       
         
       
+        
+      
     
     
     
@@ -2406,6 +2528,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2719,7 +2869,7 @@
   <a href="#discord-rpc-game-sdk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        为什么用 discord-rpc 而不是 Game SDK
+        选用 discord-rpc 而非 Game SDK 的原因
       
     </span>
   </a>
@@ -2774,7 +2924,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        三个实际用法
+        用法示例
       
     </span>
   </a>
@@ -2785,7 +2935,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑汇总
+        注意事项汇总
       
     </span>
   </a>
@@ -2928,7 +3078,7 @@
   <a href="#discord-rpc-game-sdk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        为什么用 discord-rpc 而不是 Game SDK
+        选用 discord-rpc 而非 Game SDK 的原因
       
     </span>
   </a>
@@ -2983,7 +3133,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        三个实际用法
+        用法示例
       
     </span>
   </a>
@@ -2994,7 +3144,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑汇总
+        注意事项汇总
       
     </span>
   </a>
@@ -3028,8 +3178,8 @@ Route: Genocide
 </code></pre></div>
 <p>和小图标、大厅人数、加入按钮这些，都来自这一个库。</p>
 <hr />
-<h2 id="discord-rpc-game-sdk">为什么用 <code>discord-rpc</code> 而不是 Game SDK<a class="headerlink" href="#discord-rpc-game-sdk" title="Permanent link">&para;</a></h2>
-<p>文件头的注释写得很清楚，这里复述一遍，因为<strong>你不要去"升级"它</strong>：</p>
+<h2 id="discord-rpc-game-sdk">选用 <code>discord-rpc</code> 而非 Game SDK 的原因<a class="headerlink" href="#discord-rpc-game-sdk" title="Permanent link">&para;</a></h2>
+<p>文件头的注释写得很清楚，这里复述一遍：<strong>不要把这个库"升级"成 Game SDK</strong>。</p>
 <div class="admonition quote">
 <p class="admonition-title"><code>DiscordRPC.lua:12-18</code></p>
 <p>Why not the Discord Game SDK (discord_game_sdk.dll)?
@@ -3038,15 +3188,15 @@ The Game SDK proved unstable / unusable through a direct LuaJIT FFI binding:
 matter what (any flags/version/app-id), so calling any activity method
 dereferences a NULL pointer and hard-crashes the game.</p>
 </div>
-<p>也就是说：<strong>Discord Game SDK 走 FFI 会直接把游戏搞崩</strong>（拿到的是 NULL 管理器指针），
+<p>也就是说：<strong>Discord Game SDK 走 FFI 会直接让游戏崩溃</strong>（拿到的是 NULL 管理器指针），
 而老的 <code>discord-rpc</code> 库只有几个平铺的 C 函数（<code>Discord_Initialize</code> / <code>Discord_UpdatePresence</code>），
-没有 vtable、没有 manager getter，是 LÖVE 里验证过能用的路子。</p>
+没有 vtable、没有 manager getter，在 LÖVE 中已验证可用。</p>
 <div class="admonition note">
 <p class="admonition-title">DiscordGameSDK 目录不是空的，只是没人用</p>
-<p>这个目录<strong>没被删掉</strong>， <code>x64/</code> 与 <code>x86/</code> 子目录下躺着 7 个文件（ <code>discord_game_sdk.dll</code> / <code>.dll.lib</code> / <code>.so</code> / <code>.dylib</code> / <code>.bundle</code> ），都还在版本控制里。</p>
-<p>留着它们只是"当年试过这条路"的痕迹，<strong>引擎代码没有引用任何一个</strong>。
+<p>这个目录<strong>没被删掉</strong>， <code>x64/</code> 与 <code>x86/</code> 子目录下保留着 7 个文件（ <code>discord_game_sdk.dll</code> / <code>.dll.lib</code> / <code>.so</code> / <code>.dylib</code> / <code>.bundle</code> ），都还在版本控制里。</p>
+<p>留着它们是当年尝试过这条路的痕迹，<strong>引擎代码没有引用任何一个</strong>。
 真正加载的是隔壁 <code>Resources/Libs/DiscordRPC/discord-rpc-x64.dll</code> 。
-<strong>别因为它们在里面就去改代码调 Game SDK</strong> —— 上面那段注释说的崩溃是实测过的。</p>
+<strong>不要因为它们的存在就改用 Game SDK</strong>：上面那段注释记录的崩溃是实测结果。</p>
 </div>
 <hr />
 <h2 id="_1">依赖与可用条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -3076,7 +3226,7 @@ dereferences a NULL pointer and hard-crashes the game.</p>
 <p class="admonition-title">目前只有 Windows 的库</p>
 <p><code>Resources/Libs/DiscordRPC/</code> 下<strong>只有两个 .dll</strong> ，没有 Linux 的 <code>.so</code> 、也没有 macOS 的 <code>.dylib</code> 。
 源码里虽然写好了这两个平台的候选文件名，但文件没随引擎分发。
-要上其它平台得自己去 <a href="https://github.com/discord/discord-rpc/releases">discord-rpc releases</a> 下载并放进那个目录。</p>
+需要支持其它平台时，从 <a href="https://github.com/discord/discord-rpc/releases">discord-rpc releases</a> 下载并放进那个目录。</p>
 </div>
 <p>拿不到依赖时的行为：<strong>不报错</strong>。</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">init</span><span class="p">()</span>
@@ -3105,13 +3255,13 @@ dereferences a NULL pointer and hard-crashes the game.</p>
 <span class="c1">-- love.quit()</span>
 <span class="nv">Discord</span><span class="p">.</span><span class="nf">shutdown</span><span class="p">()</span>
 </code></pre></div>
-<p>所以<strong>最常见的用法只有一步</strong>：把 <code>Game/conf_pure.lua</code> 里的 ID 换成你自己的。</p>
+<p>所以<strong>常见的用法只有一步</strong>：把 <code>Game/conf_pure.lua</code> 里的 ID 换成自己的应用 ID。</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1234567890123456789&quot;</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">写在 <code>Game/conf_pure.lua</code> 里，不要写进根目录那份</p>
 <p><code>conf_pure.lua</code> 有<strong>两份并且是叠加的</strong>：根目录那份是引擎默认值， <code>Game/conf_pure.lua</code> 那份盖在上面。
-你的改动应该写在 <strong><code>Game/conf_pure.lua</code></strong> —— 改根目录那份会在引擎更新时被冲掉。
+改动应写在 <strong><code>Game/conf_pure.lua</code></strong> —— 改根目录那份会在引擎更新时被冲掉。
 两份的对照见 <a href="../../010_quick_start/000_conf/index.html">配置文件</a> 。</p>
 </div>
 <div class="admonition danger">
@@ -3120,7 +3270,7 @@ dereferences a NULL pointer and hard-crashes the game.</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1342517648348680202&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 对</span>
 <span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;DiscordAppID&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1342517648348680202</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 错：精度丢失</span>
 </code></pre></div>
-<p>库内部会 <code>tostring(client_id)</code> ，但<strong>在你写进配置那一刻精度就已经丢了</strong>。</p>
+<p>库内部会 <code>tostring(client_id)</code> ，但在写入配置时精度已经丢失。</p>
 </div>
 <hr />
 <h2 id="_3">方法<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
@@ -3162,14 +3312,14 @@ dereferences a NULL pointer and hard-crashes the game.</p>
 <ul>
 <li><code>Discord.JoinReply</code> = <code>{ No = 0, Yes = 1, Ignore = 2 }</code> 。</li>
 <li><code>Discord.VERSION</code> 库版本，当前 <code>"2.1.0"</code> 。</li>
-<li><code>Discord.application_id</code> 你的 App ID（字符串）。</li>
+<li><code>Discord.application_id</code> 当前应用的 App ID（字符串）。</li>
 <li><code>Discord.available</code> 是否已初始化。</li>
 <li><code>Discord.last_error</code> 最近一次失败的原因。</li>
 </ul>
 </div>
 <hr />
 <h2 id="activity">activity 表可以填什么<a class="headerlink" href="#activity" title="Permanent link">&para;</a></h2>
-<p>两种命名风格都收，<strong>优先用下划线那一列</strong>（Game SDK 风格）：</p>
+<p>两种命名风格都支持，下表以<strong>下划线</strong>一列为主（Game SDK 风格）：</p>
 <table>
 <thead>
 <tr>
@@ -3290,16 +3440,16 @@ dereferences a NULL pointer and hard-crashes the game.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">图片 key 要在后台上传过</p>
-<p><code>large_image</code> / <code>small_image</code> 填的是 <strong>Discord Developer Portal → 你的应用 → Rich Presence → Art Assets</strong> 里上传图片后得到的 key（文件名去掉扩展名），
+<p><code>large_image</code> / <code>small_image</code> 填的是 <strong>Discord Developer Portal → 应用 → Rich Presence → Art Assets</strong> 里上传图片后得到的 key（文件名去掉扩展名），
 不是文件路径也不是 URL。没上传过的 key 会静默不显示图片。
-引擎默认的 <code>qq20250220-225345</code> 是 SoulEngine 自己应用下的资源，<strong>换成你的 App ID 后它就不存在了</strong>，记得一并换掉。</p>
+引擎默认的 <code>qq20250220-225345</code> 是 SoulEngine 自己应用下的资源，<strong>更换 App ID 后该资源不再存在</strong>，需要一并换掉。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title"><code>start</code> / <code>finish</code> 是秒级 unix 时间戳</p>
 <p><code>Discord.timestamp()</code> 返回 <code>os.time()</code> 。传毫秒会被当成公元 5 万年，计时显示会乱。</p>
 </div>
 <hr />
-<h2 id="_4">三个实际用法<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_4">用法示例<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p><strong>① 随场景切换 Presence</strong></p>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">SceneBattle</span><span class="p">:</span><span class="nf">load</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">setActivity</span><span class="p">({</span>
@@ -3319,7 +3469,7 @@ dereferences a NULL pointer and hard-crashes the game.</p>
 <span class="kr">end</span><span class="p">)</span>
 
 <span class="nv">Discord</span><span class="p">.</span><span class="nf">onError</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span><span class="p">)</span>
-<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] 错误&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 大概率是 App ID 不对</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Discord] 错误&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 多数情况是 App ID 不正确</span>
 <span class="kr">end</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>③ 邀请好友加入</strong></p>
@@ -3328,22 +3478,22 @@ dereferences a NULL pointer and hard-crashes the game.</p>
 
 <span class="c1">-- 房主这边收到申请</span>
 <span class="nv">Discord</span><span class="p">.</span><span class="nf">onJoinRequest</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">user</span><span class="p">)</span>
-<span class="w">    </span><span class="c1">-- 自己决定要不要放人进来</span>
+<span class="w">    </span><span class="c1">-- 此处决定是否同意加入</span>
 <span class="w">    </span><span class="nv">Discord</span><span class="p">.</span><span class="nf">respond</span><span class="p">(</span><span class="nv">user</span><span class="p">.</span><span class="py">userId</span><span class="p">,</span><span class="w"> </span><span class="nv">Discord</span><span class="p">.</span><span class="py">JoinReply</span><span class="p">.</span><span class="py">Yes</span><span class="p">)</span>
 <span class="kr">end</span><span class="p">)</span>
 </code></pre></div>
 <hr />
-<h2 id="_5">坑汇总<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_5">注意事项汇总<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
 <p class="admonition-title"><code>Discord.update(dt)</code> 必须每帧调用</p>
 <p>它内部是 <code>Discord_RunCallbacks()</code> 。漏掉的话：Presence <strong>不会刷新</strong>、所有回调<strong>不会触发</strong>。
-引擎已经在 <code>love.update(dt)</code> 里调了，除非你自己建了独立的 <code>love.update</code> 分支，否则别重复也别删。</p>
+引擎已经在 <code>love.update(dt)</code> 里调了，除非另行建立了独立的 <code>love.update</code> 分支，否则不要重复调用或删除。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">别动那句 <code>jit.off(discord.update)</code></p>
 <p><code>Discord_RunCallbacks()</code> 会从 C 通过 FFI 回调<strong>重新进入 Lua</strong>。在 JIT 编译过的代码里这么做，
 LuaJIT 会抛 <code>unprotected error in call to Lua API</code> —— 而且是在连上 Discord 约 2 秒、ready 事件触发的那一刻。
-库里专门对 <code>update</code> 关掉了 JIT，让它永远走解释器：<strong>删掉这行会在你最想不到的时候崩游戏。</strong></p>
+库里专门对 <code>update</code> 关掉了 JIT，让它永远走解释器：<strong>删掉这行会在运行到回调时崩溃。</strong></p>
 </div>
 <details class="quote">
 <summary>那段注释与代码</summary>
@@ -3369,7 +3519,7 @@ LuaJIT 会抛 <code>unprotected error in call to Lua API</code> —— 而且是
 要确认就挂 <code>onReady</code> ；Presence 一般 1~2 秒后才出现在客户端上。</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">回调里抛异常不会崩游戏</p>
+<p class="admonition-title">回调里抛异常不会中断游戏</p>
 <p>用户在回调里写错代码时，库会 <code>pcall</code> 住并打印 <code>[DiscordRPC] callback error: ...</code> 。
 因为这些回调是从 C 侧进来的，普通 <code>pcall</code> 拦不住，所以库自己在每个代理里包了一层。</p>
 </div>

@@ -12,7 +12,7 @@
         <link rel="prev" href="../010_scene/index.html">
       
       
-        <link rel="next" href="../../020_basic/index.html">
+        <link rel="next" href="../030_typers/index.html">
       
       
         
@@ -464,6 +464,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -653,10 +661,133 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to verify
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Displaying Text (Typers)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first battle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to read next
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2269,6 +2400,8 @@
       
         
       
+        
+      
     
     
     
@@ -2473,6 +2606,34 @@
     
   
     ❕️ Native Secret Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Bundled Assets
   
 
     
@@ -2891,6 +3052,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to verify
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2910,8 +3082,8 @@
 
   <h1>Creating Sprites</h1>
 
-<p>All visible parts of a game are "rendered" with <code>color</code>.<br>
-And the rendered color, in a 2D game like the current one, is carried by <code>sprites</code>.</p>
+<p>This page is part of the <strong>common base</strong> — both paths need it.</p>
+<p>All visible parts of a game are rendered as <code>color</code> , and in a 2D game that color is carried by <code>sprites</code>. The full property list is in <a href="../../020_basic/020_sprites/index.html">Basic development → Sprites</a> .</p>
 <hr />
 <h2 id="creating-an-image">Creating an Image<a class="headerlink" href="#creating-an-image" title="Permanent link">&para;</a></h2>
 <p>Just like at the end of the previous page, use <code>Sprites.CreateSprite(path, layer)</code> to create a sprite.</p>
@@ -2973,6 +3145,18 @@ Obviously, you can't answer within three seconds, so the engine chose to split i
 <li><code>pixel_snap</code> whether this image does pixel snapping (defaults to following the global <code>sprites.pixel_snap</code>, i.e. on). Set to <code>false</code> to exempt just this image—commonly used for parts in an assembly that shouldn't be individually rounded.</li>
 <li><code>velocity</code> the image's velocity</li>
 </ul>
+</div>
+<hr />
+<h2 id="how-to-verify">How to verify<a class="headerlink" href="#how-to-verify" title="Permanent link">&para;</a></h2>
+<p>Put this in the first-level region of a scene. After entering the scene, a <code>poseur</code> image at double size should appear centre screen:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">image</span><span class="p">.</span><span class="py">xscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="nv">image</span><span class="p">.</span><span class="py">yscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">The image does not appear</p>
+<p>The path is looked up in <code>Game/Resources/Sprites/</code> and <code>Resources/Sprites/</code> , and subdirectories must be written out in full, e.g. <code>Overworld/Frisk/spr_frisk_0.png</code> .<br>
+File names are case-sensitive. A case mismatch that still matches on Windows will fail to find the image once packaged for Android or Linux.</p>
 </div>
 
 

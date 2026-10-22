@@ -492,7 +492,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        耐心需求
+        学习周期
       
     </span>
   </a>
@@ -554,6 +554,14 @@
       
         
           
+        
+      
+        
+      
+        
+      
+        
+      
         
       
         
@@ -682,6 +690,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2302,6 +2422,8 @@
       
         
       
+        
+      
     
     
     
@@ -2506,6 +2628,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2950,7 +3100,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        耐心需求
+        学习周期
       
     </span>
   </a>
@@ -2976,36 +3126,35 @@
 
   <h1>开发之前</h1>
 
-<p>我们十分推荐 <em>拥有一定Lua基础的人前来学习</em> 。</p>
-<p>不过我们并不排斥新人的前来。</p>
+<p>具备 Lua 基础可更快上手；无基础者亦可按本文档顺序学习。</p>
 <hr />
 <h2 id="_1">硬件需求<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>经过不断的测试，我们发现即便是 <code>i3</code> 的低配机子也能无压力跑通 <code>Soul Engine</code> ，所以不必担心引擎会把电脑炸了。</p>
-<p>运行内存最低 <code>4G</code> 即可。</p>
+<p>经测试， <code>i3</code> 级别的处理器可正常运行 <code>Soul Engine</code> 。</p>
+<p>运行内存最低要求 <code>4G</code> 。</p>
 <hr />
 <h2 id="_2">操作系统支持<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>除了上面所提到的硬件需求以外， <code>Soul Engine</code> 中部分操作除 <code>Windows</code> 系统外无法正常使用，在后续文档中会使用警告框重点标注。</p>
+<p>除硬件需求外， <code>Soul Engine</code> 中部分操作仅在 <code>Windows</code> 系统下可用，后续文档会使用警告框标注。</p>
 <hr />
 <h2 id="_3">技术栈速览<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>Lua</code> 将作为主要开发语言。 </li>
-<li><code>GLSL</code> 将在后续编写 <code>Shader（着色器）</code> 时使用。现在先不学，如果感兴趣可以去 <code>着色器开发</code> 专题进行查阅。但如果你是纯新手——不要看。</li>
+<li><code>Lua</code> 作为主要开发语言。</li>
+<li><code>GLSL</code> 用于编写 <code>Shader（着色器）</code> ，仅在与着色器相关的内容中用到。若无相关需求可暂不学习；初学阶段不建议阅读 <code>着色器开发</code> 专题。</li>
 </ul>
-<p>如果想尽快接触一下 <code>Lua</code> 的写法，避免以后踩坑，推荐文档内的<a href="../020_lua/index.html">教程</a>。</p>
+<p>如需先了解 <code>Lua</code> 的写法，可阅读<a href="../020_lua/index.html">教程</a>。</p>
 <hr />
 <h2 id="_4">数学需求<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>这些内容并不做特别强制要求，我并不是说这些内容不需要学习，恰恰相反， <u>学到能熟练应用才是最终目的 </u>。</p>
-<p>在开发初期我们用到的数学知识并不会太多。</p>
+<p>以下内容不作为强制要求，但需达到能够熟练应用的程度。</p>
+<p>开发初期涉及的数学知识较少，主要包括：</p>
 <ul>
-<li><code>四则运算</code> 加减乘除，最常用的也就这几个。</li>
-<li><code>三角函数</code> 最拥有数学功底的模块。</li>
-<li><code>初中数学基础</code> 说的很高大上，其实就是 <code>绝对值</code> 之类的东西。</li>
+<li><code>四则运算</code> 加、减、乘、除。</li>
+<li><code>三角函数</code> 涉及数学推导较多的部分。</li>
+<li><code>初中数学基础</code> 例如 <code>绝对值</code> 等概念。</li>
 </ul>
-<p><strong>上面这些内容是游戏开发所用的最基础数学框架。</strong></p>
-<p>如果想要更高级或更拥有挑战性的数学知识，请前往 <code>数学</code> 专题查看更多内容。</p>
+<p><strong>以上内容构成游戏开发所需的最基础数学框架。</strong></p>
+<p>更深入的数学内容见 <code>数学</code> 专题。</p>
 <hr />
-<h2 id="_5">耐心需求<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>即便学的再快，也不可能一天之内学成归来，所以静下心来慢慢跟着文档走。</p>
+<h2 id="_5">学习周期<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>本套文档内容较多，需按章节顺序逐步完成。</p>
 
 
 

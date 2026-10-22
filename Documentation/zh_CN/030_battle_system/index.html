@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2204,6 +2324,8 @@
       
         
       
+        
+      
     
     
     
@@ -2408,6 +2530,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2889,13 +3039,12 @@
 
   <h1>战斗系统</h1>
 
-<p>说它为 <code>SoulEngine</code> 最复杂的模块也不为过，在这里你可以看到...</p>
-<p>Battle UI Player PlayerAttacks Game Wave Animation所有库互相搭配运转。</p>
+<p>本专题描述 <code>SoulEngine</code> 的战斗模块，涵盖 Battle、UI、Player、PlayerAttacks、Game、Wave、Animation 等库的职责与协作方式。</p>
 <blockquote>
-<p>这些模块并非独立库，而是战斗系统中互相咬合的职责层。它们通过战斗状态和回合流程紧密协作，拆开是为了让每一部分更容易定位和修改，而不是为了可以单独运行。</p>
+<p>这些库在战斗系统中分层承担不同职责，彼此依赖。文档中按库分篇说明，便于定位代码，单个库不独立运行。</p>
 <p>本专题中反复出现的 <code>Game 区</code> 概念与资源查找顺序，统一说明见 <strong><a href="../020_basic/110_game_area/index.html">基础开发 → Game 区与资源覆盖</a></strong> 。</p>
 </blockquote>
-<p>先看流程：
+<p>战斗流程如下：
 <div class="highlight"><pre><span></span><code>进入战斗
   ↓
 Game 提供遭遇数据
@@ -2971,8 +3120,8 @@ UI 更新状态 / 判断结束
 <hr />
 <h2 id="ui">UI<a class="headerlink" href="#ui" title="Permanent link">&para;</a></h2>
 <p>路径： <code>Scripts/Libraries/Battle/UI/</code> 。</p>
-<p>屏幕上所有其他可见内容均通过 <code>UI</code> 库指挥，最具代表的为 <code>stateinner.lua</code> 库，负责从进入战斗一开始到各种选项、敌人回合、结束游戏全部功能。</p>
-<p>在之后 <a href="010_ui/index.html">UI</a> 会有包括除 <code>stateinner</code> 之外的详细讲解。</p>
+<p>屏幕上其余可见内容由 <code>UI</code> 库统一管理，其中 <code>stateinner.lua</code> 覆盖从进入战斗到选项处理、敌人回合、战斗结束的完整流程。</p>
+<p><a href="010_ui/index.html">UI</a> 页面另对 <code>stateinner</code> 之外的部分作详细说明。</p>
 <hr />
 <h2 id="_4">玩家<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>路径： <code>Scripts/Libraries/Battle/Player/</code> 。</p>

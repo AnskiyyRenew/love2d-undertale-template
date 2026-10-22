@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2253,7 +2373,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑
+        注意事项
       
     </span>
   </a>
@@ -2292,7 +2412,7 @@
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        两个公式（背下来就够了）
+        两个公式
       
     </span>
   </a>
@@ -2314,7 +2434,7 @@
   <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
-        引擎里的五处真代码
+        引擎中的五处实现
       
     </span>
   </a>
@@ -2347,7 +2467,7 @@
   <a href="#_15" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑
+        注意事项
       
     </span>
   </a>
@@ -2515,6 +2635,8 @@
       
         
           
+        
+      
         
       
         
@@ -2733,6 +2855,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3305,7 +3455,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑
+        注意事项
       
     </span>
   </a>
@@ -3344,7 +3494,7 @@
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        两个公式（背下来就够了）
+        两个公式
       
     </span>
   </a>
@@ -3366,7 +3516,7 @@
   <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
-        引擎里的五处真代码
+        引擎中的五处实现
       
     </span>
   </a>
@@ -3399,7 +3549,7 @@
   <a href="#_15" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑
+        注意事项
       
     </span>
   </a>
@@ -3430,8 +3580,8 @@
 
   <h1>数学教程</h1>
 
-<p>这一页不讲数学推导，只讲<strong>在 SoulEngine 里怎么写、写出来是什么效果</strong>。
-三部分：绝对值 → 三角函数 <code>A·sin(ωx + φ)</code> → 矩阵变换（旋转框的灵魂）。</p>
+<p>本页不做数学推导，只说明<strong>在 SoulEngine 里的写法与运行效果</strong>。
+三部分：绝对值 → 三角函数 <code>A·sin(ωx + φ)</code> → 矩阵变换（旋转框的坐标换算）。</p>
 <div class="admonition warning">
 <p class="admonition-title">单位约定：引擎里角度一律是「度」</p>
 <p>贴图 <code>rotation</code> 、Arena 的 <code>angle</code> 、形状表的 <code>angle</code> —— 全是<strong>度</strong>。
@@ -3444,24 +3594,24 @@
 </div>
 <hr />
 <h2 id="_1">绝对值<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p><code>math.abs(x)</code> 把负数翻正。它真正在表达的是三件事。</p>
+<p><code>math.abs(x)</code> 把负数翻正。它对应的三类用法如下。</p>
 <h3 id="_2">距离<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>两个坐标差 <code>dx</code> 可能是正也可能是负，"离多远"只看大小：</p>
+<p>两个坐标差 <code>dx</code> 可能为正也可能为负，距离只看大小：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">a</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">b</span><span class="p">.</span><span class="py">x</span>
 <span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nb">math.abs</span><span class="p">(</span><span class="nv">dx</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="c1">-- 横向已经很接近了</span>
 <span class="kr">end</span>
 </code></pre></div>
-<p>配合 <code>dy</code> 就是最常见的<strong>粗略距离判定</strong>。注意这不是圆形判定
-（真正圆形要 <code>dx*dx + dy*dy &lt; r*r</code> ），但作为"先粗筛一遍"的写法最便宜。</p>
+<p>配合 <code>dy</code> 就是常见的<strong>粗略距离判定</strong>。注意这不是圆形判定
+（真正圆形要 <code>dx*dx + dy*dy &lt; r*r</code> ），但作为粗筛写法开销较低。</p>
 <h3 id="_3">对称<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>让某个效果左右/上下对称，或者"不管往哪边动都一样"：</p>
+<p>让某个效果左右 / 上下对称，即移动方向不影响结果：</p>
 <div class="highlight"><pre><span></span><code><span class="c1">-- 灵魂离框中心越远，颜色越红（左右都一样）</span>
 <span class="kd">local</span><span class="w"> </span><span class="nv">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.abs</span><span class="p">(</span><span class="nv">Player</span><span class="p">.</span><span class="py">sprite</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">arena</span><span class="p">.</span><span class="py">x</span><span class="p">)</span>
 <span class="nv">Player</span><span class="p">.</span><span class="py">sprite</span><span class="p">.</span><span class="py">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">offset</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">offset</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">200</span><span class="p">}</span>
 </code></pre></div>
 <h3 id="_4">收敛<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>引擎里到处都在用的"每帧朝目标靠近固定步长"写法（ <code>Arenas.lua</code> 顶部的<strong>局部</strong>函数 <code>smooth_value</code> ，没挂在 <code>Arenas</code> 表上）：</p>
+<p>引擎中多处采用如下写法：每帧朝目标靠近固定步长（ <code>Arenas.lua</code> 顶部的<strong>局部</strong>函数 <code>smooth_value</code> ，没挂在 <code>Arenas</code> 表上）：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">smooth_value</span><span class="p">(</span><span class="nv">value</span><span class="p">,</span><span class="w"> </span><span class="nv">target</span><span class="p">,</span><span class="w"> </span><span class="nv">speed</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nv">target</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="nb">math.max</span><span class="p">(</span><span class="nv">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">speed</span><span class="p">,</span><span class="w"> </span><span class="nv">target</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">value</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">target</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="nb">math.min</span><span class="p">(</span><span class="nv">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">speed</span><span class="p">,</span><span class="w"> </span><span class="nv">target</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
@@ -3469,16 +3619,17 @@
 <span class="kr">end</span>
 </code></pre></div>
 <p>这里没写 <code>abs</code> ，但<strong>距离本身是 <code>abs(target - value)</code></strong> ，
-想知道"还要几帧才到位"就得算它。 <code>Arenas.lua</code> 的 <code>ResizeWithTime</code> 就是这么反推速度的：</p>
+需要计算"还要几帧到位"就得算它。 <code>Arenas.lua</code> 的 <code>ResizeWithTime</code> 就是这么反推速度的：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.abs</span><span class="p">(</span><span class="nv">arena</span><span class="p">.</span><span class="py">target</span><span class="p">.</span><span class="py">width</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">arena</span><span class="p">.</span><span class="py">width</span><span class="p">)</span>
 <span class="nv">arena</span><span class="p">.</span><span class="py">speeds</span><span class="p">.</span><span class="py">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.floor</span><span class="p">(</span><span class="nv">dw</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nv">timew</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 想在 timew 帧内走完</span>
 </code></pre></div>
 <div class="admonition example">
 <p class="admonition-title">常用搭配</p>
+</div>
 <table>
 <thead>
 <tr>
-<th>想做的事</th>
+<th>用途</th>
 <th>写法</th>
 </tr>
 </thead>
@@ -3501,7 +3652,6 @@
 </tr>
 </tbody>
 </table>
-</div>
 <hr />
 <h2 id="a-sinx">三角函数：<code>A · sin(ω·x + φ)</code><a class="headerlink" href="#a-sinx" title="Permanent link">&para;</a></h2>
 <h3 id="_5">先记住这几个值<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
@@ -3558,7 +3708,7 @@
 <thead>
 <tr>
 <th>参数</th>
-<th>直觉</th>
+<th>含义</th>
 <th>单位</th>
 </tr>
 </thead>
@@ -3566,7 +3716,7 @@
 <tr>
 <td><code>A</code></td>
 <td>摆动的<strong>半宽</strong>。 <code>A = 20</code> 就是在中心左右各 20 像素，总共 40 像素宽</td>
-<td>像素（或任何你要的单位）</td>
+<td>像素（或任何指定的单位）</td>
 </tr>
 <tr>
 <td><code>ω</code></td>
@@ -3580,7 +3730,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>x</code> 是什么由你决定，引擎里两个现成的时间源：</p>
+<p><code>x</code> 的取值由调用方决定，引擎里有两个现成的时间源：</p>
 <table>
 <thead>
 <tr>
@@ -3593,21 +3743,21 @@
 <tr>
 <td><code>Battle.TIME_F</code></td>
 <td>战斗开始后的<strong>帧数</strong>，每帧 +1</td>
-<td>简单，但速度跟着帧率走</td>
+<td>写法简单，但速度跟着帧率走</td>
 </tr>
 <tr>
 <td><code>Battle.TIME_R</code></td>
 <td>战斗开始后的<strong>秒数</strong>，每帧 +dt</td>
-<td>帧率无关，推荐</td>
+<td>帧率无关</td>
 </tr>
 </tbody>
 </table>
 <div class="admonition example">
-<p class="admonition-title">想多久晃一趟，ω 该填多少</p>
+<p class="admonition-title">周期与 ω 的对应关系</p>
 <table>
 <thead>
 <tr>
-<th>想要的效果</th>
+<th>目标效果</th>
 <th>用帧 <code>TIME_F</code></th>
 <th>用秒 <code>TIME_R</code></th>
 </tr>
@@ -3652,8 +3802,8 @@
 <span class="nv">arrow</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">arrow_y0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nb">math.rad</span><span class="p">(</span><span class="nv">t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">180</span><span class="p">))</span>
 </code></pre></div>
 <div class="admonition note">
-<p class="admonition-title">为什么是减号</p>
-<p>屏幕上 y 越大越靠下， <code>-sin</code> 才是"往上飘"。</p>
+<p class="admonition-title">使用减号的原因</p>
+<p>屏幕上 y 越大越靠下， <code>-sin</code> 对应"往上飘"。</p>
 </div>
 <h3 id="3">场景 3：呼吸缩放<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">-- 尺寸在 0.95 ~ 1.05 倍之间呼吸</span>
@@ -3695,7 +3845,7 @@
 </code></pre></div>
 <h3 id="7">场景 7：半周期做缓动<a class="headerlink" href="#7" title="Permanent link">&para;</a></h3>
 <p><code>sin</code> 从 0° 走到 180° 是 <code>0 → 1 → 0</code> 的一个完整来回。
-拿它当"进度"用，就是天然的<strong>缓入缓出</strong>：
+拿它当"进度"用，就是<strong>缓入缓出</strong>：
 两头慢、中间快，不用写 Tween。</p>
 <div class="highlight"><pre><span></span><code><span class="c1">-- t 从 0 走到 1，值从 0 升到 1 再落回 0</span>
 <span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">progress</span><span class="w">            </span><span class="c1">-- 0..1</span>
@@ -3706,9 +3856,9 @@
 <span class="kd">local</span><span class="w"> </span><span class="nv">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">math.cos</span><span class="p">(</span><span class="nb">math.rad</span><span class="p">(</span><span class="nv">t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">180</span><span class="p">)))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span>
 </code></pre></div>
 <div class="admonition note">
-<p class="admonition-title">和 Tween 怎么选</p>
+<p class="admonition-title">与 Tween 的适用区别</p>
 <p><code>Tween</code> 适合"从 A 去 B，到了就结束"； <code>sin</code> 适合"永远在循环、随时要知道当前值"。
-波次里的持续运动基本都用 <code>sin</code> ，一次性演出用 <code>Tween</code> 。</p>
+波次里的持续运动都用 <code>sin</code> ，一次性演出用 <code>Tween</code> 。</p>
 </div>
 <h3 id="8">场景 8：衰减震动<a class="headerlink" href="#8" title="Permanent link">&para;</a></h3>
 <p>震动要"越晃越小"，做法是让 <code>A</code> 自己变小：</p>
@@ -3722,7 +3872,7 @@
 <span class="w">    </span><span class="nv">sprite</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">base_x</span>
 <span class="kr">end</span>
 </code></pre></div>
-<h3 id="_7">坑<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h3 id="_7">注意事项<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">用帧数驱动，速度会跟着帧率变</p>
 <p><code>math.sin(math.rad(Battle.TIME_F * 6))</code> 在 60fps 下是 1 秒一趟，
@@ -3732,7 +3882,7 @@
 <div class="admonition warning">
 <p class="admonition-title">别忘了乘 A</p>
 <p><code>math.sin(...)</code> 的返回值在 ±1 之间，直接写进 <code>x</code> 只会动 1 像素。
-看到"动画几乎看不出来"先检查这一项。</p>
+动画幅度过小时先检查这一项。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">sin 的相位是叠加在 ω·x 里面的</p>
@@ -3740,8 +3890,8 @@
 </div>
 <hr />
 <h2 id="_8">矩阵变换：旋转框<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
-<p>这是本页最难的部分，但也是<strong>战斗框的灵魂</strong>。
-看懂它，<code>Arenas.lua</code> 里那一大段坐标运算就全是同一个套路。</p>
+<p>本节说明旋转框的坐标换算方式。
+理解它之后，<code>Arenas.lua</code> 里那一大段坐标运算即为同一套公式。</p>
 <h3 id="_9">要解决什么问题<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <p>战斗框会转： <code>arena.rotation = 30</code> 。
 转了之后，"玩家在不在框里"就没法用 <code>x &gt; left and x &lt; right</code> 判断了 ——
@@ -3755,7 +3905,7 @@
         ＼＿＿＿＿／                    └────────┘
      四条边都是斜的                  四条边横平竖直，直接比
 </code></pre></div>
-<h3 id="_10">两个公式（背下来就够了）<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<h3 id="_10">两个公式<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
 <p>设框中心 <code>(cx, cy)</code> ，旋转角 <code>θ</code> ， <code>cos = cos(θ)</code> ， <code>sin = sin(θ)</code> 。</p>
 <p><strong>世界 → 局部</strong>（判断"点在不在这个斜框里"用这个）：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dx</span><span class="p">,</span><span class="w"> </span><span class="nv">dy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">px</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">cx</span><span class="p">,</span><span class="w"> </span><span class="nv">py</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">cy</span>
@@ -3792,7 +3942,7 @@
 <p>右边框中点跑到了 <code>(387, 359)</code> —— 往右<strong>也往下</strong>，
 这就是 30° 顺时针旋转该有的样子。</p>
 <hr />
-<h3 id="_12">引擎里的五处真代码<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<h3 id="_12">引擎中的五处实现<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
 <p>同一套矩阵，在引擎里出现了五次：</p>
 <details class="example">
 <summary>① 判断点能不能站人 —— <code>Arenas.lua</code> 的 <code>is_point_valid</code></summary>
@@ -3831,7 +3981,7 @@
 <span class="nv">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">arena</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">corner_x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">cos</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">corner_y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">sin</span>
 <span class="nv">res</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">arena</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">corner_x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">sin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">corner_y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">cos</span>
 </code></pre></div>
-<p><code>GetCenterPos(side)</code> 长得不太一样（写成 <code>arena.x + length * sin</code> / <code>arena.y - length * cos</code> 这种交叉形式），
+<p><code>GetCenterPos(side)</code> 的写法不同（写成 <code>arena.x + length * sin</code> / <code>arena.y - length * cos</code> 这种交叉形式），
 但那是同一个矩阵换个写法—— <code>side == "up"</code> 取的就是"转过的框的上边中点"：
 <code>Arena:GetCenterPos("up")</code> 能正确跟随旋转，原因就在这里。</p>
 </details>
@@ -3842,7 +3992,7 @@
 <span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">dx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">sinA</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">dy</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">cosA</span>
 </code></pre></div>
 <p>碰撞库用的也是同一个矩阵，见 <strong><a href="../030_collision/index.html">碰撞库</a></strong> 。
-完美像素碰撞那套（ <code>Sprites.GetPPShapes</code> ）内部的 <code>imageRectsToWorld</code> 也是<strong>逐字照抄</strong>这个公式，
+完美像素碰撞那套（ <code>Sprites.GetPPShapes</code> ）内部的 <code>imageRectsToWorld</code> 也采用完全相同的公式，
 所以两条判定路径描述的一定是同一个盒子。</p>
 </details>
 <details class="example">
@@ -3896,7 +4046,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>一次矩阵变换，四种重力方向全搞定了。</strong></p>
+<p><strong>一次矩阵变换即可覆盖四种重力方向。</strong></p>
 <div class="admonition warning">
 <p class="admonition-title"><code>PlayerOnCeiling</code> 是 x、y <strong>两个分量都反号</strong></p>
 <p>不是只把 x 反过来：</p>
@@ -3921,11 +4071,11 @@
 平移一定在最后一步。</p>
 </div>
 <hr />
-<h3 id="_15">坑<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<h3 id="_15">注意事项<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">角度用错单位</p>
-<p>框的 <code>rotation</code> 是度，矩阵里要的是弧度。忘写 <code>math.rad</code> 的结果通常是
-"框在疯狂乱转"，因为 30 弧度 ≈ 1718 度。</p>
+<p>框的 <code>rotation</code> 是度，矩阵里要的是弧度。忘写 <code>math.rad</code> 时框会持续旋转，
+因为 30 弧度 ≈ 1718 度。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">正角度在屏幕上是顺时针</p>

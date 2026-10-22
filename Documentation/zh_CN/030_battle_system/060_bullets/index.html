@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2330,6 +2450,8 @@
       
         
       
+        
+      
     
     
     
@@ -2534,6 +2656,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3032,7 +3182,7 @@
 
   <h1>弹幕库</h1>
 
-<p>弹幕库就是把原版里那些骨头、墙、追踪炮封装好的现成零件。</p>
+<p>弹幕库提供原版中骨头、骨墙、追踪炮的封装实现。</p>
 <p>路径： <code>Scripts/Libraries/Attacks/</code> 。<br>
 在波次里用 <code>wave.Import("Attacks.Bones")</code> 之类的方式导入（详见 <a href="../050_waves/index.html">回合脚本</a> ）。</p>
 <p>导入之后<strong>必须每帧手动调用它的 <code>Update</code></strong> ，否则弹幕不会动也不会判定。</p>
@@ -3070,7 +3220,7 @@
 <p class="admonition-title">骨头与像素吸附</p>
 <p>一根骨头是头 / 身 / 尾三张贴图拼出来的组合体，如果逐张去吸整像素，接缝会抖。<br>
 引擎的做法是：<strong>三张部件都设 <code>pixel_snap = false</code></strong> （见 <code>Bones.lua</code> 的 <code>New2D</code> ），然后在 <code>bones.Update</code> 里对三张共享的那个锚点<strong>只取整一次</strong>（ <code>Sprites.SnapEdge(ax + dx, half_x)</code> ，<code>half_x</code> 是旋转感知后的 AABB 半宽），再由这个整数锚点算出三张的坐标。<br>
-所以你<strong>不需要</strong>、也<strong>不应该</strong>手动去改骨头的 <code>pixel_snap</code> ；想整体关掉吸附就设全局 <code>Sprites.pixel_snap = false</code> ，细节见 <a href="../../020_basic/020_sprites/index.html">基础开发 → 精灵 → 像素吸附</a> 。</p>
+因此<strong>不需要</strong>也<strong>不应该</strong>手动修改骨头的 <code>pixel_snap</code> 。需要整体关闭吸附时设置全局 <code>Sprites.pixel_snap = false</code> ，细节见 <a href="../../020_basic/020_sprites/index.html">基础开发 → 精灵 → 像素吸附</a> 。</p>
 </div>
 <div class="admonition example">
 <p class="admonition-title">骨头方法</p>
@@ -3082,7 +3232,7 @@
 </ul>
 </li>
 <li><code>SetStencils(stencils)</code> 套遮罩，一般用 <code>bone:SetStencils({mask})</code> 。</li>
-<li><code>ToDown(arena)</code> / <code>ToUp(arena)</code> / <code>ToLeft(arena)</code> / <code>ToRight(arena)</code> 把骨头贴到战斗框的某一条边上（方便做"从边上长出来"）。</li>
+<li><code>ToDown(arena)</code> / <code>ToUp(arena)</code> / <code>ToLeft(arena)</code> / <code>ToRight(arena)</code> 把骨头贴到战斗框的某一条边上（用于实现从边上长出的效果）。</li>
 <li><code>SetMode(mode, color)</code> 设置伤害模式与颜色。<ul>
 <li><code>mode</code> 写进贴图的 <code>HurtMode</code> ，取值见 <a href="../030_player/index.html">玩家与灵魂 → 弹幕颜色</a> 。</li>
 <li><code>color</code> 骨头颜色，省略则不变。</li>
@@ -3094,7 +3244,7 @@
 </div>
 <p><img alt="BA-06" src="../../img/030_battle_system/ba_06_bone_modes.png" /></p>
 <h3 id="3d">3D 骨头<a class="headerlink" href="#3d" title="Permanent link">&para;</a></h3>
-<p>给一组三维顶点，引擎负责投影成二维并把它们连成骨头，适合做旋转的立体框架。</p>
+<p>给定一组三维顶点，引擎将其投影为二维并连接成骨头，可用于制作旋转的立体框架。</p>
 <div class="admonition example">
 <p class="admonition-title">创建方法</p>
 <ul>
@@ -3111,7 +3261,7 @@
 <ul>
 <li><code>x</code> / <code>y</code> / <code>z</code> 中心点坐标。<strong>直接赋值即可整体平移所有顶点</strong>（内部用元表实现）。</li>
 <li><code>points</code> 原始三维点列表。</li>
-<li><code>bulge</code> 正交模式下的"膨胀"系数， <code>0</code> 为纯正交；大于 <code>0</code> 时越靠近观察者越大。</li>
+<li><code>bulge</code> 正交模式下的膨胀系数， <code>0</code> 为纯正交；大于 <code>0</code> 时越靠近观察者越大。</li>
 <li><code>xscale</code> / <code>yscale</code> 投影后的二维缩放，纯视觉，不影响三维数据。</li>
 </ul>
 </div>
@@ -3206,7 +3356,7 @@
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">缓动名会被拼成小写</p>
-<p>Tween 内部是按 <code>("" .. In):lower()</code> 去解析的，所以 <code>"SineOut"</code> 实际查的是 <code>sineout</code> 。写 <code>"Sine"</code> + <code>"Out"</code> 两段拼接的形式即可，不要写成 <code>"sineOut"</code> 这种。</p>
+<p>Tween 内部按 <code>("" .. In):lower()</code> 解析，因此 <code>"SineOut"</code> 实际查询的是 <code>sineout</code> 。使用 <code>"Sine"</code> + <code>"Out"</code> 两段拼接的写法，不要写成 <code>"sineOut"</code> 这类形式。</p>
 </div>
 <p><img alt="BA-07" src="../../img/030_battle_system/ba_07_bone_wall_warning.png" /></p>
 <hr />
@@ -3228,7 +3378,7 @@
 <ul>
 <li><code>Blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_sprites, gb_sounds)</code> 创建一门追踪炮。<ul>
 <li><code>start_pos</code> 出现位置 <code>{x, y}</code> ，默认 <code>{320, -100}</code> 。</li>
-<li><code>final_pos</code> 移动到哪儿（开火位置），默认 <code>{320, 240}</code> 。</li>
+<li><code>final_pos</code> 开火位置，默认 <code>{320, 240}</code> 。</li>
 <li><code>angles</code> <code>{初始角度, 最终角度}</code> ，默认 <code>{180, 0}</code> 。</li>
 <li><code>wait_time</code> 移动到位的帧数，默认 <code>40</code> 。</li>
 <li><code>fire_time</code> 开火持续帧数，默认 <code>20</code> 。</li>
@@ -3279,15 +3429,15 @@
 </table>
 <p>文件夹内的文件名是<strong>固定</strong>的，不能改：</p>
 <ul>
-<li><code>spr_gasterblaster_0.png</code> ~ <code>spr_gasterblaster_5.png</code> —— 出场到开火的 6 帧</li>
-<li><code>beam.png</code> —— 光束</li>
-<li><code>snd_intro.wav</code> —— 出场音</li>
-<li><code>snd_fire.wav</code> —— 开火音</li>
+<li><code>spr_gasterblaster_0.png</code> ~ <code>spr_gasterblaster_5.png</code>：出场到开火的 6 帧</li>
+<li><code>beam.png</code>：光束</li>
+<li><code>snd_intro.wav</code>：出场音</li>
+<li><code>snd_fire.wav</code>：开火音</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">找不到会静默退回默认</p>
 <p>指定的文件夹里没有 <code>spr_gasterblaster_0.png</code> 时，引擎会打印一条警告然后退回 <code>Default</code> 文件夹。<br>
-音效那边多一层兼容：子文件夹里找不到时，会先试试老式的平铺布局（ <code>Blaster/snd_intro.wav</code> ），再退回 <code>Default</code> 。</p>
+音效多一层兼容：子文件夹中找不到时，会先查找旧版平铺布局（ <code>Blaster/snd_intro.wav</code> ），再退回 <code>Default</code> 。</p>
 <div class="highlight"><pre><span></span><code>[Attacks - Blasters] WARNING: blaster sprites &#39;MyBlaster&#39; not found at Blaster/MyBlaster/spr_gasterblaster_0.png, using &#39;Default&#39; instead.
 </code></pre></div>
 </div>
@@ -3301,10 +3451,10 @@
 </ul>
 </div>
 <div class="admonition warning">
-<p class="admonition-title"><code>bones.Clear()</code> 不会自己跑</p>
-<p>全库里 <code>bones.Clear()</code> <strong>只有定义、没有调用者</strong>——引擎不会在回合结束时替你调它。<br>
-平时看不出来，是因为你把骨头塞进了 <code>wave.objects</code> ， <code>EndWave()</code> 会把那个表里的东西逐个销毁（骨头对象自己的 <code>Destroy()</code> 会连带拆掉部件）。<br>
-但如果你<strong>没</strong>把骨头塞进 <code>wave.objects</code> ，或者有长期存活的墙，就需要在合适时机自己 <code>bones.Clear()</code> 。它只清这一份库自己的内部列表，不会碰别的库。</p>
+<p class="admonition-title"><code>bones.Clear()</code> 不会被自动调用</p>
+<p>全库里 <code>bones.Clear()</code> <strong>只有定义、没有调用者</strong>，引擎不会在回合结束时调用它。<br>
+通常不易察觉，是因为骨头被加入了 <code>wave.objects</code> ， <code>EndWave()</code> 会逐个销毁该表中的对象（骨头对象自己的 <code>Destroy()</code> 会连带拆掉部件）。<br>
+但未将骨头加入 <code>wave.objects</code> ，或存在长期存活的墙时，需要在合适的时机自行调用 <code>bones.Clear()</code> 。该函数只清理本库的内部列表，不影响其他库。</p>
 </div>
 
 

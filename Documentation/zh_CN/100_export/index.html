@@ -460,6 +460,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -580,6 +588,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2200,6 +2320,8 @@
       
         
       
+        
+      
     
     
     
@@ -2404,6 +2526,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2923,7 +3073,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        签名：出包之后多半还要补一步
+        签名：出包后通常需要补充签名
       
     </span>
   </a>
@@ -3009,7 +3159,7 @@
 
   <h1>导出与发布</h1>
 
-<p>游戏能跑了、内容也做完了，接下来就是把它变成<strong>别人能下载、能打开的东西</strong>。</p>
+<p>游戏可运行且内容完成后，下一步是将其打包为<strong>可分发、可直接打开的文件</strong>。</p>
 <p>这一步分两件事：先把配置改对（<code>conf.lua</code> 里的三个地方），再把项目交给打包工具。引擎自带打包工具，路径是项目根目录下的 <code>Packager/</code> 。</p>
 <hr />
 <h2 id="_1">发布前：先把配置改对<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -3020,13 +3170,13 @@
 </code></pre></div>
 <p>改成 <code>true</code> 。它现在只控制一件事：<strong>关掉 Windows 的黑色控制台窗口</strong>（ <code>t.console = not _RELEASED</code> ）。</p>
 <div class="admonition warning">
-<p class="admonition-title">开着控制台发布等于把调试信息送给玩家</p>
-<p>控制台里会滚动各种 <code>[WARNING]</code> 、路径、内存读数。自己在开发时留着它很有用，<strong>发布包一定要关</strong>。</p>
+<p class="admonition-title">开启控制台发布会将调试信息暴露给玩家</p>
+<p>控制台中会滚动输出各类 <code>[WARNING]</code> 、路径、内存读数。开发阶段保留控制台用于调试，<strong>发布包中必须关闭</strong>。</p>
 </div>
 <h3 id="_info"><code>_INFO</code><a class="headerlink" href="#_info" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nv">_INFO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nv">TITLE</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Soul Engine - v3.0.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nv">VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span><span class="w">   </span><span class="c1">-- 你自己游戏的版本号</span>
+<span class="w">    </span><span class="nv">VERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span><span class="w">   </span><span class="c1">-- 游戏自身的版本号</span>
 <span class="w">    </span><span class="nv">AUTHOR</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;end&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nv">CONTACT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;NaN&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nv">WEBSITE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;NaN&quot;</span><span class="p">,</span>
@@ -3034,23 +3184,23 @@
 </code></pre></div>
 <ul>
 <li><code>TITLE</code> 是<strong>窗口标题</strong>，也是出错画面上印的名字。</li>
-<li><code>VERSION</code> 是<strong>你的游戏</strong>的版本号，和引擎版本无关（引擎版本看 <code>_VER</code> ，别去改它）。</li>
+<li><code>VERSION</code> 是<strong>游戏自身</strong>的版本号，与引擎版本无关（引擎版本见 <code>_VER</code> ，不修改该值）。</li>
 <li><code>AUTHOR</code> / <code>CONTACT</code> / <code>WEBSITE</code> 会<strong>原样印在出错画面上</strong>给玩家看。</li>
 </ul>
 <div class="admonition tip">
-<p class="admonition-title">把 <code>_INFO</code> 填全再发布</p>
-<p>玩家报错时能看到的那张 "Fatal Error" 画面，最后一段就是 <code>_INFO</code> 这几项。<br>
-留着 <code>NaN</code> 发布，等于玩家拿着报错截图也找不到你。</p>
+<p class="admonition-title">发布前填全 <code>_INFO</code></p>
+<p>玩家遇到错误时显示的 Fatal Error 画面，最后一段即为 <code>_INFO</code> 这几项。<br>
+保留 <code>NaN</code> 时，玩家即使提供报错截图也无法联系到作者。</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title"><code>_VER</code> 是引擎版本，不要动</p>
+<p class="admonition-title"><code>_VER</code> 是引擎版本，不要修改</p>
 <p>第一行的 <code>_VER = "3.0.0-stable"</code> 是<strong>引擎</strong>版本号。<br>
-自己项目的版本请改 <code>_INFO.VERSION</code> ，两个别搞混。</p>
+项目的版本写在 <code>_INFO.VERSION</code> ，两者不要混淆。</p>
 </div>
 <p><img alt="EXP-01" src="../img/100_export/exp_01_conf_head.png" /></p>
 <hr />
 <h2 id="_2">打包前先跑一次兼容性检查<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>打包工具里带了一个<strong>独立</strong>的检查器，只读不改，专门找那些"在 Windows 上能跑、换到别的平台就炸"的问题。</p>
+<p>打包工具附带一个<strong>独立</strong>的检查器，只读取不修改，用于检查在 Windows 上可运行、在其他平台上会出错的问题。</p>
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>Packager
 python<span class="w"> </span>check_compat.py<span class="w">            </span><span class="c1"># 默认严格度 3（最严格）</span>
 python<span class="w"> </span>check_compat.py<span class="w"> </span>--strict<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="c1"># 按 exe 发布 / Linux 检查</span>
@@ -3084,17 +3234,17 @@ python<span class="w"> </span>check_compat.py<span class="w"> </span>--all<span 
 </tr>
 </tbody>
 </table>
-<p>它会报出三档问题：<strong>error</strong>（该严格度下会跑不起来）、<strong>warning</strong>（可能踩雷，比如 <code>loadstring</code> 这类 5.1 专属 API）、<strong>info</strong>（仅供参考）。</p>
+<p>它会报出三档问题：<strong>error</strong>（该严格度下无法运行）、<strong>warning</strong>（存在风险，例如 <code>loadstring</code> 这类 5.1 专属 API）、<strong>info</strong>（仅供参考）。</p>
 <div class="admonition danger">
-<p class="admonition-title">大小写是打包最常见的翻车点</p>
-<p>Windows 上 <code>Sprites.CreateSprite("Overworld/frisk/xxx.png")</code> 和实际文件 <code>Overworld/Frisk/xxx.png</code> 能对上，
-<strong>打包到 Android / Linux 就整张图找不到</strong>。<br>
-检查器在严格度 <code>2</code> / <code>3</code> 下会把这类引用全部揪出来。<strong>打完包发现"图白了/没了"，第一个怀疑的就是它。</strong></p>
+<p class="admonition-title">大小写是打包时最常见的问题</p>
+<p>Windows 上 <code>Sprites.CreateSprite("Overworld/frisk/xxx.png")</code> 与实际文件 <code>Overworld/Frisk/xxx.png</code> 可以匹配，
+<strong>打包到 Android / Linux 后整张图会找不到</strong>。<br>
+检查器在严格度 <code>2</code> / <code>3</code> 下会列出所有这类引用。<strong>打包后出现图片缺失时，应首先排查大小写。</strong></p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">它是静态检查，不能替代真跑一遍</p>
-<p>检查器不可能 100% 复现运行时。它只专注可可靠判定的雷区（大小写、Lua 版本语法、模块缺失、基础语法）。<br>
-真要保险，<strong>至少把导出的 exe 在本机跑一遍</strong>。</p>
+<p class="admonition-title">该检查为静态检查，不能替代实际运行</p>
+<p>检查器无法完全复现运行时行为，只覆盖可静态判定的问题（大小写、Lua 版本语法、模块缺失、基础语法）。<br>
+为确保可用，<strong>至少在本机运行一次导出的 exe</strong>。</p>
 </div>
 <hr />
 <h2 id="_3">用打包工具导出<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
@@ -3183,7 +3333,7 @@ run.bat<span class="w">            </span><span class="c1"># 或手动：python 
 </tr>
 </tbody>
 </table>
-<p>导出后的输出目录大概长这样：</p>
+<p>导出后输出目录的结构如下：</p>
 <div class="highlight"><pre><span></span><code>Export/
 ├── game.love               # .love 文件
 ├── game-win/               # Windows exe 文件夹（含 DLL）
@@ -3196,8 +3346,8 @@ run.bat<span class="w">            </span><span class="c1"># 或手动：python 
 └── game-source.zip         # 源码备份
 </code></pre></div>
 <div class="admonition warning">
-<p class="admonition-title">工具自己一定会被排除，别手动加回来</p>
-<p>为了避免"把工具本身和产物再打进去"造成<strong>内存炸弹</strong>，以下内容<strong>始终</strong>被排除：</p>
+<p class="admonition-title">工具自身始终被排除，不要手动加回</p>
+<p>为避免把工具本身与产物再次打包导致产物体积异常增大，以下内容<strong>始终</strong>被排除：</p>
 <ul>
 <li>工具自身脚本（ <code>build_tool.py</code> ）</li>
 <li>工具所在文件夹（ <code>Packager/</code> ，当它在项目内时）</li>
@@ -3210,22 +3360,22 @@ run.bat<span class="w">            </span><span class="c1"># 或手动：python 
 <hr />
 <h2 id="windowsexe">Windows：exe<a class="headerlink" href="#windowsexe" title="Permanent link">&para;</a></h2>
 <p>需要本机装了 LÖVE（界面里要指向含 <code>love.exe</code> 的目录）。</p>
-<p>产物是一个<strong>文件夹</strong>，不是单个 exe —— <code>love.dll</code> 、<code>SDL2.dll</code> 这些必须和 exe 待在一起，缺一个就打不开。</p>
+<p>产物是一个<strong>文件夹</strong>，不是单个 exe —— <code>love.dll</code> 、<code>SDL2.dll</code> 等必须与 exe 位于同一目录，缺少其中任何一个都无法启动。</p>
 <p>发布时有两种送法：</p>
 <ul>
 <li><strong>整个文件夹</strong>压成 zip 发出去，玩家解压后双击里面的 exe。</li>
 <li>做成安装包（自行用 Inno Setup / NSIS 之类），这里不做展开。</li>
 </ul>
 <div class="admonition warning">
-<p class="admonition-title">别只发 exe 那一个文件</p>
-<p><code>game.exe</code> 单独拷出去必然报缺 DLL。要发就发整个 <code>-win/</code> 文件夹。</p>
+<p class="admonition-title">不要只分发 exe 单个文件</p>
+<p><code>game.exe</code> 单独复制出去会提示缺少 DLL，需分发整个 <code>-win/</code> 文件夹。</p>
 </div>
 <hr />
 <h2 id="androidapk">Android：APK<a class="headerlink" href="#androidapk" title="Permanent link">&para;</a></h2>
 <p>Android 出包是<strong>两段</strong>，出问题时要先分清卡在哪一段：</p>
 <ol>
-<li><strong>内容段</strong>：把项目打成 <code>game.love</code> 塞进模板。这段不需要 Android 环境，失败得也快。</li>
-<li><strong>工具链段</strong>：JDK / SDK / NDK / CMake / Gradle 必须满足<strong>模板自己的构建文件</strong>要求的版本。几乎所有失败都在这段，而且失败得很慢。</li>
+<li><strong>内容段</strong>：把项目打成 <code>game.love</code> 并放入模板。该段不需要 Android 环境，失败时能较快定位。</li>
+<li><strong>工具链段</strong>：JDK / SDK / NDK / CMake / Gradle 必须满足<strong>模板自身的构建文件</strong>要求的版本。多数失败发生在这一段，且构建耗时较长。</li>
 </ol>
 <h3 id="_4">准备模板（只需一次）<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/love2d/love-android
@@ -3236,8 +3386,8 @@ git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w
 </code></pre></div>
 <p>需要 <strong>JDK 17</strong>（不能更高也不能更低）、<strong>CMake ≥ 3.21</strong>，并设置 <code>ANDROID_HOME</code> 。</p>
 <div class="admonition danger">
-<p class="admonition-title">版本要求以模板的构建文件为准，别照抄教程</p>
-<p>NDK / SDK 版本在不同 love-android 分支上差很多，写错会直接在 CMake 配置阶段失败。<strong>去模板里读</strong>：</p>
+<p class="admonition-title">版本要求以模板的构建文件为准，不套用教程中的版本</p>
+<p>NDK / SDK 版本在不同 love-android 分支上存在差异，写错会直接在 CMake 配置阶段失败。<strong>以模板中的文件为准</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -3260,7 +3410,7 @@ git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w
 </tr>
 </tbody>
 </table>
-<p>当前 <code>main</code> 分支（LÖVE 12.0）大致要求：NDK <code>27.3.13750724</code> 、compileSdk / targetSdk <code>35</code> 、minSdk <code>23</code> 、CMake <code>3.21.0+</code> 、ABI <code>armeabi-v7a</code> / <code>arm64-v8a</code> / <code>x86_64</code> 。</p>
+<p>当前 <code>main</code> 分支（LÖVE 12.0）的要求为：NDK <code>27.3.13750724</code> 、compileSdk / targetSdk <code>35</code> 、minSdk <code>23</code> 、CMake <code>3.21.0+</code> 、ABI <code>armeabi-v7a</code> / <code>arm64-v8a</code> / <code>x86_64</code> 。</p>
 </div>
 <h3 id="gamelove"><code>game.love</code> 放在哪<a class="headerlink" href="#gamelove" title="Permanent link">&para;</a></h3>
 <table>
@@ -3287,7 +3437,7 @@ git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w
 <p>打包工具会<strong>自动判断</strong>用哪个，并在日志里说明。</p>
 <div class="admonition danger">
 <p class="admonition-title">放错目录不会报错</p>
-<p>放错只会让 APK 装上去启动后是一个<strong>空的 LÖVE 界面</strong>。所以出包之后一定要复核，别只看"构建成功"。</p>
+<p>放错只会让 APK 安装后启动为一个<strong>空的 LÖVE 界面</strong>。因此出包后需要复核，不只依据构建是否成功。</p>
 </div>
 <h3 id="gradle">Gradle 任务<a class="headerlink" href="#gradle" title="Permanent link">&para;</a></h3>
 <p>默认填 <code>assembleEmbedNoRecordRelease</code> 。</p>
@@ -3295,14 +3445,14 @@ git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w
 <li>游戏要用麦克风录音 → 换成 <code>assembleEmbedRecordRelease</code></li>
 <li>要上架 Play 的 AAB → <code>bundleEmbedNoRecordRelease</code></li>
 </ul>
-<p>构建日志会实时输出到工具右侧的面板。<strong>首次要编译原生库，十几分钟到一小时都很正常</strong>。</p>
+<p>构建日志会实时输出到工具右侧的面板。<strong>首次需要编译原生库，耗时从十几分钟到一小时不等</strong>。</p>
 <div class="admonition warning">
-<p class="admonition-title">之后别手痒跑 clean</p>
-<p><code>clean</code> 会把原生编译产物全扔掉，下一次又是完整的一小时。<br>
+<p class="admonition-title">之后不要执行 clean</p>
+<p><code>clean</code> 会删除全部原生编译产物，下一次构建需要重新完整编译。<br>
 改 Lua 或素材属于常规迭代，重打包 <code>game.love</code> 再加增量 Gradle 只要几十秒。</p>
 </div>
-<h3 id="_5">签名：出包之后多半还要补一步<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>release 构建产出的很可能是<strong>未签名</strong>的 APK（文件名里带 <code>-unsigned</code> ）。<strong>未签名的 APK 装不上</strong>，手机上只会说"应用未安装"，不会告诉你原因。</p>
+<h3 id="_5">签名：出包后通常需要补充签名<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>release 构建产出的很可能是<strong>未签名</strong>的 APK（文件名里带 <code>-unsigned</code> ）。<strong>未签名的 APK 无法安装</strong>，手机上只提示应用未安装，不给出具体原因。</p>
 <p>要自己签一次（<code>zipalign</code> 和 <code>apksigner</code> 在 <code>&lt;SDK&gt;/build-tools/&lt;版本&gt;/</code> 里）：</p>
 <div class="highlight"><pre><span></span><code>zipalign<span class="w"> </span>-p<span class="w"> </span>-f<span class="w"> </span><span class="m">4</span><span class="w"> </span>unsigned.apk<span class="w"> </span>aligned.apk
 
@@ -3317,29 +3467,29 @@ apksigner<span class="w"> </span>sign<span class="w"> </span>--ks<span class="w"
 apksigner<span class="w"> </span>verify<span class="w"> </span>--verbose<span class="w"> </span>signed.apk
 </code></pre></div>
 <div class="admonition danger">
-<p class="admonition-title">正式发布的密钥要永久保存</p>
-<p>自己测试随便造一个密钥无所谓；但<strong>一旦上架，就必须一直用同一个密钥签名</strong>。<br>
-密钥丢了，你以后再也无法给已发布的游戏推送更新——只能换个包名重新发一遍。</p>
+<p class="admonition-title">正式发布的密钥需要永久保存</p>
+<p>测试阶段可自行创建密钥；但<strong>上架后必须使用同一密钥签名</strong>。<br>
+密钥丢失后无法为已发布的游戏推送更新，只能更换包名重新发布。</p>
 </div>
 <h3 id="_6">装不上的两个常见原因<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">包名和官方 LÖVE 撞了</p>
-<p>模板默认的包名是 <code>org.love2d.android</code> ，也就是"另一个 LÖVE for Android"。<br>
-如果手机上装了官方 LÖVE，你的包<strong>要么装不上（同包名不同证书），要么装上了但你分不清哪个是哪个</strong>。<br>
+<p>模板默认的包名是 <code>org.love2d.android</code> ，即另一个 LÖVE for Android。<br>
+若手机已安装官方 LÖVE，该包<strong>要么因同包名不同证书而无法安装，要么安装后无法区分二者</strong>。<br>
 确认方法：</p>
 <div class="highlight"><pre><span></span><code>aapt2<span class="w"> </span>dump<span class="w"> </span>badging<span class="w"> </span>你的.apk
 </code></pre></div>
-<p>改掉模板里的 <code>app.application_id</code> （以及各语言的 app 名称）即可。</p>
+<p>修改模板里的 <code>app.application_id</code> （以及各语言的 app 名称）即可。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title"><code>libluajit.so</code> 没被包进去</p>
-<p>这是 love-android 模板的一个静默坑：原生库<strong>被链接了但没被打包</strong>，装上去一启动就崩：</p>
+<p>这是 love-android 模板的一个静默问题：原生库<strong>已被链接但未被打包</strong>，安装后启动即崩溃：</p>
 <div class="highlight"><pre><span></span><code>dlopen failed: library &quot;libluajit.so&quot; not found
 </code></pre></div>
 <p>出包后解开 APK 确认一下 <code>lib/&lt;abi&gt;/</code> 里该有的 <code>.so</code> 都在：</p>
 <div class="highlight"><pre><span></span><code>unzip<span class="w"> </span>-l<span class="w"> </span>你的.apk<span class="w"> </span><span class="p">|</span><span class="w"> </span>findstr<span class="w"> </span>lib/
 </code></pre></div>
-<p>这个坑在<strong>重新克隆模板后</strong>要特别留意。</p>
+<p>重新克隆模板后需要特别检查该项。</p>
 </div>
 <hr />
 <h2 id="love-js">love-js（网页版）<a class="headerlink" href="#love-js" title="Permanent link">&para;</a></h2>
@@ -3353,12 +3503,12 @@ apksigner<span class="w"> </span>verify<span class="w"> </span>--verbose<span cl
 </code></pre></div>
 </div>
 <div class="admonition warning">
-<p class="admonition-title"><code>os.execute</code> / <code>io.popen</code> 在网页版里没有</p>
-<p>检查器会把它们标成 info。如果你的代码里有，网页版上直接不可用，要另想办法。</p>
+<p class="admonition-title"><code>os.execute</code> / <code>io.popen</code> 在网页版中不存在</p>
+<p>检查器会将其标记为 info。代码中使用了这两个函数时，网页版中不可用，需改用其他实现。</p>
 </div>
 <hr />
 <h2 id="_7">源码备份<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<p>勾上"完整源码备份"会打一个 <code>&lt;名称&gt;-source.zip</code> 。除了存档用，也很适合做<strong>版本留档</strong>——发一个版本就留一份，以后要回滚不用去翻 git。</p>
+<p>勾选"完整源码备份"会生成 <code>&lt;名称&gt;-source.zip</code> 。除备份用途外，也可用于<strong>版本留档</strong>：每发布一个版本保留一份，回滚时无需查阅 git 历史。</p>
 <hr />
 <h2 id="_8">发布前的一张清单<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <ul>
@@ -3368,7 +3518,7 @@ apksigner<span class="w"> </span>verify<span class="w"> </span>--verbose<span cl
 <li>[ ] 按目标平台跑过 <code>check_compat.py</code>（exe / Linux 用 <code>--strict 2</code> ，网页用 <code>--strict 3</code> ）</li>
 <li>[ ] 至少把导出的 exe 在本机跑一遍完整流程</li>
 <li>[ ] Android：签名补过了、<code>aapt2 dump badging</code> 看过包名、<code>lib/&lt;abi&gt;/</code> 里的 <code>.so</code> 都在</li>
-<li>[ ] 在<strong>真机</strong>上验一遍：手机是区分大小写的，PC 上没问题的素材路径这里才见真章</li>
+<li>[ ] 在<strong>真机</strong>上验证一遍：手机文件系统区分大小写，PC 上正常的素材路径需在此确认</li>
 <li>[ ] 发布包（尤其 Android）里没有夹带 <code>.workbuddy/</code> 、<code>Export/</code> 这些开发目录</li>
 </ul>
 <hr />
@@ -3381,9 +3531,9 @@ apksigner<span class="w"> </span>verify<span class="w"> </span>--verbose<span cl
 </ul>
 <div class="admonition danger">
 <p class="admonition-title">GameJolt 的私钥会跟着游戏包一起发出去</p>
-<p><code>GamejoltPK</code> 是明文写在代码里的，<strong>任何人解包都能看到</strong>。<br>
-它不该被当成真钥匙用，详见 <a href="../090_network/000_gamejolt/index.html">网络开发 → GameJolt</a> 。<br>
-不想留明文就把密钥编译进原生库（ <a href="../070_develop/050_secrets/index.html">开发辅助 → 密钥原生库</a> ）：打包脚本会自动带上产物——
+<p><code>GamejoltPK</code> 以明文写在代码里，<strong>任何人解包都能看到</strong>。<br>
+它不应作为密钥使用，详见 <a href="../090_network/000_gamejolt/index.html">网络开发 → GameJolt</a> 。<br>
+若需要避免明文存储，可将密钥编译进原生库（ <a href="../070_develop/050_secrets/index.html">开发辅助 → 密钥原生库</a> ）：打包脚本会自动带上产物——
 Windows 把 <code>secrets.dll</code> 拷到 exe 同目录，Android 把 <code>libsecrets.so</code> 拷进 <code>jniLibs/&lt;abi&gt;/</code> 。</p>
 </div>
 

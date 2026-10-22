@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Displaying Text (Typers)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first battle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to read next
   
 
     
@@ -2111,6 +2231,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#rectangle-or-ellipse-sethitboxshape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rectangle or ellipse: SetHitboxShape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#perfect-pixel-collision" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2341,6 +2472,8 @@
       
         
       
+        
+      
     
     
     
@@ -2545,6 +2678,34 @@
     
   
     ❕️ Native Secret Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Bundled Assets
   
 
     
@@ -3003,6 +3164,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#rectangle-or-ellipse-sethitboxshape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rectangle or ellipse: SetHitboxShape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#perfect-pixel-collision" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3073,13 +3245,16 @@ The two are the same table, but it is better to <strong>consistently write the u
 <span class="w">    </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">240</span><span class="p">,</span><span class="w">    </span><span class="c1">-- center y (world coordinates)</span>
 <span class="w">    </span><span class="nv">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w">     </span><span class="c1">-- width</span>
 <span class="w">    </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w">     </span><span class="c1">-- height</span>
-<span class="w">    </span><span class="nv">angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w">   </span><span class="c1">-- rotation angle, **unit is degrees**</span>
+<span class="w">    </span><span class="nv">angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="c1">-- rotation angle, **unit is degrees**</span>
+<span class="w">    </span><span class="nv">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;rect&quot;</span><span class="w">  </span><span class="c1">-- optional: &quot;ellipse&quot; = test this as an ellipse,</span>
+<span class="w">                    </span><span class="c1">-- anything else (or missing) = rectangle</span>
 <span class="p">}</span>
 </code></pre></div>
 <ul>
 <li><code>x</code> / <code>y</code> are the <strong>center</strong>, not the top-left corner.</li>
 <li><code>angle</code> is in <strong>degrees</strong>; the function internally calls <code>math.rad</code> itself. Do not pass radians.</li>
 <li><code>w</code> / <code>h</code> are edge lengths in a rectangle; in an ellipse they are the <strong>diameters of the two axes</strong> (see warning below).</li>
+<li><code>shape</code> is optional and says which kind this table is: <code>"ellipse"</code> makes it an ellipse inscribed in that same <code>w × h</code> box, anything else (including the field being absent) is a rectangle. See <a href="#rectangle-or-ellipse-sethitboxshape">Rectangle or ellipse</a>.</li>
 </ul>
 <hr />
 <h2 id="method-overview">Method overview<a class="headerlink" href="#method-overview" title="Permanent link">&para;</a></h2>
@@ -3097,7 +3272,7 @@ The two are the same table, but it is better to <strong>consistently write the u
 <tr>
 <td><code>Collisions.FollowShape(sprite)</code></td>
 <td>——</td>
-<td>Convert a <strong>sprite</strong> into a shape table</td>
+<td>Convert a <strong>sprite</strong> into a shape table (carries the sprite's <code>shape</code>)</td>
 </tr>
 <tr>
 <td><code>Collisions.RectangleWithPoint(rect, point)</code></td>
@@ -3124,9 +3299,29 @@ The two are the same table, but it is better to <strong>consistently write the u
 <td>ellipse × ellipse</td>
 <td>two perfect circles use fast distance check</td>
 </tr>
+<tr>
+<td><code>Collisions.ShapeWithShape(a, b)</code></td>
+<td><strong>any × any</strong></td>
+<td>picks the pair test from each side's <code>shape</code></td>
+</tr>
+<tr>
+<td><code>Collisions.ShapeWithPoint(shape, point)</code></td>
+<td><strong>any × point</strong></td>
+<td>ditto; fixes <code>CircleWithPoint</code>'s unit for you</td>
+</tr>
+<tr>
+<td><code>Collisions.ShapeName(name)</code></td>
+<td>——</td>
+<td><code>"circle"</code> → <code>"ellipse"</code>, <code>"box"</code> → <code>"rect"</code>, unknown → <code>nil</code></td>
+</tr>
+<tr>
+<td><code>Collisions.IsEllipse(shape)</code></td>
+<td>——</td>
+<td>whether a shape table says <code>"ellipse"</code></td>
+</tr>
 </tbody>
 </table>
-<p>All return <code>true</code> / <code>false</code>, <strong>without any displacement</strong>.</p>
+<p>All return <code>true</code> / <code>false</code>, <strong>without any displacement</strong> (the last two return a string / boolean).</p>
 </div>
 <div class="admonition danger">
 <p class="admonition-title">CircleWithPoint's w/h unit is inconsistent with other functions</p>
@@ -3160,7 +3355,7 @@ Whereas <code>CircleWithCircle</code> and <code>RectangleWithCircle</code> both 
 <h2 id="combining-with-sprites-followshape">Combining with sprites: FollowShape<a class="headerlink" href="#combining-with-sprites-followshape" title="Permanent link">&para;</a></h2>
 <p>Writing a shape table by hand is tedious. The real usage in the engine is to <strong>just throw a sprite in</strong>:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Collisions</span><span class="p">.</span><span class="nf">FollowShape</span><span class="p">(</span><span class="nv">mySprite</span><span class="p">)</span>
-<span class="c1">-- -&gt; {x, y, w, h, angle}</span>
+<span class="c1">-- -&gt; {x, y, w, h, angle, shape}</span>
 </code></pre></div>
 <p>It reads these fields of the sprite:</p>
 <table>
@@ -3195,6 +3390,10 @@ Whereas <code>CircleWithCircle</code> and <code>RectangleWithCircle</code> both 
 <td><code>xpivot</code> / <code>ypivot</code></td>
 <td>Ratio anchor, defaults to <code>0.5</code> (center)</td>
 </tr>
+<tr>
+<td><code>_hitbox_shape</code></td>
+<td>Copied into <code>shape</code>: <code>"ellipse"</code> makes the result an ellipse, default <code>"rect"</code></td>
+</tr>
 </tbody>
 </table>
 <p>Internal logic (simplified):</p>
@@ -3208,7 +3407,8 @@ Whereas <code>CircleWithCircle</code> and <code>RectangleWithCircle</code> both 
 <span class="w">    </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">dx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">sinA</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">dy</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">cosA</span><span class="p">,</span>
 <span class="w">    </span><span class="nv">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.abs</span><span class="p">(</span><span class="nv">w</span><span class="p">),</span>
 <span class="w">    </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.abs</span><span class="p">(</span><span class="nv">h</span><span class="p">),</span>
-<span class="w">    </span><span class="nv">angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">angle</span>
+<span class="w">    </span><span class="nv">angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">angle</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">sprite</span><span class="p">.</span><span class="py">_hitbox_shape</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;rect&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
 <div class="admonition warning">
@@ -3229,7 +3429,9 @@ Only for a 1×1 pure-white image like <code>px.png</code> does <code>Scale(155, 
 <span class="w">        </span><span class="c1">-- the Soul&#39;s own box: the sprite&#39;s geometric rectangle; if `_hitbox` is set, shrink to that size</span>
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">coll_p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">GetHitbox</span><span class="p">(</span><span class="nv">Player</span><span class="p">.</span><span class="py">sprite</span><span class="p">)</span>
 
-<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">Collisions</span><span class="p">.</span><span class="nf">RectangleWithRectangle</span><span class="p">(</span><span class="nv">coll_b</span><span class="p">,</span><span class="w"> </span><span class="nv">coll_p</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="c1">-- both shapes carry their own kind, so an &quot;ellipse&quot; bullet is tested</span>
+<span class="w">        </span><span class="c1">-- as an ellipse and a normal one as a rectangle</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">Collisions</span><span class="p">.</span><span class="nf">ShapeWithShape</span><span class="p">(</span><span class="nv">coll_b</span><span class="p">,</span><span class="w"> </span><span class="nv">coll_p</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">            </span><span class="c1">-- rough hit. When either side enabled perfect pixel (SetPPCollision(true)),</span>
 <span class="w">            </span><span class="c1">-- the real answer comes from the rectangulated shape; nil means neither side enabled, so use the rectangle result.</span>
 <span class="w">            </span><span class="kd">local</span><span class="w"> </span><span class="nv">pp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">PPCollide</span><span class="p">(</span><span class="nv">b</span><span class="p">,</span><span class="w"> </span><span class="nv">Player</span><span class="p">.</span><span class="py">sprite</span><span class="p">)</span>
@@ -3241,12 +3443,13 @@ Only for a 1×1 pure-white image like <code>px.png</code> does <code>Scale(155, 
 <span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
-<p>Four things worth learning in this code:</p>
+<p>Five things worth learning in this code:</p>
 <ol>
 <li><strong>Iterate <code>Sprites.images</code> filtered by <code>isBullet</code></strong> — this is the engine's convention field marking "I am a bullet", set on bones, cannons, homing shots when created.</li>
 <li><strong><code>Sprites.GetHitbox(sprite)</code> instead of hand-editing <code>w/h</code></strong> — it shrinks the sprite's geometric rectangle to <code>_hitbox</code> (defaults to <code>{4, 4}</code>). The sprite may have a 32×32 glowing edge, but the check only uses the center 4×4, which is the key to the UNDERTALE feel (Soul hitbox far smaller than the image).</li>
 <li><strong><code>FollowShape</code> only computes <code>x/y/angle</code></strong> — anchor and rotation are handled inside; size is left to <code>GetHitbox</code>.</li>
 <li><strong><code>PPCollide</code> is the "second gate"</strong> — only after the rectangle check hits do you do the pixel-level recheck; the order must not be reversed (reversed would send a huge number of impossible-to-hit bullets into the pixel algorithm).</li>
+<li><strong><code>ShapeWithShape</code> instead of <code>RectangleWithRectangle</code></strong> — it reads the <code>shape</code> field both sides carry, so a round bullet marked <code>"ellipse"</code> is tested as a round bullet with no extra code here (see below).</li>
 </ol>
 <h3 id="change-the-soul-hitbox">Change the Soul hitbox<a class="headerlink" href="#change-the-soul-hitbox" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nv">Player</span><span class="p">.</span><span class="nf">SetHitBox</span><span class="p">(</span><span class="nv">width</span><span class="p">,</span><span class="w"> </span><span class="nv">height</span><span class="p">)</span><span class="w">           </span><span class="c1">-- change main Soul</span>
@@ -3256,6 +3459,76 @@ Only for a 1×1 pure-white image like <code>px.png</code> does <code>Scale(155, 
 <div class="admonition warning">
 <p class="admonition-title">SetHitBox silently changes 0 and negative numbers to 1</p>
 <p>The source is <code>local w = (width &gt; 0 and width or 1)</code>. To "disable the hitbox" passing <code>0</code> becomes <code>1</code>, the hitbox still takes effect. To really disable it, you must skip the check loop yourself (e.g. temporarily set <code>isBullet</code> to false).</p>
+</div>
+<hr />
+<h2 id="rectangle-or-ellipse-sethitboxshape">Rectangle or ellipse: SetHitboxShape<a class="headerlink" href="#rectangle-or-ellipse-sethitboxshape" title="Permanent link">&para;</a></h2>
+<p>A round bullet tested as a rectangle is hit on the four empty corners of its own box — the player takes damage while the art is nowhere near them. Until now the only answer was <strong>perfect pixel collision</strong>, which pays for a rectangulation pass (and a rectangle list compared every frame) to solve what a circle solves in one line.</p>
+<p><code>SetHitboxShape</code> is the cheap middle ground: the sprite keeps one box, and that box is tested as the <strong>ellipse inscribed in it</strong>.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">bullet</span><span class="p">:</span><span class="nf">SetHitboxShape</span><span class="p">(</span><span class="s2">&quot;ellipse&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- this bullet is round from now on</span>
+<span class="nv">bullet</span><span class="p">:</span><span class="nf">SetHitboxShape</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">-- same thing (synonym)</span>
+<span class="nv">bullet</span><span class="p">:</span><span class="nf">SetHitboxShape</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">)</span><span class="w">      </span><span class="c1">-- back to the plain box (the default)</span>
+<span class="nv">bullet</span><span class="p">:</span><span class="nf">GetHitboxShape</span><span class="p">()</span><span class="w">            </span><span class="c1">-- -&gt; &quot;ellipse&quot; / &quot;rect&quot;</span>
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">The whole set</p>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sprite:SetHitboxShape(kind)</code></td>
+<td><code>"ellipse"</code> / <code>"rect"</code> (synonyms <code>circle</code> / <code>oval</code>, <code>rectangle</code> / <code>box</code>), returns <code>ok</code></td>
+</tr>
+<tr>
+<td><code>sprite:GetHitboxShape()</code></td>
+<td>current kind, <code>"rect"</code> when never set</td>
+</tr>
+<tr>
+<td><code>Player.SetHitboxShape(kind, soulObj)</code></td>
+<td>same switch for a Soul; <code>soulObj</code> nil = main Soul</td>
+</tr>
+<tr>
+<td><code>Collisions.ShapeWithShape(a, b)</code></td>
+<td>overlap test that reads each side's <code>shape</code></td>
+</tr>
+<tr>
+<td><code>Collisions.ShapeWithPoint(shape, pt)</code></td>
+<td>point test that reads <code>shape</code></td>
+</tr>
+<tr>
+<td><code>Collisions.ShapeName(name)</code></td>
+<td>normalises a name to <code>"rect"</code> / <code>"ellipse"</code>, <code>nil</code> when unknown</td>
+</tr>
+</tbody>
+</table>
+<p>The kind is stored on <code>sprite._hitbox_shape</code> and copied into every shape table the sprite produces (<code>FollowShape</code>, <code>Sprites.GetHitbox</code>), so it follows the sprite through the whole pipeline.</p>
+</div>
+<div class="highlight"><pre><span></span><code><span class="c1">-- a round bullet, no perfect-pixel needed</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">orb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;Bullets/orb.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">orb</span><span class="p">.</span><span class="py">isBullet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="nv">orb</span><span class="p">:</span><span class="nf">SetHitboxShape</span><span class="p">(</span><span class="s2">&quot;ellipse&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">The ellipse is inscribed in the same box</p>
+<p><code>w</code> / <code>h</code> keep their meaning: a 32×32 bullet becomes a circle of radius 16 — same center, same extremes, only the corners are gone. The switch can therefore only <strong>shrink</strong> a hit area, never grow it. To make one bigger, change <code>_hitbox</code> or the image size.</p>
+<p>A non-square box simply gives a non-circular ellipse (<code>w = 40, h = 20</code> → a 40×20 oval), and rotation is carried over from <code>angle</code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Unknown shape names are refused, not defaulted</p>
+<p><code>SetHitboxShape("elipse")</code> (typo) prints a warning and returns <code>false</code>, leaving the sprite on the kind it already had. A typo can never silently change how a bullet behaves.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Perfect pixel outranks the shape</p>
+<p>Once <strong>either</strong> side has perfect pixel on, <code>Sprites.PPCollide</code> gives the answer — and pixel shapes are rectangles, so the ellipse setting is not consulted at all. For genuinely irregular art (jagged rocks, thin arrows) keep using PP; the ellipse is for "round / oval", where it costs a fraction of the price.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Cost, and how to see it</p>
+<p>The ellipse test is one analytic test per pair — no rectangulation when the sprite is created, no rectangle list to walk each frame, no extra memory. Roughly what <code>RectangleWithRectangle</code> (SAT) already costs.</p>
+<p>The engine's bullet loop and <code>Collisions.ShapeWithShape</code> are already wired to it, so both sides work with no extra code. Press <code>F7</code> in battle (or <code>Battle.ToggleHitboxes(true)</code>) and an ellipse-marked sprite is outlined as an ellipse, with its box still faintly underneath.</p>
 </div>
 <hr />
 <h2 id="perfect-pixel-collision">Perfect pixel collision<a class="headerlink" href="#perfect-pixel-collision" title="Permanent link">&para;</a></h2>
@@ -3402,6 +3675,9 @@ Don't use it as the first filter to iterate hundreds of bullets. Also there are 
 <p>Note <code>Sprites.GetHitbox</code> returns a <strong>brand-new shape table</strong>; editing it won't affect the sprite itself;
 but if you want to manually override the size, just edit the returned <code>w</code> / <code>h</code> (the old code's
 <code>shape_p.w, shape_p.h = Player.sprite._hitbox[1], ...</code> is now equivalent to this line).</p>
+<p>Choosing the pair test by hand gets old fast. Mark the bullet once with
+<code>bullet:SetHitboxShape("ellipse")</code> and write <code>Collisions.ShapeWithShape(shape_b, shape_p)</code>
+instead — same result, and the engine's own bullet loop picks it up too.</p>
 </div>
 <div class="admonition example">
 <p class="admonition-title">Pure hand-written shape (no sprite needed)</p>
@@ -3432,6 +3708,11 @@ The battle box's push logic is in <code>Scripts/Libraries/Battle/Arenas.lua</cod
 <p><code>Player.Update</code> runs one <code>FollowShape</code> + one SAT per <code>isBullet</code> every frame.
 With bullets in the hundreds this is hundreds of trig operations per frame. On mobile keep the count down, or do your own rough filter first (compute the center distance, skip directly if beyond threshold).</p>
 <p><code>Sprites.PPCollide</code> internally does a cheap AABB rejection first (<code>shapeHalfExtents</code>); the expensive rectangulation comparison only runs when bounding boxes intersect. But again: <strong>rough check first, then pixels</strong>, don't use it as the first filter.</p>
+<p>And if the art is just <em>round</em>: <code>sprite:SetHitboxShape("ellipse")</code> kills most corner false-positives at roughly rectangle cost, so reach for it before turning pixels on.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Ellipse and perfect pixel do not stack</p>
+<p><code>SetHitboxShape("ellipse")</code> only describes the <strong>single</strong> shape a sprite contributes. Once perfect pixel is on for either side, <code>Sprites.PPCollide</code> answers with the rectangulated pixels and the ellipse is ignored — pick one per sprite, don't expect both.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Coordinates are world coordinates, no camera</p>

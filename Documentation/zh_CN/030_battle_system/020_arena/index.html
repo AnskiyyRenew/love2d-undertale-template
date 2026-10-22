@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -1518,7 +1638,7 @@
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        常见坑
+        常见问题
       
     </span>
   </a>
@@ -2363,6 +2483,8 @@
       
         
       
+        
+      
     
     
     
@@ -2567,6 +2689,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3072,7 +3222,7 @@
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        常见坑
+        常见问题
       
     </span>
   </a>
@@ -3098,13 +3248,13 @@
 
   <h1>战斗框</h1>
 
-<p>战斗框（ <code>Arena</code> ）就是玩家灵魂能被关进去的那个白框。<br>
-它在引擎里是一个<strong>独立的、可被任意改造的矩形/椭圆区域</strong>，而不是一张贴图——缩放、旋转、挖洞、移动全部靠数值驱动。</p>
+<p>战斗框（ <code>Arena</code> ）是限制玩家灵魂活动范围的白色框体。<br>
+引擎将其实现为<strong>独立的、可任意改造的矩形或椭圆区域</strong>，而非一张贴图，缩放、旋转、挖洞、移动均由数值驱动。</p>
 <p>路径： <code>Scripts/Libraries/Battle/Arenas.lua</code> 。<br>
-在战斗场景中以 <code>Arenas</code> 作为全局变量出场；<strong>主战斗框</strong>则固定在 <code>Battle.mainarena</code> 上。</p>
+在战斗场景中以 <code>Arenas</code> 作为全局变量存在；<strong>主战斗框</strong>则固定在 <code>Battle.mainarena</code> 上。</p>
 <hr />
 <h2 id="_1">两种模式<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p><code>mode</code> 决定了这个框是"能站的地方"还是"不能站的地方"：</p>
+<p><code>mode</code> 决定该框是可站立区域还是阻挡区域：</p>
 <table>
 <thead>
 <tr>
@@ -3126,7 +3276,7 @@
 </tr>
 </tbody>
 </table>
-<p>二者可以叠加使用：一个大的 <code>plus</code> 框提供活动范围，再叠几个小的 <code>minus</code> 框把中间挖出几个洞，就得到了原版里那种"框中带柱子"的战场。</p>
+<p>二者可以叠加使用：一个大的 <code>plus</code> 框提供活动范围，再叠几个小的 <code>minus</code> 框挖出中间的空洞，即可得到原版中框内带柱子的战场。</p>
 <div class="admonition tip">
 <p class="admonition-title">主战斗框默认是 plus</p>
 <p>进战斗时 <code>Battle.mainarena</code> 是一个 <code>plus</code> 矩形，玩家回合时尺寸为 <code>565x130</code> （战斗框本体），<br>
@@ -3166,7 +3316,7 @@
 <li><code>thickness</code> 白边厚度，默认 <code>5</code> 。</li>
 <li><code>is_active</code> 是否参与碰撞。关掉之后框还在屏幕上，但玩家会直接穿过去。</li>
 <li><code>is_containing</code> 玩家此刻是否在这个 <code>plus</code> 框里面。</li>
-<li><code>move_player</code> 框移动时是否带着玩家一起走，默认 <strong><code>false</code></strong> —— 想要"框拽着玩家走"就自己改回 <code>true</code> 。</li>
+<li><code>move_player</code> 框移动时是否带着玩家一起走，默认 <strong><code>false</code></strong> 。需要框带动玩家移动时将其改为 <code>true</code> 。</li>
 <li><code>white</code> / <code>black</code> 组成框的两张贴图（外圈白、内里黑）。</li>
 <li><code>mask</code> 该框自带的遮罩对象（仅 <code>plus</code> 有）。</li>
 </ul>
@@ -3174,24 +3324,24 @@
 <div class="admonition warning">
 <p class="admonition-title">变化速度是按帧算的，不是按秒</p>
 <p><code>speeds</code> 里的数值是<strong>每帧推进多少像素</strong>，引擎在平滑时并没有乘 <code>dt</code> 。<br>
-也就是说同样的 <code>speeds</code> 在 60 帧和 120 帧下，框缩放的快慢差了一倍。写波次时请按 <code>60 FPS</code> 的经验值去调，或者用 <code>ResizeWithTime</code> 精确控制。</p>
+也就是说同样的 <code>speeds</code> 在 60 帧和 120 帧下，框缩放的快慢差一倍。编写波次时按 <code>60 FPS</code> 的数值调整，或使用 <code>ResizeWithTime</code> 精确控制。</p>
 </div>
 <hr />
 <h2 id="_4">改变形状<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>所有"改数值"的函数写的都是 <code>target</code> ，框会自己平滑过去；想瞬间生效就找带 <code>imm</code> 参数的那个。</p>
+<p>所有修改数值的函数都写入 <code>target</code> ，框会自动平滑过渡；需要立即生效时使用带 <code>imm</code> 参数的函数。</p>
 <div class="admonition example">
 <p class="admonition-title">尺寸与位置</p>
 <ul>
 <li><code>Resize(w, h, imm)</code> 改变宽高。 <code>imm</code> 为 <code>true</code> 时立刻生效。</li>
 <li><code>ResizeWithSpeed(w, h, speedw, speedh)</code> 改变宽高并指定速度。</li>
-<li><code>ResizeWithTime(w, h, timew, timeh)</code> 改变宽高，速度按"多少帧到位"自动算出来。</li>
+<li><code>ResizeWithTime(w, h, timew, timeh)</code> 改变宽高，速度按设定的帧数自动计算。</li>
 <li><code>MoveTo(x, y, imm)</code> 移动中心点。 <code>imm</code> 为 <code>true</code> 时立刻生效。</li>
 <li><code>RotateTo(rotation)</code> 旋转到指定角度。</li>
 <li><code>ResetSpeed()</code> 把所有速度恢复默认。</li>
 </ul>
 </div>
 <h3 id="_5">单边伸缩<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>原版里"框的上边往上顶出来一块"这类效果，用下面四个函数做，它们会<strong>在伸缩的同时自动修正中心点</strong>，让对边保持不动：</p>
+<p>原版中框的上边向外扩展一块这类效果，使用以下四个函数实现，它们会<strong>在伸缩的同时自动修正中心点</strong>，使对边保持不动：</p>
 <div class="admonition example">
 <p class="admonition-title">单边方法</p>
 <ul>
@@ -3226,7 +3376,7 @@
 </div>
 <hr />
 <h2 id="_7">取坐标<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<p>写弹幕时经常需要"从框的上边缘某处发射"，用这两个函数可以省掉手算旋转：</p>
+<p>编写弹幕时常需要从框的某条边缘发射，使用以下两个函数可免去手动计算旋转：</p>
 <div class="admonition example">
 <p class="admonition-title">坐标方法</p>
 <ul>
@@ -3237,13 +3387,13 @@
 <p>两个函数都做了旋转补偿，框转了多少度，取出来的点就跟着转多少度。</p>
 <hr />
 <h2 id="_8">跟随者<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
-<p>有些东西（比如挂在框边上的装饰）需要跟着框一起动，用 <code>AddFollower</code> 挂上去即可，之后每帧自动同步坐标：</p>
+<p>部分对象（如挂在框边上的装饰）需要跟随框移动，使用 <code>AddFollower</code> 挂载后每帧自动同步坐标：</p>
 <div class="admonition example">
 <p class="admonition-title">跟随者方法</p>
 <ul>
 <li><code>AddFollower(sprite, position)</code> 让一张贴图跟着框走。<ul>
 <li><code>sprite</code> 要跟随的贴图对象。</li>
-<li><code>position</code> 挂在哪儿，取值与上面两个取坐标函数一致（ <code>"up"</code> 、 <code>"ul"</code> 、 <code>"left"</code> ……）。</li>
+<li><code>position</code> 挂载位置，取值与上面两个取坐标函数一致（ <code>"up"</code> 、 <code>"ul"</code> 、 <code>"left"</code> 等）。</li>
 </ul>
 </li>
 <li><code>Destroy()</code> 销毁这个框以及它的两张贴图。</li>
@@ -3268,11 +3418,11 @@
 </code></pre></div>
 <p><img alt="BA-02" src="../../img/030_battle_system/ba_02_arena_minus.png" /></p>
 <hr />
-<h2 id="_10">常见坑<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<h2 id="_10">常见问题<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>框缩放了但弹幕没跟着裁</strong> —— 遮罩忘了每帧 <code>mask:Follow(Arena.black)</code> 。</li>
-<li><strong>玩家被弹出到奇怪的地方</strong> —— 被 <code>minus</code> 框推出去后如果落点也不合法，引擎会用一圈圈扩散的方式找最近的合法点，找不着就原地不动。把 <code>minus</code> 框摆得太挤就会出现这种现象。</li>
-<li><strong>框瞬间就位了</strong> —— 检查是不是误传了 <code>imm = true</code> ，或者 <code>speeds</code> 给得太大。</li>
+<li><strong>框缩放了但弹幕未同步裁剪</strong>：遮罩未每帧执行 <code>mask:Follow(Arena.black)</code> 。</li>
+<li><strong>玩家被弹出到与预期不符的位置</strong>：被 <code>minus</code> 框推出去后若落点同样不合法，引擎会以逐圈扩散的方式查找最近的合法点，查找失败则原地不动。 <code>minus</code> 框布置过密时会出现该现象。</li>
+<li><strong>框瞬间就位</strong>：检查是否误传了 <code>imm = true</code> ，或 <code>speeds</code> 取值过大。</li>
 </ul>
 
 

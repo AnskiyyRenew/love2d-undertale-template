@@ -12,7 +12,7 @@
         <link rel="prev" href="../010_scene/index.html">
       
       
-        <link rel="next" href="../../020_basic/index.html">
+        <link rel="next" href="../030_typers/index.html">
       
       
         
@@ -464,6 +464,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -653,10 +661,133 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        验证点
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2269,6 +2400,8 @@
       
         
       
+        
+      
     
     
     
@@ -2473,6 +2606,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2891,6 +3052,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        验证点
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2910,8 +3082,9 @@
 
   <h1>贴图的创建</h1>
 
-<p>游戏中所有可以看见的部分，都是被“渲染”上的 <code>颜色</code> 。<br>
-而渲染的颜色，在2D游戏也就是现在的情况下，使用 <code>贴图</code> 来承载。</p>
+<p>本页属于<strong>通用底座</strong>的一部分，两条路线都要用到。</p>
+<p>游戏中所有可见的部分都是渲染出的 <code>颜色</code> 。<br>
+在 2D 游戏中，渲染的颜色由 <code>贴图</code> 承载。全部属性见 <a href="../../020_basic/020_sprites/index.html">基础开发 → 贴图</a> 。</p>
 <hr />
 <h2 id="_1">创建图片<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>和上一页的末尾一样，使用 <code>Sprites.CreateSprite(path, layer)</code> 来创建一个贴图。</p>
@@ -2931,22 +3104,20 @@
 </div>
 <hr />
 <h2 id="_2">编辑图片<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p><strong>首先需要掌握一个以后也很常用的操作：赋值</strong><br>
-<u>很高大上但是实际上就是让什么东西去等于这个函数操作。</u></p>
-<p>或许你想过要一次性用一长串参数把图片创建好，比如：</p>
+<p><strong>首先需要掌握一个常用的操作：赋值</strong>，即将函数返回的结果赋予某个变量。</p>
+<p>创建贴图时也可以一次性传入全部参数，例如：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
-<p>好消息是引擎<strong>并没有</strong>这么设计： <code>Sprites.CreateSprite(path, layer)</code> 只收两个参数，位置、颜色、缩放这些统统在拿到贴图之后再逐个赋值。</p>
+<p>引擎未采用该设计： <code>Sprites.CreateSprite(path, layer)</code> 只接收两个参数，位置、颜色、缩放等均在取得贴图之后逐个赋值。</p>
 <div class="admonition danger">
 <p class="admonition-title">如果它真的收一长串参数</p>
-<p>假如创建函数真的要求你把所有属性一口气填完，那只想改个 <code>xscale</code> 的你就得长这样：</p>
+<p>若创建函数要求一次填完所有属性，仅修改 <code>xscale</code> 时需写成：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;a.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
-<p>请在三秒之内告诉我，倒数第三个nil是谁？<br>
-很明显，你很难在三秒之内答出来，所以引擎选择了拆开写，就这么简单。</p>
+<p>此时难以分辨各个 <code>nil</code> 对应的参数位置，因此引擎将属性改为创建后逐个赋值。</p>
 </div>
 <hr />
-<p><code>CreateSprite</code> 会返回一个 <code>物体</code> ，你可以把它理解为这个东西代表了这个图片，所以我们接下来可以这么写：</p>
+<p><code>CreateSprite</code> 会返回一个代表该贴图的对象，可将其赋值给变量：</p>
 <div class="admonition example">
 <p class="admonition-title">接住图片</p>
 <div class="highlight"><pre><span></span><code><span class="nv">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
@@ -2973,6 +3144,18 @@
 <li><code>pixel_snap</code> 是否让这张图做像素吸附（默认跟随全局 <code>sprites.pixel_snap</code> ，也就是开着）。设成 <code>false</code> 就单独放过这一张，常用于拼装体里不该被单独取整的零件。</li>
 <li><code>velocity</code> 图片的速度</li>
 </ul>
+</div>
+<hr />
+<h2 id="_3">验证点<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>在场景的第一层区域写下这段，进入场景后屏幕正中央应出现放大一倍的 <code>poseur</code> 图片：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="nv">image</span><span class="p">.</span><span class="py">xscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="nv">image</span><span class="p">.</span><span class="py">yscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">图片没有出现</p>
+<p>路径从 <code>Game/Resources/Sprites/</code> 与 <code>Resources/Sprites/</code> 两处查找，子目录要写全，例如 <code>Overworld/Frisk/spr_frisk_0.png</code> 。<br>
+文件名区分大小写。Windows 上大小写写错仍能匹配，打包到 Android 或 Linux 后该图会找不到。</p>
 </div>
 
 

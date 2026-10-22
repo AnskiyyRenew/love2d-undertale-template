@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2204,6 +2324,8 @@
       
         
       
+        
+      
     
     
     
@@ -2408,6 +2530,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2820,7 +2970,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        为什么要多这一层
+        该层的作用
       
     </span>
   </a>
@@ -2858,7 +3008,7 @@
   <a href="#se_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        什么时候别用 SE
+        不适用 SE 的场景
       
     </span>
   </a>
@@ -2895,12 +3045,12 @@
 
   <h1>与LOVE开发</h1>
 
-<p><code>SoulEngine</code> 基于 <code>love</code> ，所以这意味着不可能脱离 <code>love</code> 的底层。</p>
-<p>而 <code>love2d</code> 中有很多优秀的api，而在某些情况下必须要使用这些api进行开发，它们并不直接包含在 <code>SoulEngine</code> 中的任何一个文件里。</p>
-<p>这个专题下均介绍 <code>love2d</code> 原版API如何与 <code>SoulEngine</code> 搭配起来。</p>
+<p><code>SoulEngine</code> 基于 <code>love</code> 构建，无法脱离 <code>love</code> 的底层。</p>
+<p><code>love2d</code> 的部分 API 在某些开发场景下必须使用，这些 API 并未包含在 <code>SoulEngine</code> 的任何文件中。</p>
+<p>本专题介绍 <code>love2d</code> 原版 API 与 <code>SoulEngine</code> 的配合使用方式。</p>
 <hr />
 <h2 id="se"><code>SE</code> 是什么<a class="headerlink" href="#se" title="Permanent link">&para;</a></h2>
-<p><code>main.lua</code> 启动时加载的第一件东西就是它：</p>
+<p><code>main.lua</code> 启动时首先加载它：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">SE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ImportFile</span><span class="p">(</span><span class="s2">&quot;Engine.FuncProtector&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p><code>FuncProtector</code> 返回一个表，按 LÖVE 的模块名分好类，里面<strong>每一个函数都是对应 <code>love.xxx</code> 的直接转发</strong>：</p>
@@ -2908,23 +3058,23 @@
 <span class="nv">SE</span><span class="p">.</span><span class="py">audio</span><span class="p">.</span><span class="nf">newSource</span><span class="p">(</span><span class="s2">&quot;a.wav&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;static&quot;</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 等价于 love.audio.newSource(&quot;a.wav&quot;, &quot;static&quot;)</span>
 <span class="nv">SE</span><span class="p">.</span><span class="py">filesystem</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">&quot;config.json&quot;</span><span class="p">)</span><span class="w">          </span><span class="c1">-- 等价于 love.filesystem.read(&quot;config.json&quot;)</span>
 </code></pre></div>
-<p>所以你不需要重新学一套 API：<strong>把 <code>love.</code> 换成 <code>SE.</code> 就行</strong>。参数、返回值、报错行为全都一致， <a href="https://love2d.org/wiki">LOVE2D wiki</a> 上的说明可以照抄。</p>
+<p>因此无需重新学习一套 API：<strong>将 <code>love.</code> 替换为 <code>SE.</code> 即可</strong>。参数、返回值、报错行为完全一致，可参照 <a href="https://love2d.org/wiki">LOVE2D wiki</a> 中的说明。</p>
 <div class="admonition example">
 <p class="admonition-title">改写规则</p>
 <div class="highlight"><pre><span></span><code><span class="nv">love</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
 <span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
 </code></pre></div>
-<p>只换开头的模块名，后面一个字都不用动。</p>
+<p>仅替换开头的模块名，其余部分不变。</p>
 </div>
-<h3 id="_1">为什么要多这一层<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<h3 id="_1">该层的作用<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <p>打开 <code>Scripts/Libraries/Engine/FuncProtector.lua</code> ，每个函数体都长这样：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">newCanvas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(...)</span>
 <span class="w">    </span><span class="c1">-- TODO: Implement adaptation logic</span>
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">love</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">newCanvas</span><span class="p">(...)</span>
 <span class="kr">end</span><span class="p">,</span>
 </code></pre></div>
-<p>那句 <code>TODO</code> （实现适配逻辑）是留给以后的：不同 LÖVE 版本、不同平台的某些行为并不完全一致，等真需要处理的时候， <strong>只改这一层就够了</strong>，引擎内部和你的游戏代码都不用动。</p>
-<p>目前所有函数都是纯直通、没有任何额外行为，可以放心地当它就是 <code>love</code> 。</p>
+<p>该 <code>TODO</code> （实现适配逻辑）用于后续适配：不同 LÖVE 版本、不同平台的个别行为并不完全一致，需要适配时<strong>只修改这一层</strong>，引擎内部与游戏代码均无需改动。</p>
+<p>目前所有函数均为纯直通，没有额外行为，可等同于 <code>love</code> 使用。</p>
 <h3 id="_2">它包了哪些模块<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>一共 20 个分类、316 个函数：</p>
 <table>
@@ -3038,23 +3188,23 @@
 </tr>
 </tbody>
 </table>
-<p><code>SE._top</code> 比较特殊 —— 它装的是 <code>love</code> 表本身的顶层函数（这类函数不在任何子模块里）：</p>
+<p><code>SE._top</code> 较为特殊，它包含 <code>love</code> 表本身的顶层函数（这类函数不属于任何子模块）：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">SE</span><span class="p">.</span><span class="py">_top</span><span class="p">.</span><span class="nf">getVersion</span><span class="p">()</span><span class="w">                      </span><span class="c1">-- 等价于 love.getVersion()</span>
 <span class="nv">SE</span><span class="p">.</span><span class="py">_top</span><span class="p">.</span><span class="nf">isVersionCompatible</span><span class="p">(</span><span class="s2">&quot;11.4&quot;</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition note">
-<p class="admonition-title">没包进来的东西</p>
+<p class="admonition-title">未包含在 SE 中的内容</p>
 <p>事件回调（ <code>keypressed</code> 、 <code>update</code> 、 <code>draw</code> 之类）不在这里 —— 引擎把事件转发给场景，写法见 <a href="../020_basic/010_scene/index.html">场景</a> 。<br>
 LÖVE 的<strong>对象方法</strong>（ <code>source:play()</code> 、 <code>canvas:renderTo()</code> ）也不在这里，它们跟着对象走。</p>
 </div>
 <h3 id="_3">引擎自己加的函数<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p><code>FuncProtector.lua</code> 末尾还有两块不是直通的，是引擎自己写的工具，现在就能用：</p>
+<p><code>FuncProtector.lua</code> 末尾另有两块非直通内容，为引擎自行实现的工具函数，当前即可使用：</p>
 <div class="admonition example">
 <p class="admonition-title">工具函数 SE.tools</p>
 <ul>
 <li><code>SE.tools.hexColor(hexcode)</code> → <code>{r, g, b}</code><ul>
-<li>十六进制颜色字符串转成 <code>setColor</code> 能吃的三个 <code>0 ~ 1</code> 的数。支持 <code>#RGB</code> 与 <code>#RRGGBB</code> 两种写法， <code>#</code> 可省略。</li>
-<li>传入的不是字符串、或者长度不对时返回 <code>nil</code> （不报错），所以可以安全地用来解析玩家/配置文件给的颜色。</li>
+<li>将十六进制颜色字符串转换为 <code>setColor</code> 所需的三个 <code>0 ~ 1</code> 的数值。支持 <code>#RGB</code> 与 <code>#RRGGBB</code> 两种写法， <code>#</code> 可省略。</li>
+<li>传入的不是字符串或长度不合法时返回 <code>nil</code> （不报错），可用于解析玩家或配置文件提供的颜色。</li>
 </ul>
 </li>
 </ul>
@@ -3064,7 +3214,7 @@ LÖVE 的<strong>对象方法</strong>（ <code>source:play()</code> 、 <code>c
 <ul>
 <li><code>SE.draw_.colorText(r, g, b, a, ...)</code> → 无<ul>
 <li>先 <code>setColor</code> ，再用剩余参数调 <code>print</code> ，最后<strong>自动把颜色还原成白色</strong>。参数与 <code>love.graphics.print</code> 完全一样。</li>
-<li>省掉的正是"画完必须还原颜色"这一步 —— 忘了还原会染到后面所有绘制上，见 <a href="000_graphics/index.html">图像绘制</a> 的坑。</li>
+<li>该函数省去的是绘制后必须还原颜色这一步骤。未还原时颜色会影响后续所有绘制，详见 <a href="000_graphics/index.html">图像绘制</a> 中的相关说明。</li>
 </ul>
 </li>
 </ul>
@@ -3074,11 +3224,11 @@ LÖVE 的<strong>对象方法</strong>（ <code>source:play()</code> 、 <code>c
 <span class="kd">local</span><span class="w"> </span><span class="nv">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">tools</span><span class="p">.</span><span class="nf">hexColor</span><span class="p">(</span><span class="s2">&quot;#C14949&quot;</span><span class="p">)</span>
 <span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setColor</span><span class="p">(</span><span class="nv">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nv">c</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="nv">c</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
-<p><code>conf_pure.lua</code> 里设置主色调那两行就是这么写的（默认注释着，想改主色把它解开）：</p>
+<p><code>conf_pure.lua</code> 中设置主色调的两行即采用该写法（默认处于注释状态，修改主色时取消注释）：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;MainColor&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">tools</span><span class="p">.</span><span class="nf">hexColor</span><span class="p">(</span><span class="s2">&quot;#C14949&quot;</span><span class="p">))</span>
 </code></pre></div>
-<h2 id="se_1">什么时候别用 SE<a class="headerlink" href="#se_1" title="Permanent link">&para;</a></h2>
-<p><code>SE</code> 是<strong>底层兜底</strong>，不是首选。引擎自己包过一层的东西优先用引擎的，因为它们额外做了 Game 区覆盖、缓存、音量跟随之类的处理：</p>
+<h2 id="se_1">不适用 SE 的场景<a class="headerlink" href="#se_1" title="Permanent link">&para;</a></h2>
+<p><code>SE</code> 提供<strong>底层兜底</strong>，不优先使用。引擎已封装的部分优先使用引擎封装的版本，因为它们额外处理了 Game 区覆盖、缓存、音量跟随等逻辑：</p>
 <table>
 <thead>
 <tr>
@@ -3105,16 +3255,16 @@ LÖVE 的<strong>对象方法</strong>（ <code>source:play()</code> 、 <code>c
 </tr>
 </tbody>
 </table>
-<p>反过来说，<strong>引擎没包的</strong>（建 Canvas、写 Shader、直接画图形、读写文件……）就放心用 <code>SE</code> 。引擎内部也是这么做的： <code>Sprites.lua</code> 加载贴图最底层那一步就是 <code>SE.graphics.newImage</code> ，只是在它上面又包了缓存、Game 区优先和像素吸附。</p>
+<p>反之，<strong>引擎未封装的部分</strong>（创建 Canvas、编写 Shader、直接绘制图形、读写文件等）使用 <code>SE</code> 。引擎内部同样如此： <code>Sprites.lua</code> 加载贴图的最底层即为 <code>SE.graphics.newImage</code> ，在其之上又封装了缓存、Game 区优先和像素吸附。</p>
 <hr />
 <h2 id="_4">本专题内容<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="000_graphics/index.html">图像绘制</a> —— <code>SE.graphics</code> 与 <code>love.graphics</code> 的关系、全部 101 个函数一览</li>
-<li><a href="010_audio/index.html">音频系统</a> —— <code>SE.audio</code> 与引擎 <code>Audio</code> 库的分工</li>
+<li><a href="000_graphics/index.html">图像绘制</a>：<code>SE.graphics</code> 与 <code>love.graphics</code> 的关系、全部 101 个函数一览</li>
+<li><a href="010_audio/index.html">音频系统</a>：<code>SE.audio</code> 与引擎 <code>Audio</code> 库的分工</li>
 </ul>
 <div class="admonition info">
 <p class="admonition-title">提示</p>
-<p>这个专题下所有内容均可以在 <a href="https://love2d.org/wiki">LOVE2D wiki</a> 中查看，但这里只挑几个最常用的讲解。</p>
+<p>本专题所有内容均可在 <a href="https://love2d.org/wiki">LOVE2D wiki</a> 中查看，此处选取其中常用的部分讲解。</p>
 </div>
 
 

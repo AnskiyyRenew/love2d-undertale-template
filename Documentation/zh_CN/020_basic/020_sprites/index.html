@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2352,6 +2472,8 @@
       
         
       
+        
+      
     
     
     
@@ -2556,6 +2678,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3077,10 +3227,10 @@
   <h1>贴图</h1>
 
 <p>所有的美术资源都将使用贴图库来完成。</p>
-<p><u>有些人可能习惯称贴图Sprite为精灵图，实际上意思是一样的。</u></p>
+<p><u>贴图（Sprite）也称精灵图，两者指同一概念。</u></p>
 <p>所有贴图的路径： <code>Resources/Sprites/</code><br>
 贴图库路径： <code>Scripts/Libraries/Sprites.lua</code></p>
-<p>如果想<strong>覆盖</strong>引擎自带的贴图（比如换掉默认的 <code>px.png</code> ），把自己画的同名图片放到 <code>Game/Resources/Sprites/</code> 即可，Game 区优先，主目录兜底。</p>
+<p>覆盖引擎自带的贴图（例如替换默认的 <code>px.png</code> ）时，将同名图片放入 <code>Game/Resources/Sprites/</code> 即可，Game 区优先，主目录兜底。</p>
 <hr />
 <h2 id="_1">创建一个贴图<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>使用 <code>Sprites.CreateSprite(path, layer)</code> 来创建一个贴图：</p>
@@ -3096,9 +3246,9 @@
 <p>默认情况下，这张图片会生成到屏幕正中心，也就是 <code>(320, 240)</code> 的位置。</p>
 <hr />
 <h2 id="_2">贴图的属性<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>分为 <code>直接属性</code> 和 <code>方法调用</code> 两种类型来设置属性</p>
-<p>在 <code>直接属性</code> 中，我们通过点号（ <code>.</code> ）来设置属性；<br>
-在 <code>方法调用</code> 中，我们使用语法糖，通过冒号（ <code>:</code> ）来设置属性。</p>
+<p>属性设置分为 <code>直接属性</code> 与 <code>方法调用</code> 两类。</p>
+<p><code>直接属性</code> 通过点号（ <code>.</code> ）设置；<br>
+<code>方法调用</code> 通过冒号（ <code>:</code> ）设置。</p>
 <div class="admonition tip">
 <p class="admonition-title">直接属性</p>
 <ul>
@@ -3127,7 +3277,7 @@
 <li><code>outline</code> 图片描边颜色和厚度，由五个参数构成 <code>{r, g, b, a, thickness}</code> ，分别代表 <code>{红, 绿, 蓝, 透明度, 厚度}</code></li>
 <li><code>follow_mode</code> 用于跟随父对象的设置，支持两种，一个是 <code>position</code> ：表示只跟随位置，父对象旋转不进行干扰；第二种是 <code>full</code> ：跟随父对象的位置和旋转情况。</li>
 <li><code>isBullet</code> 是否为可伤害类型（弹幕类型），一个贴图就是通过此变量转化成弹幕的，默认 <code>false</code> 。</li>
-<li><code>HurtMode</code> 弹幕伤害是什么类型，例如：橙色、蓝色、红色、绿色......</li>
+<li><code>HurtMode</code> 弹幕伤害的类型，例如：橙色、蓝色、红色、绿色。</li>
 </ul>
 </div>
 <div class="admonition tip">
@@ -3143,7 +3293,7 @@
 </li>
 <li><code>Outline(r, g, b, a, t)</code> 设置贴图的边框。<ul>
 <li><code>r, g, b, a</code> 颜色与透明度，均为 <code>0 ~ 1</code> 的数值。</li>
-<li><code>t</code> 边框厚度，一般情况下可以用 <code>2</code> ，根据情况加粗。</li>
+<li><code>t</code> 边框厚度，常用取值为 <code>2</code> 。</li>
 </ul>
 </li>
 <li><code>SetFourPointMode(enabled)</code> 是否开启四角顶点模式，也就是常用的 <code>拉腿</code> 变形。</li>
@@ -3167,8 +3317,8 @@
 <li><code>SetChildren(children)</code> 将多个贴图物体设置为当前贴图的子对象。</li>
 <li><code>AddChild(child)</code> 给子对象组额外添加一个子对象 <code>child</code> 。</li>
 <li><code>RemoveChild(child)</code> 从子对象组中移除 <code>child</code> 贴图对象。</li>
-<li><code>GetPosition()</code> 获取图片的坐标，返回 <code>x, y</code> ，一般可以使用两个变量进行承接。</li>
-<li><code>GetPositionParent()</code> 获取父对象的坐标，返回 <code>x, y</code> ，一般可以使用两个变量进行承接。</li>
+<li><code>GetPosition()</code> 获取图片的坐标，返回 <code>x, y</code> ，可用两个变量接收。</li>
+<li><code>GetPositionParent()</code> 获取父对象的坐标，返回 <code>x, y</code> ，可用两个变量接收。</li>
 <li><code>SetStencils(stencils)</code> 设置贴图的遮罩，可以使用多个遮罩。</li>
 <li><code>SetShaders(shaders)</code> 设置贴图的着色器为 <code>shaders</code> ，可以使用多个着色器。</li>
 <li><code>GetShaders()</code> 获取使用的着色器。</li>
@@ -3187,6 +3337,8 @@
 <li><code>GetAnimationPath()</code> 返回当前动画的帧序列路径，没有动画时返回 <code>nil</code> 。</li>
 <li><code>SetPPCollision(enabled)</code> 开关这张图的<strong>完美像素碰撞</strong>，返回 <code>(成功, 矩形数量)</code> 。详见下方「完美像素碰撞」。</li>
 <li><code>IsPPCollision()</code> 返回这张图是否开着完美像素碰撞。</li>
+<li><code>SetHitboxShape(kind)</code> 把判定形状切成<strong>椭圆</strong>或矩形： <code>"ellipse"</code> / <code>"rect"</code> （别名 <code>circle</code> / <code>oval</code> 与 <code>rectangle</code> / <code>box</code> ），返回 <code>ok</code> 。详见下方。</li>
+<li><code>GetHitboxShape()</code> 返回当前种类，没设过就是 <code>"rect"</code> 。</li>
 <li><code>Destroy() / Remove()</code> 删除贴图。</li>
 </ul>
 </div>
@@ -3196,47 +3348,47 @@
 <span class="nv">a</span><span class="p">.</span><span class="py">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
 <span class="nv">a</span><span class="p">:</span><span class="nf">MoveTo</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
-<p>你大概率会看见一个红色的poseur光剩下了一双腿在屏幕顶端。</p>
+<p>运行后，图片变为红色并移动至 <code>(320, 0)</code> ，屏幕顶端只显示图片的下半部分。</p>
 </div>
 <hr />
 <h2 id="_3">库级方法<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>上面那些都是「某一张贴图」的方法，下面这些挂在 <code>Sprites</code> 库自己身上：</p>
+<p>上述方法作用于单个贴图对象，以下方法由 <code>Sprites</code> 库提供：</p>
 <div class="admonition tip">
 <p class="admonition-title">库级方法</p>
 <ul>
-<li><code>Sprites.CreateSpriteQuad(path, quad, layer)</code> 只取图片里 <code>quad</code> 指定的一块来创建贴图，<code>quad</code> 填 <code>{x = , y = , width = , height = }</code> 。做图集（tileset）裁切时用得上。</li>
-<li><code>Sprites.MultiDust(sprs, sound, remove, time)</code> 让<strong>一整组</strong>贴图一起化成尘埃，整体按包围盒扩散，比一个个调 <code>Dust</code> 更自然。</li>
+<li><code>Sprites.CreateSpriteQuad(path, quad, layer)</code> 只取图片里 <code>quad</code> 指定的一块来创建贴图，<code>quad</code> 填 <code>{x = , y = , width = , height = }</code> 。用于图集（tileset）裁切。</li>
+<li><code>Sprites.MultiDust(sprs, sound, remove, time)</code> 让<strong>一整组</strong>贴图一起化成尘埃，整体按包围盒扩散，无需逐张调用 <code>Dust</code> 。</li>
 <li><code>Sprites.ShakeSprite(sprite, magnitude, duration, speed)</code> 让贴图抖动一段时间。<code>magnitude</code> 可以是一个数，也可以是 <code>{x = , y = }</code> 。</li>
-<li><code>Sprites.ShadowSprite(sprite, target_scale, duration, speed)</code> 生成一个跟着贴图放大淡出的影子，返回那个影子贴图对象。</li>
-<li><code>Sprites.GetCacheInfo()</code> 返回 <code>(缓存数量, 明细列表)</code> ，用来看看图片缓存里当前都有谁。</li>
+<li><code>Sprites.ShadowSprite(sprite, target_scale, duration, speed)</code> 生成一个跟着贴图放大淡出的影子，返回该影子贴图对象。</li>
+<li><code>Sprites.GetCacheInfo()</code> 返回 <code>(缓存数量, 明细列表)</code> ，用于查看当前图片缓存的内容。</li>
 <li><code>Sprites.CleanupCache()</code> 手动跑一次 LRU 清理（正常流程下引擎会按 <code>OPT_LRU_SPRITES</code> 自动跑）。</li>
 </ul>
 </div>
 <hr />
 <h2 id="step">每帧回调 Step<a class="headerlink" href="#step" title="Permanent link">&para;</a></h2>
-<p>想让某张贴图每帧自己干点事（飘动、跟随、计时自毁……），往它身上挂一个 <code>Step</code> 函数即可，引擎每帧会自动调用：</p>
+<p>为贴图挂载 <code>Step</code> 函数后，引擎每帧自动调用，可用于飘动、跟随、计时自毁等逻辑：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">spr</span><span class="p">.</span><span class="py">Step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">,</span><span class="w"> </span><span class="nv">dt</span><span class="p">)</span>
 <span class="w">    </span><span class="c1">-- 每帧一次</span>
 <span class="kr">end</span>
 </code></pre></div>
-<p>骨头和蓝灵魂平台上也有同名的钩子（不过没有 <code>dt</code> ）。完整说明见 <a href="../170_step/index.html">Step 每帧回调</a> 。</p>
+<p>骨头与蓝灵魂平台上也有同名钩子，该钩子不传入 <code>dt</code> 。完整说明见 <a href="../170_step/index.html">Step 每帧回调</a> 。</p>
 <hr />
 <h2 id="_4">像素吸附<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>像素画最怕"半像素抖动"：贴图坐标带着小数，采样出来的边缘就会忽明忽暗。这件事引擎默认就帮你做了。</p>
+<p>贴图坐标带小数时，采样出的边缘会明暗闪烁，即半像素抖动。引擎默认启用像素吸附。</p>
 <p>全局开关是 <code>sprites.pixel_snap</code> （默认 <code>true</code> ），也可以用 <code>Sprites.SetPixelSnap(enabled)</code> 改；单张图可以自己覆盖：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">sprites</span><span class="p">.</span><span class="py">pixel_snap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w">      </span><span class="c1">-- 全局关掉</span>
 <span class="nv">Sprites</span><span class="p">.</span><span class="nf">SetPixelSnap</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 全局打开</span>
 <span class="nv">spr</span><span class="p">.</span><span class="py">pixel_snap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w">          </span><span class="c1">-- 只放过这一张</span>
 </code></pre></div>
 <p>吸附的规则是<strong>吸边、不吸中心</strong>：真正被取整的是四边形四条<strong>边</strong>所在的坐标，不是图片的中心点。这两者只有在图片尺寸为偶数时才刚好相等，所以奇数尺寸的贴图直接用中心取整会歪半像素。</p>
-<p>复合体（比如骨头那种头 / 身 / 尾拼起来的东西）要<strong>只对共享锚点取整一次</strong>：把各零件设成 <code>pixel_snap = false</code> ，再用 <code>Sprites.SnapEdge(centre, offset)</code> 把锚点吸好，然后照锚点摆放零件。如果放任每个零件各自取整，接缝处就会错位。</p>
+<p>由多个零件拼合的复合体（例如骨头的头 / 身 / 尾）需<strong>只对共享锚点取整一次</strong>：将各零件设为 <code>pixel_snap = false</code> ，再用 <code>Sprites.SnapEdge(centre, offset)</code> 吸附锚点，然后按锚点摆放零件。若各零件分别取整，接缝处会错位。</p>
 <ul>
 <li><code>Sprites.SnapCoord(v)</code> 单个数取整，等价于 <code>math.floor(v + 0.5)</code> 。</li>
 <li><code>Sprites.SnapEdge(centre, offset)</code> 把「边」吸到整数： <code>centre</code> 是中心坐标， <code>offset</code> 是这条边相对中心的偏移（例如半宽），返回吸附后的中心坐标。</li>
 </ul>
 <div class="admonition warning">
-<p class="admonition-title">旋转过的贴图不认识「边」</p>
-<p>贴图一旦转了角度，四边形就不再和坐标轴平行，<code>SnapEdge</code> 那套就没有意义了。旋转件的正确做法是「不要吸附」，只要保证它的几何和关掉吸附时完全一致即可。</p>
+<p class="admonition-title">旋转过的贴图不适用边吸附</p>
+<p>贴图旋转角度后，四边形不再与坐标轴平行，<code>SnapEdge</code> 不再适用。旋转件不执行吸附，其几何结果与关闭吸附时一致。</p>
 </div>
 <hr />
 <h2 id="_5">完美像素碰撞<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
@@ -3245,16 +3397,27 @@
 <span class="nv">spr</span><span class="p">:</span><span class="nf">SetPPCollision</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 退回普通包围盒</span>
 <span class="nv">spr</span><span class="p">:</span><span class="nf">IsPPCollision</span><span class="p">()</span><span class="w">         </span><span class="c1">-- 查询当前状态</span>
 </code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">圆形与椭圆使用形状判定</p>
+<p>若所需形状为圆或椭圆，使用 <code>spr:SetHitboxShape("ellipse")</code> 即可完成判定，无需矩形化，也无需逐帧遍历多个小方框：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">spr</span><span class="p">:</span><span class="nf">SetHitboxShape</span><span class="p">(</span><span class="s2">&quot;ellipse&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 这张图按椭圆判定</span>
+<span class="nv">spr</span><span class="p">:</span><span class="nf">SetHitboxShape</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 退回方框（默认）</span>
+<span class="nv">spr</span><span class="p">:</span><span class="nf">GetHitboxShape</span><span class="p">()</span><span class="w">            </span><span class="c1">-- -&gt; &quot;ellipse&quot; / &quot;rect&quot;</span>
+</code></pre></div>
+<p>椭圆内切于同一个方框，只削去四个角，见
+<a href="../../050_intermediate/030_collision/index.html">进阶 → 碰撞判定</a> 。
+椭圆无法描述的美术形状使用完美像素碰撞。</p>
+</div>
 <p>判定本身用 <code>Sprites.PPCollide(a, b)</code> ：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">PPCollide</span><span class="p">(</span><span class="nv">bullet</span><span class="p">,</span><span class="w"> </span><span class="nv">Player</span><span class="p">.</span><span class="py">sprite</span><span class="p">)</span>
 <span class="c1">-- true  = 真的撞上了</span>
 <span class="c1">-- false = 没撞上</span>
 <span class="c1">-- nil   = 两边都没开完美像素，请沿用包围盒的结论</span>
 </code></pre></div>
-<p>也就是说它<strong>只在至少一方开了的时候才给答案</strong>，返回 <code>nil</code> 时千万别当成"没撞上"。</p>
+<p>该函数<strong>仅在至少一方启用完美像素碰撞时返回结果</strong>，返回 <code>nil</code> 时沿用包围盒的判定结论。</p>
 <div class="admonition warning">
-<p class="admonition-title">开了之后判定会变大</p>
-<p>完美像素是拿贴图的<strong>不透明像素</strong>去判定的。16×16 的心形图开出完美像素后，判定范围会比默认那个居中的 <code>{4, 4}</code> 小方框<strong>大不少</strong>。手感要"擦弹"就继续用 <code>_hitbox</code> ，要"贴合形状"才开这个，两者二选一。</p>
+<p class="admonition-title">开启后判定范围会变大</p>
+<p>完美像素使用贴图的<strong>不透明像素</strong>判定。16×16 的心形图启用后，判定范围大于默认的居中 <code>{4, 4}</code> 方框。需要擦弹手感时使用 <code>_hitbox</code> ，需要贴合形状时使用完美像素，两者择一。</p>
 </div>
 <p>相关辅助：</p>
 <ul>
@@ -3263,11 +3426,11 @@
 <li><code>Sprites.GetHitbox(sprite)</code> 一步得到「包围盒 + <code>_hitbox</code> 覆盖」的结果，战斗里判灵魂判定用的就是它。</li>
 <li><code>Sprites.ClearPPCache()</code> 清空矩形缓存。热重载了库或者贴图之后调一次。</li>
 </ul>
-<p>底层的矩形化算法在 <code>Scripts/Libraries/PerfectPixel/</code> ，有 C 后端（ <code>cpp.dll</code> ）与纯 Lua 版（ <code>pure.lua</code> ）两份，前者大约快 10 倍，可用时会自动启用。想打开 F7 碰撞箱叠加层看判定形状，见 <a href="../../030_battle_system/070_scene/index.html">战斗系统 → 战斗场景</a> 。</p>
+<p>底层的矩形化算法在 <code>Scripts/Libraries/PerfectPixel/</code> ，有 C 后端（ <code>cpp.dll</code> ）与纯 Lua 版（ <code>pure.lua</code> ）两份，前者约快 10 倍，可用时自动启用。按 <code>F7</code> 可打开碰撞箱叠加层查看判定形状，见 <a href="../../030_battle_system/070_scene/index.html">战斗系统 → 战斗场景</a> 。</p>
 <hr />
 <h2 id="_6">关于颜色<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>在这里，颜色被分为 <code>红、绿、蓝</code> 三种基本色，后续所有颜色均通过这三个颜色调配而成。</p>
-<p>下面介绍一些可能会常用的颜色：</p>
+<p>以下列出常用颜色：</p>
 <ul>
 <li><code>{1, 0, 1}</code> KR的大粉色，通过红蓝同比例调配而成。</li>
 <li><code>{0.4, 0, 1}</code> 紫色，但是略显深蓝。</li>
@@ -3276,31 +3439,30 @@
 <li><code>{1, 1, 0}</code> 黄色的确认。</li>
 </ul>
 <h3 id="_7">浅色与深色<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p>说到深浅，我们一般通过往一个颜色里加入白色或黑色来进行调配，所以我们可以这么做：</p>
-<p>红色是 <code>{1, 0, 0}</code> ，如果你想要深色，应该怎么做？<br>
-答案是往这个颜色里加 <code>黑色</code> ，而黑色是 <code>{0, 0, 0}</code></p>
-<p>我们开始相加求平均：<br></p>
+<p>调整深浅时，向颜色中加入白色或黑色。</p>
+<p>红色为 <code>{1, 0, 0}</code> ，加入 <code>黑色</code> <code>{0, 0, 0}</code> 得到深色。</p>
+<p>逐项相加后取平均：<br></p>
 <ul>
-<li><code>(1 + 0) / 2 = 0.5</code> 第一个颜色变成了0.5。</li>
-<li><code>(0 + 0) / 2 = 0</code> 第二个颜色变成了0。</li>
-<li><code>(0 + 0) / 2 = 0</code> 第三个颜色变成了0。</li>
+<li><code>(1 + 0) / 2 = 0.5</code> 第一项变为 0.5。</li>
+<li><code>(0 + 0) / 2 = 0</code> 第二项变为 0。</li>
+<li><code>(0 + 0) / 2 = 0</code> 第三项变为 0。</li>
 </ul>
-<p>最终得出深红色是： <code>{0.5, 0, 0}</code> 。</p>
-<p>浅色我们也这么做：</p>
+<p>得到深红色： <code>{0.5, 0, 0}</code> 。</p>
+<p>浅色同理：</p>
 <ul>
-<li><code>(1 + 1) / 2 = 1</code> 第一个颜色变成了1。</li>
-<li><code>(0 + 1) / 2 = 0.5</code> 第二个颜色变成了0.5。</li>
-<li><code>(0 + 1) / 2 = 0.5</code> 第三个颜色变成了0.5。</li>
+<li><code>(1 + 1) / 2 = 1</code> 第一项变为 1。</li>
+<li><code>(0 + 1) / 2 = 0.5</code> 第二项变为 0.5。</li>
+<li><code>(0 + 1) / 2 = 0.5</code> 第三项变为 0.5。</li>
 </ul>
-<p>最终得出浅红色是： <code>{1, 0.5, 0.5}</code> 。</p>
-<p><strong>不过一般情况下，这种调配方法可能调太过头，所以可以把加进去的1变成0.5等。</strong></p>
+<p>得到浅红色： <code>{1, 0.5, 0.5}</code> 。</p>
+<p><strong>该方法的变化幅度可能过大，可将加入的值由 <code>1</code> 改为 <code>0.5</code> 等较小数值。</strong></p>
 <h3 id="_8">彩虹色<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <p>对 <code>{r, g, b}</code> 进行三角函数周期变换操作，通过调整相位，可以做出彩虹色的效果。</p>
 <div class="highlight"><pre><span></span><code><span class="nv">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nv">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="nv">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nv">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.sin</span><span class="p">(</span><span class="nv">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span>
 </code></pre></div>
-<p>如果将rgb应用到某个图片的颜色上，这个图片就会开始进行彩虹色变换。</p>
+<p>将上述 rgb 应用到贴图的 <code>color</code> 上，贴图颜色会按周期变化，呈现彩虹色。</p>
 
 
 

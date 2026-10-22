@@ -621,6 +621,61 @@ function typers.New(fn, position, layer, size, mode)
         typer.y = y
     end
 
+    --- Pixel width of the widest line typed out so far, ignoring `typer.x`.
+    --- Only letters that already exist are measured, so the value grows while
+    --- the text is still being typed.
+    function typer:GetWidth()
+        local letters = typer.letters
+        if (not letters or #letters == 0) then return 0 end
+
+        -- A letter's `x` is relative to `typer.x` and its `width` excludes
+        -- `scale`, so scale it back in to get the drawn footprint. A letter
+        -- placed left of the previous one means a new line started (`\n` or
+        -- auto-wrap), which closes the line that was being measured.
+        local widest, line_right, prev_right, left = 0, 0, nil, nil
+        for _, letter in ipairs(letters) do
+            local x = letter.x or 0
+            local right = x + (letter.width or 0) * (letter.scale or 1)
+            if (left == nil or x < left) then left = x end
+            if (prev_right and right < prev_right) then
+                if (line_right > widest) then widest = line_right end
+                line_right = 0
+            end
+            if (right > line_right) then line_right = right end
+            prev_right = right
+        end
+        if (line_right > widest) then widest = line_right end
+
+        left = left or 0
+        if (widest <= left) then return 0 end
+        return widest - left
+    end
+
+    --- Pixel height of every line typed out so far, ignoring `typer.y`.
+    --- Spans from the top of the highest glyph to the bottom of the lowest
+    --- one, so both the line gaps added by `\n` / auto-wrap and each glyph's
+    --- own `scale` are included.
+    function typer:GetHeight()
+        local letters = typer.letters
+        if (not letters or #letters == 0) then return 0 end
+
+        local top, bottom = nil, nil
+        for _, letter in ipairs(letters) do
+            local y = letter.y or 0
+            local font = letter.font
+            local h = ((font and font.getHeight) and font:getHeight() or 0) * (letter.scale or 1)
+            if (top == nil or y < top) then top = y end
+            if (bottom == nil or (y + h) > bottom) then bottom = y + h end
+        end
+        if (top == nil) then return 0 end
+        return (bottom or 0) - top
+    end
+
+    --- Both measurements in one call, returned as two numbers: width, height.
+    function typer:GetLettersSize()
+        return typer:GetWidth(), typer:GetHeight()
+    end
+
     function typer:UseBondFont(config)
         typer.bondfont = config
         -- Re-setting bondfont re-enables the bondfont feature.

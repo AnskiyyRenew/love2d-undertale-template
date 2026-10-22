@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -1997,7 +2117,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        最快上手
+        快速上手
       
     </span>
   </a>
@@ -2008,12 +2128,12 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        它替你改了什么
+        改写的内容
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="它替你改了什么">
+    <nav class="md-nav" aria-label="改写的内容">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2086,7 +2206,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑与限制
+        限制与注意事项
       
     </span>
   </a>
@@ -2347,6 +2467,8 @@
       
         
       
+        
+      
     
     
     
@@ -2551,6 +2673,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2951,7 +3101,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        最快上手
+        快速上手
       
     </span>
   </a>
@@ -2962,12 +3112,12 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        它替你改了什么
+        改写的内容
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="它替你改了什么">
+    <nav class="md-nav" aria-label="改写的内容">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3040,7 +3190,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑与限制
+        限制与注意事项
       
     </span>
   </a>
@@ -3066,8 +3216,8 @@
 
   <h1>ShaderToy 转化库</h1>
 
-<p><a href="https://www.shadertoy.com/">ShaderToy</a> 上有大量现成的 GLSL 片元着色器。这个库把它们的
-<code>mainImage</code> 写法<strong>自动改写</strong>成 LÖVE 能编译的 Shader，省掉手工搬运的活。</p>
+<p><a href="https://www.shadertoy.com/">ShaderToy</a> 上有大量现成的 GLSL 片元着色器。该库将它们的
+<code>mainImage</code> 写法<strong>自动改写</strong>成 LÖVE 可编译的 Shader，无需手工搬运。</p>
 <p>路径： <code>Scripts/Libraries/ShaderToy/</code></p>
 <table>
 <thead>
@@ -3087,7 +3237,7 @@
 </tr>
 <tr>
 <td><code>rules.lua</code></td>
-<td>改写规则表，改这里就能扩展支持</td>
+<td>改写规则表，在此处扩展支持的写法</td>
 </tr>
 </tbody>
 </table>
@@ -3095,14 +3245,14 @@
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">它不是渲染管线</p>
-<p>这个库只负责"把代码翻译成 LÖVE Shader"和"每帧喂 uniform"。
-画在哪、画多大仍然由贴图的 <code>SetShaders</code> 或你自己的 <code>setCanvas</code> 决定。
+<p>该库只负责"把代码翻译成 LÖVE Shader"与"每帧更新 uniform"。
+绘制位置与尺寸仍由贴图的 <code>SetShaders</code> 或自定义的 <code>setCanvas</code> 决定。
 引擎常规的 Shader 用法见 <strong><a href="../020_shaders/index.html">着色器</a></strong> 。</p>
 </div>
 <hr />
-<h2 id="_1">最快上手<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>引擎里有一份能直接跑的测试场景 <code>Scripts/Scenes/TEST/scene_shader.lua</code> ，
-把 ShaderToy 的代码原样粘进 <code>convert()</code> 就行：</p>
+<h2 id="_1">快速上手<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>引擎内置一份可直接运行的测试场景 <code>Scripts/Scenes/TEST/scene_shader.lua</code> ，
+将 ShaderToy 的代码原样传入 <code>convert()</code> 即可：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">shadertoy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ImportFile</span><span class="p">(</span><span class="s2">&quot;ShaderToy&quot;</span><span class="p">)</span>
 <span class="kd">local</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">shadertoy</span><span class="p">.</span><span class="nf">convert</span><span class="p">([[</span>
 <span class="nv">void</span><span class="w"> </span><span class="nf">mainImage</span><span class="p">(</span><span class="w"> </span><span class="nv">out</span><span class="w"> </span><span class="nv">vec4</span><span class="w"> </span><span class="nv">fragColor</span><span class="p">,</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nv">vec2</span><span class="w"> </span><span class="nv">fragCoord</span><span class="w"> </span><span class="p">)</span>
@@ -3122,12 +3272,12 @@
 <span class="kr">end</span>
 </code></pre></div>
 <div class="admonition warning">
-<p class="admonition-title"><code>s.shader</code> 才是真 Shader</p>
+<p class="admonition-title"><code>s.shader</code> 为实际 Shader</p>
 <p><code>convert()</code> 返回的是包装对象，传给 <code>SetShaders</code> / <code>love.graphics.setShader</code> 时
 要用它的 <code>.shader</code> 字段。</p>
 </div>
 <hr />
-<h2 id="_2">它替你改了什么<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="_2">改写的内容<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p><code>convert.lua</code> 对原代码做这几件事（规则都在 <code>rules.lua</code> 里）：</p>
 <table>
 <thead>
@@ -3165,7 +3315,7 @@
 </tr>
 </tbody>
 </table>
-<p>同时在代码最前面<strong>自动插入</strong>它检测到的 uniform 声明，你不用自己写 <code>extern</code> ：</p>
+<p>同时在代码最前面<strong>自动插入</strong>它检测到的 uniform 声明，无需自行编写 <code>extern</code> ：</p>
 <table>
 <thead>
 <tr>
@@ -3207,7 +3357,7 @@
 </tr>
 </tbody>
 </table>
-<p>没在代码里出现的则<strong>不会</strong>插入声明，也不会赋值 —— 所以删掉没用的变量能省一点开销。</p>
+<p>未出现在代码中的 uniform <strong>不会</strong>插入声明，也不会赋值，因此删除无用变量可减少一部分每帧开销。</p>
 <h3 id="fragcoord">fragCoord 是怎么算出来的<a class="headerlink" href="#fragcoord" title="Permanent link">&para;</a></h3>
 <p>转换后的 <code>effect</code> 函数开头长这样：</p>
 <div class="highlight"><pre><span></span><code><span class="kt">vec2</span><span class="w"> </span><span class="n">fragCoord</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">vec2</span><span class="p">(</span><span class="n">texture_coords</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">iResolution</span><span class="p">.</span><span class="n">x</span><span class="p">,</span>
@@ -3217,9 +3367,9 @@
 <p class="admonition-title">fragCoord 来自被画图形的 UV，不是屏幕坐标</p>
 <p>它是 <code>texture_coords</code>（贴图 UV）× <code>iResolution</code> 算出来的。
 <strong>只有铺满全屏的图</strong>才等于 ShaderToy 里的屏幕坐标。
-把它挂在一张 32×32 的小贴图上，你会看到"整张 shader 被压缩进那 32×32 的区域"。</p>
+把它挂在一张 32×32 的小贴图上，整张 shader 会被压缩进该 32×32 的区域。</p>
 <p>结尾还有一句 <code>fragColor *= vec4(1.0,1.0,1.0, Texel(texture, texture_coords).a);</code> ：
-<strong>结果会乘上贴图的 alpha</strong>。用 <code>px.png</code> （1×1 白）最省事；贴图有透明区域的话，
+<strong>结果会乘上贴图的 alpha</strong>。使用 <code>px.png</code> （1×1 白色贴图）可避免该影响；贴图有透明区域时，
 那些地方的颜色会被乘成 0。</p>
 </div>
 <hr />
@@ -3227,8 +3377,8 @@
 <p>ShaderToy 的 <code>iChannel0~3</code> 默认是噪声图。这个库的做法：</p>
 <ul>
 <li>转换时，凡是检测到代码里用了 <code>iChannelN</code> ，就生成一张 <strong>256×256 随机噪声</strong>贴图顶上
-  （ <code>rules.DEFAULT_NOISE_SIZE</code> ），所以你什么都不做也不会编译失败。</li>
-<li>想换成自己的图，用 <code>setChannel</code> 。</li>
+  （ <code>rules.DEFAULT_NOISE_SIZE</code> ），因此不做额外配置也能通过编译。</li>
+<li>需要替换为指定贴图时，使用 <code>setChannel</code> 。</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="nv">s</span><span class="p">:</span><span class="nf">setChannel</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">myImage</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 第 0 通道用 myImage</span>
 </code></pre></div>
@@ -3260,7 +3410,7 @@
 <div class="admonition warning">
 <p class="admonition-title">FFT 是 O(N²) 的朴素实现</p>
 <p><code>simpleFFT</code> 对 512 个采样点做双重循环，每帧约 <strong>26 万次</strong>三角函数运算，
-而且是<strong>每帧重算</strong>。手机上这是实打实的开销，别在移动端常开。</p>
+而且是<strong>每帧重算</strong>。按上述运算量，该通道不适于在移动端长期启用。</p>
 </div>
 <hr />
 <h2 id="shader">单个 Shader 的方法<a class="headerlink" href="#shader" title="Permanent link">&para;</a></h2>
@@ -3303,7 +3453,7 @@
 </tr>
 <tr>
 <td><code>s:printCode(mode, savePath)</code></td>
-<td>打印/保存转换后的代码，调试神器</td>
+<td>打印/保存转换后的代码，用于调试</td>
 </tr>
 <tr>
 <td><code>s:generateNoiseTexture(size)</code></td>
@@ -3314,19 +3464,18 @@
 <p>字段： <code>s.shader</code> （真 Shader）、 <code>s.original</code> （原文）、 <code>s.code</code> （转换后）、
 <code>s.externs</code> （插入的声明）、 <code>s.runtimeFlags</code> （检测到哪些 uniform）、 <code>s.time</code> / <code>s.frame</code> 。</p>
 <div class="admonition example">
-<p class="admonition-title">转不出来时先看转换结果</p>
+<p class="admonition-title">转换失败时的排查方式</p>
 <p><div class="highlight"><pre><span></span><code><span class="nv">s</span><span class="p">:</span><span class="nf">printCode</span><span class="p">()</span><span class="w">                       </span><span class="c1">-- 打印最终 GLSL</span>
 <span class="nv">s</span><span class="p">:</span><span class="nf">printCode</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span><span class="w">             </span><span class="c1">-- 打印原文</span>
 <span class="nv">s</span><span class="p">:</span><span class="nf">printCode</span><span class="p">(</span><span class="s2">&quot;extern&quot;</span><span class="p">)</span><span class="w">               </span><span class="c1">-- 只打印插入的声明</span>
-<span class="nv">s</span><span class="p">:</span><span class="nf">printCode</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;out.glsl&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">-- 存到文件慢慢看</span>
+<span class="nv">s</span><span class="p">:</span><span class="nf">printCode</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;out.glsl&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">-- 保存到文件后查看</span>
 </code></pre></div>
-绝大多数"编译失败"都能靠这个一眼看出来：是不是某个 uniform 没被检测到、
-是不是括号把 <code>mainImage</code> 的匹配搞断了。</p>
+多数编译失败可通过该输出定位：uniform 未被检测到，或括号导致 <code>mainImage</code> 匹配中断。</p>
 </div>
 <hr />
 <h2 id="pass">多 Pass 工程<a class="headerlink" href="#pass" title="Permanent link">&para;</a></h2>
 <p>ShaderToy 的 "Buffer A / Buffer B / Image" 在这里叫 <strong>pass</strong> ，前一个 pass 的输出
-会自动喂给后一个 pass 的 <code>iChannel</code> （第 j 个 pass → <code>iChannel(j-1)</code> ）。</p>
+会自动作为后一个 pass 的 <code>iChannel</code> 输入（第 j 个 pass → <code>iChannel(j-1)</code> ）。</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">proj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">shadertoy</span><span class="p">.</span><span class="nf">newProject</span><span class="p">()</span>
 
 <span class="nv">proj</span><span class="p">:</span><span class="nf">addPass</span><span class="p">(</span><span class="s2">&quot;bufferA&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">codeA</span><span class="p">)</span>
@@ -3369,35 +3518,35 @@
 </tbody>
 </table>
 <div class="admonition warning">
-<p class="admonition-title">多 pass 会吃掉显存</p>
+<p class="admonition-title">多 pass 的画布数量与显存占用</p>
 <p>每个 pass 建 <strong>两张</strong>全屏画布（ <code>CANVAS_WIDTH × CANVAS_HEIGHT</code> ）。
-3 个 pass 就是 6 张全屏画布，手机上要掂量一下。切换场景记得 <code>unload()</code> 。</p>
+3 个 pass 即 6 张全屏画布，移动端需要计入该占用。切换场景时调用 <code>unload()</code> 。</p>
 </div>
 <hr />
-<h2 id="_5">坑与限制<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_5">限制与注意事项<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <div class="admonition danger">
 <p class="admonition-title">只认 GLSL ES 1.0</p>
 <p>LÖVE 的 Shader 是 GLSL ES 1.0。ShaderToy 上用 <code>textureLod</code> 、 <code>textureSize</code> 、
 整数运算、 <code>switch</code> 、 <code>in</code> / <code>out</code> 变量、 <code>#version 300 es</code> 的着色器<strong>一定编译失败</strong>。
-找的时候挑标注 "Sound"/"Buffer" 简单、没有 cubemap 的老着色器成功率最高。</p>
+选择标注为 "Sound" / "Buffer"、结构简单且不含 cubemap 的旧版着色器，可提高通过率。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">不支持的 uniform 不会自动补</p>
 <p><code>iDate</code> 、 <code>iChannelTime</code> 、 <code>iSampleRate</code> 、 <code>iKeyboard</code> 之类<strong>不在</strong> <code>rules.UNIFORM_RULES</code> 里。
 代码里引用了它们，转换时不会插入声明 → 编译报"未定义变量"。
-要支持就往 <code>rules.lua</code> 里自己加规则（加 <code>extern</code> 文本 + flag，再在 <code>init.lua</code> 的
+如需支持，可在 <code>rules.lua</code> 中添加规则（加 <code>extern</code> 文本 + flag，再在 <code>init.lua</code> 的
 <code>update</code> 里补一段 <code>send</code> ）。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title"><code>mainImage</code> 之外的函数会原样保留</p>
-<p>转换只替换 <code>mainImage</code> 这一块的正则匹配，其余函数照抄。这通常是好事
-（辅助函数能正常用），但如果原文里有<strong>另一个</strong>符合 <code>void mainImage(...)</code> 形状的
-函数（比如注释掉的版本），会被一起改写，导致重复定义。</p>
+<p>转换只替换 <code>mainImage</code> 这一块的正则匹配，其余函数照抄，因此辅助函数可正常使用。
+但如果原文里有<strong>另一个</strong>符合 <code>void mainImage(...)</code> 形状的函数（例如被注释掉的版本），
+会被一起改写，导致重复定义。</p>
 </div>
 <div class="admonition danger">
 <p class="admonition-title">编译失败是 error，不是返回 nil</p>
 <p><code>convert()</code> 内部直接调 <code>SE.graphics.newShader</code> ，语法错会<strong>抛错</strong>。
-加载别人的着色器时务必包 <code>pcall</code> ，否则整个场景起不来：</p>
+加载外部来源的着色器时用 <code>pcall</code> 包裹，否则整个场景无法初始化：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">pcall</span><span class="p">(</span><span class="nv">shadertoy</span><span class="p">.</span><span class="py">convert</span><span class="p">,</span><span class="w"> </span><span class="nv">code</span><span class="p">)</span>
 <span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;着色器编译失败：&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">s</span><span class="p">))</span>
@@ -3408,8 +3557,8 @@
 <div class="admonition warning">
 <p class="admonition-title">iTime 是累加 dt，不受战斗暂停影响</p>
 <p><code>update(dt)</code> 里 <code>self._time = self._time + dt</code> 一直往上加。
-暂停菜单如果不调 <code>update</code> 它就停住；调了就继续走。想让动画跟着游戏节奏，
-自己传一个处理后的 <code>dt</code> 进去。</p>
+暂停菜单不调用 <code>update</code> 时该值停止累加，调用后继续累加。需要让动画跟随游戏节奏时，
+传入处理后的 <code>dt</code> 。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Y 轴是反的</p>

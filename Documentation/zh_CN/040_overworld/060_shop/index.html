@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -1935,7 +2055,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        队列：把几个话题挤成一行
+        队列：把几个话题合并为一行
       
     </span>
   </a>
@@ -1946,7 +2066,7 @@
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       
-        「（新）」到底什么时候出现
+        「（新）」的出现条件
       
     </span>
   </a>
@@ -1984,7 +2104,7 @@
   <a href="#_11" class="md-nav__link">
     <span class="md-ellipsis">
       
-        怎么进商店
+        进入商店
       
     </span>
   </a>
@@ -2380,6 +2500,8 @@
       
         
       
+        
+      
     
     
     
@@ -2584,6 +2706,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3057,7 +3207,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        队列：把几个话题挤成一行
+        队列：把几个话题合并为一行
       
     </span>
   </a>
@@ -3068,7 +3218,7 @@
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       
-        「（新）」到底什么时候出现
+        「（新）」的出现条件
       
     </span>
   </a>
@@ -3106,7 +3256,7 @@
   <a href="#_11" class="md-nav__link">
     <span class="md-ellipsis">
       
-        怎么进商店
+        进入商店
       
     </span>
   </a>
@@ -3150,7 +3300,7 @@
 <span class="nv">shop</span><span class="p">.</span><span class="nf">SetBuyPrice</span><span class="p">(</span><span class="s2">&quot;CrabApple&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span>
 <span class="nv">shop</span><span class="p">.</span><span class="nf">SetBuyPrice</span><span class="p">(</span><span class="s2">&quot;HotCat&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">)</span>
 
-<span class="c1">-- 右侧两栏：店主的吐槽 + 会滑上来的简介面板</span>
+<span class="c1">-- 右侧两栏：店主的评价 + 会滑上来的简介面板</span>
 <span class="nv">shop</span><span class="p">.</span><span class="nf">SetBuyOpinion</span><span class="p">(</span><span class="s2">&quot;CrabApple&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;I</span><span class="se">\n</span><span class="s2">made</span><span class="se">\n</span><span class="s2">this.&quot;</span><span class="p">)</span>
 <span class="nv">shop</span><span class="p">.</span><span class="nf">SetIntroduction</span><span class="p">(</span><span class="s2">&quot;CrabApple&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+20 HP&quot;</span><span class="p">)</span>
 
@@ -3227,11 +3377,11 @@
 <div class="admonition warning">
 <p class="admonition-title"><code>Talk</code> 显示的不是 <code>SetMainText</code></p>
 <p><code>SetMainText</code> 是<strong>待机时</strong>（光标停在四个按钮上）显示在下方文本框里的问候语。<br>
-<code>Talk</code> 打开的是话题列表，选中的话题正文会<strong>临时借走</strong>同一个文本框显示。</p>
+<code>Talk</code> 打开的是话题列表，选中的话题正文会<strong>临时占用</strong>同一个文本框显示。</p>
 </div>
 <p>选 <code>Buy</code> / <code>Sell</code> / <code>Talk</code> 之后，列表占左边一栏（每页 5 行，可滚动），光标是一颗红色灵魂。<br>
-<code>Buy</code> / <code>Sell</code> 时右侧会同时显示店主的吐槽和会滑上来的简介面板； <code>Talk</code> 时右侧两栏清空。</p>
-<p>三个动作在<strong>没东西可看</strong>时会挡下来，播一句话然后退回待机：</p>
+<code>Buy</code> / <code>Sell</code> 时右侧会同时显示店主的评价和会滑上来的简介面板； <code>Talk</code> 时右侧两栏清空。</p>
+<p>三个动作在<strong>没有可显示内容</strong>时会被拦截，播放一句话后退回待机：</p>
 <table>
 <thead>
 <tr>
@@ -3281,8 +3431,8 @@
 </tr>
 <tr>
 <td><code>MESSAGE</code></td>
-<td>一条挡路的话（金钱不够、物品栏满了、话题正文、拒收台词）</td>
-<td>回到进它之前那个状态</td>
+<td>一条阻塞性消息（金钱不够、物品栏已满、话题正文、拒收台词）</td>
+<td>回到进入该状态前的那个状态</td>
 </tr>
 <tr>
 <td><code>EXITING</code></td>
@@ -3292,9 +3442,9 @@
 </tbody>
 </table>
 <div class="admonition tip">
-<p class="admonition-title">为什么要有那一帧锁</p>
-<p><code>Typers.Update</code> 跑在 <code>scene.update</code> <strong>之前</strong>，所以"读完这句话的那一次确认键"在同一帧里还会被 <code>shop.Update</code> 再读到一次。<br>
-不锁的话，关掉消息的那一按会立刻把列表重新打开。代码里那个 <code>input_lock</code> 就是干这个的。</p>
+<p class="admonition-title">该帧锁的作用</p>
+<p><code>Typers.Update</code> 跑在 <code>scene.update</code> <strong>之前</strong>，因此读完消息的那一次确认键在同一帧里还会被 <code>shop.Update</code> 再读到一次。<br>
+不加锁时，关闭消息的那一次按键会立即重新打开列表。代码中的 <code>input_lock</code> 用于避免该情况。</p>
 </div>
 <h3 id="_4">键位<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <table>
@@ -3340,7 +3490,7 @@
 <li><code>shop.SetGoods(list)</code> 整份替换货架。<ul>
 <li><code>list</code> 物品 <strong>id 字符串</strong>数组，例如 <code>{"CrabApple", "HotCat"}</code> 。</li>
 <li>id 在 <code>ITEMS</code> 里查不到会被跳过，并打印一句 <code>[Shop] Unknown item id: xxx</code> 。</li>
-<li>名字是<strong>加入货架时</strong>从 <code>ITEMS</code> 抄下来的，之后改 <code>ITEMS</code> 不影响已在架上的商品。</li>
+<li>名称在<strong>加入货架时</strong>从 <code>ITEMS</code> 读取，之后修改 <code>ITEMS</code> 不影响已在架上的商品。</li>
 </ul>
 </li>
 <li><code>shop.AddGoods(id)</code> 往货架末尾加一件。</li>
@@ -3352,7 +3502,7 @@
 </li>
 <li><code>shop.GetAmount(id)</code> 读库存，无限时返回 <code>math.huge</code> 。</li>
 <li><code>shop.IsSoldOut(id)</code> 库存是不是 <code>&lt;= 0</code> 。<ul>
-<li>售罄的商品留在货架上，但行尾会多一个 <code>Overworld.Shop.Text.SoldOut</code>（<code>已售罄</code>），选中它按确认只响一声，不扣钱。</li>
+<li>售罄的商品留在货架上，但行尾会多一个 <code>Overworld.Shop.Text.SoldOut</code>（<code>已售罄</code>），选中它按确认只播放音效，不扣钱。</li>
 </ul>
 </li>
 </ul>
@@ -3370,17 +3520,17 @@
 </code></pre></div>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">卖价为 0 = 这件东西本店不收</p>
-<p>选中卖价为 <code>0</code> 的物品按确认，不会成交，而是播一句拒收台词（见下）。<br>
-这正好是最省事的"这件不收"写法：<strong>把卖价设成 <code>0</code></strong> （或者干脆连买价也别设，那样半价也是 <code>0</code> ）。<br>
-注意 <code>SetBuyPrice</code> 都没调过的商品，<code>GetSellPrice</code> 也会算出 <code>0</code> —— 忘了设买价的商品是卖不出去的。</p>
+<p class="admonition-title">卖价为 0 表示该物品不收购</p>
+<p>选中卖价为 <code>0</code> 的物品按确认，不会成交，而是播放一句拒收台词（见下）。<br>
+将卖价设为 <code>0</code> 即可表示该物品不收购（不设置买价时，半价的计算结果同样为 <code>0</code> ）。<br>
+未调用过 <code>SetBuyPrice</code> 的商品，<code>GetSellPrice</code> 同样返回 <code>0</code> ，即未设置买价的商品无法卖出。</p>
 </div>
 <div class="admonition example">
 <p class="admonition-title">评价与简介</p>
 <ul>
-<li><code>shop.SetBuyOpinion(id, opinion)</code> 设置买入时右侧显示的吐槽。</li>
+<li><code>shop.SetBuyOpinion(id, opinion)</code> 设置买入时右侧显示的评价。</li>
 <li><code>shop.GetBuyOpinion(id)</code> 读回来，没设过时取本地化 <code>Overworld.Shop.Opinion.Default</code>（<code>……</code>）。</li>
-<li><code>shop.SetSellOpinion(id, opinion)</code> 设置卖出时的吐槽。</li>
+<li><code>shop.SetSellOpinion(id, opinion)</code> 设置卖出时的评价。</li>
 <li><code>shop.GetSellOpinion(id)</code> 读回来，缺省同上。</li>
 <li><code>shop.GetOpinion(id)</code> 按<strong>当前开着哪个列表</strong>自动选：<code>SELL</code> 页读卖出那份、<code>TALK</code> 页读话题旁白那份，其余读买入那份。</li>
 <li><code>shop.SetIntroduction(id, text)</code> 设置会滑上来的简介面板里的短说明。</li>
@@ -3390,13 +3540,13 @@
 </div>
 <div class="admonition warning">
 <p class="admonition-title">评价文字不要写成对白的格式</p>
-<p>右栏的吐槽和简介面板都是<strong>面板文字</strong>，不是对白。以星号加空格开头的话， <code>EText</code> 会做两空格的悬挂缩进，正好把字挤出右栏。<br>
+<p>右栏的评价和简介面板都是<strong>面板文字</strong>，不是对白。以星号加空格开头的话， <code>EText</code> 会做两空格的悬挂缩进，正好把字挤出右栏。<br>
 主文本框里的话题正文、拒收台词仍然要带星号——那是真的对白。</p>
 </div>
 <div class="admonition example">
 <p class="admonition-title">出售开关与拒收台词</p>
 <ul>
-<li><code>shop.SetSellable(value)</code> 本店收不收东西，默认 <code>true</code> 。设成 <code>false</code> 后选 <code>Sell</code> 只播一句话，不开列表。</li>
+<li><code>shop.SetSellable(value)</code> 本店是否收购物品，默认 <code>true</code> 。设为 <code>false</code> 后选 <code>Sell</code> 只播放一句话，不打开列表。</li>
 <li><code>shop.IsSellable()</code> 读回来。</li>
 <li><code>shop.SetNoSellText(text)</code> 「本店什么都不收」那句话（ <code>SetSellable(false)</code> 时用）。</li>
 <li><code>shop.SetCannotSellText(id, text)</code> 设置<strong>单件</strong>物品被拒收时的台词。 <code>text</code> 写表就是多段，一次确认推进一段。</li>
@@ -3404,7 +3554,7 @@
 <li><code>shop.GetCannotSellText(id)</code> 解析后的结果。<strong>表进表出</strong>：设的是多段，读出来也是多段。</li>
 <li><code>shop.SetCannotSellTexts(map)</code> 批量： <code>SetCannotSellTexts({Stick = "...", Bandage = {"...", "..."}})</code> 。</li>
 <li><code>shop.GetCannotSellTexts()</code> 读回那张单件表。</li>
-<li><code>shop.ClearCannotSellTexts()</code> 清掉所有单件台词（全店默认那句留着）。</li>
+<li><code>shop.ClearCannotSellTexts()</code> 清除所有单件台词（全店默认那句保留）。</li>
 </ul>
 <p>台词里的 <code>%s</code> 会替换成物品名：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">shop</span><span class="p">.</span><span class="nf">SetCannotSellText</span><span class="p">(</span><span class="s2">&quot;Bandage&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* 我可不需要%s。&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;* 拿走拿走。&quot;</span><span class="p">})</span>
@@ -3412,8 +3562,8 @@
 <p>解析顺序是 <strong>单件 → 全店默认 → 本地化</strong> <code>Overworld.Shop.Text.CannotSell</code>（<code>* 这个我不收。</code>）。</p>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">台词里写个裸 <code>%</code> 也不会崩店</p>
-<p>作者文案是手写的，<code>formatRefusal</code> 会把 <code>string.format</code> 包在 <code>pcall</code> 里。格式串坏掉就直接原样显示，不会把整个商店拖下水。</p>
+<p class="admonition-title">台词中出现裸 <code>%</code> 的处理</p>
+<p>文案为手写内容，<code>formatRefusal</code> 会将 <code>string.format</code> 包在 <code>pcall</code> 中。格式串无效时按原样显示，不影响商店运行。</p>
 </div>
 <div class="admonition example">
 <p class="admonition-title">钱与杂项</p>
@@ -3424,7 +3574,7 @@
 <li><code>shop.GetMaxItems()</code> 读回来。</li>
 <li><code>shop.Refresh()</code> 重画金钱/背包读数；正开着列表的话连列表一起重建。</li>
 <li><code>shop.GetPlayer()</code> 返回商店里那颗红色灵魂贴图。</li>
-<li><code>shop.GetBackground()</code> 返回背景贴图对象，自己 <code>Scale</code> / <code>SetAnimation</code> 即可。</li>
+<li><code>shop.GetBackground()</code> 返回背景贴图对象，可对其调用 <code>Scale</code> / <code>SetAnimation</code> 。</li>
 <li><code>shop.Update(dt)</code> 每帧调用，处理输入与演出。</li>
 <li><code>shop.Clear()</code> 见上面那条 danger。</li>
 </ul>
@@ -3433,13 +3583,13 @@
 <p class="admonition-title">文本框宽度</p>
 <ul>
 <li><code>shop.SetMainTextWidth(width)</code> 主文本框宽度（问候语、拒收台词、话题正文）。默认 <code>560</code>（面板 <code>x=40..600</code>）。</li>
-<li><code>shop.SetOpinionWidth(width)</code> 右栏吐槽的宽度。默认 <code>170</code>（<code>x=460..630</code>）。</li>
+<li><code>shop.SetOpinionWidth(width)</code> 右栏评价的宽度。默认 <code>170</code>（<code>x=460..630</code>）。</li>
 <li><code>shop.SetIntroWidth(width)</code> 简介面板的宽度。默认 <code>182</code>（<code>x=448..630</code>）。</li>
 <li><code>shop.SetTextWidths(main, opinion, intro)</code> 三个一起设，传 <code>nil</code> 的那项保持不变。</li>
 <li><code>shop.SetAutoWrap(enabled)</code> 自动换行总开关，默认<strong>开</strong>。关掉之后只认手写的 <code>\n</code> 。</li>
 <li><code>shop.IsAutoWrap()</code> 读回来。</li>
 </ul>
-<p>改完宽度，引擎会顺手把三块面板重排一次—— <code>EText</code> 一边打字一边读 <code>size</code> ， <code>InstText</code> 是预渲染的，所以要 <code>Rebuild()</code> 。</p>
+<p>修改宽度后，引擎会重新排列三块面板—— <code>EText</code> 在打字过程中读取 <code>size</code> ， <code>InstText</code> 为预渲染，因此需要 <code>Rebuild()</code> 。</p>
 </div>
 <hr />
 <h2 id="_6">交谈话题与队列<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
@@ -3460,13 +3610,13 @@
 <li><code>shop.GetTalks()</code> 读回原始表（<strong>没有</strong>折叠队列，顺序就是 <code>AddTalk</code> 的顺序）。</li>
 </ul>
 </div>
-<h3 id="_7">队列：把几个话题挤成一行<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h3 id="_7">队列：把几个话题合并为一行<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
 <p><code>SetQueue</code> 把几个话题绑成一条队列，<strong>同时只显示其中一个</strong>——对话走到哪儿就显示哪个。读完当前的，揭示下一个；全读完了再绕回第一个。</p>
 <div class="highlight"><pre><span></span><code><span class="nv">shop</span><span class="p">.</span><span class="nf">SetQueue</span><span class="p">(</span><span class="s2">&quot;天气&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;时间&quot;</span><span class="p">)</span><span class="w">        </span><span class="c1">-- 两者只显示其中一个</span>
 <span class="nv">shop</span><span class="p">.</span><span class="nf">SetQueue</span><span class="p">({</span><span class="s2">&quot;天气&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;时间&quot;</span><span class="p">})</span><span class="w">      </span><span class="c1">-- 同上</span>
 <span class="nv">shop</span><span class="p">.</span><span class="nf">SetQueue</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">                  </span><span class="c1">-- 也可以给 AddTalk 的顺序号</span>
 </code></pre></div>
-<p>成员用<strong>话题名</strong>或 <strong>1-based 序号</strong>给，而且是<strong>惰性解析</strong>的——<code>SetQueue</code> 写在 <code>AddTalk</code> 前面后面都行。每调一次加一条队列，所以一家店可以有好几条互不相干的队列；<strong>不属于任何队列的话题永远显示</strong>。</p>
+<p>成员用<strong>话题名</strong>或 <strong>1-based 序号</strong>指定，且为<strong>惰性解析</strong>——<code>SetQueue</code> 写在 <code>AddTalk</code> 之前或之后均可。每调用一次添加一条队列，因此一家商店可以有多条互不相关的队列；<strong>不属于任何队列的话题始终显示</strong>。</p>
 <div class="admonition example">
 <p class="admonition-title">队列方法</p>
 <ul>
@@ -3479,8 +3629,8 @@
 <div class="highlight"><pre><span></span><code><span class="c1">-- {{topic = &quot;天气&quot;, texts = {...}, seen = 0, is_new = false}, ...}</span>
 </code></pre></div>
 </div>
-<h3 id="_8">「（新）」到底什么时候出现<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>这里有两个<strong>容易混的</strong>判断，代码里就是两个不同的函数：</p>
+<h3 id="_8">「（新）」的出现条件<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>这里有两个<strong>容易混淆</strong>的判断，代码中对应两个不同的函数：</p>
 <table>
 <thead>
 <tr>
@@ -3502,9 +3652,9 @@
 </tr>
 </tbody>
 </table>
-<p>关键是：<strong>「（新）」不是"未读"的意思，而是"队列刚翻页翻出来的"</strong>。</p>
+<p>关键是：<strong>「（新）」表示队列刚翻页显示出的成员，不表示未读</strong>。</p>
 <ul>
-<li><strong>进店时所有话题都不带标记</strong>——哪怕你从没读过。</li>
+<li><strong>进店时所有话题都不带标记</strong>——即使从未读过。</li>
 <li>只有队列<strong>前移</strong>、揭示出一个<strong>还没读过</strong>的成员时，才把那个成员标上「（新）」。</li>
 <li>一旦读完，标记立刻清除。所以队列走完一轮之后，就不会再有「（新）」了。</li>
 <li><strong>不在任何队列里的话题永远不会自己带上标记</strong>，要手动调 <code>SetTalkNew</code> 。</li>
@@ -3515,9 +3665,9 @@
 <ul>
 <li><code>shop.IsTalkNew(index)</code> 当前带不带「（新）」。</li>
 <li><code>shop.SetTalkNew(index, value)</code> 手动开关「（新）」。话题在队列外时用这个。</li>
-<li><code>shop.IsTalkUnread(index)</code> 从来没读过？</li>
-<li><code>shop.SetTalkSeen(index, seen)</code> 标记读过（<code>true</code>）/ 没读过（<code>false</code>），顺手清掉「（新）」。<ul>
-<li>置成"没读过"会让这个成员<strong>跳到队列最前面</strong>——这正是存档恢复对话进度的用法。</li>
+<li><code>shop.IsTalkUnread(index)</code> 是否从未读过。</li>
+<li><code>shop.SetTalkSeen(index, seen)</code> 标记为已读（<code>true</code>）/ 未读（<code>false</code>），同时清除「（新）」。<ul>
+<li>置为未读会让该成员<strong>移到队列最前面</strong>，该行为用于从存档恢复对话进度。</li>
 </ul>
 </li>
 <li><code>shop.ResetTalkProgress()</code> 全部话题回到未读，每条队列的指针也回到第一个。</li>
@@ -3526,7 +3676,7 @@
 <p>上面这些方法的 <code>index</code> 都接受<strong>话题名</strong>或 <strong>1-based 序号</strong>。</p>
 </div>
 <h3 id="_9">右栏的话题旁白<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<p>打开话题列表时，右侧那一栏显示的不是话题列表，而是<strong>店主对当前光标所在话题的吐槽</strong>。</p>
+<p>打开话题列表时，右侧那一栏显示的不是话题列表，而是<strong>店主对当前光标所在话题的评价</strong>。</p>
 <p>它有一条三级解析链：<strong>单话题 → 全店默认 → 本地化</strong> <code>Overworld.Shop.TalkOpinion.Default</code> 。</p>
 <div class="highlight"><pre><span></span><code><span class="nv">shop</span><span class="p">.</span><span class="nf">SetTalkOpinion</span><span class="p">(</span><span class="s2">&quot;想聊点什么？&quot;</span><span class="p">)</span><span class="w">          </span><span class="c1">-- 只给一个参数 = 全店默认</span>
 <span class="nv">shop</span><span class="p">.</span><span class="nf">SetTalkOpinion</span><span class="p">(</span><span class="s2">&quot;天气&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;又聊天气？&quot;</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 给两个参数 = 单独设置某个话题</span>
@@ -3542,14 +3692,14 @@
 </ul>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">想让某个话题回到默认，不能传 <code>nil</code></p>
-<p><code>SetTalkOpinion("天气", nil)</code> 不会被当成"清掉天气的旁白"——参数少一个，它会走<strong>一个参数</strong>的分支，
-把<strong>全店默认</strong>设成了字符串 <code>"天气"</code> 。要单独清某一项，只能用 <code>ClearTalkOpinions()</code> 全清。</p>
+<p class="admonition-title">让某个话题回到默认值时不能传 <code>nil</code></p>
+<p><code>SetTalkOpinion("天气", nil)</code> 不会被当作清除该话题的旁白——参数少一个时会走<strong>一个参数</strong>的分支，
+把<strong>全店默认</strong>设为字符串 <code>"天气"</code> 。清除单个话题只能使用 <code>ClearTalkOpinions()</code> 全部清除。</p>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">旁白里的 <code>%s</code> 会换成话题名</p>
-<p>和拒收台词一样由 <code>fillName</code> 处理：文案里的 <code>%s</code> 替换成当前话题名，且 <code>string.format</code> 被 <code>pcall</code> 包着，
-所以作者文案里写个裸 <code>%</code> 也只会原样显示，不会把商店拖下水。</p>
+<p class="admonition-title">旁白里的 <code>%s</code> 会替换为话题名</p>
+<p>与拒收台词相同，由 <code>fillName</code> 处理：文案中的 <code>%s</code> 替换为当前话题名，且 <code>string.format</code> 被 <code>pcall</code> 包裹，
+因此文案中出现裸 <code>%</code> 时按原样显示，不影响商店运行。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">旁白不要写成对白的格式</p>
@@ -3561,13 +3711,13 @@
 <p>选中话题、正文开始打字之后，<code>hideElements()</code> 会把右栏一起清掉；回到列表时旁白才按光标位置重新出现。</p>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">队列的指针是怎么走的</p>
-<p>一条队列的当前成员这样选：<strong>先取第一个未读的</strong>；一个未读的都没有了，才按 <code>cursor</code> 轮转。所以中途往队列里插一个新话题，它会立刻顶上来显示。</p>
+<p class="admonition-title">队列指针的选取规则</p>
+<p>一条队列的当前成员按以下顺序选取：<strong>先取第一个未读的</strong>；不存在未读成员时，才按 <code>cursor</code> 轮转。因此中途向队列插入一个新话题后，该话题会立即显示。</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">别给队列加所谓的模式开关</p>
-<p>交谈只做了<strong>列表</strong>这一种形态，队列只影响"哪些行显示得出来"。<br>
-如果你在想"要不要让菜单第三项直接变成话题名"——不要。那是另一套交互，和队列不是一回事。</p>
+<p class="admonition-title">队列不支持模式开关</p>
+<p>交谈只支持<strong>列表</strong>这一种形态，队列只决定哪些行显示。<br>
+将菜单第三项改为话题名属于另一套交互，与队列无关。</p>
 </div>
 <hr />
 <h2 id="_10">钱与背包<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
@@ -3577,10 +3727,10 @@
 <li>钱不够时买不了，会弹一句 <code>Overworld.Shop.Text.NoGold</code> 。</li>
 <li>交易结果<strong>立刻写进 <code>DATA</code></strong> ，存档时会一起带走。</li>
 </ul>
-<p>成交时顺手做的事：买 → <code>snd_buyitem.wav</code> ，库存减一；卖 → <code>snd_buyitem.wav</code> ，从 <code>items</code> 里 <code>table.remove</code> 。<br>
+<p>成交时的附带操作：买 → <code>snd_buyitem.wav</code> ，库存减一；卖 → <code>snd_buyitem.wav</code> ，从 <code>items</code> 里 <code>table.remove</code> 。<br>
 买/卖完成后，右栏会换成一句结算文案（ <code>Overworld.Shop.Text.Bought</code> / <code>Text.Sold</code> ，都带 <code>%s</code> 占位）。</p>
 <hr />
-<h2 id="_11">怎么进商店<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<h2 id="_11">进入商店<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
 <p>商店只是一个普通场景，从主世界调 <code>Overworld.ChangeScene</code> 切进去即可：</p>
 <div class="highlight"><pre><span></span><code><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">ow</span><span class="p">.</span><span class="nf">getInteractResult</span><span class="p">(</span><span class="s2">&quot;warp&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="nv">ow</span><span class="p">.</span><span class="nf">ChangeScene</span><span class="p">(</span><span class="s2">&quot;Overworld.Shops.scene_shop_0&quot;</span><span class="p">)</span>
@@ -3589,9 +3739,9 @@
 <p><code>ChangeScene(scene, mark, direction)</code> 的另外两个参数都有默认值（<code>mark = 1</code> 、 <code>direction = "down"</code>）。它会<strong>先检查 <code>Char.controlling</code></strong> ，玩家不受控时直接 return，然后记下 <code>DATA.room = Scenes.name_current</code> 。<br>
 离开时商店自己会 <code>Scenes.switchTo(DATA.room)</code> 回原场景，不需要额外处理。</p>
 <div class="admonition tip">
-<p class="admonition-title">想换一整家店，不用改引擎代码</p>
-<p>场景名 <code>Overworld.Shops.scene_shop_0</code> 会依次到 <code>Game.Scenes.</code> 和 <code>Scripts.Scenes.</code> 两个根去找，<strong>Game 区优先</strong>。<br>
-所以想改自带那家店，把 <code>scene_shop_0.lua</code> 放一份到 <code>Game/Scenes/Overworld/Shops/</code> 里改就行，引擎那份不用动。</p>
+<p class="admonition-title">替换整家商店无需修改引擎代码</p>
+<p>场景名 <code>Overworld.Shops.scene_shop_0</code> 会依次到 <code>Game.Scenes.</code> 和 <code>Scripts.Scenes.</code> 两个根查找，<strong>Game 区优先</strong>。<br>
+修改自带商店时，将 <code>scene_shop_0.lua</code> 复制一份到 <code>Game/Scenes/Overworld/Shops/</code> 并修改即可，引擎自带的文件保持不变。</p>
 </div>
 
 

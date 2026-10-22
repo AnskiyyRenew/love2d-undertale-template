@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Displaying Text (Typers)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first battle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to read next
   
 
     
@@ -904,8 +1024,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ccadd-floating-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CCAdd Floating Text
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measuring-the-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measuring the Text
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2308,6 +2450,8 @@
       
         
       
+        
+      
     
     
     
@@ -2512,6 +2656,34 @@
     
   
     ❕️ Native Secret Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Bundled Assets
   
 
     
@@ -2964,8 +3136,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ccadd-floating-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CCAdd Floating Text
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measuring-the-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measuring the Text
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2995,6 +3189,7 @@
 <h2 id="creating-a-typer">Creating a Typer<a class="headerlink" href="#creating-a-typer" title="Permanent link">&para;</a></h2>
 <p>The three <strong>character-by-character</strong> Typers are divided by "how tags are handled", namely <code>EText</code>, <code>NText</code> and <code>SText</code>.</p>
 <p>The fourth, <code>InstText</code>, has no typing animation, and its usage differs a lot from them, so it is placed separately at the end of this section.</p>
+<p>In addition, <code>Typers.CCAdd</code> builds on <code>InstText</code> to provide animated floating text, also placed at the end of this section.</p>
 <hr />
 <h3 id="etext-typer">EText Typer<a class="headerlink" href="#etext-typer" title="Permanent link">&para;</a></h3>
 <p><code>EText</code> stands for <code>Easy Text</code>; its feature is that the style is written inside the text, similar to <code>bbcode</code>.</p>
@@ -3212,6 +3407,7 @@
 <li><code>SetColor(r, g, b)</code> Changes color, <code>0 ~ 1</code> or <code>0 ~ 255</code> both accepted.</li>
 <li><code>UseBondFont(config)</code> Switches to a different Chinese/English font config, same structure as <code>EText</code>'s bondfont.</li>
 <li><code>Destroy()</code> / <code>Remove()</code> Destroys. Decrements the character's reference in the cache by one, <strong>can be called repeatedly</strong>.</li>
+<li><code>GetWidth()</code> / <code>GetHeight()</code> Width of the widest line and total height of every line; see <a href="#measuring-the-text">Measuring the Text</a>.</li>
 <li><code>t.font</code> / <code>t.fontsize</code> These two properties are written directly; writing them conveniently re-lays out once, no need to <code>Rebuild()</code> yourself.</li>
 </ul>
 </div>
@@ -3243,6 +3439,127 @@ so you don't need to manage it in <code>love.update</code> — after changing co
 <p><code>Layers.clear()</code> / <code>Typers.ClearAll()</code> will clear it together, but <strong>calling <code>Destroy()</code> yourself is safest</strong>.
 Creating repeatedly without destroying, the character sprites in the cache will only keep growing.
 <code>Typers.InstText.ClearCache()</code> can clear all character cache at once — but instances currently being drawn are also released together, use with caution.</p>
+</div>
+<hr />
+<h3 id="ccadd-floating-text">CCAdd Floating Text<a class="headerlink" href="#ccadd-floating-text" title="Permanent link">&para;</a></h3>
+<p><code>Typers.CCAdd</code> wraps <code>InstText</code> into <strong>animated floating text</strong>: after the text is created, an animation function controls its visibility and movement, and it disappears on its own once finished. It suits text that does not need to appear character by character, such as damage numbers and pickup hints.</p>
+<p>Use <code>Typers.CCAdd(text, x, y, layer, align, anim_func)</code> to create.</p>
+<ul>
+<li><code>text</code> The text to display, passed straight to <code>InstText.New</code>. Passing a table only takes item <code>1</code>; line breaks must be written as <code>\n</code>.</li>
+<li><code>x</code> / <code>y</code> The <strong>top-left</strong> horizontal and vertical coordinates of the text, passed as two separate numbers, not a table.</li>
+<li><code>layer</code> Layer, default <code>0</code>.</li>
+<li><code>align</code> Alignment, default <code>"center"</code>, same values as <code>InstText:SetAlign</code>.</li>
+<li><code>anim_func</code> The animation function, called every frame as <code>func(self)</code>. If omitted, the default animation is used.</li>
+</ul>
+<p>The return value is the CC object itself, whose fields can be read and written directly:</p>
+<div class="admonition example">
+<p class="admonition-title">CC object fields</p>
+<ul>
+<li><code>cc.inst</code> The underlying <code>InstText</code> instance; <code>alpha</code> / <code>x</code> / <code>y</code> / <code>fontsize</code> and similar properties can be assigned directly.</li>
+<li><code>cc.time</code> Frame counter, starting at <code>0</code>. The default animation increments it every frame; a custom animation must increment it itself.</li>
+<li><code>cc.func</code> The animation function itself.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Creation example</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">cc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="nf">CCAdd</span><span class="p">(</span><span class="s2">&quot;+20&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Alpha is 0 at creation</p>
+<p><code>CCAdd</code> sets <code>cc.inst.alpha</code> to <code>0</code> after creation, so the text stays invisible until the animation raises the alpha.</p>
+</div>
+<p><strong>Default animation:</strong></p>
+<p>When <code>anim_func</code> is omitted, the Engine creates four tweens on the first frame (<code>cc.time == 1</code>):</p>
+<ul>
+<li><code>alpha</code> <code>0</code> → <code>1</code>, 40 ticks, fade in.</li>
+<li><code>alpha</code> <code>1</code> → <code>0</code>, 70-tick delay then 40 ticks, fade out.</li>
+<li><code>y</code> original → <code>y - 30</code>, 50 ticks, <code>Quad Out</code>, rising 30 pixels first.</li>
+<li><code>y - 30</code> → <code>y - 60</code>, 70-tick delay then 50 ticks, <code>Quad In</code>, rising another 30 pixels.</li>
+</ul>
+<p>Both duration and delay are measured in ticks, consistent with <code>Tween.CreateTween</code>.</p>
+<p><strong>Custom animation:</strong></p>
+<p><code>anim_func</code> is called with a colon, so <code>self</code> is the CC object itself:</p>
+<div class="admonition example">
+<p class="admonition-title">Custom animation</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">cc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="nf">CCAdd</span><span class="p">(</span><span class="s2">&quot;MISS&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;center&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">inst</span><span class="p">.</span><span class="py">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">inst</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">inst</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">A custom animation must handle alpha and its own ending</p>
+<p><code>cc.inst.alpha</code> is <code>0</code> at creation; if a custom animation never writes <code>alpha</code>, the text stays invisible.
+The default animation's fade-out comes from a tween. A custom animation has no such layer and must decide when to end by itself.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">The default animation releases itself when it ends</p>
+<p>At <code>cc.time == 125</code> the default animation destroys <code>cc.inst</code> and removes the CC from <code>Typers._cc</code>, so nothing else is needed.
+<code>125</code> comes from the last tween: a <code>70</code>-frame delay plus a <code>50</code>-frame duration means it writes its final value on frame <code>123</code>, and the rest is margin.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">A custom animation is never released automatically</p>
+<p>A custom <code>anim_func</code> has no end condition, so the CC stays in <code>Typers._cc</code> and the <code>anim_func</code> keeps being called every frame.
+Call <code>Typers.CCRemove(cc)</code> when the animation is over to destroy the instance and drop it from the list:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Typers</span><span class="p">.</span><span class="nf">CCRemove</span><span class="p">(</span><span class="nv">cc</span><span class="p">)</span>
+</code></pre></div>
+<p>It can be called more than once, and also from inside the CC's own <code>anim_func</code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Cleared wholesale on a scene switch</p>
+<p><code>Typers.ClearAll()</code> walks <code>Typers._cc</code>, destroys every <code>cc.inst</code> and empties the list; <code>Layers.clear()</code> calls it internally.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Update timing</p>
+<p><code>Typers.Update</code> is called by <code>main.lua</code> inside <code>love.update</code>, <strong>before</strong> <code>scene.update</code>; it walks <code>Typers._cc</code> in reverse order and calls <code>func</code> on each entry.</p>
+</div>
+<hr />
+<h2 id="measuring-the-text">Measuring the Text<a class="headerlink" href="#measuring-the-text" title="Permanent link">&para;</a></h2>
+<p>Every typer can report the size of the text it currently holds, through the same three methods. Sizes ignore <code>typer.x</code> / <code>typer.y</code>: they describe the letters themselves, not where they sit on screen.</p>
+<div class="admonition example">
+<p class="admonition-title">Measurement methods</p>
+<ul>
+<li><code>typer:GetWidth()</code> Pixel width of the <strong>widest line</strong>. <code>\n</code> and auto-wrap start new lines, which are measured separately; the largest result wins.</li>
+<li><code>typer:GetHeight()</code> Pixel height from the top of the highest glyph to the bottom of the lowest one. Includes the gaps added between lines and each glyph's own <code>scale</code>.</li>
+<li><code>typer:GetLettersSize()</code> Both values in one call, returned as two numbers (width, height) rather than a table.</li>
+</ul>
+</div>
+<p>Code that holds a typer without knowing which module built it can use the module-level entry point, which accepts an instance of any of the four:</p>
+<ul>
+<li><code>Typers.GetLettersSize(typer)</code> Same two return values; <code>0, 0</code> for a nil typer or for an object that has no measurement methods.</li>
+</ul>
+<div class="admonition example">
+<p class="admonition-title">Placing a second label next to the first</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">gold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">InstText</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s2">&quot;GOLD 120&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">465</span><span class="p">,</span><span class="w"> </span><span class="mi">420</span><span class="p">},</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">w</span><span class="p">,</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gold</span><span class="p">:</span><span class="nf">GetLettersSize</span><span class="p">()</span>
+
+<span class="c1">-- Start 10 pixels past the first label instead of guessing a width.</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">InstText</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s2">&quot;LV 3&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">465</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">w</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">420</span><span class="p">},</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Branching on the height of a typed-out sentence</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">EText</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="s2">&quot;A short line&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;A much longer line that wraps&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">270</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">})</span>
+
+<span class="c1">--- Called once the sentence has finished typing.</span>
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">fits_one_row</span><span class="p">(</span><span class="nv">typer</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="nf">GetLettersSize</span><span class="p">(</span><span class="nv">typer</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">27</span>
+<span class="kr">end</span>
+</code></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><code>InstText</code> is final immediately, the other three grow over time</p>
+<p><code>InstText</code> lays out the whole text when it is created, so both values are final right after <code>New()</code>, <code>SetText()</code> or <code>Rebuild()</code>.
+<code>EText</code>, <code>NText</code> and <code>SText</code> only hold the letters typed so far, so the numbers keep growing until the sentence is done; a sentence that has not started yet contributes nothing.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Only letters are measured</p>
+<p>Spaces create no letter, so they are absent from the result, while tags such as <code>[wait:x]</code> never appear in the layout at all.
+Effects like <code>shake</code> move glyphs at draw time and are not included, so the footprint on screen can be a few pixels larger than the returned value.
+Alignment does not change the size either: <code>SetAlign("center")</code> moves the letters without widening them.</p>
 </div>
 
 

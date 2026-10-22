@@ -409,6 +409,46 @@ function typers.New(text, position, layer, size)
         rebuildLetters()
     end
 
+    --- Pixel width of the widest line, ignoring `typer.x`. Every letter already
+    --- stores the total width of its own line in `line_width` - the same value
+    --- alignment is computed from - so the largest of those is the answer.
+    function typer:GetWidth()
+        local letters = typer.letters
+        if (not letters or #letters == 0) then return 0 end
+
+        local widest = 0
+        for _, letter in ipairs(letters) do
+            local w = letter.line_width or 0
+            if (w > widest) then widest = w end
+        end
+        return widest
+    end
+
+    --- Pixel height of every line, ignoring `typer.y`. Spans from the top of
+    --- the highest glyph to the bottom of the lowest one, so both the line
+    --- gaps added by `\n` / auto-wrap and each glyph's own `scale` count.
+    function typer:GetHeight()
+        local letters = typer.letters
+        if (not letters or #letters == 0) then return 0 end
+
+        local top, bottom = nil, nil
+        for _, letter in ipairs(letters) do
+            local y = letter.y or 0
+            -- Unlike `width`, the height has `scale` applied here.
+            local font = letter.font
+            local h = ((font and font.getHeight) and font:getHeight() or 0) * (letter.scale or 1)
+            if (top == nil or y < top) then top = y end
+            if (bottom == nil or (y + h) > bottom) then bottom = y + h end
+        end
+        if (top == nil) then return 0 end
+        return (bottom or 0) - top
+    end
+
+    --- Both measurements in one call, returned as two numbers: width, height.
+    function typer:GetLettersSize()
+        return typer:GetWidth(), typer:GetHeight()
+    end
+
     function typer:SetColor(r, g, b)
         typer.color = {r, g, b}
     end

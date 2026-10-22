@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2374,6 +2494,8 @@
       
         
       
+        
+      
     
     
     
@@ -2578,6 +2700,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3125,7 +3275,7 @@
 模块路径： <code>Scripts/Libraries/Overworld/map.lua</code> ，以全局 <code>Map</code> 出场。</p>
 <hr />
 <h2 id="_1">地图的基本参数<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>引擎自带的地图都是这套参数，新建地图时照抄即可：</p>
+<p>引擎自带的地图均使用以下参数，新建地图时可参照设置：</p>
 <table>
 <thead>
 <tr>
@@ -3152,11 +3302,11 @@
 </tr>
 </tbody>
 </table>
-<p>导出后的 <code>.lua</code> 放在 <code>Maps/</code> 下（或 <code>Maps/子目录/</code> 下），Tiled 工程与 <code>.tmx</code> 放 <code>Maps/tmx/</code> 只是约定，方便自己找回来改。</p>
+<p>导出后的 <code>.lua</code> 放在 <code>Maps/</code> 下（或 <code>Maps/子目录/</code> 下）。Tiled 工程与 <code>.tmx</code> 放在 <code>Maps/tmx/</code> 属于目录约定，便于后续修改时定位源文件。</p>
 <div class="admonition tip">
 <p class="admonition-title">图块集还有两条硬约束</p>
-<p><strong>图块集必须"嵌入地图"（不能用外部 <code>.tsx</code> ）</strong>，否则 STI 会直接 assert 崩掉场景；<strong>图块尺寸必须是 20 × 20</strong> 。<br>
-图块图片路径、动画图块的做法也都有坑，统一写在 <strong><a href="../015_sti/index.html">STI 与图块集</a></strong> 。</p>
+<p><strong>图块集必须嵌入地图（不能使用外部 <code>.tsx</code> ）</strong>，否则 STI 会直接 assert 导致场景崩溃；<strong>图块尺寸必须是 20 × 20</strong> 。<br>
+图块图片路径与动画图块的处理方式统一写在 <strong><a href="../015_sti/index.html">STI 与图块集</a></strong> 。</p>
 </div>
 <p><img alt="OW-02" src="../../img/040_overworld/ow_02_tiled_layers.png" /></p>
 <hr />
@@ -3229,7 +3379,7 @@
 <td>实体</td>
 <td><code>walls</code></td>
 <td><code>static</code> 矩形 / 多边形 / 椭圆</td>
-<td><strong>不能</strong>，真的挡路</td>
+<td><strong>不能</strong>，会产生阻挡</td>
 </tr>
 <tr>
 <td>传感器</td>
@@ -3245,7 +3395,7 @@
 </tr>
 </tbody>
 </table>
-<p>也就是说，只有 <code>warps</code> 和 <code>triggers</code> 是"能穿过去的区域"；告示牌、存档点、箱子和真的墙一样会挡住你，你得<strong>贴上去</strong>才能触发它们。这三者内部走的是同一套接触事件（ <code>beginContact</code> ），只是碰撞外形取的是贴图底部的一条窄边。</p>
+<p>只有 <code>warps</code> 与 <code>triggers</code> 是可穿过的区域；告示牌、存档点、箱子与墙一样会阻挡玩家，需要接触后才能触发。这三者内部走的是同一套接触事件（ <code>beginContact</code> ），只是碰撞外形取的是贴图底部的一条窄边。</p>
 <div class="admonition warning">
 <p class="admonition-title"><code>marks</code> 没有物理体</p>
 <p><code>marks</code> 只被读成一个 <code>{x, y, direction}</code> 的坐标点，不生碰撞体、也没有贴图。所以它既可以摆在墙里，也可以拿来当纯逻辑锚点。</p>
@@ -3253,7 +3403,7 @@
 <div class="admonition warning">
 <p class="admonition-title">坐标要乘 2</p>
 <p>引擎在读对象时会把 <code>x</code> / <code>y</code> / <code>width</code> / <code>height</code> 全部乘 <code>2</code> 再建碰撞体。<br>
-所以运行时拿到的坐标已经是世界坐标，但<strong>你在 Tiled 里看到的数字是缩放前的</strong>。</p>
+因此运行时读到的坐标已是世界坐标，但 Tiled 中显示的数字为缩放前的值。</p>
 </div>
 <hr />
 <h3 id="marks">marks 出生点<a class="headerlink" href="#marks" title="Permanent link">&para;</a></h3>
@@ -3269,33 +3419,33 @@
 </div>
 <hr />
 <h3 id="walls">walls 墙<a class="headerlink" href="#walls" title="Permanent link">&para;</a></h3>
-<p><code>walls</code> 是唯一会真正挡住玩家的东西。三种形状都支持：</p>
+<p><code>walls</code> 是唯一会真正阻挡玩家的层。三种形状都支持：</p>
 <ul>
 <li>矩形（默认）</li>
-<li>多边形 —— 斜墙、尖角都可以</li>
-<li>椭圆 / 圆 —— 用 <code>width</code> 或 <code>height</code> 里较小的那个当直径</li>
+<li>多边形：斜墙、尖角均可</li>
+<li>椭圆 / 圆：以 <code>width</code> 与 <code>height</code> 中较小的值为直径</li>
 </ul>
 <p><code>rotation</code> 属性会被正确应用（多边形与椭圆都会跟着转）。</p>
 <div class="admonition example">
 <p class="admonition-title">墙的摩擦</p>
-<p>墙与玩家的摩擦都是 <code>0.01</code> ，这是刻意调低的：摩擦低，玩家撞到斜墙时才会<strong>沿着墙滑</strong>而不是被粘住。<br>
-两个值分别在 <code>map.lua</code> 的 <code>wall_friction</code> 与 <code>char.lua</code> 里，改成大数字就会"贴墙"。</p>
+<p>墙与玩家的摩擦均为 <code>0.01</code> ，该值是刻意调低的：摩擦较低时，玩家撞到斜墙会<strong>沿墙滑动</strong>而不是被粘住。<br>
+两个值分别在 <code>map.lua</code> 的 <code>wall_friction</code> 与 <code>char.lua</code> 里，调大后玩家会<strong>贴墙</strong>。</p>
 </div>
 <hr />
 <h3 id="warps">warps 传送区<a class="headerlink" href="#warps" title="Permanent link">&para;</a></h3>
-<p>碰到就换场景的区域。它只是<strong>告诉你碰到了</strong>，换场景的动作由你在场景脚本里写（见 <a href="../030_interact/index.html">交互与对话</a> ）。</p>
+<p>碰到即切换场景的区域。它只记录碰撞发生，切换场景的动作在场景脚本中实现（见 <a href="../030_interact/index.html">交互与对话</a> ）。</p>
 <h3 id="triggers">triggers 自定义触发区<a class="headerlink" href="#triggers" title="Permanent link">&para;</a></h3>
-<p>和 <code>warps</code> 一样是传感器，但没有固定用途，属性随便加。最常见的用法是加一个自定义属性（比如 <code>rr</code> ）当"房间编号"，然后按它分流。</p>
+<p>与 <code>warps</code> 同为传感器，但没有固定用途，属性可自由添加。常见用法是添加一个自定义属性（例如 <code>rr</code> ）作为房间编号，再按该属性分流。</p>
 <div class="highlight"><pre><span></span><code><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">getInteractResult</span><span class="p">(</span><span class="s2">&quot;trigger&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rr&quot;</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="c1">-- 碰到了 rr == 1 的触发区</span>
 <span class="kr">end</span>
 </code></pre></div>
 <h3 id="signs-saves-chests">signs / saves / chests<a class="headerlink" href="#signs-saves-chests" title="Permanent link">&para;</a></h3>
-<p>这三个引擎会<strong>自动生成贴图</strong>（告示牌、存档点、箱子），不用自己画。属性：</p>
+<p><code>signs</code> / <code>saves</code> / <code>chests</code> 三层的贴图由引擎<strong>自动生成</strong>（告示牌、存档点、箱子），无需自行绘制。属性如下：</p>
 <ul>
-<li><code>signs</code> —— <code>id</code> 不填就按摆放顺序自动编号。</li>
-<li><code>saves</code> —— <code>room</code> 是存档点上显示的地名， <code>x</code> / <code>y</code> 是存档坐标。</li>
-<li><code>chests</code> —— <code>give</code> 会被原样读进运行时对象的 <code>give</code> 字段（不填为 <code>false</code> ），但<strong>引擎里没有任何地方读它</strong>。箱子到底给什么，由 <code>CHEST</code> （= <code>DATA.chests</code> ）和你的场景脚本决定，见 <a href="../040_menu/index.html">菜单 · 存档 · 箱子</a> 。</li>
+<li><code>signs</code>：<code>id</code> 不填时按摆放顺序自动编号。</li>
+<li><code>saves</code>：<code>room</code> 是存档点上显示的地名， <code>x</code> / <code>y</code> 是存档坐标。</li>
+<li><code>chests</code>：<code>give</code> 会被原样读入运行时对象的 <code>give</code> 字段（不填为 <code>false</code> ），但<strong>引擎内没有任何位置读取该字段</strong>。箱子给出的物品由 <code>CHEST</code> （= <code>DATA.chests</code> ）与场景脚本决定，见 <a href="../040_menu/index.html">菜单 · 存档 · 箱子</a> 。</li>
 </ul>
 <hr />
 <h2 id="_3">运行时访问<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
@@ -3304,16 +3454,16 @@
 <p class="admonition-title">对象容器</p>
 <ul>
 <li><code>Map.objects.marks</code> / <code>.walls</code> / <code>.warps</code> / <code>.triggers</code> / <code>.signs</code> / <code>.saves</code> / <code>.chests</code> 各自类型的运行时对象列表。</li>
-<li><code>Map.objects.unknowns</code> 名字没对上的对象层。<strong>这个表目前永远是空的</strong>——引擎只按已知层名分发，遇到不认识的层就悄悄跳过，不会往这里写。发现拼写错误要靠 <code>Map.debug_objects</code> （见下）。</li>
+<li><code>Map.objects.unknowns</code> 层名未匹配的对象层。<strong>该表当前始终为空</strong>——引擎只按已知层名分发，遇到未识别的层会直接跳过，不会写入此处。层名拼写错误需通过 <code>Map.debug_objects</code> 排查（见下）。</li>
 <li><code>Map.debug_objects</code> 原始 Tiled 对象，按<strong>层名</strong>索引（包括拼错的层），调试绘制专用。</li>
 </ul>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">层名拼错了怎么查</p>
-<p>打开 <code>Overworld.debug</code> 后，<code>Map.debug_objects</code> 里<strong>所有</strong>对象层都会被画出来，包括拼错名字的那层。<br>
-颜色表里没有它的名字，就会落到 <code>unknowns</code> 的<strong>暗红色</strong>——看到一片暗红框，说明这层的名字没被引擎认出来。详见本页末尾「调试」。</p>
+<p class="admonition-title">层名拼写错误的排查</p>
+<p>开启 <code>Overworld.debug</code> 后，<code>Map.debug_objects</code> 里<strong>所有</strong>对象层都会被绘制，包括层名拼写错误的那层。<br>
+颜色表中没有对应层名时，会落到 <code>unknowns</code> 的<strong>暗红色</strong>；出现暗红色框表示该层名未被引擎识别。详见本页末尾「调试」。</p>
 </div>
-<p>每个运行时对象大致长这样：</p>
+<p>运行时对象的结构如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">,</span><span class="w">               </span><span class="c1">-- 世界坐标（已 ×2）</span>
 <span class="w">    </span><span class="nv">width</span><span class="p">,</span><span class="w"> </span><span class="nv">height</span><span class="p">,</span><span class="w">      </span><span class="c1">-- 尺寸（已 ×2）</span>
@@ -3323,7 +3473,7 @@
 <span class="w">    </span><span class="nv">sprite</span><span class="p">,</span><span class="w">             </span><span class="c1">-- 贴图（signs / saves / chests 有）</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>不想碰碰撞、只想按条件取一个对象，用 <code>Overworld.FindObject</code> 更省事，见 <a href="../030_interact/index.html">交互与对话</a> 。</p>
+<p>若只需按条件取一个对象而不涉及碰撞，可使用 <code>Overworld.FindObject</code> ，见 <a href="../030_interact/index.html">交互与对话</a> 。</p>
 <hr />
 <h2 id="_4">地图与物理世界<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <div class="admonition example">
@@ -3349,13 +3499,13 @@
 <div class="admonition warning">
 <p class="admonition-title">瓦片动画需要 Update</p>
 <p>Tiled 的动画瓦片只有在 <code>Map.Update</code> 里被调用 <code>map:update(dt)</code> 时才会推进。<br>
-这一行引擎已经写好了，别在优化时删掉它。</p>
+该调用已由引擎写入，优化时不要删除。</p>
 </div>
 <hr />
 <h2 id="_5">镜头<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p><code>Overworld.Init</code> 会扫描所有可见瓦片层，算出<strong>实际有内容的那块矩形</strong>（考虑图层偏移与无限地图的负坐标区块），再按视口大小换算成 <code>Camera:setBounds</code> 。</p>
 <p>覆盖区域比视口小时，镜头会被锁在正中央。</p>
-<p>想手动接管：</p>
+<p>如需手动控制镜头：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">ow</span><span class="p">.</span><span class="nf">Init</span><span class="p">(</span><span class="s2">&quot;Maps/main_scene/sol.lua&quot;</span><span class="p">)</span>
 <span class="nv">Camera</span><span class="p">:</span><span class="nf">setBounds</span><span class="p">(</span><span class="nv">min_x</span><span class="p">,</span><span class="w"> </span><span class="nv">min_y</span><span class="p">,</span><span class="w"> </span><span class="nv">max_x</span><span class="p">,</span><span class="w"> </span><span class="nv">max_y</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 覆盖自动结果</span>
 <span class="nv">Camera</span><span class="p">:</span><span class="nf">setPosition</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">)</span><span class="w">                        </span><span class="c1">-- 手动定位</span>

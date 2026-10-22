@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2325,6 +2445,8 @@
       
         
       
+        
+      
     
     
     
@@ -2529,6 +2651,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3042,7 +3192,7 @@
 <li><code>color</code> 弹跳文本是什么颜色，默认红色 <code>{1, 0, 0}</code> 。</li>
 </ul>
 </li>
-<li><code>UI.newMissText(text, pos, color)</code> 生成新的不动文本，常见于当玩家在校准界面却不按下攻击键而漏掉攻击的时刻。<ul>
+<li><code>UI.newMissText(text, pos, color)</code> 生成新的不动文本，常见于玩家在校准界面未按下攻击键而漏掉攻击时。<ul>
 <li><code>text</code> 要打出的文本，不能用中文。</li>
 <li><code>pos</code> 在什么位置开始弹跳。</li>
 <li><code>color</code> 文本颜色，默认白色 <code>{1, 1, 1}</code> ，自带黑色描边。</li>
@@ -3062,14 +3212,14 @@
 <li><code>UI.MoveBarPosition(dx, dy)</code> 以 <code>(dx, dy)</code> 的速度移动血条。</li>
 <li><code>UI.MovePosition(dx, dy)</code> 同时执行 <code>Text</code> 和 <code>Bar</code> 的移动函数。</li>
 <li><code>UI.SetHPNameLimit(x)</code> 修改HP标签的最小横坐标到 <code>x</code> ，默认是 <code>245</code> 。</li>
-<li><code>UI.GetLayout()</code> 获取整个布局，想系统的修改布局建议使用此函数。</li>
+<li><code>UI.GetLayout()</code> 获取整个布局，需要系统性修改布局时使用此函数。</li>
 <li><code>UI.GetHPBar()</code> 返回当前血量代表的血条。</li>
 <li><code>UI.GetMaxHPBar()</code> 返回最大血量代表的血条。</li>
 <li><code>UI.GetKRBar()</code> 返回KR代表的血条。</li>
 <li><code>UI.GetBars()</code> 返回如上的三个血条。</li>
 </ul>
 </div>
-<p><strong>状态中枢和UI在主体中被调用，分别使用如下变量出场：</strong></p>
+<p><strong>状态中枢与 UI 在主体中被调用，分别对应以下变量：</strong></p>
 <p><code>UI.state</code> &amp; <code>UI.buttons</code></p>
 <hr />
 <h2 id="_1">按键<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -3083,12 +3233,12 @@
 <li><code>buttons.ResetAllState()</code> 将所有按键归位到待机状态并将玩家放在第一个按钮的位置。</li>
 <li><code>buttons.RemoveButton(id)</code> 移除第 <code>id</code> 个按钮，此按钮将不做任何反馈。</li>
 <li><code>buttons.SetLogic(logic)</code> 按钮的切换逻辑表，保存的内容为 <code>起点，终点，操作</code> 。</li>
-<li><code>buttons.SetSprites(sprs)</code> 一次性设置四个按钮的图片，会细讲。</li>
-<li><code>buttons.SetAnimations(anims)</code> 一次性设置四个按钮的图片，会细讲。</li>
+<li><code>buttons.SetSprites(sprs)</code> 一次性设置四个按钮的图片，详见下文。</li>
+<li><code>buttons.SetAnimations(anims)</code> 一次性设置四个按钮的图片，详见下文。</li>
 </ul>
 </div>
 <h3 id="_2">切换图片<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>这是原本的按钮表，按照按钮顺序依次排开元素，表内第一项为 <code>待机图片</code> ，第二项为 <code>选中图片</code> 。</p>
+<p>以下为原本的按钮表，元素按按钮顺序依次排开，表内第一项为 <code>待机图片</code> ，第二项为 <code>选中图片</code> 。</p>
 <div class="highlight"><pre><span></span><code><span class="nv">sprites</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">        </span><span class="s2">&quot;UI/Battle Screen/spr_fightbt_0.png&quot;</span><span class="p">,</span>
@@ -3109,7 +3259,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <h3 id="_3">切换动画<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>与图片不一样，这次我们采用多组数据了，也就是在如上的表再加上一层：</p>
+<p>与图片不同，动画需要多组数据，即在上述表外再增加一层：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">buttons</span><span class="p">.</span><span class="py">animations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">anims</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nv">idle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="p">{{</span>
@@ -3125,15 +3275,15 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">})</span>
 </code></pre></div>
-<p>由于实际上调用的是图片的 <code>SetAnimation</code> 操作，所以需要传递两个值，一个为 <code>图片组</code> 、 一个为 <code>间隔</code> 。</p>
+<p>该操作内部调用图片的 <code>SetAnimation</code> ，需传入两个值：<code>图片组</code> 与 <code>间隔</code> 。</p>
 <hr />
 <h2 id="_4">状态中枢<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <div class="admonition danger">
 <p class="admonition-title">事先注意</p>
-<p>本文件通常情况下无需进行修改，因为在底层支持的逻辑是稳定不变的， <strong>在了解完状态流程后即可进入下一页面</strong> 。</p>
+<p>本文件通常无需修改，底层逻辑稳定不变， <strong>了解状态流程后即可进入下一页面</strong> 。</p>
 </div>
 <h3 id="_5">状态流程<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>战斗系统中，拥有如下的状态来确定玩家所处的UI阶段：</p>
+<p>战斗系统使用以下状态标识玩家所处的 UI 阶段：</p>
 <ul>
 <li><code>ACTIONSELECT</code> 玩家回合初始状态（左右选择按钮）。</li>
 <li><code>FIGHTMENU</code> 战斗按键第一页面。</li>
@@ -3145,7 +3295,7 @@
 <li><code>DEFENDING</code> 敌人回合。</li>
 <li><code>DIALOGUERESULT</code> 行动、物品选择之后会进入此状态等待旁白文本。 <u>注意拼写是 <code>DIALOGUE</code> ，不是 <code>DIALOG</code> 。</u></li>
 <li><code>TRYINGFLEE</code> 在按下 <code>Flee</code> 后瞬间执行。</li>
-<li><code>FLEEING</code> 按下 <code>Flee</code> 成功后持续执行，直到战斗结束，也可以通过手段拉回到 <code>DEFENDING</code> 状态。</li>
+<li><code>FLEEING</code> 按下 <code>Flee</code> 成功后持续执行，直到战斗结束，也可切换回 <code>DEFENDING</code> 状态。</li>
 <li><code>WIN</code> 战斗胜利。会播放胜利文本、隐藏灵魂，文本播完后淡出并切到结算场景。</li>
 </ul>
 

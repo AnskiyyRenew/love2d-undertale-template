@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2202,6 +2322,8 @@
       
         
       
+        
+      
     
     
     
@@ -2406,6 +2528,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2704,7 +2854,7 @@
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑
+        常见问题
       
     </span>
   </a>
@@ -3094,7 +3244,7 @@
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        坑
+        常见问题
       
     </span>
   </a>
@@ -3165,13 +3315,13 @@
 <span class="c1">-- -&gt; &quot;* 你回复了12HP!&quot;</span>
 </code></pre></div>
 <h3 id="_2">多个占位符<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>按顺序填，顺序错了文本就串味：</p>
+<p>按顺序填入，顺序错误会导致文本错乱：</p>
 <div class="highlight"><pre><span></span><code><span class="nt">&quot;Battle.WinTexts1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;* 你赢了！[wait:0.5]\n* 你获得了 %s XP 和 %s 金钱。\n&quot;</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.WinTexts1&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nv">exp</span><span class="p">,</span><span class="w"> </span><span class="nv">gold</span><span class="p">})</span>
 </code></pre></div>
 <h3 id="_3">单个值不用包表<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>传的不是表，引擎会自己包一层：</p>
+<p>传入非表值时，引擎会自动包一层表：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.HP.NotFull&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 等价于 {12}</span>
 </code></pre></div>
 <div class="admonition warning">
@@ -3179,8 +3329,8 @@
 <p><code>string.format</code> 失败时（参数不够、类型不对、多了 <code>%</code> ）引擎<strong>不报错</strong>，
 只打印一行 <code>[L10N WARNING] string.format failed for key: ...</code> ，
 然后<strong>原样返回带 <code>%s</code> 的字符串</strong>。玩家会看到字面量的 <code>%s</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.HP.NotFull&quot;</span><span class="p">)</span><span class="w">       </span><span class="c1">-- 忘了传参数</span>
-<span class="c1">-- -&gt; &quot;* 你回复了%sHP!&quot;   ← 原样出来，占位符没被替掉</span>
+<div class="highlight"><pre><span></span><code><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.HP.NotFull&quot;</span><span class="p">)</span><span class="w">       </span><span class="c1">-- 未传参数</span>
+<span class="c1">-- -&gt; &quot;* 你回复了%sHP!&quot;   ← 原样返回，占位符未被替换</span>
 </code></pre></div>
 </div>
 <hr />
@@ -3226,8 +3376,8 @@
 </div>
 <hr />
 <h2 id="_5">动态拼键<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>键可以在运行时拼出来，这是给"每个敌人/每个动作配不同文本"用的。
-引擎的战斗场景就是这么做的：</p>
+<p>键可以在运行时拼接，用于为每个敌人/每个动作配置不同文本。
+引擎的战斗场景采用该方式：</p>
 <div class="highlight"><pre><span></span><code><span class="c1">-- Scripts/Scenes/Battle/scene_battle_init.lua:24</span>
 <span class="nv">Battle</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span>
 <span class="w">    </span><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;Battle.Actions.Texts.&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">enemy</span><span class="p">.</span><span class="py">id</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">action</span><span class="p">.</span><span class="py">id</span><span class="p">),</span>
@@ -3353,11 +3503,11 @@
 <div class="admonition example">
 <p class="admonition-title">给自己的敌人加翻译</p>
 <ol>
-<li>在 <code>Game/Encounter/&lt;你的敌人&gt;.lua</code> 里写 <code>Localize.localizeText("Battle.EnemiesName.Sol")</code></li>
-<li>在 <code>Game/Localization/&lt;语言&gt;.json</code> 里加 <code>"Battle.EnemiesName.Sol": "索尔"</code></li>
+<li>在 <code>Game/Encounter/&lt;敌人名&gt;.lua</code> 中调用 <code>Localize.localizeText("Battle.EnemiesName.Sol")</code></li>
+<li>在 <code>Game/Localization/&lt;语言&gt;.json</code> 中加入 <code>"Battle.EnemiesName.Sol": "索尔"</code></li>
 <li>F2 重载</li>
 </ol>
-<p>键名随便起，只要两边对得上；但<strong>跟着引擎的前缀走</strong>更容易维护。</p>
+<p>键名只要两侧一致即可；沿用引擎的前缀便于维护。</p>
 </div>
 <hr />
 <h2 id="_7">缺键会怎样<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
@@ -3370,13 +3520,12 @@
 <div class="highlight"><pre><span></span><code><span class="c1">-- 战斗里：nil 直接进了打字机</span>
 <span class="nv">Battle</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">(</span><span class="nv">Localize</span><span class="p">.</span><span class="nf">localizeText</span><span class="p">(</span><span class="s2">&quot;...&quot;</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;ACTIONSELECT&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p><code>Typers.EText.New(nil, ...)</code> 后面遍历文本时会炸 —— 表现是"按下去才崩"，
-而不是安静地显示空白。所以终端里看到 <code>Missing localization key</code> 别当噪音，
-那是<strong>即将崩溃或显示异常</strong>的信号。</p>
+<p><code>Typers.EText.New(nil, ...)</code> 在后续遍历文本时会抛出错误，表现为按键之后才出错，
+而不是显示空白。终端中出现 <code>Missing localization key</code> 是<strong>崩溃或显示异常</strong>的信号。</p>
 <div class="admonition warning">
 <p class="admonition-title">每帧查词会把警告刷满</p>
 <p>菜单类代码每帧重绘、每帧查词，缺一个键就是每秒 60 行警告。
-要么补上键，要么像虚拟键盘那样自己缓存结果。</p>
+需要补上该键，或像虚拟键盘那样自行缓存结果。</p>
 </div>
 <hr />
 <h2 id="_8">打字机标签原样透传<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
@@ -3432,18 +3581,18 @@
 </table>
 <div class="admonition note">
 <p class="admonition-title">它是唯一带内置兜底词表的模块</p>
-<p>别的模块缺键就是 <code>nil</code> ，虚拟键盘缺键会退到 <code>LABEL_SETS.en</code> ，
-最多显示英文，不会崩。想改它的文案，往 JSON 里加 <code>VirtualKeyboard.&lt;key&gt;</code> 即可。</p>
+<p>其他模块缺键时返回 <code>nil</code> ，虚拟键盘缺键会回退到 <code>LABEL_SETS.en</code> ，
+最多显示英文，不会崩溃。修改其文案时，在 JSON 中加入 <code>VirtualKeyboard.&lt;key&gt;</code> 即可。</p>
 </div>
 <hr />
-<h2 id="_10">坑<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<h2 id="_10">常见问题<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">值是数字/布尔会返回 nil</p>
 <p>只有 <code>string</code> 和 <code>table</code> 合法。写 <code>"Battle.Foo": 123</code> 会打印
 <code>Invalid localization value for key: ...</code> 并返回 <code>nil</code> 。</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">JSON 里别写尾部逗号、别写注释</p>
+<p class="admonition-title">JSON 中不要写尾部逗号与注释</p>
 <p>dkjson 对宽松 JSON 的容忍度有限（它支持 <code>//</code> 和 <code>/* */</code> 注释，
 但尾部逗号不行）。解析失败会回退到 <code>en</code> 并打印位置信息：</p>
 <div class="highlight"><pre><span></span><code>[L10N WARNING] Invalid language file.
@@ -3453,9 +3602,9 @@
 <p>用那个 <code>position</code> 直接定位字符。</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">改了翻译没生效？按这个顺序查</p>
+<p class="admonition-title">修改翻译未生效的排查顺序</p>
 <ol>
-<li>终端那行 <code>using language: xxx (路径)</code> 指的是不是你改的那份文件</li>
+<li>终端那行 <code>using language: xxx (路径)</code> 是否为所修改的文件</li>
 <li>是不是改完没按 <strong>F2</strong></li>
 <li>JSON 是不是解析失败了（会有 <code>Invalid language file</code> 警告）</li>
 <li>键名是不是拼错了（会有 <code>Missing localization key</code> 警告）</li>

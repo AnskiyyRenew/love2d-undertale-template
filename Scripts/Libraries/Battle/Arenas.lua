@@ -33,6 +33,28 @@ local function clamp(value, min, max)
     return math.max(min, math.min(value, max))
 end
 
+-- Drop a single arena's mask from arenas.stencils without touching the others.
+-- A plus arena registers its mask on New(); Destroy() calls this so the array
+-- only ever holds masks that belong to a live arena.
+--
+-- The array is mutated in place rather than replaced: minus arenas capture it by
+-- reference (SetStencils copies the mask objects, not the table), so a fresh
+-- table would leave existing sprites pointing at a dead list. Flagging
+-- isactive = false additionally neutralises those older copies, since
+-- Masks.Draw skips inactive masks.
+local function unregister_mask(mask)
+    if (not mask) then return end
+
+    mask.isactive = false
+
+    for i = #arenas.stencils, 1, -1
+    do
+        if (arenas.stencils[i] == mask) then
+            table.remove(arenas.stencils, i)
+        end
+    end
+end
+
 -- Returns the half-extent (half-width, half-height) of a sprite based on its
 -- image size and current scale. The player heart is 16x16 at scale 1, so the
 -- default is (8, 8); when yscale shrinks (crouch), the y half shrinks with it.
@@ -552,6 +574,8 @@ function arenas.New(mode, shape, x, y, width, height, angle)
         LuaEX.rmVarTable(arenas.insts, arena)
         arena.white:Destroy()
         arena.black:Destroy()
+        unregister_mask(arena.mask)
+        arena.mask = nil
     end
 
     table.insert(arenas.insts, arena)
@@ -694,13 +718,32 @@ function arenas.Clear()
         end
     end
 
-    -- Drop every mask the destroyed arenas registered. A plus arena pushes its
-    -- mask into arenas.stencils on New(); without this reset the array would
-    -- keep growing wave after wave, and Masks.Draw(arenas.stencils) would
-    -- re-write every stale mask into the stencil buffer every frame -- so a
-    -- large mask from a previous wave would keep clipping the current wave's
-    -- bullets long after that arena was gone.
-    arenas.stencils = {}
+    -- Only the masks of the arenas that were actually destroyed go away:
+    -- Destroy() unregisters each one individually. insts[1] is the main battle
+    -- box and deliberately outlives Clear(), so its plus mask has to survive --
+    -- blanking arenas.stencils outright dropped that mask too, which is why the
+    -- box stopped clipping bullets after the first turn.
+    --
+    -- The array is rebuilt in place instead of being replaced by a new table so
+    -- minus arenas that already captured it stay in sync.
+    local alive = {}
+
+    for _, a in ipairs(arenas.insts)
+    do
+        if (a.mask) then
+            table.insert(alive, a.mask)
+        end
+    end
+
+    for i = #arenas.stencils, 1, -1
+    do
+        arenas.stencils[i] = nil
+    end
+
+    for i, m in ipairs(alive)
+    do
+        arenas.stencils[i] = m
+    end
 end
 
 return arenas

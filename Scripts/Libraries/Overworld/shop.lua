@@ -191,6 +191,7 @@ gwhite:Scale(212, 170)
 gwhite.x = 640 - gwhite.xscale / 2
 local gblack = Sprites.CreateSprite("px.png", -2)
 gblack.x = gwhite.x
+gblack.y = gwhite.y
 gblack:Scale(202, 160)
 gblack.color = {0, 0, 0}
 

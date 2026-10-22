@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2324,6 +2444,8 @@
       
         
       
+        
+      
     
     
     
@@ -2528,6 +2650,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3020,7 +3170,7 @@
 
   <h1>回合脚本</h1>
 
-<p>敌人回合里发生的一切，都写在<strong>回合脚本</strong>（ <code>Wave</code> ）里：弹幕怎么出、什么时候出、出完什么时候结束。</p>
+<p>敌人回合的全部内容写在<strong>回合脚本</strong>（ <code>Wave</code> ）中：弹幕的生成方式、生成时机以及结束条件。</p>
 <p>路径： <code>Game/Waves/</code> （Game 区，优先）、 <code>Scripts/Waves/</code> （引擎默认，兜底）。<br>
 名字的解析规则见 <a href="../000_init/index.html">战斗初始化 → 回合脚本</a> 。</p>
 <hr />
@@ -3043,7 +3193,7 @@ Battle.Defending()
 <div class="admonition tip">
 <p class="admonition-title">顶层代码只跑一次</p>
 <p>波次文件是被 <code>require</code> 进来的，<strong>顶层代码只在加载时执行一次</strong>。<br>
-"每一帧要做的事"必须写进 <code>wave.Update</code> 里；"进回合时初始化一次"的东西则写在顶层。</p>
+每帧执行的代码必须写进 <code>wave.Update</code> ；进回合时初始化一次的内容写在顶层。</p>
 </div>
 <p><img alt="BA-05" src="../../img/030_battle_system/ba_05_wave_running.png" /></p>
 <hr />
@@ -3074,26 +3224,26 @@ Battle.Defending()
 
 <span class="kr">return</span><span class="w"> </span><span class="nv">wave</span>
 </code></pre></div>
-<p>第一行是固定的： <code>ImportFile("Battle.Waves")</code> 拿到的是<strong>所有波次共享的那个表</strong>，引擎靠它来收尾。</p>
+<p>第一行是固定的： <code>ImportFile("Battle.Waves")</code> 返回<strong>所有波次共享的表</strong>，引擎通过它收尾。</p>
 <hr />
 <h2 id="_3">波次可用方法<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="admonition example">
 <p class="admonition-title">波次方法</p>
 <ul>
 <li><code>EndWave()</code> 结束本回合。会销毁 <code>wave.objects</code> 里的所有对象、清掉 <code>wave.Import</code> 导入过的库缓存，并把 <code>ENDED</code> 置为 <code>true</code> 。</li>
-<li><code>Import(path)</code> 导入一个引擎库，出错时只打印不崩。<ul>
+<li><code>Import(path)</code> 导入一个引擎库，出错时仅打印错误信息，不中断运行。<ul>
 <li><code>path</code> 库路径，例如 <code>"Attacks.Bones"</code> 。</li>
 </ul>
 </li>
-<li><code>objects</code> 你自己往里塞的表。 <code>EndWave</code> 会自动销毁里面的所有东西，省得手写清理。</li>
-<li><code>Update(dt)</code> <strong>由你定义</strong>，引擎每帧调用。</li>
+<li><code>objects</code> 存放本回合创建对象的表。 <code>EndWave</code> 会自动销毁其中的所有对象，无需手动清理。</li>
+<li><code>Update(dt)</code> <strong>由波次文件定义</strong>，引擎每帧调用。</li>
 <li><code>ENDED</code> 本回合是否已结束（引擎会读它）。</li>
 </ul>
 </div>
 <div class="admonition example">
 <p class="admonition-title">波次里常用的全局量</p>
 <ul>
-<li><code>Battle.mainarena</code> 主战斗框，想改形状就改它（详见 <a href="../020_arena/index.html">战斗框</a> ）。</li>
+<li><code>Battle.mainarena</code> 主战斗框，修改形状时改动该对象（详见 <a href="../020_arena/index.html">战斗框</a> ）。</li>
 <li><code>Battle.TIME_F</code> 从战斗开始到现在过了多少<strong>帧</strong>。</li>
 <li><code>Battle.TIME_R</code> 从战斗开始到现在过了多少<strong>秒</strong>。</li>
 <li><code>Player.canMove</code> 玩家能不能操作灵魂，开场记得设回 <code>true</code> 。</li>
@@ -3106,12 +3256,12 @@ Battle.Defending()
 <p class="admonition-title">弹幕库不是全局量</p>
 <p><code>Bones</code> 、 <code>Blasters</code> 都<strong>没有</strong>挂在全局上，直接用会拿到 <code>nil</code> 。<br>
 <code>Bones</code> 用波次自己的 <code>wave.Import("Attacks.Bones")</code> 拿；<br>
-<code>Blasters</code> 需要<strong>战斗场景</strong>自己 <code>ImportFile("Attacks.Blasters")</code> 并挂成全局（引擎自带的 <code>scene_battle_init.lua</code> 、 <code>scene_battle_template.lua</code> 就是这么做的），这样波次里才见得到它。</p>
+<code>Blasters</code> 需要<strong>战斗场景</strong>自行 <code>ImportFile("Attacks.Blasters")</code> 并挂成全局（引擎自带的 <code>scene_battle_init.lua</code> 、 <code>scene_battle_template.lua</code> 即采用该方式），波次中才能访问到它。</p>
 </div>
 <div class="admonition danger">
 <p class="admonition-title">改过的东西要记得还原</p>
 <p><code>Player.canMove</code> 、 <code>Player.SetSoul</code> 、战斗框尺寸这些东西<strong>不会</strong>在回合结束时自动恢复。<br>
-一个波次里把灵魂换成了蓝色，下一个波次如果没换回来，玩家就还是蓝色的。养成在每个波次开头显式设置一次的习惯。</p>
+一个波次里把灵魂换成了蓝色，下一个波次若未换回，玩家仍为蓝色灵魂。在每个波次开头显式设置一次可避免该问题。</p>
 </div>
 <hr />
 <h2 id="_4">生成弹幕<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
@@ -3142,7 +3292,7 @@ Battle.Defending()
 <p>关于骨头与追踪炮的完整方法列表，见 <a href="../060_bullets/index.html">弹幕库</a> 。</p>
 <hr />
 <h2 id="_5">自己做弹幕<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>不用弹幕库也完全可以。任何一张贴图，只要 <code>isBullet = true</code> ，就会被纳入玩家碰撞判定：</p>
+<p>不使用弹幕库同样可以创建弹幕。任何一张贴图，只要 <code>isBullet = true</code> ，就会被纳入玩家碰撞判定：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">bullet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;bullet.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bullets&quot;</span><span class="p">)</span>
 <span class="nv">bullet</span><span class="p">:</span><span class="nf">Scale</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
 <span class="nv">bullet</span><span class="p">:</span><span class="nf">MoveTo</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">)</span>
@@ -3151,12 +3301,12 @@ Battle.Defending()
 <span class="nb">table.insert</span><span class="p">(</span><span class="nv">wave</span><span class="p">.</span><span class="py">objects</span><span class="p">,</span><span class="w"> </span><span class="nv">bullet</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition warning">
-<p class="admonition-title">别忘了塞进 wave.objects</p>
-<p>不塞进去的话， <code>EndWave</code> 不会销毁它，它会一直留在屏幕上下一个回合还看得见。</p>
+<p class="admonition-title">需将弹幕加入 wave.objects</p>
+<p>未加入时， <code>EndWave</code> 不会销毁该弹幕，它会保留在屏幕上，下一个回合仍然可见。</p>
 </div>
 <hr />
 <h2 id="_6">多段波次<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>一个回合想分几段演出，用 <code>time</code> 做状态机是最直接的做法：</p>
+<p>一个回合分为多段演出时，可使用 <code>time</code> 作为状态机：</p>
 <details class="example">
 <summary>三段式波次</summary>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">wave</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ImportFile</span><span class="p">(</span><span class="s2">&quot;Battle.Waves&quot;</span><span class="p">)</span>
@@ -3202,7 +3352,7 @@ Battle.Defending()
 <li><code>Battle.waveModule</code> 上一次实际加载成功的模块全名，例如 <code>Game.Waves.bones.wave1</code> ，可以用来确认 Game 区覆盖有没有生效。</li>
 </ul>
 </div>
-<p>引擎在回合结束时会自动清一次，所以正常游玩不用管它。只有<strong>调试时改了波次文件却没生效</strong>，才需要手动处理。</p>
+<p>引擎在回合结束时会自动清理一次，正常游玩无需处理。仅当<strong>调试时修改了波次文件但未生效</strong>，才需要手动清理缓存。</p>
 
 
 

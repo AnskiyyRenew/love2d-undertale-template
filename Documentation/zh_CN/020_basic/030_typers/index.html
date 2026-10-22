@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -904,8 +1024,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ccadd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CCAdd 浮动文字
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        测量文本尺寸
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2308,6 +2450,8 @@
       
         
       
+        
+      
     
     
     
@@ -2512,6 +2656,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2964,8 +3136,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ccadd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CCAdd 浮动文字
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        测量文本尺寸
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2990,11 +3184,12 @@
 
 <p>打字机位置： <code>Scripts/Libraries/Typers/</code> 文件夹。</p>
 <p>打字机一共分为四种： <code>InstText</code> 只负责把整段文字直接画出来，剩下三种 <code>EText</code> / <code>NText</code> / <code>SText</code> 都可以正常逐个打字。</p>
-<p>屏幕上所有文本均可以通过打字机进行绘制，但我们也有额外方式，在下一页会说。</p>
+<p>屏幕上所有文本均可通过打字机绘制，其他绘制方式见下一页。</p>
 <hr />
 <h2 id="_1">创建打字机<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>三种<strong>逐字打字</strong>的打字机是按"标签怎么处理"来分的，分别是 <code>EText</code> 、 <code>NText</code> 和 <code>SText</code> 。</p>
+<p>三种<strong>逐字打字</strong>的打字机按标签的处理方式区分，分别是 <code>EText</code> 、 <code>NText</code> 和 <code>SText</code> 。</p>
 <p>第四种 <code>InstText</code> 不带打字动画，用法和它们差别较大，单独放在本节最后。</p>
+<p>此外 <code>Typers.CCAdd</code> 基于 <code>InstText</code> 提供带动画的浮动文字，同样放在本节最后。</p>
 <hr />
 <h3 id="etext">EText 打字机<a class="headerlink" href="#etext" title="Permanent link">&para;</a></h3>
 <p><code>EText</code> 全称 <code>Easy Text</code> ，特点是样式写在文本中，类似于 <code>bbcode</code> 。</p>
@@ -3022,15 +3217,15 @@
 <summary>所有标签</summary>
 <ul>
 <li><code>[wait:x]</code> 让打字机等待 <code>x</code> 秒，只允许直接输入数字，不允许输入算式例如 <code>1 / 2</code> 。<ul>
-<li>等待走的是<strong>自己的计时器</strong>，所以后面再出现 <code>[speed:]</code> 也吞不掉这段暂停。</li>
+<li>等待使用<strong>独立的计时器</strong>，后续出现的 <code>[speed:]</code> 不会覆盖这段暂停。</li>
 <li>玩家按取消键快进，或者这一句带 <code>[skip]</code> 时，等待会被直接跳过，剩下的字立刻打出来。</li>
 </ul>
 </li>
 <li><code>[speed:x]</code> 将打字机的打字间隔设置为 <code>x</code> 秒，只允许直接输入数字，不允许输入算式。默认此值为 <code>1/15=0.0667</code> 秒。</li>
-<li><code>[size:x]</code> 把<strong>后面</strong>的文字字号改成 <code>x</code> ，只允许直接输入数字。已经打出来的字会保持创建时的字号，所以屏幕上的文本不会"回溯"着变小变大。bondfont 不会因此关闭，每个字的缩放与字距依旧生效。</li>
+<li><code>[size:x]</code> 把<strong>后面</strong>的文字字号改成 <code>x</code> ，只允许直接输入数字。已打出的字保持创建时的字号，屏幕上的文本不会改变字号。bondfont 不会因此关闭，每个字的缩放与字距依旧生效。</li>
 <li><code>[colorRGB:r, g, b]</code> 使用RGB格式设置字符颜色 <code>（0 ~ 255）</code> 。</li>
 <li><code>[colorHEX:rrggbb]</code> 使用十六进制设置字符颜色 <code>（00 ~ ff）</code> 。</li>
-<li><code>[font:x]</code> 将字体设置为 <code>x</code> 。路径从 <code>Resources/Fonts/</code> 开始算，但<strong>会先查 <code>Game/Resources/Fonts/</code></strong> ，同名文件 Game 区优先。设置字体会顺手关掉 bondfont，想恢复得自己再开。</li>
+<li><code>[font:x]</code> 将字体设置为 <code>x</code> 。路径从 <code>Resources/Fonts/</code> 开始算，但<strong>会先查 <code>Game/Resources/Fonts/</code></strong> ，同名文件 Game 区优先。设置字体会关闭 bondfont，恢复需重新启用。</li>
 <li><code>[effect:name, int]</code> 设置字符的特效。<ul>
 <li><code>name</code> 特效的名字： <code>shake</code> 原地颤动、 <code>rotate</code> 进行轻微旋转，其他名字等于没有特效。</li>
 <li><code>int</code> 特效强度，默认 <code>1</code> ，数字越大强度越大。</li>
@@ -3053,12 +3248,12 @@
 <li><code>[skip]</code> 本句话进行快进，不需要值。快进会跳过所有 <code>[wait:]</code> 等待。</li>
 <li><code>[noskip]</code> 禁止这一句被取消键快进，和 <code>[skip]</code> 正好相反。</li>
 <li><code>[next]</code> 这句打完立刻翻到下一句，不用等玩家按确认键， <code>manual</code> 模式下同样生效。<ul>
-<li>气泡属于"显示它的那一句"，所以 <code>[next]</code> 会把气泡和文本一起清掉；下一句想继续用气泡得重新 <code>[showbubble:]</code> 。</li>
+<li>气泡属于显示它的那一句，因此 <code>[next]</code> 会把气泡和文本一起清掉；下一句需要气泡时需重新使用 <code>[showbubble:]</code> 。</li>
 </ul>
 </li>
 <li><code>[showbubble:dir, pos]</code> 显示气泡对话框。 <code>dir</code> 是尾巴朝向，可取 <code>left</code> / <code>right</code> / <code>up</code> / <code>down</code> （默认 <code>left</code> ）； <code>pos</code> 是尾巴沿着边框的位置 <code>0 ~ 1</code> ，默认 <code>0.5</code> 。</li>
 <li><code>[hidebubble]</code> 隐藏气泡对话框。</li>
-<li><code>[func:name]</code> 调用名为 <code>name</code> 的函数。<strong>查表顺序</strong>：先查本打字机的 <code>funcs</code> 注册表（用 <code>typer:SetFunc</code> 注册过），未命中再回退到 <code>_G[name]</code> 全局。所以 local / 闭包 / upvalue 函数，只要先用 <code>:SetFunc</code> 注册过，也能从文本里调到，不必再挂到全局污染命名空间。</li>
+<li><code>[func:name]</code> 调用名为 <code>name</code> 的函数。<strong>查表顺序</strong>：先查本打字机的 <code>funcs</code> 注册表（用 <code>typer:SetFunc</code> 注册过），未命中再回退到 <code>_G[name]</code> 全局。local / 闭包 / upvalue 函数只要通过 <code>:SetFunc</code> 注册过，也能从文本中调用，无需挂到全局命名空间。</li>
 <li><code>[func:name|a, b, c]</code> 调用名为 <code>name</code> 的函数，并可以进行传参操作，使用英文逗号进行分割。查表顺序同上。<ul>
 <li>数字字符串会自动 <code>tonumber</code> 转成数字；其他参数按字符串原样传入。</li>
 <li>函数执行报错会被 <code>pcall</code> 包住，只打印 <code>[EText] func callback error: ...</code> 不会中断打字。</li>
@@ -3071,23 +3266,23 @@
 <div class="admonition example">
 <p class="admonition-title">实例方法</p>
 <ul>
-<li><code>typer:SetFunc(name, fn)</code> 注册函数 <code>fn</code> 到本打字机的 <code>funcs</code> 表里，让 <code>[func:name]</code> 能调到 local / 闭包 / upvalue。<ul>
+<li><code>typer:SetFunc(name, fn)</code> 注册函数 <code>fn</code> 到本打字机的 <code>funcs</code> 表里，使 <code>[func:name]</code> 可调用 local / 闭包 / upvalue 函数。<ul>
 <li><code>name</code> 字符串名（与文本里 <code>[func:name]</code> 对应）；空串或非字符串直接返回。</li>
 <li><code>fn</code> 是 <code>function</code> 时注册；传 <code>nil</code> 时<strong>清掉</strong>该名字的条目。</li>
 <li>返回 typer 自身，支持链式： <code>t:SetFunc("shake", shake):SetFunc("heal", heal)</code>。</li>
-<li><strong>注册时机</strong>：必须在文本扫到 <code>[func:]</code> 标签<strong>之前</strong>完成——通常建完 typer 立即注册即可。</li>
-<li>旧的全局函数写法仍兼容（<code>_G[name]</code> 兜底），既有文本不用改。</li>
+<li><strong>注册时机</strong>：必须在文本扫描到 <code>[func:]</code> 标签<strong>之前</strong>完成，通常在创建 typer 后立即注册。</li>
+<li>旧的全局函数写法仍兼容（<code>_G[name]</code> 兜底），既有文本无需修改。</li>
 </ul>
 </li>
 </ul>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">标签可以连着写</p>
-<p><code>[font:x][colorHEX:ffff00][effect:shake, 2]</code> 这样连着排是没问题的，效果依次叠加。</p>
+<p class="admonition-title">多个标签可连续排列</p>
+<p>例如 <code>[font:x][colorHEX:ffff00][effect:shake, 2]</code> ，效果依次叠加。</p>
 </div>
 <hr />
 <h3 id="ntext">NText 打字机<a class="headerlink" href="#ntext" title="Permanent link">&para;</a></h3>
-<p><code>NText</code> 全称 <code>Neutral Text</code> ，特点是样式写在样式表中，和文本单独分割开来，这样会更方便进行文本的修改。</p>
+<p><code>NText</code> 全称 <code>Neutral Text</code> ，特点是样式写在样式表中，与文本分离，修改文本时不影响样式。</p>
 <p>使用 <code>Typers.NText.New(text, position, layer, size, opts, mode)</code> 来创建一个 <code>ntext</code> 模式的打字机。</p>
 <ul>
 <li><code>text</code> 要打的文本，可以使用字符串或表，若使用表则会将文本分开为可翻页类型。</li>
@@ -3122,7 +3317,7 @@
 <li><code>outline</code> 文本的外边框，使用 <code>{r, g, b, a, t}</code> 格式。</li>
 <li><code>scale</code> 文本的放大倍数，默认为 <code>1</code> 。中文之类的宽字符由 <code>bondfont</code> 自动处理，会以 <code>2</code> 倍绘制。</li>
 <li><code>autowrap</code> 是否自动换行。</li>
-<li><code>wait</code> 暂停多少秒再继续。和 <code>[wait:x]</code> 一样走<strong>独立计时器</strong>，后续样式盖不掉它，快进时会被跳过。</li>
+<li><code>wait</code> 暂停多少秒再继续。与 <code>[wait:x]</code> 一样使用<strong>独立计时器</strong>，后续样式不会覆盖，快进时会被跳过。</li>
 <li><code>effect</code> 字符特效，格式 <code>{name = "shake", intensity = 3}</code> 。</li>
 <li><code>voice</code> 单个打字音效文件名，放在 <code>Resources/Sounds/Voices/</code> 下。</li>
 <li><code>voices</code> 打字音效列表，每个字符随机挑一个播。</li>
@@ -3145,7 +3340,7 @@
 </details>
 <hr />
 <h3 id="stext">SText 打字机<a class="headerlink" href="#stext" title="Permanent link">&para;</a></h3>
-<p><code>SText</code> 全称 <code>Sequence Text</code> 序列打字机，特点是文本是在打字过程中逐渐拼接起来的，非常适合 <strong>有多个检测条件</strong> 的情况。</p>
+<p><code>SText</code> 全称 <code>Sequence Text</code> 序列打字机，特点是文本在打字过程中逐渐拼接，适用于 <strong>存在多个检测条件</strong> 的情况。</p>
 <div class="admonition example">
 <p class="admonition-title">使用案例</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
@@ -3167,11 +3362,11 @@
 <ul>
 <li><code>self:addText(text)</code> 给当前句子添加文本。</li>
 <li><code>self:addSkipText(text)</code> 添加需要被<strong>瞬间打出</strong>的文本（快进时立刻出现）。</li>
-<li><code>self:setFont(name)</code> 设置字体。设置字体会顺手关掉 <code>bondfont</code> ，想恢复得自己再开。</li>
-<li><code>self:setWaitTime(time)</code> 暂停多少秒再继续。走<strong>独立计时器</strong>，后面的 <code>setSpeed</code> 吞不掉它，快进时会被跳过。</li>
+<li><code>self:setFont(name)</code> 设置字体。设置字体会关闭 <code>bondfont</code> ，恢复需重新启用。</li>
+<li><code>self:setWaitTime(time)</code> 暂停多少秒再继续。使用<strong>独立计时器</strong>，后续的 <code>setSpeed</code> 不会覆盖，快进时会被跳过。</li>
 <li><code>self:setSpeed(interval)</code> 设置打字间隔时间（秒）。</li>
 <li><code>self:setEffect(name, intensity)</code> 设置字符特效， <code>name</code> 填 <code>shake</code> 或 <code>rotate</code> ， <code>intensity</code> 默认 <code>1</code> 。</li>
-<li><code>self:setColor(r, g, b)</code> 设置颜色， <code>0 ~ 1</code> 或 <code>0 ~ 255</code> 引擎会自动识别。</li>
+<li><code>self:setColor(r, g, b)</code> 设置颜色，取值为 <code>0 ~ 1</code> 或 <code>0 ~ 255</code> ，引擎自动识别。</li>
 <li><code>self:setColorHEX(hex)</code> 以十六进制形式设置颜色，例如 <code>"ff0000"</code> 。</li>
 <li><code>self:setOutline(r, g, b, a, t)</code> 文本边框，会以 8 个方向的偏移副本画在字后面。</li>
 <li><code>self:setVoices(voices)</code> 设置打字音效，可以传一个文件名，也可以传一串。</li>
@@ -3184,7 +3379,7 @@
 <hr />
 <h3 id="insttext">InstText 打字机<a class="headerlink" href="#insttext" title="Permanent link">&para;</a></h3>
 <p><code>InstText</code> 全称 <code>Instant Text</code> ，特点是<strong>没有打字动画</strong>：创建的一瞬间整段文字就已经画在屏幕上了。</p>
-<p>它适合<strong>长期存在、又不需要逐字出现</strong>的文字——战斗菜单按钮、商店里的金钱读数、状态栏这类。因为它把每个字符预先渲染成一张贴图并<strong>跨实例缓存</strong>，同一段字画多久都不额外花性能，比每帧跑一次 <code>printf</code> 划算。</p>
+<p>适用于<strong>长期存在且不需要逐字出现</strong>的文字，例如战斗菜单按钮、商店金钱读数、状态栏。每个字符预先渲染为一张贴图并<strong>跨实例缓存</strong>，显示时长不产生额外的渲染开销，无需每帧调用 <code>printf</code> 。</p>
 <p>使用 <code>Typers.InstText.New(text, position, layer, size)</code> 创建。</p>
 <ul>
 <li><code>text</code> 要显示的文本。传表只会取<strong>第 <code>1</code> 项</strong>；想换行得自己写 <code>\n</code> （或者打开自动换行）。</li>
@@ -3209,14 +3404,15 @@
 <li><code>SetText(new_text)</code> 换文字。会重新预渲染，<strong>不会</strong>动颜色。</li>
 <li><code>SetAlign(mode)</code> 对齐方式， <code>"left"</code> （默认） / <code>"center"</code> / <code>"right"</code> 。对齐是按整行宽度相对 <code>position</code> 算的。</li>
 <li><code>Rebuild()</code> 强制重排一次。手动改了 <code>size</code> 或 <code>auto_wrap</code> 之后要自己调它。</li>
-<li><code>SetColor(r, g, b)</code> 改颜色， <code>0 ~ 1</code> 或 <code>0 ~ 255</code> 都认。</li>
+<li><code>SetColor(r, g, b)</code> 改颜色， <code>0 ~ 1</code> 或 <code>0 ~ 255</code> 均可。</li>
 <li><code>UseBondFont(config)</code> 换一套中英字体配置，结构同 <code>EText</code> 的 bondfont。</li>
 <li><code>Destroy()</code> / <code>Remove()</code> 销毁。会把字符从缓存里减一次引用，<strong>可以重复调用</strong>。</li>
-<li><code>t.font</code> / <code>t.fontsize</code> 这两个属性是直接写的，写上去会顺手重排一次，不用自己 <code>Rebuild()</code> 。</li>
+<li><code>GetWidth()</code> / <code>GetHeight()</code> 最宽一行的宽度，以及所有行的总高度，见文末「测量文本尺寸」小节。</li>
+<li><code>t.font</code> / <code>t.fontsize</code> 这两个属性可直接赋值，赋值后会自动重排，无需调用 <code>Rebuild()</code> 。</li>
 </ul>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">颜色是烤进字符里的：先改色，再改字</p>
+<p class="admonition-title">颜色预渲染在字符中：先改色，再改字</p>
 <p><code>InstText</code> 把每个字符预先渲染成贴图，绘制时不再重新上色。所以顺序必须是
 <code>SetColor</code> → <code>SetText</code> （或 <code>SetColor</code> → <code>Rebuild()</code> ）。
 反过来先换字再改色，屏幕上不会有任何变化。</p>
@@ -3228,21 +3424,142 @@
 <span class="nv">t</span><span class="p">:</span><span class="nf">Rebuild</span><span class="p">()</span><span class="w">          </span><span class="c1">-- ← 改完 auto_wrap / size 必须自己重排</span>
 </code></pre></div>
 <ul>
-<li>默认<strong>关</strong>。不打开就永远只排一行，所以引擎里已有的调用一个字都不会跑版。</li>
-<li>打开后按 <code>size[1]</code> 折行，规则和 <code>EText</code> / <code>NText</code> 一致：英文<strong>按单词</strong>折（整个单词推到下一行，不会切一半），中文等宽字符<strong>逐字</strong>折；单个词本身比盒子还宽时才会硬断。</li>
-<li>它和 <code>EText</code> 一样<strong>不认方括号标签</strong>， <code>[wait:]</code> 之类会原样画成文字。</li>
+<li>默认<strong>关闭</strong>。关闭时只排一行，引擎内已有的调用不受影响。</li>
+<li>打开后按 <code>size[1]</code> 折行，规则与 <code>EText</code> / <code>NText</code> 一致：英文<strong>按单词</strong>折（整个单词推到下一行，不会切一半），中文等宽字符<strong>逐字</strong>折；单个词本身比盒子还宽时才会硬断。</li>
+<li>它和 <code>EText</code> 一样<strong>不解析方括号标签</strong>， <code>[wait:]</code> 之类会原样画成文字。</li>
 </ul>
 </div>
 <div class="admonition note">
-<p class="admonition-title">它不需要每帧更新</p>
+<p class="admonition-title">无需每帧更新</p>
 <p><code>InstText</code> 把自己注册进图层，由 <code>Layers</code> 直接绘制，<strong>不走 <code>Typers.Update</code></strong>，
-所以 <code>love.update</code> 里不用管它——改完内容它自己会重画。</p>
+因此 <code>love.update</code> 中无需处理；修改内容后会自动重绘。</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">记得自己销毁</p>
-<p><code>Layers.clear()</code> / <code>Typers.ClearAll()</code> 会把它一起清掉，但<strong>随手 <code>Destroy()</code> 最保险</strong>。
-反复创建却不销毁，缓存里的字符贴图只会一直涨。
-<code>Typers.InstText.ClearCache()</code> 能一刀清空全部字符缓存——但正在画的实例也会被一起释放，慎用。</p>
+<p class="admonition-title">需要手动销毁</p>
+<p><code>Layers.clear()</code> / <code>Typers.ClearAll()</code> 会把它一起清掉，主动调用 <code>Destroy()</code> 可确保实例被释放。
+反复创建而不销毁时，缓存中的字符贴图数量会持续增长。
+<code>Typers.InstText.ClearCache()</code> 会清空全部字符缓存，正在绘制的实例也会被一并释放。</p>
+</div>
+<hr />
+<h3 id="ccadd">CCAdd 浮动文字<a class="headerlink" href="#ccadd" title="Permanent link">&para;</a></h3>
+<p><code>Typers.CCAdd</code> 用 <code>InstText</code> 封装出一类<strong>带动画的浮动文字</strong>：文本创建后由动画函数控制显隐与位移，播完自行消失。适用于伤害数字、拾取提示这类不需要逐字出现的文字。</p>
+<p>使用 <code>Typers.CCAdd(text, x, y, layer, align, anim_func)</code> 创建。</p>
+<ul>
+<li><code>text</code> 要显示的文本，直接传给 <code>InstText.New</code> 。传表只取第 <code>1</code> 项，换行需自行写 <code>\n</code> 。</li>
+<li><code>x</code> / <code>y</code> 文本<strong>左上角</strong>的横坐标与纵坐标，两个数字分开传，不是表。</li>
+<li><code>layer</code> 图层，缺省 <code>0</code> 。</li>
+<li><code>align</code> 对齐方式，缺省 <code>"center"</code> ，取值与 <code>InstText:SetAlign</code> 相同。</li>
+<li><code>anim_func</code> 动画函数，每帧以 <code>func(self)</code> 的形式调用。不传则使用默认动画。</li>
+</ul>
+<p>返回值即 CC 对象本身，字段可直接读写：</p>
+<div class="admonition example">
+<p class="admonition-title">CC 对象字段</p>
+<ul>
+<li><code>cc.inst</code> 内部的 <code>InstText</code> 实例， <code>alpha</code> / <code>x</code> / <code>y</code> / <code>fontsize</code> 等属性可直接赋值。</li>
+<li><code>cc.time</code> 帧计数，初始为 <code>0</code> 。默认动画每帧自增，自定义动画需自行累加。</li>
+<li><code>cc.func</code> 动画函数本体。</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">创建示例</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">cc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="nf">CCAdd</span><span class="p">(</span><span class="s2">&quot;+20&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">创建时 alpha 为 0</p>
+<p><code>CCAdd</code> 在创建后把 <code>cc.inst.alpha</code> 置为 <code>0</code> ，文本要等动画把 <code>alpha</code> 抬上去才可见。</p>
+</div>
+<p><strong>默认动画：</strong></p>
+<p>不传 <code>anim_func</code> 时，引擎在第一帧（ <code>cc.time == 1</code> ）创建 4 个补间：</p>
+<ul>
+<li><code>alpha</code> <code>0</code> → <code>1</code> ，40 帧，淡入。</li>
+<li><code>alpha</code> <code>1</code> → <code>0</code> ，延迟 70 帧后再用 40 帧淡出。</li>
+<li><code>y</code> 原位 → <code>y - 30</code> ，50 帧， <code>Quad Out</code> ，先上浮 30 像素。</li>
+<li><code>y - 30</code> → <code>y - 60</code> ，延迟 70 帧后再用 50 帧， <code>Quad In</code> ，继续上浮 30 像素。</li>
+</ul>
+<p>补间的时长与延迟单位均为帧，与 <code>Tween.CreateTween</code> 一致。</p>
+<p><strong>自定义动画：</strong></p>
+<p><code>anim_func</code> 以冒号方式调用， <code>self</code> 就是 CC 对象自身：</p>
+<div class="admonition example">
+<p class="admonition-title">自定义动画</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">cc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="nf">CCAdd</span><span class="p">(</span><span class="s2">&quot;MISS&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;center&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">inst</span><span class="p">.</span><span class="py">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">math.max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">inst</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">inst</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">自定义动画需自行处理 alpha 与结束时机</p>
+<p>创建时 <code>cc.inst.alpha</code> 为 <code>0</code> ，自定义动画不改写 <code>alpha</code> 时文本一直不可见。
+默认动画的淡出由补间完成，自定义动画没有这一层，需自行判定并结束。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">默认动画结束后自动释放</p>
+<p>默认动画在 <code>cc.time</code> 达到 <code>125</code> 帧时销毁 <code>cc.inst</code> 并把该 CC 移出 <code>Typers._cc</code> ，无需额外处理。
+<code>125</code> 由最后一个补间推得：延迟 <code>70</code> 帧 + 时长 <code>50</code> 帧，补间在第 <code>123</code> 帧写入终值，其余为余量。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">自定义动画不会自动释放</p>
+<p>自定义 <code>anim_func</code> 没有结束判定，CC 会一直留在 <code>Typers._cc</code> 中， <code>anim_func</code> 每帧继续调用。
+动画结束时调用 <code>Typers.CCRemove(cc)</code> 销毁实例并移出列表：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Typers</span><span class="p">.</span><span class="nf">CCRemove</span><span class="p">(</span><span class="nv">cc</span><span class="p">)</span>
+</code></pre></div>
+<p>该函数可重复调用，也可以在 <code>anim_func</code> 内部对自身使用。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">切换场景时统一清理</p>
+<p><code>Typers.ClearAll()</code> 会遍历 <code>Typers._cc</code> ，销毁每个 <code>cc.inst</code> 并清空列表； <code>Layers.clear()</code> 内部会调用它。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">更新时机</p>
+<p><code>Typers.Update</code> 由 <code>main.lua</code> 在 <code>love.update</code> 中调用，位置在 <code>scene.update</code> <strong>之前</strong>；它按倒序遍历 <code>Typers._cc</code> 并逐个调用 <code>func</code> 。</p>
+</div>
+<hr />
+<h2 id="_2">测量文本尺寸<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>四种打字机都能报告当前所持文本的尺寸，方法一致。尺寸不含 <code>typer.x</code> / <code>typer.y</code> ，描述的是字符本身，与它在屏幕上的位置无关。</p>
+<div class="admonition example">
+<p class="admonition-title">测量方法</p>
+<ul>
+<li><code>typer:GetWidth()</code> <strong>最宽一行</strong>的像素宽度。 <code>\n</code> 与自动换行会开启新行，各行分别测量，取其中最大值。</li>
+<li><code>typer:GetHeight()</code> 从最靠上的字形顶点到最靠下的字形底边的像素高度。包含行间空隙与各字形自身的 <code>scale</code> 。</li>
+<li><code>typer:GetLettersSize()</code> 一次取两个值，以两个数字返回（宽、高），不返回表。</li>
+</ul>
+</div>
+<p>持有某个打字机、却不知道它由哪个模块创建时，可以调用模块级入口，它对四种模块的实例都适用：</p>
+<ul>
+<li><code>Typers.GetLettersSize(typer)</code> 返回值相同；传入 <code>nil</code> 或没有测量方法的对象时返回 <code>0, 0</code> 。</li>
+</ul>
+<div class="admonition example">
+<p class="admonition-title">把第二段文字接到第一段之后</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">gold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">InstText</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s2">&quot;GOLD 120&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">465</span><span class="p">,</span><span class="w"> </span><span class="mi">420</span><span class="p">},</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">w</span><span class="p">,</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gold</span><span class="p">:</span><span class="nf">GetLettersSize</span><span class="p">()</span>
+
+<span class="c1">-- 从第一段文字末尾再往右 10 像素开始，不必估算宽度。</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">lv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">InstText</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s2">&quot;LV 3&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">465</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">w</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">420</span><span class="p">},</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="admonition example">
+<p class="admonition-title">按已打出句子的高度分支</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">EText</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="s2">&quot;一行短句&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;很长很长、会折行的一句话&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">270</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">})</span>
+
+<span class="c1">--- 句子打完之后调用。</span>
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">fits_one_row</span><span class="p">(</span><span class="nv">typer</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="nf">GetLettersSize</span><span class="p">(</span><span class="nv">typer</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">h</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">27</span>
+<span class="kr">end</span>
+</code></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><code>InstText</code> 立即可用，另外三种随时间增长</p>
+<p><code>InstText</code> 在创建时就排完整段文字，因此 <code>New()</code> 、 <code>SetText()</code> 或 <code>Rebuild()</code> 之后数值即定值。
+<code>EText</code> / <code>NText</code> / <code>SText</code> 只保存已打出的字符，数值会一直增长到整句结束；尚未开始的句子不参与计算。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">只统计字符</p>
+<p>空格不产生字符，因此不计入结果； <code>[wait:x]</code> 之类的标签本就不参与排版。
+<code>shake</code> 等效果在绘制时才偏移字形，不计入，屏幕上的实际占用可能比返回值大几像素。
+对齐也不改变尺寸： <code>SetAlign("center")</code> 只平移字符，不会让它变宽。</p>
 </div>
 <hr />
 

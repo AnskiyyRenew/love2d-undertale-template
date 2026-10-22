@@ -464,6 +464,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -636,6 +644,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to verify
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -688,6 +707,118 @@
     
   
     Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Displaying Text (Typers)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first battle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to read next
   
 
     
@@ -2308,6 +2439,8 @@
       
         
       
+        
+      
     
     
     
@@ -2512,6 +2645,34 @@
     
   
     ❕️ Native Secret Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Bundled Assets
   
 
     
@@ -2969,6 +3130,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to verify
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2988,7 +3160,8 @@
 
   <h1>Modifying Game Information</h1>
 
-<p>At the very beginning, we won't learn how to add new elements to the game; we'll prioritize learning <u>how to make the game your own</u>.</p>
+<p>This page is part of the <strong>common base</strong> — both paths need it.</p>
+<p>This page only covers the game's basic information; it does not add new content yet. The full variable reference is in <a href="../../020_basic/000_conf/index.html">Basic development → Configuration</a> .</p>
 <hr />
 <h2 id="modifying-the-configuration-file-conflua">Modifying the Configuration File (conf.lua)<a class="headerlink" href="#modifying-the-configuration-file-conflua" title="Permanent link">&para;</a></h2>
 <p>You only need to look at the content before the <code>love.conf(t)</code> line:</p>
@@ -3012,10 +3185,10 @@
 <span class="nv">CANVAS_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">CANVAS_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span>
 
 <span class="c1">-- How much the GAME SCREEN is scaled. It is ALWAYS kept dead-centre.</span>
-<span class="c1">--     &quot;integer&quot; → whole-number scaling (pixel-perfect; the default)</span>
-<span class="c1">--     &quot;auto&quot;    → fill as much of the window / screen as possible</span>
+<span class="c1">--     &quot;integer&quot; → whole-number scaling (pixel-perfect)</span>
+<span class="c1">--     &quot;auto&quot;    → fill as much of the window / screen as possible (the default)</span>
 <span class="c1">--     false/nil → 1:1, no scaling</span>
-<span class="nv">SCREEN_SCALE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
+<span class="nv">SCREEN_SCALE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;auto&quot;</span>
 
 <span class="c1">-- Legacy switch, only used when SCREEN_SCALE is nil: true = &quot;auto&quot; while</span>
 <span class="c1">-- fullscreen and 1:1 otherwise. Prefer SCREEN_SCALE.</span>
@@ -3041,7 +3214,7 @@
 <li><code>LOGICAL_HEIGHT</code> the window's height.</li>
 <li><code>CANVAS_WIDTH</code> the in-game screen's width.</li>
 <li><code>CANVAS_HEIGHT</code> the in-game screen's height.</li>
-<li><code>SCREEN_SCALE</code> how large the in-game screen is drawn; the canvas is <strong>always centered</strong>: <code>"integer"</code> scales only by whole-number multiples (pixel-perfect, default), <code>"auto"</code> fills as much of the window as possible (allows fractional multiples), a number fixes the multiplier, <code>false</code> keeps 1:1 with no scaling. At runtime you can also switch with the global function <code>SetScreenScale(mode)</code> and read the current multiplier with <code>GetScreenScale()</code>.</li>
+<li><code>SCREEN_SCALE</code> how large the in-game screen is drawn; the canvas is <strong>always centered</strong>: <code>"integer"</code> scales only by whole-number multiples (pixel-perfect), <code>"auto"</code> fills as much of the window as possible (allows fractional multiples, the default), a number fixes the multiplier, <code>false</code> keeps 1:1 with no scaling. At runtime you can also switch with the global function <code>SetScreenScale(mode)</code> and read the current multiplier with <code>GetScreenScale()</code>.</li>
 <li><code>FILL_SCREEN</code> whether to fill the entire screen. <u>Now just a legacy switch</u>—it only takes effect when <code>SCREEN_SCALE</code> is unset (<code>nil</code>); for new projects just change <code>SCREEN_SCALE</code>.</li>
 <li><code>USE_ERRHANDLER</code> whether to enable the custom error screen, default <code>true</code>. <u>But this feature is not very stable; issues during drawing may cause a crash. If you want to see all errors, temporarily disable it.</u></li>
 </ul>
@@ -3142,6 +3315,42 @@
 <p class="admonition-title">On whether to monitor memory</p>
 <p><code>SE_MEMORY_SAFETY</code> is the master switch. If your game truly needs such a large number of images and typewriters, you can turn this variable off.</p>
 <p>But if memory leaks become severe enough to crash the machine, you bear the consequences yourself.</p>
+</div>
+<hr />
+<h2 id="how-to-verify">How to verify<a class="headerlink" href="#how-to-verify" title="Permanent link">&para;</a></h2>
+<p>Restart the game after making changes and check against this table:</p>
+<table>
+<thead>
+<tr>
+<th>Change</th>
+<th>What should happen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_INFO.TITLE</code></td>
+<td>The window title bar shows the text you entered; has no effect on Android</td>
+</tr>
+<tr>
+<td><code>LOGICAL_WIDTH</code> / <code>LOGICAL_HEIGHT</code></td>
+<td>The window size changes</td>
+</tr>
+<tr>
+<td><code>SCREEN_SCALE</code></td>
+<td>The game screen changes size inside the window; it stays centred</td>
+</tr>
+<tr>
+<td><code>FirstRoom</code> in <code>Game/conf_pure.lua</code></td>
+<td>The game opens directly into that scene instead of the logo scene</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Two reasons a change has no effect</p>
+<ul>
+<li>The change was written into the root <code>conf_pure.lua</code> while <code>Game/conf_pure.lua</code> also sets the same variable. The Game copy runs later and overwrites the engine default.</li>
+<li><code>Game/conf_pure.lua</code> has a syntax error. The engine then rolls back entirely to the defaults, prints <code>[Conf] WARNING</code> , and every change in that file is dropped.</li>
+</ul>
 </div>
 
 

@@ -645,6 +645,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -765,6 +773,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2385,6 +2505,8 @@
       
         
       
+        
+      
     
     
     
@@ -2589,6 +2711,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3142,16 +3292,16 @@
 
   <h1>环境配置</h1>
 
-<p>这四个字虽然听起来很吓人，但实际上配置起来相当简单——<br>
-<u>你完全不需要动环境，就是装一些压缩包而已。</u></p>
+<p>本页安装 LÖVE 与 SoulEngine，并按操作系统配置开发工具。<br>
+配置内容为下载并解压安装包，不涉及环境变量等系统设置。</p>
 <hr />
 <h2 id="soulengine">安装引擎与SoulEngine<a class="headerlink" href="#soulengine" title="Permanent link">&para;</a></h2>
-<p>截至目前，不论love 12+版本跳票或是正式发布了，都请下载12+版本。<br>
-<a href="https://nightly.link/love2d/love/workflows/main/main">点我下载</a></p>
-<p>在这之后，<a href="https://github.com/AnskiyyRenew/love2d-undertale-template">下载 SoulEngine</a></p>
-<p>确保你安装的至少是3.0.0以上的版本，最显著的验证方法就是点开 <code>conf.lua</code> ，查看<strong>第二行</strong>，若拥有 <code>3.0.0-stable</code> 或更新版本的字样，则证明版本无误。</p>
+<p>截至目前，不论 love 12+ 版本是否已正式发布，均需下载 12+ 版本。<br>
+<a href="https://nightly.link/love2d/love/workflows/main/main">下载 LÖVE</a></p>
+<p>之后 <a href="https://github.com/AnskiyyRenew/love2d-undertale-template">下载 SoulEngine</a> 。</p>
+<p>需确保安装的版本不低于 3.0.0。验证方式为打开 <code>conf.lua</code> 查看<strong>第二行</strong>，其中包含 <code>3.0.0-stable</code> 或更新的版本字符串即表示版本正确。</p>
 <div class="highlight"><pre><span></span><code><span class="c1">-- Soul Engine Configuration File</span>
-<span class="nv">_VER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;3.0.0-stable&quot;</span><span class="w">      </span><span class="c1">-- ← 就是这一行</span>
+<span class="nv">_VER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;3.0.0-stable&quot;</span><span class="w">      </span><span class="c1">-- ← 版本字符串所在行</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title"><code>_VER</code> 在哪</p>
@@ -3159,69 +3309,63 @@
 </div>
 <div class="admonition warning">
 <p class="admonition-title">LOVE 的 12.0 仍在开发中</p>
-<p><code>conf.lua</code> 里的 <code>t.version</code> 写的是 <code>12.0</code> 。如果你在官网只找到 11.x 的稳定版，需要去<strong>nightly / 测试版</strong>那一栏下载 12.x，否则引擎用到的 API 会缺失。</p>
+<p><code>conf.lua</code> 里的 <code>t.version</code> 写的是 <code>12.0</code> 。如果官网只提供 11.x 稳定版，需要到 <strong>nightly / 测试版</strong> 一栏下载 12.x，否则引擎用到的 API 会缺失。</p>
 </div>
-<p>3.0.0的API大概已经全部稳定下来，后续更新的时候这些API都不会进行更换。</p>
-<p><u>接下来我们将按不同操作系统分流，请各位时刻跟随自己应属于的说明部分。</u></p>
+<p>3.0.0 的 API 已稳定，后续版本不会再变更这些 API。</p>
+<p><u>以下内容按操作系统分流，请阅读与自身系统对应的部分。</u></p>
 <hr />
 <h2 id="windows">Windows 开发<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h2>
-<p>对于 Windows ，可选的编程工具很多，你甚至也可以通过自己写命令行来运行游戏。</p>
-<p>但是如果要选一个最方便的，目前我推荐： <code>Visual Studio Code</code> 。是蓝色的丝带，不要下载成紫色的。</p>
+<p>Windows 下可选的开发工具较多，也可以直接通过命令行运行游戏。</p>
+<p>本文档以 <code>Visual Studio Code</code> 为例。下载时注意图标为蓝色，紫色图标对应的是另一款软件。</p>
 <hr />
 <h2 id="linux">Linux 开发<a class="headerlink" href="#linux" title="Permanent link">&para;</a></h2>
-<p>也推荐 <code>VSCode</code> ，但是 <code>Linux</code> 的命令行是最大的看点。</p>
-<p>安装 LOVE2D 后， <code>love</code> 命令会被自动注册到环境当中。</p>
-<p>所以对于 <code>Linux</code> 用户，可以在终端运行如下命令来运行：
+<p>同样使用 <code>VSCode</code> ，并可直接通过命令行运行游戏。</p>
+<p>安装 LOVE2D 后， <code>love</code> 命令会自动注册到环境中，可在终端执行如下命令运行：</p>
 <div class="highlight"><pre><span></span><code>love<span class="w"> </span>.
-</code></pre></div></p>
+</code></pre></div>
 <hr />
 <h2 id="macos">macOS 开发<a class="headerlink" href="#macos" title="Permanent link">&para;</a></h2>
-<p>可以在如上链接处下载（或者应用商店等地方均可）。</p>
-<p>仍然推荐用 <code>VSCode</code> 。</p>
+<p>可从上述链接或应用商店等渠道下载。</p>
+<p>同样使用 <code>VSCode</code> 。</p>
 <hr />
 <h2 id="android">Android 开发<a class="headerlink" href="#android" title="Permanent link">&para;</a></h2>
-<p>国内用户可以选择 <code>MT管理器</code>，此应用虽然部分功能收费，<u>但是在 SoulEngine 的全部开发中完全用不到</u>。</p>
+<p>国内用户可选择 <code>MT管理器</code>，该应用部分功能收费，<u>但 SoulEngine 的全部开发流程均不涉及这些功能</u>。</p>
 <p>下载地址：<a href="https://mt2.cn">https://mt2.cn</a>。</p>
 <div class="admonition info">
-<p class="admonition-title">关于MT的说明</p>
-<p>此应用无害，若判断为有害均为误判。</p>
-<p><strong>前提是你是在如上链接所说的官网下载的。</strong></p>
+<p class="admonition-title">关于 MT 管理器的说明</p>
+<p>该应用无害，若被判断为有害均属误报。</p>
+<p><strong>前提是从上述官网链接下载。</strong></p>
 </div>
-<p>国外用户可以选择（我真不信哪个外国人会专门看中文页面） <code>Squircle CE</code> 。</p>
-<p>抛开工具选择，首先需要去下载 <code>LOVE for Android</code> 。</p>
-<p>在桌面会多出两个图标，一个是默认启动特定文件夹路径的主程序，另一个是可以自选路径，但是通常要打包成 <code>.love</code> 随后用Loader启动。</p>
-<p>所以在开发中，软件最好具备直接点开 <code>.love</code> 文件进行修改的能力。</p>
+<p>其他地区用户可选择 <code>Squircle CE</code> 。</p>
+<p>除工具外，还需下载 <code>LOVE for Android</code> 。</p>
+<p>安装后桌面会新增两个图标：一个用于启动固定文件夹路径的主程序，另一个可自选路径，通常需打包成 <code>.love</code> 后用 Loader 启动。</p>
+<p>因此开发工具需具备直接打开 <code>.love</code> 文件进行修改的能力。</p>
 <hr />
 <h2 id="ios">iOS 开发<a class="headerlink" href="#ios" title="Permanent link">&para;</a></h2>
-<p><code>LOVE2D</code> 在 <code>iOS</code> 操作系统上是收费的，尽管 <code>SoulEngine</code> 永远也不会收费。</p>
+<p><code>LOVE2D</code> 在 <code>iOS</code> 上为付费应用， <code>SoulEngine</code> 本身免费。</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>请自行考虑是否决定购买，但我通常不建议这么做。</p>
+<p>是否购买请自行评估，不建议在 iOS 平台上进行开发。</p>
 </div>
 <hr />
-<p><strong><em>在完成上面所有不同操作系统的配置方法后，可以继续阅读下一小节。</em></strong></p>
+<p><strong><em>完成对应操作系统的配置后，可继续阅读下一小节。</em></strong></p>
 <hr />
 <h2 id="vscode">使用 VSCode 打开项目<a class="headerlink" href="#vscode" title="Permanent link">&para;</a></h2>
-<p>首先进入 SoulEngine 的项目根目录，在空白区域 <code>右键</code> ，可以看到弹出一个菜单，找到 <code>通过 Code 打开</code> 。</p>
+<p>进入 SoulEngine 的项目根目录，在空白区域 <code>右键</code> ，在弹出的菜单中选择 <code>通过 Code 打开</code> 。</p>
 <p><img alt="" src="../../img/000_before/001_menu.png" /></p>
-<p>或者如果你的菜单栏打开之后看不见 <code>通过 Code 打开</code> 选项，也可以不走右键打开的图形化道路， <u>我们也有命令行版本的：</u></p>
-<p>在项目目录下打开 <code>cmd</code> 或 <code>Powershell</code> 执行：
+<p>若菜单中没有 <code>通过 Code 打开</code> 选项，也可使用命令行方式，在项目目录下打开 <code>cmd</code> 或 <code>Powershell</code> 执行：</p>
 <div class="highlight"><pre><span></span><code>code<span class="w"> </span>.
-</code></pre></div></p>
-<p><strong>打开之后，若进行安全性询问请无条件通过。</strong></p>
-<details class="info">
-<summary>为什么无条件通过？</summary>
-<p>你是作者，为什么不无条件通过？是信不过你未来的游戏吗？</p>
-</details>
-<p>在这之后，可以看到侧边栏有很多文件，这些就是项目的所有内容了。</p>
+</code></pre></div>
+<p>首次打开时会弹出工作区信任询问，选择信任以继续。</p>
+<p>打开后，侧边栏显示的文件即为项目的全部内容。</p>
 <h3 id="_1">拓展的选择<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">为什么需要下载拓展</p>
 <p><code>LOVE2D</code> 的游戏启动方式并不是打开程序后选择文件夹，而是需要手动把文件夹 <code>拖拽</code> 至 <code>love.exe</code> 上打开。</p>
-<p>而每次调试都需要重新重复此操作，会导致不必要的麻烦。鉴于此，我们在 <code>VSCode</code> 中选择一个可以 <u>自动启动</u> 的拓展。</p>
+<p>每次调试都需重复此操作，因此选用支持 <u>自动启动</u> 的 <code>VSCode</code> 拓展。</p>
 </div>
-<p>对于拓展，我最推荐的是 <code>LOVE Launcher - SK83RJOSH</code> 拓展。</p>
-<p><u>我推荐它的原因是：</u></p>
+<p>本文档使用 <code>LOVE Launcher - SK83RJOSH</code> 拓展。</p>
+<p><u>选择该拓展的原因：</u></p>
 <ol>
 <li>使用 <code>ALT + L</code> 按键可直接启动游戏。</li>
 <li>它不会过多干预工作区，无代码补全支持，仅拥有轻量的快速启动能力。</li>
@@ -3229,24 +3373,24 @@
 </ol>
 <p><img alt="LOVE Launcher - SK83RJOSH" src="../../img/000_before/000_ext.png" /></p>
 <h3 id="_2">设置拓展<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>安装之后，我们需要告诉 <code>拓展</code> ：<u>我需要的love.exe在哪？</u></p>
+<p>安装之后，需要为该 <code>拓展</code> 指定 <code>love.exe</code> 的路径。</p>
 <p>点击 <code>VSCode</code> 左下角的小齿轮，找到 <code>Settings</code> 选项，随后按照下面图片中的设置：</p>
 <ol>
-<li>搜索 <code>love</code> ，这可以帮助我们迅速定位到拓展。</li>
-<li>修改第二个选项为你的 <code>love.exe</code> 路径。（路径没有打码，但请不要死板的对照设置，<u>图片里的路径一般不能用</u>）</li>
+<li>搜索 <code>love</code> ，可快速定位到该拓展。</li>
+<li>修改第二个选项为 <code>love.exe</code> 的路径。（<u>图片中的路径仅为示例，需替换为实际路径</u>）</li>
 </ol>
 <p><img alt="" src="../../img/000_before/003_settings.png" /></p>
 <h3 id="_3">启动验证<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>做完这一步后，按下 <code>Alt + L</code> 组合键，查看是否正常打开游戏。</p>
-<p>若启动后出现如下图片中的情况，则说明启动成功了：</p>
+<p>完成设置后，按下 <code>Alt + L</code> 组合键，检查游戏是否正常打开。</p>
+<p>若出现如下图片中的界面，则说明启动成功：</p>
 <p><img alt="" src="../../img/000_before/004_init.png" /></p>
 <h3 id="_4">收尾<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>到此，除 <code>Android</code> 与 <code>iOS</code> 外的所有操作系统安装配置问题已解决完毕。</p>
+<p>至此，除 <code>Android</code> 与 <code>iOS</code> 外的操作系统安装配置已完成。</p>
 <hr />
 <h2 id="mt">使用 MT 管理器进行开发<a class="headerlink" href="#mt" title="Permanent link">&para;</a></h2>
-<p>MT 管理器相对来说较简单，因为 <u>只有一种选择</u> 。</p>
-<p>首先下载之后，你或许会下载到 <code>.love</code> 文件，这是直接可用的。</p>
-<p>若下载到了 <code>.zip</code> 文件，也可以直接进行使用。</p>
+<p>MT 管理器 <u>仅提供单一打开方式</u>，操作步骤如下。</p>
+<p>下载完成后可能得到 <code>.love</code> 文件，该文件可直接打开使用。</p>
+<p>若下载到 <code>.zip</code> 文件，同样可以直接使用。</p>
 <p>打开方式：单击 <code>LOVE Loader</code> 程序，选择对应的压缩文件即可启动。</p>
 
 

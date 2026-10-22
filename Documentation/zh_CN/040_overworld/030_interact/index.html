@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -1778,7 +1898,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        交互是怎么来的
+        交互的产生
       
     </span>
   </a>
@@ -1844,7 +1964,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        常见坑
+        常见问题
       
     </span>
   </a>
@@ -2324,6 +2444,8 @@
       
         
       
+        
+      
     
     
     
@@ -2528,6 +2650,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2928,7 +3078,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        交互是怎么来的
+        交互的产生
       
     </span>
   </a>
@@ -2994,7 +3144,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        常见坑
+        常见问题
       
     </span>
   </a>
@@ -3020,9 +3170,9 @@
 
   <h1>交互与对话</h1>
 
-<p>玩家碰到某个东西之后要发生什么，全部由<strong>你的场景脚本</strong>决定。引擎只负责告诉你"碰到了、碰的是谁"。</p>
+<p>玩家碰到对象之后的行为全部由<strong>场景脚本</strong>决定。引擎只记录碰撞发生与碰撞对象。</p>
 <hr />
-<h2 id="_1">交互是怎么来的<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h2 id="_1">交互的产生<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>物理世界的碰撞回调会把接触到的对象记进 <code>World.interactions</code> ：</p>
 <div class="admonition example">
 <p class="admonition-title">interactions 字段</p>
@@ -3035,19 +3185,19 @@
 </ul>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">不需要面朝它</p>
-<p>判定只看碰撞，<strong>不要求玩家面向那个方向</strong>。原版那套"要走到牌子前面"的限制在这里没有实现，碰到就算。</p>
+<p class="admonition-title">不需要面朝该对象</p>
+<p>判定只看碰撞，<strong>不要求玩家面向该方向</strong>。原版中需走到告示牌正面的限制在此未实现，发生碰撞即计入。</p>
 </div>
 <hr />
 <h2 id="_2">读取交互<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <div class="admonition example">
 <p class="admonition-title">读取方法</p>
 <ul>
-<li><code>Overworld.getInteractResult(obj_type, id, extra_key)</code> 是否正碰着符合条件的东西。<ul>
+<li><code>Overworld.getInteractResult(obj_type, id, extra_key)</code> 是否正碰着符合条件的对象。<ul>
 <li><code>obj_type</code> 类型名，例如 <code>"warp"</code> 。</li>
 <li><code>id</code> 省略时只要类型对就返回 <code>true</code> 。</li>
 <li><code>extra_key</code> 省略（或传数字）时按 <code>id</code> 匹配；传<strong>字符串</strong>时按该名字的<strong>自定义属性</strong>匹配（例如 <code>"rr"</code> ）。</li>
-<li>按属性匹配时<strong>返回的是那个属性的值</strong>（不是 <code>true</code> ）—— <code>rr</code> 是 <code>3</code> 就返回 <code>3</code> ，直接就能拿来当编号用。</li>
+<li>按属性匹配时<strong>返回该属性的值</strong>（不是 <code>true</code> ）：<code>rr</code> 为 <code>3</code> 时返回 <code>3</code> ，可直接作为编号使用。</li>
 </ul>
 </li>
 <li><code>Overworld.getTouchResult(obj_type, id, extra_key)</code> 同上，但检查 <code>touching</code> 里的<strong>每一个</strong>对象而不是只查最后碰到的那个。</li>
@@ -3063,18 +3213,18 @@
 <strong><code>getTouchResult</code> 两道都没有。</strong> 它只读 <code>touching</code> 列表，所以：</p>
 <ul>
 <li>玩家被锁着（对话中 / 菜单里）时它照样返回 <code>true</code> ；</li>
-<li>用 <code>getTouchResult</code> 做触发时，容易出现"关掉对话的那一次确认键又把对话打开"。要自己加 <code>FLAG</code> 之类的去重。</li>
+<li>用 <code>getTouchResult</code> 做触发时，关闭对话的那一次确认键会再次打开对话，需自行添加 <code>FLAG</code> 等去重手段。</li>
 </ul>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">旧脚本的第四个参数会被忽略</p>
-<p><code>getInteractResult</code> 的老签名有一个第 4 参数（当年是"必须面朝"的开关）。<br>
-现在<strong>接收但直接忽略</strong>，只是为了让老场景脚本还能跑。面向判定本身已经没有了（见上一条），新代码别写它。</p>
+<p><code>getInteractResult</code> 的旧签名有一个第 4 参数（原为朝向判定的开关）。<br>
+当前<strong>接收但直接忽略</strong>，仅为兼容旧场景脚本。朝向判定已移除（见上一条），新代码不传入该参数。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">重叠时用 getTouchResult</p>
 <p><code>getInteractResult</code> 只看"最后碰到的那一个"。两个触发区叠在一起时，先碰到的会被后碰到的顶掉。<br>
-只要有一个命中就算数的场合（比如"进入某个房间"），请一律用 <code>getTouchResult</code> 。</p>
+只要有一个命中即生效的场合（例如进入某个房间），均使用 <code>getTouchResult</code> 。</p>
 </div>
 <div class="highlight"><pre><span></span><code><span class="c1">-- 碰到了 id 为 1 的 warp</span>
 <span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">getInteractResult</span><span class="p">(</span><span class="s2">&quot;warp&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span>
@@ -3087,7 +3237,7 @@
 </code></pre></div>
 <hr />
 <h2 id="_3">一键确认<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p><code>onConfirm</code> 把"碰着 + 按了确认"合并成一次调用，是最常用的写法：</p>
+<p><code>onConfirm</code> 将碰撞判定与确认键合并为一次调用：</p>
 <div class="admonition example">
 <p class="admonition-title">确认方法</p>
 <ul>
@@ -3120,13 +3270,13 @@
 </ul>
 </div>
 <p>返回的 <code>dialog</code> 有两个字段： <code>block</code> （那个白边黑底的框）与 <code>text</code> （打字机对象）。</p>
-<p>引擎默认在文本播完后销毁框并解锁玩家。想接着干点什么，覆盖 <code>text._onComplete</code> 即可：</p>
+<p>引擎默认在文本播完后销毁框并解锁玩家。若需要在文本播完后执行其他逻辑，覆盖 <code>text._onComplete</code> ：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dialog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">({</span><span class="s2">&quot;* 你捡起了一块石头。&quot;</span><span class="p">})</span>
 
 <span class="nv">dialog</span><span class="p">.</span><span class="py">text</span><span class="p">.</span><span class="py">_onComplete</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">()</span>
 <span class="w">    </span><span class="nv">dialog</span><span class="p">.</span><span class="py">block</span><span class="p">:</span><span class="nf">Destroy</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">Char</span><span class="p">.</span><span class="py">controlling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">    </span><span class="c1">-- 你自己的后续逻辑</span>
+<span class="w">    </span><span class="c1">-- 后续逻辑</span>
 <span class="kr">end</span>
 </code></pre></div>
 <p><img alt="OW-04" src="../../img/040_overworld/ow_04_dialog.png" /></p>
@@ -3150,7 +3300,7 @@
 </div>
 <hr />
 <h2 id="_6">一份完整的场景脚本<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>把上面的零件拼起来：</p>
+<p>将上述各部分组合起来：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">scene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
 <span class="kd">local</span><span class="w"> </span><span class="nv">ow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ImportFile</span><span class="p">(</span><span class="s2">&quot;Overworld&quot;</span><span class="p">)</span>
 
@@ -3200,22 +3350,22 @@
 <span class="kr">return</span><span class="w"> </span><span class="nv">scene</span>
 </code></pre></div>
 <hr />
-<h2 id="_7">常见坑<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_7">常见问题<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">对话刚结束的那一帧，<code>getInteractResult</code> 一律返回 false</p>
 <p>引擎有一个<strong>单帧锁</strong>：文本播完的那一帧，所有 <code>getInteractResult</code> 调用都会返回 <code>false</code> （ <code>getTouchResult</code> 不受影响）。<br>
-这是为了防住"关掉对话的那一次确认键又立刻把对话打开一遍"的死循环。<br>
-如果你在这一帧里想连续触发两件事，第二件会被吞掉——把它挪到下一帧，或者自己写状态机。</p>
+该锁用于避免关闭对话的那一次确认键立即再次打开对话的死循环。<br>
+在同一帧内连续触发两个交互时，第二个不会执行，需将其移至下一帧，或自行实现状态机。</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title"><code>Char.controlling</code> 为 false 时 <code>getInteractResult</code> 不生效</p>
 <p><code>getInteractResult</code> 里有 <code>if (not Char.controlling) then return end</code> （注意返回的是 <code>nil</code> ，不是 <code>false</code> ）。<br>
-自己锁了玩家却忘了恢复，走 <code>getInteractResult</code> / <code>onConfirm</code> 的交互会<strong>静默失效</strong>。<br>
-但 <code>getTouchResult</code> 和 <code>FindObject</code> <strong>不看这个字段</strong>，它们永远照常工作。</p>
+锁定玩家后未恢复时，通过 <code>getInteractResult</code> / <code>onConfirm</code> 实现的交互会<strong>静默失效</strong>。<br>
+但 <code>getTouchResult</code> 与 <code>FindObject</code> <strong>不读取该字段</strong>，始终正常返回。</p>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">对话框要跟着镜头</p>
-<p>自己做 UI 时用 <code>GetRelativePos(x, y)</code> 换算坐标，别直接写屏幕坐标——镜头是会动的。</p>
+<p class="admonition-title">对话框要跟随镜头</p>
+<p>自定义 UI 时使用 <code>GetRelativePos(x, y)</code> 换算坐标，不直接写入屏幕坐标——镜头位置会变化。</p>
 </div>
 
 

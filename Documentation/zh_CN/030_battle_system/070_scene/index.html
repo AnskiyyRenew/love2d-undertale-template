@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -1619,7 +1739,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        调试小贴士
+        调试排查
       
     </span>
   </a>
@@ -2324,6 +2444,8 @@
       
         
       
+        
+      
     
     
     
@@ -2528,6 +2650,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2994,7 +3144,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        调试小贴士
+        调试排查
       
     </span>
   </a>
@@ -3020,8 +3170,8 @@
 
   <h1>战斗场景与回调</h1>
 
-<p>战斗的<strong>流程</strong>由引擎负责，战斗的<strong>内容</strong>由遭遇文件负责，而中间那一层"这一场战斗到底要发生什么"——比如用了物品回多少血、逃跑时要播什么——就写在战斗场景里。</p>
-<p>路径： <code>Scripts/Scenes/Battle/</code> 。引擎自带 <code>scene_battle.lua</code> 、 <code>scene_battle_init.lua</code> 、 <code>scene_battle_template.lua</code> 、 <code>scene_battle_ow.lua</code> 四份，照着抄一份改即可。</p>
+<p>战斗的<strong>流程</strong>由引擎负责，战斗的<strong>内容</strong>由遭遇文件负责，介于两者之间的这一层——这一场战斗的具体表现（如使用物品回复的血量、逃跑时播放的内容）——写在战斗场景里。</p>
+<p>路径： <code>Scripts/Scenes/Battle/</code> 。引擎自带 <code>scene_battle.lua</code> 、 <code>scene_battle_init.lua</code> 、 <code>scene_battle_template.lua</code> 、 <code>scene_battle_ow.lua</code> 四份，可参照其中一份实现。</p>
 <hr />
 <h2 id="_1">场景骨架<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">scene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
@@ -3069,7 +3219,7 @@
 <div class="admonition danger">
 <p class="admonition-title"><code>scene.clear</code> 里两行都不能少</p>
 <p><code>Battle.Clear()</code> 负责清掉遭遇、动画、波次、灵魂、攻击模式这一整套缓存；<br>
-<code>Layers.clear()</code> 负责清图层。少写前者，第二次进战斗会拿到上一场残留的状态（敌人还带着上次的血条、灵魂沿用上次的颜色），而且<strong>不会报错</strong>，非常难查。</p>
+<code>Layers.clear()</code> 负责清图层。少写前者，第二次进战斗会拿到上一场残留的状态（敌人还带着上次的血条、灵魂沿用上次的颜色），而且<strong>不会报错</strong>，问题难以定位。</p>
 </div>
 <hr />
 <h2 id="_2">回调一览<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -3088,7 +3238,7 @@
 </li>
 <li><code>Battle.HandleSpare()</code> 玩家在 <code>MERCYMENU</code> 里选了 <code>饶恕</code> ，<strong>而且场上还有敌人没被饶恕掉</strong>。<ul>
 <li>可选饶恕的敌人这时候已经被移除，并把 <code>gold</code> 结算进了 <code>Battle.GOLD</code> 。</li>
-<li>一个敌人都不剩时引擎直接 <code>Battle.Win()</code> ，<strong>不会</strong>走到这里；所以这个回调只在"部分敌人能饶恕"的场面出现。</li>
+<li>一个敌人都不剩时引擎直接 <code>Battle.Win()</code> ，<strong>不会</strong>走到这里；该回调只在部分敌人可饶恕的场面触发。</li>
 </ul>
 </li>
 <li><code>Battle.HandleFlee()</code> 玩家在 <code>MERCYMENU</code> 里选了 <code>逃跑</code> 并判定成功。</li>
@@ -3104,7 +3254,7 @@
 <span class="w">    </span><span class="c1">-- 你自己的逻辑</span>
 <span class="kr">end</span>
 </code></pre></div></li>
-<li><code>Battle.Win(extra_texts, on_complete)</code> 战斗胜利。同样建议调用 <code>Battle.defaultWin</code>：
+<li><code>Battle.Win(extra_texts, on_complete)</code> 战斗胜利。同样需调用 <code>Battle.defaultWin</code>：
     <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">Win</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">Battle</span><span class="p">.</span><span class="nf">defaultWin</span><span class="p">({</span><span class="s2">&quot;* Your LOVE increased!&quot;</span><span class="p">})</span>
 <span class="kr">end</span>
@@ -3113,22 +3263,22 @@
 </ul>
 </div>
 <div class="admonition warning">
-<p class="admonition-title"><code>HandleSpare</code> 引擎里是个空函数，不接管会出事</p>
-<p>引擎那边只有一句 <code>function battle.HandleSpare() end</code> 。<br>
+<p class="admonition-title"><code>HandleSpare</code> 在引擎中为空函数，需在场景中接管</p>
+<p>引擎中只有一句 <code>function battle.HandleSpare() end</code> 。<br>
 而按确认选饶恕的同一帧，引擎已经 <code>destroy_elements()</code> 把饶恕菜单的选项（ <code>state.typers</code> ）清空了。
-如果你什么都不做、状态还停在 <code>MERCYMENU</code> ，下一帧它就会去读那张已经空掉的表，直接报 <code>attempt to index a nil value</code> 。</p>
-<p>所以只要你的战斗里存在"一部分敌人能饶恕、另一部分不能"的情况，就必须在场景里接管它。最省事的写法是照旧推进到敌人回合：</p>
+未接管该回调且状态仍停留在 <code>MERCYMENU</code> 时，下一帧会读取已被清空的表，直接报 <code>attempt to index a nil value</code> 。</p>
+<p>因此只要战斗中存在"一部分敌人能饶恕、另一部分不能"的情况，就必须在场景中接管该回调。可直接推进到敌人回合：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">HandleSpare</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">Battle</span><span class="p">.</span><span class="nf">BattleDialogue</span><span class="p">({</span><span class="s2">&quot;* 剩下的敌人可没打算放过你。&quot;</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;DEFENDING&quot;</span><span class="p">)</span>
 <span class="kr">end</span>
 
 <span class="nv">Battle</span><span class="p">.</span><span class="py">HandleSpare</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">HandleSpare</span>
 </code></pre></div>
-<p>自带的两只 Poseur 都是 <code>canspare = true</code> ，一次饶恕就清空、直接走 <code>Win()</code> ，所以演示场景里碰不到这条。</p>
+<p>自带的两只 Poseur 都是 <code>canspare = true</code> ，一次饶恕即清空敌人、直接走 <code>Win()</code> ，因此演示场景不会触发该回调。</p>
 </div>
 <div class="admonition example">
 <p class="admonition-title">OnHit 的标准写法</p>
-<p>引擎把弹幕的 <code>HurtMode</code> 原样传给你，怎么解释由你决定：</p>
+<p>引擎将弹幕的 <code>HurtMode</code> 原样传入，其解释方式由场景决定：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">OnHit</span><span class="p">(</span><span class="nv">bullet</span><span class="p">)</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">damage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">bullet</span><span class="p">[</span><span class="s2">&quot;HurtMode&quot;</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;normal&quot;</span><span class="p">):</span><span class="nf">lower</span><span class="p">()</span>
@@ -3151,7 +3301,7 @@
 </div>
 <hr />
 <h2 id="_3">对话<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>战斗中几乎所有文本都走打字机，引擎提供了两个包装：</p>
+<p>战斗中的文本通过打字机输出，引擎提供两个封装函数：</p>
 <div class="admonition example">
 <p class="admonition-title">对话方法</p>
 <ul>
@@ -3171,10 +3321,10 @@
 <p class="admonition-title">战斗文本里的等待与快进</p>
 <p><code>texts</code> 里可以混写打字机标签，战斗对话最常见的两个是：</p>
 <ul>
-<li><code>[wait:x]</code> 停 <code>x</code> <strong>秒</strong>再继续。它走的是打字机<strong>自己的</strong> <code>waittime</code> 计时器，和逐字间隔<strong>互不干扰</strong>——写 <code>[wait:0.5]</code> 之后再写 <code>[speed:0.01]</code> ，那半秒的停顿不会被加速吞掉。</li>
+<li><code>[wait:x]</code> 停 <code>x</code> <strong>秒</strong>再继续。它使用打字机<strong>自身的</strong> <code>waittime</code> 计时器，与逐字间隔<strong>互不干扰</strong>：写 <code>[wait:0.5]</code> 之后再写 <code>[speed:0.01]</code> ，该停顿不会被加速跳过。</li>
 <li><code>[speed:x]</code> 改逐字间隔（每字 <code>x</code> 秒），改完一直生效到下一次 <code>[speed:]</code> 。默认 <code>1/15 ≈ 0.0667</code> 秒。</li>
 </ul>
-<p>玩家按住<strong>取消键</strong>（默认是 <code>X</code> ）时，引擎会<strong>直接清掉当前的 <code>waittime</code></strong> 并立刻把剩下的字打完，不会一段段陪着等。带 <code>[noskip]</code> 的文本不吃这套。</p>
+<p>玩家按住<strong>取消键</strong>（默认是 <code>X</code> ）时，引擎会<strong>直接清掉当前的 <code>waittime</code></strong> 并立即输出剩余文本，不会逐段等待。带 <code>[noskip]</code> 的文本不响应快进。</p>
 <p>完整标签表见 <a href="../../020_basic/030_typers/index.html">基础开发 → 打字机</a> 。</p>
 </div>
 <hr />
@@ -3182,7 +3332,7 @@
 <div class="admonition example">
 <p class="admonition-title">状态方法</p>
 <ul>
-<li><code>Battle.ChangeState(new_state)</code> 切换状态。<strong>这是唯一正规的切换方式</strong>，它会保证 <code>EnteringState</code> 恰好被调用一次。</li>
+<li><code>Battle.ChangeState(new_state)</code> 切换状态。该函数是唯一的切换入口，会保证 <code>EnteringState</code> 恰好被调用一次。</li>
 <li><code>Battle.state</code> 当前状态。可用值见 <a href="../010_ui/index.html">UI → 状态流程</a> 。</li>
 <li><code>Battle.game</code> 当前遭遇表。</li>
 <li><code>Battle.EXP</code> / <code>Battle.GOLD</code> 本场战斗累计的EXP与金钱，敌人死亡时自动累加。</li>
@@ -3199,7 +3349,7 @@
 <li><code>Battle.selected_index</code> 玩家当前选中的是第几个物品。</li>
 </ul>
 </div>
-<p>这三个值在 <code>EnteringState</code> 里尤其有用——比如判断"玩家对 1 号敌人使用了 Check"。</p>
+<p>这三个值在 <code>EnteringState</code> 中用于判断具体操作，例如判断玩家是否对 1 号敌人使用了 Check。</p>
 <hr />
 <h2 id="_5">其它可用方法<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <div class="admonition example">
@@ -3210,7 +3360,7 @@
 <li><code>Battle.Clear()</code> 清掉整棵战斗模块树与 Game 区的战斗内容缓存。</li>
 <li><code>Battle.SetGame(file)</code> 载入遭遇文件，返回遭遇表（不返回时说明没找到）。</li>
 <li><code>Battle.SetAttackPattern(name)</code> 切换攻击模式，详见 <a href="../040_attack/index.html">攻击模式</a> 。</li>
-<li><code>Battle.Defending()</code> 手动进入敌人回合（一般用不到，状态机自己会走）。</li>
+<li><code>Battle.Defending()</code> 手动进入敌人回合（通常由状态机自动进入）。</li>
 </ul>
 </div>
 <hr />
@@ -3220,16 +3370,16 @@
 <li><strong>进场</strong>：把 <code>DATA.player</code> 的存档数据推进 <code>Player</code> ，战斗用的是真实血量而不是遭遇文件里的模板值。</li>
 <li><strong>出场</strong>： <code>scene.clear</code> 时把 EXP / GOLD / 剩余血量写回 <code>DATA</code> ，并按 <code>DATA.lv_data</code> 结算升级。</li>
 </ol>
-<p>想改升级规则（比如把 20 级封顶扩到 30 级、改每级的 HP 曲线），去 <code>Game/Logics/init.lua</code> 里的 <code>lv_data</code> 表，详见 <strong><a href="../../020_basic/120_game_logics/index.html">游戏逻辑与世界规则</a></strong> ；<br>
-想改"打赢了给多少"，去遭遇文件里改敌人的 <code>exp</code> 与 <code>gold</code> 。</p>
+<p>修改升级规则（如将等级上限由 20 级扩展到 30 级、调整每级的 HP 曲线）时，修改 <code>Game/Logics/init.lua</code> 中的 <code>lv_data</code> 表，详见 <strong><a href="../../020_basic/120_game_logics/index.html">游戏逻辑与世界规则</a></strong> ；<br>
+修改战斗奖励时，调整遭遇文件中敌人的 <code>exp</code> 与 <code>gold</code> 。</p>
 <hr />
-<h2 id="_6">调试小贴士<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_6">调试排查<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <ul>
-<li>敌人动画没出来 → 看终端有没有 <code>[Game - Animation] WARNING: Enemy #x has no animation.</code> ，八成是 <code>InitAnimation</code> 的下标写错了。</li>
-<li>波次没生效 → 看有没有 <code>exists but failed to load</code> ，详见 <a href="../000_init/index.html">战斗初始化</a> 。</li>
-<li>第二次进战斗状态不对 → 检查 <code>scene.clear</code> 里的 <code>Battle.Clear()</code> 。</li>
-<li>战斗结束没跳场景 → 检查 <code>Battle.SetEndRoom</code> 设的场景名是否真的存在。</li>
-<li><strong>判定看着不对</strong>（明明没碰到却扣血 / 撞上了却不扣血）→ 按 <code>F7</code> 打开判定框覆盖层，也能在代码里调 <code>Battle.ToggleHitboxes(true)</code> 。开了完美像素碰撞时看到的是真实像素轮廓而不是矩形，详见 <a href="../../020_basic/020_sprites/index.html">基础开发 → 精灵 → 完美像素碰撞</a> 。</li>
+<li>敌人动画未出现：检查终端是否输出 <code>[Game - Animation] WARNING: Enemy #x has no animation.</code> ，原因为 <code>InitAnimation</code> 的下标错误。</li>
+<li>波次未生效：检查是否输出 <code>exists but failed to load</code> ，详见 <a href="../000_init/index.html">战斗初始化</a> 。</li>
+<li>第二次进战斗状态异常：检查 <code>scene.clear</code> 中的 <code>Battle.Clear()</code> 。</li>
+<li>战斗结束未切换场景：检查 <code>Battle.SetEndRoom</code> 设置的场景名是否存在。</li>
+<li><strong>判定与表现不符</strong>（未接触却扣血 / 已接触却不扣血）：按 <code>F7</code> 打开判定框覆盖层，也可在代码中调用 <code>Battle.ToggleHitboxes(true)</code> 。开启完美像素碰撞时显示的是真实像素轮廓而非矩形，详见 <a href="../../020_basic/020_sprites/index.html">基础开发 → 精灵 → 完美像素碰撞</a> 。</li>
 </ul>
 
 

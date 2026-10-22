@@ -464,6 +464,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -664,6 +672,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to verify
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -688,6 +707,118 @@
     
   
     Creating Sprites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Displaying Text (Typers)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first battle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to read next
   
 
     
@@ -2308,6 +2439,8 @@
       
         
       
+        
+      
     
     
     
@@ -2512,6 +2645,34 @@
     
   
     ❕️ Native Secret Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Bundled Assets
   
 
     
@@ -2969,6 +3130,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to verify
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2988,8 +3160,8 @@
 
   <h1>Creating and Switching Scenes</h1>
 
-<p>A scene can be imagined as you creating a new <code>world</code>.<br>
-All operations within this world are defined by you.</p>
+<p>This page is part of the <strong>common base</strong> — both paths need it.</p>
+<p>A scene is a self-contained unit of execution; everything that happens inside it is defined by the scene itself. The full scene reference is in <a href="../../020_basic/010_scene/index.html">Basic development → Scenes</a> .</p>
 <hr />
 <h2 id="creating-a-scene">Creating a Scene<a class="headerlink" href="#creating-a-scene" title="Permanent link">&para;</a></h2>
 <p>In <code>SoulEngine</code>, there are two base scene templates: <code>scene_template.lua</code> and <code>scene_template_full.lua</code>.</p>
@@ -3042,6 +3214,35 @@ In short, the region inside a <code>function - end</code> wrapper counts as one 
 <div class="highlight"><pre><span></span><code><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">)</span>
 </code></pre></div></p>
 <p>The code above creates a <code>Poseur</code> image at the center of the screen.</p>
+<hr />
+<h2 id="how-to-verify">How to verify<a class="headerlink" href="#how-to-verify" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>What you did</th>
+<th>What should happen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wrote <code>print("This is my new scene")</code> in the first-level region</td>
+<td>The console prints that string</td>
+</tr>
+<tr>
+<td>Wrote <code>Sprites.CreateSprite("poseur.png")</code> in the first-level region</td>
+<td>A Poseur image appears centre screen</td>
+</tr>
+<tr>
+<td>Set <code>FirstRoom</code> in <code>Game/conf_pure.lua</code> to the scene name</td>
+<td>The game opens directly into that scene</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Still landing in the old scene after changing <code>FirstRoom</code></p>
+<p>A scene name uses dots for subdirectories: <code>Battle.myfirst</code> maps to <code>Scripts/Scenes/Battle/myfirst.lua</code> or <code>Game/Scenes/Battle/myfirst.lua</code> .<br>
+The two roots are searched as <code>Game.Scenes.</code> first and <code>Scripts.Scenes.</code> second; when neither has the file, the terminal prints a message starting with <code>[Scenes]</code> .</p>
+</div>
 
 
 

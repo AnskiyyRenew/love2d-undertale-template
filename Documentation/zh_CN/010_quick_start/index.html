@@ -79,6 +79,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -459,6 +464,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -579,6 +592,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2199,6 +2324,8 @@
       
         
       
+        
+      
     
     
     
@@ -2403,6 +2530,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2793,6 +2948,97 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        按想做的东西选入口
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        引擎能做什么
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        通用底座
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        两条路线
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="两条路线">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        路线 A：一场能打的战斗
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        路线 B：一张能走的地图
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        拿到产出之后
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2810,16 +3056,155 @@
 
   <h1>快速上手</h1>
 
-<p>本页面旨在让 <code>无从下手</code> 的用户进行部分参考，涵盖从 <code>刚入门</code> 直到 <code>开始制作回合/Overworld地图</code> 阶段，请按需阅读本专题下的目录。</p>
-<p>也同样包含包括常见问题等部分。</p>
-<p>在本专题下，考虑到所有人的能力差异，学习进度不会太快，请放心食用。</p>
+<p>本专题回答一个问题： <code>SoulEngine</code> 与 <code>LOVE2D</code> 安装完成之后，接下来做什么。</p>
+<p>专题分成两段：<strong>通用底座</strong>四页是后面所有路线都要用到的部分，读完后能让画面跑起来；<strong>两条路线</strong>各自独立，选一条走完即可得到一个可运行的结果，不需要两条都做。</p>
 <hr />
-<p>如果你已经下载好了 <code>SoulEngine</code> 和 <code>LOVE2D</code> ，接下来你或许会茫然：</p>
-<div class="admonition question">
-<p class="admonition-title">Question</p>
-<p>接下来我要做什么？有什么可以让我做的？</p>
+<h2 id="_1">按想做的东西选入口<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>已经想好做什么</th>
+<th>入口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一场能打的回合制战斗</td>
+<td><a href="040_first_battle/index.html">第一场战斗</a></td>
+</tr>
+<tr>
+<td>一张能走动的地图</td>
+<td><a href="050_first_map/index.html">第一张地图</a></td>
+</tr>
+<tr>
+<td>界面、过场演出、小游戏</td>
+<td>读下方的通用底座，读完直接写自己的场景</td>
+</tr>
+<tr>
+<td>还没决定</td>
+<td>读下方的通用底座，读完再回到这里选</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">通用底座不能跳过</p>
+<p>两条路线都要先知道场景怎么建、贴图怎么放。<code>conf.lua</code> 与 <code>Game/conf_pure.lua</code> 的区别、Game 区覆盖规则也属于这一层。</p>
 </div>
-<p>倘若你真的有这种疑问，那么接下来，在经过深思熟虑整理了众多看法后，特地整理出了学习顺序，确保各位可以从 <code>懵懂无知</code> 一步步成长为 <code>SoulEngine大神</code> 。</p>
+<hr />
+<h2 id="_2">引擎能做什么<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>引擎按模块划分职责，下表按"想做出的东西"给出对应的模块与查阅入口：</p>
+<table>
+<thead>
+<tr>
+<th>想做出的东西</th>
+<th>由哪部分负责</th>
+<th>查阅</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>回合制战斗、弹幕、敌人回合</td>
+<td>战斗系统</td>
+<td><a href="../030_battle_system/index.html">战斗系统</a></td>
+</tr>
+<tr>
+<td>在地图上走动、对话、存档点、箱子、遇敌</td>
+<td>Overworld 主世界</td>
+<td><a href="../040_overworld/index.html">Overworld 主世界系统</a></td>
+</tr>
+<tr>
+<td>商店买卖、拒收台词、交谈话题</td>
+<td>Overworld → 商店</td>
+<td><a href="../040_overworld/060_shop/index.html">商店</a></td>
+</tr>
+<tr>
+<td>菜单、状态页、背包</td>
+<td>Overworld → 菜单</td>
+<td><a href="../040_overworld/040_menu/index.html">菜单 · 存档 · 箱子</a></td>
+</tr>
+<tr>
+<td>自定义界面、过场演出、小游戏</td>
+<td>场景 + 贴图 + 打字机 + GUI</td>
+<td><a href="../020_basic/index.html">基础开发</a></td>
+</tr>
+<tr>
+<td>背景音乐与音效</td>
+<td>Audio</td>
+<td><a href="../020_basic/050_audio/index.html">基础开发 → 音频</a></td>
+</tr>
+<tr>
+<td>多语言切换</td>
+<td>Localize</td>
+<td><a href="../080_l10n/index.html">本地化</a></td>
+</tr>
+<tr>
+<td>奖杯、分数榜、云端存档</td>
+<td>GameJolt</td>
+<td><a href="../090_network/000_gamejolt/index.html">网络开发 → GameJolt</a></td>
+</tr>
+<tr>
+<td>打包成 exe / APK / 网页</td>
+<td>Packager</td>
+<td><a href="../100_export/index.html">导出与发布</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">不属于引擎范围的部分</p>
+<p>地图需要用 Tiled 编辑，图块与角色素材需要自行绘制或获取。引擎负责读取与运行这些内容，不提供制作工具。</p>
+</div>
+<hr />
+<h2 id="_3">通用底座<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>四页按顺序阅读，每页末尾都有对应的验证方式：</p>
+<table>
+<thead>
+<tr>
+<th>页面</th>
+<th>读完能做什么</th>
+<th>验证方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="000_conf/index.html">修改游戏信息</a></td>
+<td>改掉窗口标题、作者、初始场景</td>
+<td>启动后窗口标题与进入的场景改变</td>
+</tr>
+<tr>
+<td><a href="010_scene/index.html">新建与跳转场景</a></td>
+<td>让引擎打开自己写的场景</td>
+<td>控制台输出指定内容，或屏幕中央出现图片</td>
+</tr>
+<tr>
+<td><a href="020_sprites/index.html">贴图的创建</a></td>
+<td>在屏幕上放一张图并改属性</td>
+<td>屏幕上出现该图</td>
+</tr>
+<tr>
+<td><a href="030_typers/index.html">显示文字</a></td>
+<td>在屏幕上打出一行字</td>
+<td>文字逐字出现</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_4">两条路线<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="a">路线 A：一场能打的战斗<a class="headerlink" href="#a" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>产出</strong>：敌人出现在屏幕上，可完成一次攻击结算与一个敌人回合。</li>
+<li><strong>需要改动的文件</strong>：遭遇文件、战斗场景、初始场景配置，共三处。</li>
+<li><strong>入口</strong>：<a href="040_first_battle/index.html">第一场战斗</a></li>
+</ul>
+<h3 id="b">路线 B：一张能走的地图<a class="headerlink" href="#b" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>产出</strong>：角色在地图上走动，走到标记处能触发对话。</li>
+<li><strong>需要改动的文件</strong>：主世界场景、初始场景配置，共两处。地图可直接使用引擎自带的那张。</li>
+<li><strong>入口</strong>：<a href="050_first_map/index.html">第一张地图</a></li>
+<li>自建地图需要 Tiled，见 <a href="../040_overworld/010_map/index.html">Overworld → 地图与对象层</a> 。</li>
+</ul>
+<hr />
+<h2 id="_5">拿到产出之后<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p><a href="060_next/index.html">接下来读什么</a></p>
 
 
 

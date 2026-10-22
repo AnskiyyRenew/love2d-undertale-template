@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../070_develop/050_secrets/index.html">
+        <link rel="prev" href="../070_develop/060_bundled_assets/index.html">
       
       
         <link rel="next" href="000_files/index.html">
@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2202,6 +2322,8 @@
       
         
       
+        
+      
     
     
     
@@ -2406,6 +2528,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2857,8 +3007,8 @@
   <h1>本地化</h1>
 
 <p>本地化（L10n）把<strong>所有面向玩家的文字</strong>从代码里抽出来，放进 JSON 文件。
-代码里只写"键"，运行时由 Lua 库查表、替换占位符，得到当前语言的实际文本。</p>
-<p>三块东西：</p>
+代码中只写键名，运行时由 Lua 库查表、替换占位符，得到当前语言的实际文本。</p>
+<p>三部分组成：</p>
 <table>
 <thead>
 <tr>
@@ -2876,7 +3026,7 @@
 <tr>
 <td>游戏覆盖翻译</td>
 <td><code>Game/Localization/</code></td>
-<td><strong>你的游戏的文案放这里</strong>，同名文件<strong>叠加在引擎之上</strong></td>
+<td><strong>游戏自身的文案放在此处</strong>，同名文件<strong>叠加在引擎之上</strong></td>
 </tr>
 <tr>
 <td>查找替换库</td>

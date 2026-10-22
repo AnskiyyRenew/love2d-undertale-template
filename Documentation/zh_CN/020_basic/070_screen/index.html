@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2302,6 +2422,8 @@
       
         
       
+        
+      
     
     
     
@@ -2506,6 +2628,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -3043,7 +3193,7 @@
 </details>
 <hr />
 <h2 id="screen_scale">画布缩放（SCREEN_SCALE）<a class="headerlink" href="#screen_scale" title="Permanent link">&para;</a></h2>
-<p>画布本身永远是 <code>CANVAS_WIDTH × CANVAS_HEIGHT</code> ，变的只是它<strong>被放多大画到窗口里</strong>。这件事由 <code>conf.lua</code> 里的 <code>SCREEN_SCALE</code> 决定，并且画布<strong>始终居中</strong>（边框也跟着画布一起缩放，所以窗框和游戏画面不会错位）。</p>
+<p>画布本身的尺寸始终为 <code>CANVAS_WIDTH × CANVAS_HEIGHT</code> ， <code>SCREEN_SCALE</code> 决定它绘制到窗口时的放大倍数，该配置位于 <code>conf.lua</code> 。画布<strong>始终居中</strong>（边框也随画布一起缩放，因此窗框与游戏画面不会错位）。</p>
 <table>
 <thead>
 <tr>
@@ -3075,25 +3225,25 @@
 <div class="highlight"><pre><span></span><code><span class="nf">SetScreenScale</span><span class="p">(</span><span class="s2">&quot;integer&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 切换缩放方式</span>
 <span class="nb">print</span><span class="p">(</span><span class="nf">GetScreenScale</span><span class="p">())</span><span class="w">     </span><span class="c1">-- 读出当前倍数（例如 2）</span>
 </code></pre></div>
-<p>旧的 <code>FILL_SCREEN</code> 现在只是遗留开关：<strong>只有当 <code>SCREEN_SCALE</code> 为 <code>nil</code></strong> 时才起作用（含义是"全屏时按 <code>auto</code> ，否则 1:1"）。新项目直接用 <code>SCREEN_SCALE</code> 就好。</p>
+<p>旧的 <code>FILL_SCREEN</code> 现在只是遗留开关：<strong>只有当 <code>SCREEN_SCALE</code> 为 <code>nil</code></strong> 时才起作用（含义是全屏时按 <code>auto</code> ，否则 1:1）。新项目使用 <code>SCREEN_SCALE</code> 。</p>
 <hr />
 <h2 id="_2">中间画布<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>此画布并不负责直接绘制屏幕上的内容，它的作用只有一个： <strong>着色器</strong> 。</p>
-<p>当给整个屏幕设置着色器的时候，中间画布会派上用场，负责进行着色器的叠加操作，让至少两个着色器可以同时显示在屏幕上。</p>
-<p><strong>详细的着色器专题请看 <a href="../../050_intermediate/020_shaders/index.html">高阶开发 → 着色器</a> 。</strong></p>
-<p>简单介绍绘制流程，我将这个方法称为乒乓法。 <strong>处理流程类似于将所有着色器在这两个画布之间来回切换，故称为乒乓法</strong> ：
+<p>该画布不直接绘制屏幕内容，仅用于<strong>着色器</strong>处理。</p>
+<p>为整个屏幕设置着色器时，中间画布负责着色器的叠加，使两个及以上的着色器同时生效。</p>
+<p><strong>着色器的详细说明见 <a href="../../050_intermediate/020_shaders/index.html">高阶开发 → 着色器</a> 。</strong></p>
+<p>绘制流程如下，该方法在两个画布之间来回切换以叠加着色器，称为乒乓法：
 <div class="highlight"><pre><span></span><code>1. 先将第一个着色器打到2号画布。
 2. 切换画布，2号画布输入到1号画布，额外加一个着色器。
 3. 两画布互换，1号画布现在叠了两层特效，输入到2号画布，再加一个着色器。
 4. 两画布再次互换，重新回到步骤2。
 5. 重复这两个步骤直到所有着色器被加上。
 </code></pre></div></p>
-<p>此过程耗时很短。</p>
-<p><strong>注意：大多数所谓的同时支持多个着色器的模板或引擎，基本也是使用这个方法制作的，相当于我分享了部分做法。</strong></p>
+<p>该过程在单次绘制流程内完成。</p>
+<p><strong>多数支持多个着色器的模板与引擎使用相同的方法。</strong></p>
 <hr />
 <h2 id="_3">摄像机<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>画布是不动的，永远站在原地，而摄像机的作用是偏移 <strong>画布里面</strong> 的内容。</p>
-<p>默认情况下，已经有一个摄像机被生成了，叫做 <code>Camera</code> ，以下是它的属性和方法：</p>
+<p>画布位置固定，摄像机用于偏移<strong>画布内部</strong>的内容。</p>
+<p>引擎默认生成一个名为 <code>Camera</code> 的摄像机，其属性与方法如下：</p>
 <div class="admonition example">
 <p class="admonition-title">摄像机属性</p>
 <ul>
@@ -3101,10 +3251,10 @@
 <li><code>w / h</code> 摄像机的视图大小，也就是摄像机从中心开始能看到多大的地方，默认 <code>(640, 480)</code> ，即整个屏幕。</li>
 <li><code>xscale / yscale</code> 摄像机在水平竖直方向上的缩放，默认 <code>(1, 1)</code> ，即原大小。</li>
 <li><code>r</code> 摄像机的角度，默认 <code>0</code> 。</li>
-<li><code>shaker</code> 用来制作摄像机震动的变量。</li>
+<li><code>shaker</code> 摄像机震动相关变量。</li>
 </ul>
 </div>
-<p>下面是常用的摄像机方法，部分 <strong>已经被正确使用且无需二次调用</strong> 的方法不会出现在这里：</p>
+<p>以下列出常用方法；引擎内部已调用且无需再次调用的方法不在其中：</p>
 <div class="admonition example">
 <p class="admonition-title">常用摄像机方法</p>
 <ul>
@@ -3125,7 +3275,7 @@
 </ul>
 </div>
 <p>关于新建摄像机：<br>
-新建的摄像机不会被使用，除非你真的修改了 <code>main.lua</code> ，不再有单独的一个 <code>Camera</code> 主摄像机来确定偏移与缩放。</p>
+新建的摄像机不会被使用，除非修改 <code>main.lua</code> ，不再由单独的 <code>Camera</code> 主摄像机确定偏移与缩放。</p>
 <hr />
 <h2 id="overworld">关于 Overworld 边界框定<a class="headerlink" href="#overworld" title="Permanent link">&para;</a></h2>
 <p>在 <code>v3.0.0</code> 及以后版本中，所有的 <code>Overworld</code> 地图都自动加上了检测地图边界框定摄像机的做法，无需再次手动输入 <code>setBounds</code> 等函数。</p>

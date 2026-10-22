@@ -12,7 +12,7 @@
         <link rel="prev" href="../040_preload/index.html">
       
       
-        <link rel="next" href="../../080_l10n/index.html">
+        <link rel="next" href="../060_bundled_assets/index.html">
       
       
         
@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2204,6 +2324,8 @@
       
         
       
+        
+      
     
     
     
@@ -2553,6 +2675,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -3086,7 +3236,7 @@
 <tr>
 <td>hook 导出函数</td>
 <td>不能</td>
-<td>进程内随便拦截</td>
+<td>可在进程内拦截导出函数</td>
 </tr>
 <tr>
 <td><code>print(Gamejolt.private_key)</code></td>
@@ -3096,9 +3246,9 @@
 </tbody>
 </table>
 <p>最后一条是最根本的限制：<strong>只要密钥参与客户端签名，它就等于公开</strong>。GameJolt 官方也是这个立场。真正要守住 private key，只有让它待在服务端。</p>
-<p>这套方案换来的是一次很便宜的挪动：从"随手两分钟就能翻到"变成"得会用反汇编器"。</p>
+<p>这套方案把获取密钥的成本从"解包后直接搜索明文"提高到"需要反汇编分析"。</p>
 <div class="admonition warning">
-<p class="admonition-title">两条经验</p>
+<p class="admonition-title">使用要点</p>
 <ul>
 <li><strong>只藏真正需要藏的东西。</strong> GameJolt 的 <code>game_id</code> 是公开信息，放这里没意义，只会平白增加维护负担。</li>
 <li><strong>别指望它保护高价值资产。</strong> 如果泄露密钥会导致实质损失，请走服务端代理。</li>
@@ -3124,7 +3274,7 @@ Resources/Libs/Secrets/android/&lt;abi&gt;/libsecrets.so  Android
 </code></pre></div>
 <hr />
 <h2 id="_3">两个平台，两种落位<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>这是整个方案最容易翻车的地方： <code>ffi.load</code> 走的是<strong>操作系统加载器</strong>（ <code>LoadLibrary</code> / <code>dlopen</code> ），<strong>不是</strong> LÖVE 的虚拟文件系统。 <code>Resources/Libs/...</code> 这种路径只对 <code>love.filesystem</code> 有意义，对操作系统毫无意义。</p>
+<p>这是整个方案最容易出错的地方： <code>ffi.load</code> 走的是<strong>操作系统加载器</strong>（ <code>LoadLibrary</code> / <code>dlopen</code> ），<strong>不是</strong> LÖVE 的虚拟文件系统。 <code>Resources/Libs/...</code> 这种路径只对 <code>love.filesystem</code> 有意义，对操作系统毫无意义。</p>
 <table>
 <thead>
 <tr>
@@ -3141,7 +3291,7 @@ Resources/Libs/Secrets/android/&lt;abi&gt;/libsecrets.so  Android
 </tr>
 <tr>
 <td>fused exe</td>
-<td><strong>exe 同目录</strong> —— fused 之后磁盘上没有源码树</td>
+<td><strong>exe 同目录</strong>（fused 之后磁盘上没有源码树）</td>
 <td><code>build_tool.py: copy_secret_dll</code></td>
 </tr>
 <tr>
@@ -3280,7 +3430,7 @@ Resources/Libs/Secrets/android/&lt;abi&gt;/libsecrets.so  Android
 <span class="p">}</span>
 </code></pre></div>
 <p>所以 <code>.rodata</code> 里不存在任何 blob， <code>strings</code> 扫不出来。编译加了 <code>-s</code> （strip）和 <code>-fvisibility=hidden</code> ，只导出两个符号。</p>
-<p>导出函数名刻意起得很朴素（ <code>se_cfg</code> / <code>se_cfg_probe</code> ），不出现 <code>secret</code> 、 <code>key</code> 、 <code>gamejolt</code> 之类的字眼 —— 目的是让人第一眼看不出这是什么库。</p>
+<p>导出函数名刻意起得很朴素（ <code>se_cfg</code> / <code>se_cfg_probe</code> ），不出现 <code>secret</code> 、 <code>key</code> 、 <code>gamejolt</code> 之类的字眼，目的是降低该库的可识别度。</p>
 
 
 

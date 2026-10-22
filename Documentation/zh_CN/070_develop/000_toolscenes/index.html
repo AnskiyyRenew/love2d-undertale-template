@@ -462,6 +462,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -582,6 +590,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../010_quick_start/060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2204,6 +2324,8 @@
       
         
       
+        
+      
     
     
     
@@ -2375,7 +2497,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        更简洁的写法
+        直接注册控制点
       
     </span>
   </a>
@@ -2523,6 +2645,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2979,7 +3129,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        更简洁的写法
+        直接注册控制点
       
     </span>
   </a>
@@ -3010,7 +3160,7 @@
 
   <h1>场景辅助工具</h1>
 
-<p>引擎内置了一些 <strong>辅助开发用的工具场景</strong> ，放在 <code>Scripts/Scenes/TOOL/</code> 与 <code>Scripts/Scenes/TEST/</code> 目录下。它们只在开发阶段使用，不参与正式游戏流程，你可以随时改写甚至删掉它们。</p>
+<p>引擎内置了一些 <strong>辅助开发用的工具场景</strong> ，放在 <code>Scripts/Scenes/TOOL/</code> 与 <code>Scripts/Scenes/TEST/</code> 目录下。它们只在开发阶段使用，不参与正式游戏流程，可随时改写或删除。</p>
 <p>这些场景和普通场景一样用 <code>Scenes.switchTo</code> 进入。想让它成为启动场景，直接在 <code>conf_pure.lua</code> 里改 <code>FirstRoom</code> ：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Global</span><span class="p">.</span><span class="nf">SetVariable</span><span class="p">(</span><span class="s2">&quot;FirstRoom&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOOL.TweenEase&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -3020,8 +3170,8 @@
 </div>
 <hr />
 <h2 id="_1">贝塞尔缓动编辑器<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>缓动库的贝塞尔曲线可以手写控制点，也可以用这个场景 <strong>可视化地捏</strong> 出来。</p>
-<p>打开场景 <code>TOOL.TweenEase</code> 后，左侧是操作按钮，右侧是一块坐标系画布：<strong>横轴是时间进度 <code>t</code>（0~1），纵轴是缓动后的输出值（0~1）</strong> 。曲线越"鼓"，缓动的加减速就越明显。</p>
+<p>缓动库的贝塞尔曲线可以手写控制点，也可以用这个场景 <strong>可视化地调整</strong> 。</p>
+<p>打开场景 <code>TOOL.TweenEase</code> 后，左侧是操作按钮，右侧是一块坐标系画布：<strong>横轴是时间进度 <code>t</code>（0~1），纵轴是缓动后的输出值（0~1）</strong> 。曲线的弯曲程度越大，缓动的加减速越明显。</p>
 <h3 id="_2">画布上的图形含义<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -3118,14 +3268,15 @@
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">py</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="kr">end</span><span class="p">)</span>
 </code></pre></div>
-<p>把这段粘进你的项目后，就能像普通缓动一样使用它：</p>
+<p>将这段代码加入项目后，可按普通缓动的方式使用：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Tween</span><span class="p">.</span><span class="nf">CreateTween</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="nv">value</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="nv">value</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">poseur</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">value</span>
 <span class="kr">end</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;myBezier&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="_6">更简洁的写法<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
-<p>如果你只是想要一条固定形状的贝塞尔缓动，库还提供了直接注册控制点的接口 <code>Tween.CreateBezierEasing(name, points)</code> ，等价于上面整段手动代码：</p>
+<h3 id="_6">直接注册控制点<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>只需要一条固定形状的贝塞尔缓动时，还可以使用直接注册控制点的接口
+<code>Tween.CreateBezierEasing(name, points)</code> ，等价于上面整段手写代码：</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Tween</span><span class="p">.</span><span class="nf">CreateBezierEasing</span><span class="p">(</span><span class="s2">&quot;myBezier&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="p">{</span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">    </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
 <span class="w">    </span><span class="p">{</span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.33</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.67</span><span class="p">},</span>
@@ -3137,7 +3288,8 @@
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="nv">value</span><span class="p">)</span>
 <span class="kr">end</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;myBezier&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span>
 </code></pre></div>
-<p>也就是说：用编辑器 <strong>捏形状</strong>，然后把导出的控制点列表交给 <code>CreateBezierEasing</code> 即可，无需保留那段德卡斯特里奥求值代码。</p>
+<p>使用方式为：在编辑器中调整形状，再把导出的控制点列表交给 <code>CreateBezierEasing</code> ，
+不需要保留那段德卡斯特里奥求值代码。</p>
 <div class="admonition tip">
 <p class="admonition-title">关于缓动名与方向</p>
 <p>自定义缓动的名字本身不区分类型与方向，<code>CreateTween</code> 的 <code>easingType</code> 直接填这个名字、方向参数留空字符串 <code>""</code> 即可。</p>

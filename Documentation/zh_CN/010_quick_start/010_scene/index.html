@@ -464,6 +464,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -664,6 +672,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        验证点
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -688,6 +707,118 @@
     
   
     贴图的创建
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../030_typers/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    显示文字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../040_first_battle/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一场战斗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../050_first_map/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一张地图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../060_next/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    接下来读什么
   
 
     
@@ -2308,6 +2439,8 @@
       
         
       
+        
+      
     
     
     
@@ -2512,6 +2645,34 @@
     
   
     ❕️ 密钥原生库
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../070_develop/060_bundled_assets/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 内置资源一览
   
 
     
@@ -2969,6 +3130,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        验证点
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2988,16 +3160,16 @@
 
   <h1>新建与跳转场景</h1>
 
-<p>场景，可以把它想象成你新建了一个 <code>世界</code> 。<br>
-在这个世界中的所有的操作均由你来定义。</p>
+<p>本页属于<strong>通用底座</strong>的一部分，两条路线都要用到。</p>
+<p>场景可视为一个独立的运行单元，其中的全部行为由场景自身定义。完整的场景说明见 <a href="../../020_basic/010_scene/index.html">基础开发 → 场景</a> 。</p>
 <hr />
 <h2 id="_1">新建场景<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>在 <code>SoulEngine</code> 中，拥有两个底层场景模板： <code>scene_template.lua</code> 与 <code>scene_template_full.lua</code></p>
-<p>刚上手的时候，我们复制轻量版的 <code>scene_template.lua</code> 即可。</p>
+<p>初次使用时复制轻量版 <code>scene_template.lua</code> 即可。</p>
 <p>放置在路径 <code>Scripts/Scenes/</code> 中， <u>也就是 <code>scene_template.lua</code> 同目录下</u> 。想覆盖引擎自带的场景，就把同名文件放进 <code>Game/Scenes/</code> ，Game 区优先、引擎目录兜底。</p>
 <div class="admonition tip">
 <p class="admonition-title">调整初始化配置</p>
-<p>在这之后不要忘了把 <code>Game/conf_pure.lua</code> 里的 <code>FirstRoom</code> 改成你刚新建的场景名字。</p>
+<p>随后需将 <code>Game/conf_pure.lua</code> 里的 <code>FirstRoom</code> 改为新建场景的名称。</p>
 </div>
 <hr />
 <h2 id="_2">编辑场景<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -3016,32 +3188,60 @@
 
 <span class="kr">return</span><span class="w"> </span><span class="nv">scene</span>
 </code></pre></div>
-<p>轻量版场景内部仅这些代码，你也许发现了这些代码将这整个场景代码分成了几个不同的部分，接下来每个部分的功能如下：</p>
+<p>轻量版场景内部仅这些代码，该模板将场景代码分为几个不同部分，各部分功能如下：</p>
 <div class="admonition tip">
 <p class="admonition-title">同级代码</p>
-<p>在这里，我们按 <code>包裹次数</code> 进行分级：<br>
-简而言之，在 <code>function - end</code> 包裹区域内，算作一层。</p>
-<p>若还有新的包裹块那么会多加一层。</p>
+<p>分级按 <code>包裹次数</code> 计算：在 <code>function - end</code> 包裹区域内算作一层。</p>
+<p>若还有新的包裹块，则再加一层。</p>
 </div>
 <ol>
 <li>第一层区域，在所有 <code>function - end</code> 区域之外、 <code>return</code> 之前，将会在进入场景的一瞬间执行 <u>仅仅一次</u> 。</li>
 <li>第二层区域，在 <code>function</code> 内部，会在特定情况下执行。</li>
 </ol>
-<p>至于详细来说：</p>
+<p>具体说明：</p>
 <ul>
 <li><code>scene.update</code> 之内的区域每一刻（帧）都会执行，每秒大约执行 <code>60</code> 次（默认）。</li>
 <li><code>scene.draw</code> 之内的区域每一刻（帧）都会执行，每秒大约执行 <code>60</code> 次（默认）。</li>
 </ul>
 <h3 id="_4">制造第一次反馈<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>让我们假设你成功复制粘贴了一个新的场景，请在 <code>第一层区域</code> 范围内键入如下代码：
+<p>复制出新场景后，在 <code>第一层区域</code> 中键入下面这段：
 <div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;这是我的新场景&quot;</span><span class="p">)</span>
 </code></pre></div></p>
-<p>在这之后，进入场景时，控制台内会出现print里面的字样，这说明你成功了。</p>
+<p>进入场景后，控制台会输出该字符串，即表示执行成功。</p>
 <h3 id="android">Android 测试反馈<a class="headerlink" href="#android" title="Permanent link">&para;</a></h3>
-<p>在 Android ，若没有控制台可看而又不知道自己是否成功跳转到了自己刚写的场景中，那么我们可以复制如下代码到场景的 <code>第一层区域</code> 中：
+<p>在 Android 上若无法查看控制台，可将如下代码复制到场景的 <code>第一层区域</code> ，用于确认是否成功跳转到新建场景：
 <div class="highlight"><pre><span></span><code><span class="nv">Sprites</span><span class="p">.</span><span class="nf">CreateSprite</span><span class="p">(</span><span class="s2">&quot;poseur.png&quot;</span><span class="p">)</span>
 </code></pre></div></p>
 <p>上面的代码会在屏幕正中央创建一个 <code>Poseur</code> 图片。</p>
+<hr />
+<h2 id="_5">验证点<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>做法</th>
+<th>应该看到的变化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>场景第一层区域写 <code>print("这是我的新场景")</code></td>
+<td>控制台输出该字符串</td>
+</tr>
+<tr>
+<td>场景第一层区域写 <code>Sprites.CreateSprite("poseur.png")</code></td>
+<td>屏幕正中央出现 Poseur 图片</td>
+</tr>
+<tr>
+<td><code>Game/conf_pure.lua</code> 的 <code>FirstRoom</code> 改为该场景名</td>
+<td>启动后直接进入该场景</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">改了 <code>FirstRoom</code> 仍然进入旧场景</p>
+<p>场景名用点号表示子目录： <code>Battle.myfirst</code> 对应 <code>Scripts/Scenes/Battle/myfirst.lua</code> 或 <code>Game/Scenes/Battle/myfirst.lua</code> 。<br>
+两个根按 <code>Game.Scenes.</code> 优先、 <code>Scripts.Scenes.</code> 兜底的顺序查找，两处都找不到时终端会打印 <code>[Scenes]</code> 开头的提示。</p>
+</div>
 
 
 
