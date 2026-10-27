@@ -43,7 +43,8 @@ logic = {
 }
 
 logic.flags = {
-    test_killed = 0
+    test_killed = 0,
+    dialog = false
 }
 logic.chests = {
     chest = {

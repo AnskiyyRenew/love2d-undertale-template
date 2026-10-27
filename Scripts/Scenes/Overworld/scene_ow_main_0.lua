@@ -126,7 +126,7 @@ function scene.update(dt)
         end
     end
 
-    if (ow.getInteractResult("sign", 1, nil, true)) then
+    if (ow.getInteractResult("sign", 1)) then
         if (Controller.GetState("confirm") == 1) then
             ow.dialogNew({
                 "* SOL, SINCERA and SPYDER"

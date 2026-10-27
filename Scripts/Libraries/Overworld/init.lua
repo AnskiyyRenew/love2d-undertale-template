@@ -111,7 +111,11 @@ local overworld = {
     stat = require(path .. "Overworld.stat"),
     inst = {},
     interacts = {},
-    ui_prefer = "down",
+    -- "auto" derives the side from the player's screen position every time an
+    -- overlay opens; "up" / "down" pin it.
+    ui_prefer = "auto",
+    -- Canvas Y below which overlays flip up (2/3 of the 480px canvas).
+    ui_threshold = 320,
 
     _enc = {
         _type = "default",
@@ -167,6 +171,37 @@ function GetRelativePos(x, y)
     local rx = clamp(Camera.x, (Camera.max_x or math.huge), (Camera.min_x or -math.huge))
     local ry = clamp(Camera.y, (Camera.max_y or math.huge), (Camera.min_y or -math.huge))
     return rx - 320 + x, ry - 240 + y
+end
+
+---Canvas-space Y of the player sprite (0-480), or nil before the map is ready.
+---Mirrors the camera clamping used by GetRelativePos so overlays and the
+---side-detection below always agree on where the camera actually is.
+function overworld.GetPlayerScreenY()
+    local spr = Char and Char.currentSprite
+    if (not spr) then return nil end
+    local ry = clamp(Camera.y, (Camera.max_y or math.huge), (Camera.min_y or -math.huge))
+    return spr.y + 240 - ry
+end
+
+---Mirror a canvas Y across the horizontal midline (y = 240).
+function overworld.FlipY(y)
+    return 480 - y
+end
+
+---Which side the overlay UI (dialogs, the stat menu) opens on.
+---Set `ui_prefer` to "up" / "down" to force it; the default "auto" opens the
+---UI above the player once the player drops below `ui_threshold` (canvas Y,
+---320 = the bottom third), so the box never sits on top of the sprite.
+function overworld.ResolveUIPosition()
+    local pref = overworld.ui_prefer
+    if (pref == "up" or pref == "down") then
+        return pref
+    end
+
+    local sy = overworld.GetPlayerScreenY()
+    if (not sy) then return "down" end
+
+    return (sy > (overworld.ui_threshold or 320)) and "up" or "down"
 end
 
 function SpawnBlock(x, y, width, height, thickness)
@@ -539,8 +574,13 @@ function overworld.dialogNew(texts, position)
     end
     dialog_just_closed = false -- a new dialog clears any stale frame lock
     dialog_lock_pending = false
-    local pos = (position or overworld.ui_prefer)
-    local y = (pos == "down" and 400 or 80)
+    local pos = position
+    if (pos ~= "up" and pos ~= "down") then
+        pos = overworld.ResolveUIPosition()
+    end
+    -- 400 and 80 are mirrors across the midline (FlipY(400) == 80), so only the
+    -- box moves; the text below keeps its offset from the box and never flips.
+    local y = (pos == "up") and overworld.FlipY(400) or 400
 
     local _x, _y = GetRelativePos(320, y)
     local dialog = {

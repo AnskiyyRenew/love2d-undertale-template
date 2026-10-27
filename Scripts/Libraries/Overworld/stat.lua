@@ -66,6 +66,17 @@ local in_menu = 1
 local in_item = 1
 local in_item_menu = 1
 
+-- Left column geometry (canvas coords, y is the box centre). The column is a
+-- small status box stacked on a taller button box; both share the same width.
+-- DOWN runs 56..309, UP mirrors that across the midline and runs 171..424.
+local COL_X, COL_W = 100, 132
+local STATUS_Y, STATUS_H = 106, 100
+local BUTTONS_Y, BUTTONS_H = 240, 138
+-- Baselines of the four status lines, as offsets from STATUS_Y. Keeping them
+-- relative is what lets a mirrored box carry its text along instead of
+-- flipping the lines themselves.
+local STATUS_LINE = { -46, -4, 14, 31 }
+
 function stat.Update(dt)
     if (Char.controlling) then
         if (Controller.GetState("menu") == 1 and not stat._created) then
@@ -90,29 +101,37 @@ function stat.Update(dt)
             local _x, _y = get_relative_pos(65, 205)
             heart:MoveTo(_x, _y)
 
-            local _x, _y = get_relative_pos(100, 240)
-            spawn_block(_x, _y, 132, 138, 5)
+            -- Mirror the whole left column when the player is low on screen.
+            -- The button box sits on the midline (240) and mirrors onto
+            -- itself, so only the status box actually moves down; the button
+            -- box, its order and the heart stay where they are.
+            local flipped = (Overworld.ResolveUIPosition() == "up")
+            local buttons_y = flipped and Overworld.FlipY(BUTTONS_Y) or BUTTONS_Y
+            local status_y = flipped and Overworld.FlipY(STATUS_Y) or STATUS_Y
 
-            local _x, _y = get_relative_pos(100, 106)
-            spawn_block(_x, _y, 132, 100, 5)
+            local _x, _y = get_relative_pos(COL_X, buttons_y)
+            spawn_block(_x, _y, COL_W, BUTTONS_H, 5)
 
-            local _x, _y = get_relative_pos(43, 60)
+            local _x, _y = get_relative_pos(COL_X, status_y)
+            spawn_block(_x, _y, COL_W, STATUS_H, 5)
+
+            local _x, _y = get_relative_pos(43, status_y + STATUS_LINE[1])
             local t = Typers.InstText.New(DATA.player.name, {_x, _y}, "GUI")
             table.insert(elements, t)
 
-            local _x, _y = get_relative_pos(45, 102)
+            local _x, _y = get_relative_pos(45, status_y + STATUS_LINE[2])
             local t = Typers.InstText.New("LV " .. DATA.player.lv, {_x, _y}, "GUI")
             t.font = "Crypt Of Tomorrow.ttf"
             t.fontsize = 16
             table.insert(elements, t)
 
-            local _x, _y = get_relative_pos(45, 120)
+            local _x, _y = get_relative_pos(45, status_y + STATUS_LINE[3])
             local t = Typers.InstText.New("HP " .. DATA.player.hp .. "/" .. DATA.player.maxhp, {_x, _y}, "GUI")
             t.font = "Crypt Of Tomorrow.ttf"
             t.fontsize = 16
             table.insert(elements, t)
 
-            local _x, _y = get_relative_pos(45, 137)
+            local _x, _y = get_relative_pos(45, status_y + STATUS_LINE[4])
             local t = Typers.InstText.New("G  " .. DATA.player.gold, {_x, _y}, "GUI")
             t.font = "Crypt Of Tomorrow.ttf"
             t.fontsize = 16

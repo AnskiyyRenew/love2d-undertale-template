@@ -166,13 +166,6 @@ local function load_native()
     return nil
 end
 
-local function ensure()
-    if Secrets._tried then return end
-    Secrets._tried = true
-    wire_fallback()
-    Secrets._lib = load_native()
-end
-
 
 -- 4. Fallback wiring
 
@@ -191,6 +184,13 @@ local function wire_fallback()
     if (ok_v and type(pk) == "string" and pk ~= "") then
         Secrets.fallback[Secrets.SLOT_GAMEJOLT_PK] = pk
     end
+end
+
+local function ensure()
+    if Secrets._tried then return end
+    Secrets._tried = true
+    wire_fallback()
+    Secrets._lib = load_native()
 end
 
 
