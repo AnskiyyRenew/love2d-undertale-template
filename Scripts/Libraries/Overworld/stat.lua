@@ -65,6 +65,11 @@ heart.color = {1, 0, 0}
 local in_menu = 1
 local in_item = 1
 local in_item_menu = 1
+local in_cell = 1
+-- One-frame input swallow: set when entering item2 so the same confirm press
+-- that opened the sub-menu can't instantly fire its confirm on the same frame.
+-- Mirrors the input_lock pattern used in shop.lua.
+local input_lock = false
 
 -- Left column geometry (canvas coords, y is the box centre). The column is a
 -- small status box stacked on a taller button box; both share the same width.
@@ -162,6 +167,11 @@ function stat.Update(dt)
         if (Controller.GetState("confirm") == 1) then
             if (stat._page == "idle") then
                 if (in_menu == 1) then
+                    -- Empty inventory: block entering the item list so
+                    -- confirm is a no-op and the top menu stays put.
+                    if (#DATA.player.items == 0) then
+                        return
+                    end
                     in_item = 1
                     in_item_menu = 1
                     stat._page = "item"
@@ -220,10 +230,11 @@ function stat.Update(dt)
                     table.insert(temp_elements, t)
 
                 elseif (in_menu == 3) then
-                    stat._page = "cell"
+                stat._page = "cell"
+                in_cell = 1
 
-                    local _x, _y = get_relative_pos(360, 230)
-                    spawn_block(_x, _y, 345, 350, 5, temp_elements)
+                local _x, _y = get_relative_pos(360, 230)
+                spawn_block(_x, _y, 345, 350, 5, temp_elements)
 
                     local _x, _y = get_relative_pos(215, 87)
                     heart:MoveTo(_x, _y)
@@ -243,6 +254,13 @@ function stat.Update(dt)
                 end
             elseif (stat._page == "item") then
                 stat._page = "item2"
+                input_lock = true
+            elseif (stat._page == "cell") then
+                local _cell = DATA.player.cells[in_cell]
+                if (_cell) then
+                    stat.Destroy()
+                    ITEMS.DoCellAction(_cell.id)
+                end
             end
         elseif (Controller.GetState("cancel") == 1) then
             if (stat._page == "idle") then
@@ -296,21 +314,35 @@ function stat.Update(dt)
             end
             local _x, _y = get_relative_pos(215, 87 + (in_item - 1) * 32)
             heart:MoveTo(_x, _y)
-        elseif (stat._page == "item2") then
-            if (Controller.GetState("right") == 1) then
-                in_item_menu = math.min(3, in_item_menu + 1)
-            elseif (Controller.GetState("left") == 1) then
-                in_item_menu = math.max(1, in_item_menu - 1)
+        elseif (stat._page == "cell") then
+            if (Controller.GetState("down") == 1) then
+                in_cell = math.min(math.max(1, #DATA.player.cells), in_cell + 1)
+            elseif (Controller.GetState("up") == 1) then
+                in_cell = math.max(1, in_cell - 1)
             end
-
-            local _i18nx = tonumber(Localize.localizeText("Overworld.Menu.Interval")[in_item_menu])
-            local _x, _y = get_relative_pos(_i18nx, 378)
+            local _x, _y = get_relative_pos(215, 87 + (in_cell - 1) * 32)
             heart:MoveTo(_x, _y)
+        elseif (stat._page == "item2") then
+            -- Swallow the confirm press that opened this sub-menu (same frame).
+            if (input_lock) then
+                input_lock = false
+            else
+                if (Controller.GetState("right") == 1) then
+                    in_item_menu = math.min(3, in_item_menu + 1)
+                elseif (Controller.GetState("left") == 1) then
+                    in_item_menu = math.max(1, in_item_menu - 1)
+                end
 
-            if (Controller.GetState("confirm") == 1) then
-                stat.Destroy()
-                Char.controlling = false
-                Overworld.dialogNew(ITEMS.GetActionByID())
+                local _i18nx = tonumber(Localize.localizeText("Overworld.Menu.Interval")[in_item_menu])
+                local _x, _y = get_relative_pos(_i18nx, 378)
+                heart:MoveTo(_x, _y)
+
+                if (Controller.GetState("confirm") == 1) then
+                    local _id = DATA.player.items[in_item]
+                    local _action = ({"use", "info", "drop"})[in_item_menu]
+                    stat.Destroy()
+                    ITEMS.DoItemAction(_id, _action)
+                end
             end
         end
     end
@@ -318,9 +350,21 @@ end
 
 function stat.Destroy()
     stat._created = false
+    stat._page = "idle"
     Char.controlling = true
     heart.alpha = 0
 
+    -- Clear BOTH layers: the top-level menu (elements) and whatever sub-page
+    -- was open (temp_elements). Previously only `elements` was cleared, so the
+    -- item list / USE-INFO-DROP row / cell list stayed on screen when a
+    -- third-level action popped a dialog — looked messy under the dialog box.
+    for i = #temp_elements, 1, -1
+    do
+        local e = temp_elements[i]
+        if (e.Destroy) then
+            e:Destroy()
+        end
+    end
     for i = #elements, 1, -1
     do
         local e = elements[i]
@@ -328,6 +372,12 @@ function stat.Destroy()
             e:Destroy()
         end
     end
+
+    -- Reset selection state so reopening the menu always starts clean.
+    in_item = 1
+    in_item_menu = 1
+    in_cell = 1
+    input_lock = false
 end
 
 

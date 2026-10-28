@@ -3228,15 +3228,16 @@
 <li><code>[font:x]</code> Sets the font to <code>x</code>. The path starts from <code>Resources/Fonts/</code>, but <strong><code>Game/Resources/Fonts/</code> is checked first</strong>; same-named files in the Game region take priority. Setting the font conveniently turns off bondfont; to restore it you must turn it on again yourself.</li>
 <li><code>[effect:name, int]</code> Sets the character's effect.<ul>
 <li><code>name</code> The effect name: <code>shake</code> vibrates in place, <code>rotate</code> does a slight rotation, other names mean no effect.</li>
-<li><code>int</code> Effect intensity, default <code>1</code>; larger number means stronger.</li>
+<li><code>int</code> Effect intensity; larger number means stronger. <strong>Both the comma and the value must be written</strong>: <code>[effect:shake, 1]</code>. Writing only <code>[effect:shake]</code> makes the whole tag do nothing (parsing relies on the comma separator). A value that is not a number falls back to <code>1</code>.</li>
 </ul>
 </li>
 <li><code>[outline:r, g, b, a, t]</code> Sets the text's outer border.<ul>
-<li><code>r, g, b, a</code> Border color and alpha.</li>
-<li><code>t</code> Border thickness.</li>
+<li><code>r, g, b, a</code> Border color and alpha, in the <code>0 ~ 1</code> range, handed straight to <code>setColor</code>.</li>
+<li><code>t</code> Border thickness, in pixels.</li>
+<li>All five segments accept <strong>integers only</strong>; a decimal such as <code>0.5</code> makes the whole tag fail silently.</li>
 </ul>
 </li>
-<li><code>[voice:name]</code> Sets the typing sound effect; files are in <code>Resources/Sounds/Voices/</code>, just write the file name.</li>
+<li><code>[voice:name]</code> Sets the typing sound effect; files are in <code>Resources/Sounds/Voices/</code>, just write the file name. The default is <code>v_monster.wav</code>; setting it replaces the voice list with that single entry.</li>
 <li><code>[portrait:frames|interval|mode]</code> Sets the animation played simultaneously while typing, generally a character playing a speaking animation while talking.<ul>
 <li><code>frames</code> Frame images, <strong>separated by English commas</strong>, e.g. <code>a.png, b.png</code>.</li>
 <li><code>interval</code> Seconds per frame, default <code>1/30</code>.</li>
@@ -3251,7 +3252,7 @@
 <li>A bubble belongs to "the sentence that displays it", so <code>[next]</code> clears the bubble together with the text; if you want to keep using the bubble in the next sentence you must re-<code>[showbubble:]</code>.</li>
 </ul>
 </li>
-<li><code>[showbubble:dir, pos]</code> Shows the bubble dialog box. <code>dir</code> is the tail direction, can be <code>left</code> / <code>right</code> / <code>up</code> / <code>down</code> (default <code>left</code>); <code>pos</code> is the tail's position along the border <code>0 ~ 1</code>, default <code>0.5</code>.</li>
+<li><code>[showbubble:dir, pos]</code> Shows the bubble dialog box. <code>dir</code> is the tail direction, can be <code>left</code> / <code>right</code> / <code>up</code> / <code>down</code> (default <code>left</code>); <code>pos</code> is the tail's position along the border <code>0 ~ 1</code>, default <code>0.5</code>. <strong>Both the comma and <code>pos</code> must be written</strong>; <code>[showbubble:left]</code> alone has no effect.</li>
 <li><code>[hidebubble]</code> Hides the bubble dialog box.</li>
 <li><code>[func:name]</code> Calls a function named <code>name</code>. <strong>Lookup order</strong>: first check this typer's <code>funcs</code> registry (registered with <code>typer:SetFunc</code>), if not found fall back to the <code>_G[name]</code> global. So local / closure / upvalue functions, as long as registered first with <code>:SetFunc</code>, can also be called from text, without polluting the namespace by attaching to global.</li>
 <li><code>[func:name|a, b, c]</code> Calls a function named <code>name</code>, and can pass parameters, separated by English commas. Lookup order is the same as above.<ul>
@@ -3260,7 +3261,7 @@
 <li>When not found, prints <code>[EText] function not found in typer.funcs or _G: &lt;name&gt;</code> and skips.</li>
 </ul>
 </li>
-<li><code>^</code> This symbol can be used to directly reset all styles to default.</li>
+<li><code>^</code> Resets color, alpha, outline, scale and effect to their defaults, <strong>and adds a <code>0.3</code> second pause</strong> (same dedicated timer as <code>[wait:]</code>, skipped while fast-forwarding). Font and font size are <strong>not</strong> reset; to change them back, write <code>[font:]</code> / <code>[size:]</code> again.</li>
 </ul>
 </details>
 <div class="admonition example">
@@ -3279,6 +3280,22 @@
 <div class="admonition tip">
 <p class="admonition-title">Tags can be written consecutively</p>
 <p><code>[font:x][colorHEX:ffff00][effect:shake, 2]</code> written consecutively like this is fine; effects stack in order.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Special characters in text</p>
+<p>Besides square-bracket tags, a few characters in the text are handled directly by the Engine:</p>
+<ul>
+<li><code>\n</code> Line break; the cursor returns to the start of the line and moves down one row.</li>
+<li><code>\t</code> Tab, as wide as four spaces.</li>
+<li><code>*</code> A leading asterisk plus space is treated as a dialogue prefix. The Engine normalizes <code>*X</code> into <code>* X</code>, and gives every wrapped line a <strong>two-space hanging indent</strong>. Panel text should not start with <code>*</code>, or the indent will push the characters out of the panel; see <a href="../../040_overworld/060_shop/index.html">Shop</a>.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Auto-wrap</p>
+<p><code>EText</code>'s <code>typer.auto_wrap</code> is <strong>off</strong> by default. Turning it on wraps by <code>size[1]</code>, with the same rules as <code>InstText</code>: English wraps by word, Chinese and other equal-width characters wrap character by character.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">EText</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="s2">&quot;A very very long sentence that certainly won&#39;t fit&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">270</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">})</span>
+<span class="nv">t</span><span class="p">.</span><span class="py">auto_wrap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
 </div>
 <hr />
 <h3 id="ntext-typer">NText Typer<a class="headerlink" href="#ntext-typer" title="Permanent link">&para;</a></h3>

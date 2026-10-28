@@ -3428,21 +3428,24 @@
 <h3 id="2">2. 初始化（由调用方执行）<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltID&quot;</span><span class="p">),</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltPK&quot;</span><span class="p">))</span>
 </code></pre></div>
-<p><code>init</code> 只做三件事：把 <code>app_id</code> 转成数字、存 <code>private_key</code> 、拼出 <code>base_url</code> 。</p>
+<p><code>init</code> 做四件事：把 <code>app_id</code> 转成数字、存 <code>private_key</code> 、拼出 <code>base_url</code> 、清掉上一次遗留的登录状态。</p>
 <details class="quote">
 <summary><code>init</code> 源码</summary>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">app_id</span><span class="p">,</span><span class="w"> </span><span class="nv">private_key</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">tonumber</span><span class="p">(</span><span class="nv">app_id</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">private_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">private_key</span>
 <span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://api.gamejolt.com/api/game/v1_2&quot;</span>
+<span class="w">    </span><span class="c1">-- Pointing at another game must not keep the previous player logged in.</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">logout</span><span class="p">()</span>
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="p">(</span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">private_key</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
 </details>
-<div class="admonition warning">
-<p class="admonition-title">必须先 init</p>
-<p><code>base_url</code> 只在 <code>init()</code> 里赋值。没初始化就调 <code>fetchUser()</code> 等方法，
-会在拼 URL 时因为拼接 <code>nil</code> 直接抛错，而且是<strong>运行到那一行才报</strong>，不是加载时。</p>
+<div class="admonition note">
+<p class="admonition-title">没 init 会返回 false，不会拼 nil 抛错</p>
+<p><code>base_url</code> 只在 <code>init()</code> 里赋值。没初始化就调用任意接口时，
+库会先做 <code>requireConfig()</code> 检查，返回 <code>false, "GameJolt: call gamejolt.init(app_id, private_key) first"</code> 。
+切换到另一个 <code>app_id</code> 时 <code>init()</code> 会清掉旧的 <code>username</code> / <code>user_token</code> ，避免串号。</p>
 </div>
 <h3 id="3">3. 确认能不能用<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">isAvailable</span><span class="p">()</span>
@@ -3455,6 +3458,7 @@
 <div class="highlight"><pre><span></span><code><span class="nv">md5</span><span class="p">.</span><span class="nf">sumhexa</span><span class="p">(</span><span class="nv">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">request_path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">private_key</span><span class="p">)</span>
 </code></pre></div>
 <p>其中 <code>request_path</code> 是<strong>不含 signature 本身的完整路径+参数</strong>。库里的每个方法都会自行拼一遍，调用方不需要处理。</p>
+<p><code>request_path</code> 的参数值会先做百分号编码，再按编码后的字符串算签名，两边始终一致。</p>
 <details class="quote">
 <summary><code>generateSignature</code> 与 <code>apiRequest</code></summary>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">generateSignature</span><span class="p">(</span><span class="nv">request_path</span><span class="p">)</span>
@@ -3462,33 +3466,46 @@
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">md5</span><span class="p">.</span><span class="nf">sumhexa</span><span class="p">(</span><span class="nv">input</span><span class="p">)</span>
 <span class="kr">end</span>
 
-<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+<span class="c1">-- On failure returns false, message, kind, where kind is &quot;transport&quot; (unreachable, bad</span>
+<span class="c1">-- HTTP status, unparseable body) or &quot;api&quot; (the server explicitly refused).</span>
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">path</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">https</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="nv">https</span><span class="p">.</span><span class="py">request</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;function&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">SE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="p">.</span><span class="py">getOS</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="p">.</span><span class="nf">getOS</span><span class="p">())</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;Unknown&quot;</span>
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">reason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">https_error</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;missing native https module&quot;</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;GameJolt API unavailable on &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">platform</span><span class="p">)..</span><span class="s2">&quot;: &quot;</span><span class="o">..</span><span class="nv">reason</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;GameJolt API unavailable on &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">platform</span><span class="p">)..</span><span class="s2">&quot;: &quot;</span><span class="o">..</span><span class="nv">reason</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="c1">-- lua-https (https.dll) API: returns code, body, headers</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">response</span><span class="p">,</span><span class="w"> </span><span class="nv">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">https</span><span class="p">.</span><span class="nf">request</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&amp;signature=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">generateSignature</span><span class="p">(</span><span class="nv">path</span><span class="p">)</span>
 
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">code</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTP error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">code</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- lua-https (https.dll) API: returns code, body, headers. DNS and TLS failures raise</span>
+<span class="w">    </span><span class="c1">-- instead of returning a code in some builds, hence the pcall.</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">raised</span><span class="p">,</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">pcall</span><span class="p">(</span><span class="nv">https</span><span class="p">.</span><span class="py">request</span><span class="p">,</span><span class="w"> </span><span class="nv">url</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">raised</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTPS request failed: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">code</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">code</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTPS request failed: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">body</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">code</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTP error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">code</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="p">,</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">json</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">body</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nv">data</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;JSON decode error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">err</span><span class="p">)..</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Response: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">body</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="p">,</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">json</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">response</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">data</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;JSON decode error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">err</span><span class="p">)..</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Response: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">response</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- A body that parses but carries no response envelope is not a valid success.</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nv">payload</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Malformed response: missing response envelope&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="p">.</span><span class="py">success</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="p">.</span><span class="py">message</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;API error&quot;</span>
+<span class="w">    </span><span class="c1">-- GameJolt reports success as the string &quot;true&quot;/&quot;false&quot;, but tolerate a bare boolean</span>
+<span class="w">    </span><span class="c1">-- so neither shape slips past the check.</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">payload</span><span class="p">.</span><span class="py">success</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">payload</span><span class="p">.</span><span class="py">success</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">payload</span><span class="p">.</span><span class="py">message</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;API error&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;api&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">payload</span>
 <span class="kr">end</span>
 </code></pre></div>
 </details>
+<p><code>apiRequest</code> 收的是<strong>不带 <code>signature</code> 的路径</strong>，URL 与签名都由它在内部组装，调用方不需要自己拼。</p>
 <h3 id="_3">返回值的统一约定<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -3503,12 +3520,16 @@
 <td><code>data.response</code> （一张表），<strong>没有第二个返回值</strong></td>
 </tr>
 <tr>
-<td>失败</td>
-<td><code>false, 错误信息字符串</code></td>
+<td>传输层失败（无 https 模块、网络异常、HTTP 状态码非 200、响应无法解析）</td>
+<td><code>false, 错误信息, "transport"</code></td>
+</tr>
+<tr>
+<td>服务端拒绝（业务层返回失败）</td>
+<td><code>false, 错误信息, "api"</code>，错误信息即接口返回的 <code>message</code></td>
 </tr>
 </tbody>
 </table>
-<p>所以调用时要么先判 <code>false</code> ，要么像某些方法那样自己包一层：</p>
+<p>第三个返回值 <code>kind</code> 用来区分"没连上"和"连上了但被拒"。库内部用它判断心跳要不要继续；调用方一般用不到，忽略即可。</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">res</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">fetchUser</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;somebody&quot;</span><span class="p">)</span>
 <span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">res</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;失败了:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="p">)</span>
@@ -3516,11 +3537,10 @@
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">users</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">username</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
-<div class="admonition bug">
-<p class="admonition-title">成功时第二返回值也是 nil，别把它当错误码</p>
-<p>比如 <code>fetchUser</code> 成功时只返回 <code>data.response</code> ，第二个返回值是 <code>nil</code> 。
-写成 <code>local res, err = ...; if err then ...</code> 是安全的，但 <code>if (not res) then</code> 在
-某些接口返回空表时也会误判，统一使用 <code>res == false</code> 判断。</p>
+<div class="admonition note">
+<p class="admonition-title">失败一定返回 <code>false</code></p>
+<p>成功只返回一张表，失败总是以 <code>false</code> 开头。<code>if (not res) then</code> 也能用，
+但 <code>res == false</code> 更贴近约定： <code>res</code> 为表时一定是成功。</p>
 </div>
 <hr />
 <h2 id="_4">方法一览<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
@@ -3528,9 +3548,10 @@
 <div class="admonition example">
 <p class="admonition-title">通用</p>
 <ul>
-<li><code>init(app_id, private_key)</code> 设置 <code>app_id</code> / <code>private_key</code> / <code>base_url</code> ，返回两者是否都非空。</li>
+<li><code>init(app_id, private_key)</code> 设置 <code>app_id</code> / <code>private_key</code> / <code>base_url</code> ，返回两者是否都非空，并清掉旧登录状态。</li>
 <li><code>isAvailable()</code> 原生 <code>https</code> 模块是否就绪。失败时第二返回值是带平台名的说明。</li>
-<li><code>isLoggedIn()</code> <code>user_token</code> 与 <code>username</code> 是否都已设置（<strong>不校验有效性</strong>，见下方警告）。</li>
+<li><code>isLoggedIn()</code> 是否已有一份<strong>被服务端接受过</strong>的凭据，见下方说明。</li>
+<li><code>logout()</code> 清掉本地 <code>username</code> / <code>user_token</code> 并停掉心跳。纯本地操作，不发请求。</li>
 </ul>
 </div>
 <h3 id="_6">用户<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
@@ -3538,29 +3559,36 @@
 <p class="admonition-title">用户</p>
 <ul>
 <li><code>fetchUser(user_id, username)</code> 查用户信息，两个参数给一个即可，<strong>不需要登录</strong>。</li>
-<li><code>authUser(username, user_token)</code> 验证用户名 + token。成功后 <code>gamejolt.username</code> / <code>gamejolt.user_token</code> 留着给后续接口用。</li>
+<li><code>authUser(username, user_token)</code> 验证用户名 + token。只有服务端接受之后，凭据才会存下来给后续接口用。</li>
+<li><code>logout()</code> 丢弃本地凭据，回到未登录状态。</li>
 </ul>
 </div>
-<div class="admonition bug">
-<p class="admonition-title"><code>authUser</code> 失败后 <code>isLoggedIn()</code> 仍然是 true</p>
-<p>源码是<strong>先把 username/token 存下来、再发请求</strong>：</p>
-<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">username</span><span class="p">,</span><span class="w"> </span><span class="nv">user_token</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">username</span><span class="w">       </span><span class="c1">-- 先存</span>
-<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">user_token</span>
-<span class="w">    </span><span class="o">..</span><span class="p">.</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span>
+<div class="admonition note">
+<p class="admonition-title"><code>authUser</code> 先验证、后写入</p>
+<p>旧实现是先把 <code>username</code> / <code>token</code> 存下来再发请求，失败也不回滚，于是 <code>authUser</code> 返回 <code>false</code> 时
+<code>isLoggedIn()</code> 依然是 <code>true</code> ，后续接口带着无效 token 一路失败。现在是<strong>验证通过才提交</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/users/auth/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;username=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">clean_user</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;user_token=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">clean_token</span><span class="p">)</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">result</span><span class="p">,</span><span class="w"> </span><span class="nv">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">path</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">logout</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">message</span>
 <span class="kr">end</span>
+
+<span class="nv">gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">clean_user</span>
+<span class="nv">gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">clean_token</span>
+<span class="nv">gamejolt</span><span class="p">.</span><span class="py">_verified</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="kr">return</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
-<p>网络失败 / token 错误时它返回 <code>false, err</code> ，但两个字段<strong>已经写进去了</strong>，
-于是 <code>isLoggedIn()</code> 依旧返回 <code>true</code> ，后面所有需要登录的接口都会带着错 token 去请求。</p>
-<p>需要在调用方补一层清理：</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
-<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
-<span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
-<span class="kr">end</span>
-</code></pre></div>
+<p>由此得到几条确定的行为：</p>
+<ul>
+<li><code>isLoggedIn()</code> 为 <code>true</code> 意味着这份凭据<strong>至少成功通过一次</strong> <code>/users/auth/</code></li>
+<li><code>authUser</code> 失败会把库恢复到未登录状态，<strong>不需要</strong>调用方手动置 nil</li>
+<li>用户名与 token 会先去掉首尾空白再从非空才算合法，纯空格或非字符串入参直接返回 <code>false</code></li>
+<li>重新登录失败时，上一次登录状态会被清掉，不会留半新半旧的凭据</li>
+</ul>
 </div>
 <h3 id="_7">奖杯（成就）<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
 <div class="admonition example">
@@ -3633,6 +3661,16 @@
 <p class="admonition-title"><code>interval</code> 是秒不是毫秒</p>
 <p><code>state.elapsed = state.elapsed + dt</code> ，<code>dt</code> 是秒。写成 <code>30000</code> 会得到 30000 秒一次心跳。</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">心跳被服务端拒绝时会停掉并掉线</p>
+<p>每次 ping 的失败原因由第三个返回值 <code>kind</code> 区分：</p>
+<ul>
+<li><code>"transport"</code> 网络不通、状态码非 200 等 —— 只记 <code>last_error</code> ，下一轮继续重试</li>
+<li><code>"api"</code> 服务端明确拒绝（凭据失效、会话过期等） —— 置 <code>_session_auto.enabled = false</code> 并把 <code>_verified</code> 置为 <code>false</code></li>
+</ul>
+<p>后一种情况下 <code>isLoggedIn()</code> 会变成 <code>false</code> ，避免整个游戏周期内反复用无效凭据重试。
+玩家重新 <code>authUser</code> 成功后再调 <code>sessionUpdate()</code> 即可恢复。</p>
+</div>
 <h3 id="_9">数据存储（云存档 / 全局数据）<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <p>一套简单的 key-value 存储。</p>
 <div class="admonition example">
@@ -3656,20 +3694,19 @@
 <span class="c1">-- 游戏全局的公告（不需要登录）</span>
 <span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">dataStore</span><span class="p">(</span><span class="s2">&quot;motd&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;今天服务器维护&quot;</span><span class="p">)</span>
 </code></pre></div>
-<div class="admonition danger">
-<p class="admonition-title"><code>key</code> 和 <code>data</code> 没有做任何 URL 编码</p>
-<p>源码是裸字符串拼接：</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;/data-store/set/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
-<span class="w">            </span><span class="s2">&quot;&amp;key=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&amp;data=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="p">...</span>
+<div class="admonition note">
+<p class="admonition-title"><code>key</code> 和 <code>data</code> 会被百分号编码</p>
+<p>所有查询参数值都过一遍 <code>urlencode</code> ，再按编码后的字符串算签名：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/data-store/set/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;key=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">key</span><span class="p">)</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&amp;data=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">data</span><span class="p">)</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">credentials</span>
 </code></pre></div>
-<p>只要 key 或 data 里出现 <code>&amp;</code> 、 <code>=</code> 、 <code>#</code> 、空格、中文，URL 就会被截断/解析错，
-而且<strong>签名是按拼好的字符串算的</strong>，服务端对不上会直接返回签名错误。</p>
-<p>可行的处理方式：</p>
-<ul>
-<li>key 只用 <code>[A-Za-z0-9_-]</code></li>
-<li>data 先 <code>json.encode</code> 再做一次<strong>自行实现</strong>的百分号编码（或 base64）再传</li>
-<li>不要直接把玩家输入的文本拼进去</li>
-</ul>
+<p>所以 <code>key</code> / <code>data</code> 里带空格、中文、<code>&amp;</code> 、 <code>=</code> 、 <code>#</code> 都不会截断 URL 或导致签名不匹配。
+仍然建议对结构化数据先 <code>json.encode</code> 再存，方便读回来解析。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title"><code>user_data</code> 为 true 时会先检查登录</p>
+<p>旧实现在未登录时拼 <code>nil</code> 凭据直接抛错。现在 <code>user_data</code> 为 <code>true</code> 且未登录时返回
+<code>false, "GameJolt: not authenticated, call gamejolt.authUser(username, user_token) first"</code> 。</p>
 </div>
 <h3 id="_10">分数榜<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
 <div class="admonition example">
@@ -3677,7 +3714,9 @@
 <ul>
 <li><code>fetchScoresLocal(table_id)</code> 拉榜单前 N 名，<strong>不需要登录</strong>。<code>table_id</code> 省略则取游戏的主榜。</li>
 <li><code>fetchScoresGlobal(table_id)</code> 带 <code>username + user_token</code> 请求，返回里会多出玩家自己的排名/前后名次，<strong>需要登录</strong>。</li>
-<li><code>submitScore(score, table_id, sort, extra_data)</code> 提交分数。<code>sort</code> 是展示用的数值，<code>extra_data</code> 是额外文本（比如用时、等级）。</li>
+<li><code>submitScore(score, table_id, sort, extra_data, as_guest)</code> 提交分数。<code>sort</code> 是展示用的数值，<code>extra_data</code> 是额外文本（比如用时、等级）。</li>
+<li>已登录时自动带上凭据，分数挂到玩家账号上</li>
+<li>未登录时按游客提交，第五个参数 <code>as_guest</code> 传 <code>true</code> 则在已登录状态下也强制按游客提交</li>
 </ul>
 </div>
 <div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">submitScore</span><span class="p">(</span><span class="mi">12345</span><span class="p">,</span><span class="w"> </span><span class="mi">535</span><span class="p">,</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;LV19|Genocide&quot;</span><span class="p">)</span>
@@ -3686,11 +3725,23 @@
 <span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">scores</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">s</span><span class="p">.</span><span class="py">score</span><span class="p">,</span><span class="w"> </span><span class="nv">s</span><span class="p">.</span><span class="py">user</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
-<div class="admonition bug">
-<p class="admonition-title"><code>submitScore</code> 不带用户名/token，提交的是游客分数</p>
-<p>拼 URL 时<strong>没有</strong>附加 <code>username</code> / <code>user_token</code> （对比 <code>fetchScoresGlobal</code> 就带了），
-所以即使已调用 <code>authUser</code> ，分数也是以 <strong>guest</strong> 身份提交的，不会挂到玩家账号上。</p>
-<p>想提交实名分数，自己照着库的写法补一个带凭据的版本，或改这个库。</p>
+<div class="admonition note">
+<p class="admonition-title">凭据拼在所有可选参数之后</p>
+<p><code>submitScore</code> 先拼 <code>table_id</code> / <code>sort</code> / <code>extra_data</code> ，末尾再追加凭据，所以两者位置不会互相影响：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">credentials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">as_guest</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">isLoggedIn</span><span class="p">())</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">credentials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">userParams</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/scores/add/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;score=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">score</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="p">(</span><span class="nv">table_id</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;&amp;table_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">table_id</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="p">(</span><span class="nv">sort</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;&amp;sort=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">sort</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="p">(</span><span class="nv">extra_data</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;&amp;extra_data=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">extra_data</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="nv">credentials</span>
+</code></pre></div>
+<p>掉线后（比如心跳被服务端拒绝）凭据会自动消失，无需调用方干预，后续提交自然降级成游客分数。
+<code>score</code> 缺失时直接返回 <code>false, "GameJolt: score is required"</code> ，不会把 <code>nil</code> 拼进 URL。</p>
 </div>
 <hr />
 <h2 id="_11">一个完整的登录流程<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
@@ -3700,8 +3751,7 @@
 <span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">username</span><span class="p">,</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w">          </span><span class="c1">-- 库内部已经logout()，不用手动清凭据</span>
 <span class="w">    </span><span class="kr">end</span>
 
 <span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">sessionUpdate</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 之后自动心跳</span>
@@ -3713,6 +3763,7 @@
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">true</span>
 <span class="kr">end</span>
 </code></pre></div>
+<p>退出登录走 <code>logout()</code> ；只想停会话但保持登录则用 <code>sessionClose()</code> 。</p>
 <hr />
 <h2 id="_12">注意事项汇总<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
@@ -3729,10 +3780,15 @@
 <p class="admonition-title">失败不会抛异常，只返回 <code>false</code></p>
 <p>没判返回值的话，失败会被静默忽略。所有调用都建议写成 <code>if (res == false) then ...</code> 。</p>
 </div>
-<div class="admonition warning">
+<div class="admonition note">
 <p class="admonition-title">GameJolt 返回的 <code>success</code> 是字符串</p>
-<p>库里判的是 <code>data.response.success == "false"</code> —— 注意是字符串 <code>"false"</code> 不是布尔。
-这是照 GameJolt API 的实际返回写的，别去"修正"它。</p>
+<p>GameJolt 实际返回的是字符串 <code>"true"</code> / <code>"false"</code> 。库判的是
+<code>payload.success == false or payload.success == "false"</code> ，两种形式都能拦住，不用自己去转类型。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">请求失败不会抛出到 <code>love.update</code></p>
+<p><code>https.request</code> 被包在 <code>pcall</code> 里。DNS 失败、TLS 握手失败等在某些 lua-https 构建里是<strong>抛错</strong>而非返回错误码，
+包一层之后统一转成 <code>false, 错误信息, "transport"</code> ，不会让整局崩掉。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">非 Windows 平台直接不可用</p>

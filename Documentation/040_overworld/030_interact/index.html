@@ -3263,12 +3263,20 @@ In cases where hitting any one counts (e.g. "entered a certain room"), always us
 <ul>
 <li><code>Overworld.dialogNew(texts, position)</code> pops up a dialog box and returns the <code>dialog</code> object.<ul>
 <li><code>texts</code> an array of text.</li>
-<li><code>position</code> <code>"down"</code> (bottom of screen, default) or <code>"up"</code> (top).</li>
+<li><code>position</code> <code>"down"</code> (bottom of screen) or <code>"up"</code> (top). Omitted, the value comes from <code>Overworld.ui_prefer</code>.</li>
 </ul>
 </li>
-<li><code>Overworld.ui_prefer</code> the default value used when <code>position</code> is not passed.</li>
+<li><code>Overworld.ui_prefer</code> the value used when <code>position</code> is not passed.<ul>
+<li><code>"auto"</code> (default) derives the side from the player's position on screen: above <code>ui_threshold</code> it opens upwards, otherwise downwards.</li>
+<li><code>"down"</code> / <code>"up"</code> pins one side, no more auto-detection.</li>
+</ul>
+</li>
+<li><code>Overworld.ui_threshold</code> the auto-detection line in canvas Y, default <code>320</code> (two thirds of 480).</li>
+<li><code>Overworld.ResolveUIPosition()</code> returns the value used this frame, <code>"up"</code> or <code>"down"</code>.</li>
+<li><code>Overworld.FlipY(y)</code> mirrors a canvas Y across the midline <code>240</code>, i.e. <code>480 - y</code>.</li>
 </ul>
 </div>
+<p>Both sides share one box and one set of text offsets: only the box moves, the text keeps its offset from the box and is therefore never mirrored.</p>
 <p>The returned <code>dialog</code> has two fields: <code>block</code> (the white-bordered black-filled box) and <code>text</code> (the typewriter object).</p>
 <p>The engine destroys the box and unlocks the player by default after the text finishes. To do something more, override <code>text._onComplete</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dialog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">({</span><span class="s2">&quot;* 你捡起了一块石头。&quot;</span><span class="p">})</span>

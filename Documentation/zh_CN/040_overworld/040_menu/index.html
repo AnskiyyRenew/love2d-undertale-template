@@ -3187,12 +3187,25 @@
 <p>表里的 <code>ITEM</code> / <code>STAT</code> / <code>CELL</code> 是<strong>界面上三个按钮的名字</strong>，不是 <code>Stat._page</code> 的值——后者一律小写。</p>
 </blockquote>
 <p>进入 <code>ITEM</code> 后再按一次确认会进入 <code>使用</code> / <code>信息</code> / <code>丢弃</code> 三选一界面（ <code>_page</code> 变为 <code>"item2"</code> ）。</p>
+<div class="admonition note">
+<p class="admonition-title">第三级菜单的动作路由</p>
+<p>在 <code>item2</code> 选中某项动作并按确认后，引擎调用 <code>ITEMS.DoItemAction(物品id, 动作名)</code> ，按 id 在 <code>Game/Logics/items.lua</code> 的 <code>_actions</code> 里查注册函数并执行。<strong>未注册的物品走默认回退</strong>（组装通用提示； <code>drop</code> 时移出背包）。详见 <a href="../000_init/index.html">初始化与场景骨架 → ITEMS</a> 。<br>
+进入 <code>item2</code> 的同一帧会被 <code>input_lock</code> 吞掉一次输入，避免打开子菜单的确认键直接触发所选动作。 <code>CELL</code> 页面选中某联系人后按确认则调用 <code>ITEMS.DoCellAction(联系人id)</code> 。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">空背包不进入物品页</p>
+<p>背包为空时在 <code>ITEM</code> 上按确认是 no-op ，停留在 <code>idle</code> 页，不打开空列表。</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">启用 CELL 页面的条件</p>
 <p><code>DATA.player.getcell = true</code> 之后菜单才会出现第三项。<br>
 <code>stat.lua</code> 顶层已写入 <code>DATA.player.getcell = true</code> ，默认关闭该项时改为 <code>false</code> 。</p>
 </div>
 <p><img alt="OW-05" src="../../img/040_overworld/ow_05_menu.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">菜单的上下位置</p>
+<p>左栏由两个同宽的框组成：上方是状态框，下方是三个按钮所在的按钮框。玩家在画面底部三分之一以下时，整栏绕中线 <code>240</code> 镜像，状态框落到按钮框下方；按钮框以 <code>240</code> 为中心，镜像后位置不变，因此按钮顺序与光标不受影响。判定规则与对话框共用 <code>Overworld.ui_prefer</code> / <code>ui_threshold</code> 。</p>
+</div>
 <hr />
 <h2 id="save">存档点 <code>Save</code><a class="headerlink" href="#save" title="Permanent link">&para;</a></h2>
 <p>碰到存档点后调用 <code>Overworld.SaveInteract</code> 即可，它会<strong>先播对话、再打开存档页</strong>。</p>

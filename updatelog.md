@@ -19,6 +19,7 @@
 - Added an optional `as_guest` argument to `Gamejolt.submitScore(score, table_id, sort, extra_data, as_guest)`; scores are filed under the logged-in account unless it is set
 - Overworld overlays now pick their side automatically: `Overworld.ui_prefer` defaults to `"auto"`, and a dialog or the stat menu opens above the player once the player drops below `Overworld.ui_threshold` (canvas Y, default `320`). `Overworld.ResolveUIPosition()`, `Overworld.GetPlayerScreenY()` and `Overworld.FlipY(y)` are exposed for custom overlays, and `"up"` / `"down"` still pin one side
 - The stat menu's left column mirrors across the screen midline in the `"up"` layout: the status box moves under the button box while the button box (centred on `240`) stays put, and the text inside keeps its offset so the lines are never flipped
+- Added third-level menu action routing for the overworld stat menu: `ITEMS.DoItemAction(id, action)` and `ITEMS.DoCellAction(id)` look up registered functions by id (in `Game/Logics/items.lua`'s `_actions` / `_cell_actions`) and run them, falling through to a default `Overworld.dialogNew` line when an id or action is unregistered. The `CELL` page is now navigable, and confirm dials the selected contact
 
 ## Bug Fixes
 - Fixed stencil masks leaking across frames and waves: `Masks.Clear()` now zeroes the stencil buffer instead of only disabling the test, and `love.draw` clears the stencil buffer every frame
@@ -39,6 +40,9 @@
 - Fixed `Gamejolt.submitScore()` submitting as a guest even after a successful `authUser()`; credentials are appended whenever someone is logged in
 - Fixed the session heartbeat retrying forever with credentials the server had already refused: an `"api"` failure stops the heartbeat and drops back to logged out, while transport failures still retry
 - Fixed `Gamejolt.init()` carrying the previous player's credentials over to another `app_id`
+- Fixed the stat menu's third-level confirm never actually firing: `stat.Destroy()` set `Char.controlling = false` right before `Overworld.dialogNew(...)`, but `dialogNew` returns early when `Char.controlling` is `false`, so the dialog never opened. The confirm now routes through `ITEMS.DoItemAction` and lets `dialogNew` seize control itself
+- Fixed `stat.Destroy()` leaving the second-level menu on screen: only `elements` was cleared, so the item list / USE-INFO-DROP row / cell list stayed visible under a popped dialog. `temp_elements` is now cleared too, and the selection state (`in_item` / `in_item_menu` / `in_cell` / `_page`) is reset on close
+- Fixed an empty inventory still entering the item list page on confirm; confirm on `ITEM` is now a no-op when `#DATA.player.items == 0`, staying on the top menu
 
 ## Partial Changes
 - `BORDER_MODE` now defaults to `false` in `conf.lua`
@@ -55,6 +59,8 @@
 - GameJolt failures return `false, message, kind` instead of `false, message`; `Gamejolt.authUser()` still returns only `boolean, message`
 - `apiRequest` takes the unsigned request path instead of a complete URL, so the URL and its signature are assembled in one place
 - The GameJolt documentation page is rewritten in both languages: the workarounds documented for `authUser` and for data-store encoding are no longer needed
+- `items.lua`'s `_actions` restructured from an array of `{id=, use=string, …}` records into a dictionary keyed by id whose values are `function(id)` closures; `GetActionByID` now queries the dictionary (legacy compat). Added `_cell_actions` for phone actions and `FindCellNameByID`
+- The `item2` sub-menu swallows the entry frame via an `input_lock` flag (mirroring `shop.lua`), so the confirm press that opens Use/Info/Drop can't instantly fire the chosen action on the same frame
 
 <!--
 Included commits (v3.0.0..HEAD):

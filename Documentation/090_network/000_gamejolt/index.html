@@ -3428,21 +3428,24 @@ That is <strong>obfuscation, not encryption</strong>, and nothing in the engine 
 <h3 id="2-initialize-the-engine-wont-do-it-for-you">2. Initialize (the engine won't do it for you)<a class="headerlink" href="#2-initialize-the-engine-wont-do-it-for-you" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltID&quot;</span><span class="p">),</span><span class="w"> </span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;GamejoltPK&quot;</span><span class="p">))</span>
 </code></pre></div>
-<p><code>init</code> only does three things: converts <code>app_id</code> to a number, stores <code>private_key</code>, and builds <code>base_url</code>.</p>
+<p><code>init</code> does four things: converts <code>app_id</code> to a number, stores <code>private_key</code>, builds <code>base_url</code>, and clears any login state left over from a previous game.</p>
 <details class="quote">
 <summary>Source of <code>init</code></summary>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">gamejolt</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">app_id</span><span class="p">,</span><span class="w"> </span><span class="nv">private_key</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">tonumber</span><span class="p">(</span><span class="nv">app_id</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">private_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">private_key</span>
 <span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://api.gamejolt.com/api/game/v1_2&quot;</span>
+<span class="w">    </span><span class="c1">-- Pointing at another game must not keep the previous player logged in.</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">logout</span><span class="p">()</span>
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="p">(</span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">private_key</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
 </details>
-<div class="admonition warning">
-<p class="admonition-title">You must init first</p>
-<p><code>base_url</code> is only assigned inside <code>init()</code>. If you call <code>fetchUser()</code> and other methods without initializing,
-URL building will throw an error because it concatenates <code>nil</code> — and it happens <strong>when that line runs</strong>, not at load time.</p>
+<div class="admonition note">
+<p class="admonition-title">Without init the library returns false instead of concatenating nil</p>
+<p><code>base_url</code> is only assigned inside <code>init()</code>. Calling any endpoint before that hits a
+<code>requireConfig()</code> guard that returns <code>false, "GameJolt: call gamejolt.init(app_id, private_key) first"</code> —
+it does not throw. Switching to another <code>app_id</code> clears the stored <code>username</code> / <code>user_token</code>, so the two games cannot mix credentials.</p>
 </div>
 <h3 id="3-check-whether-it-can-be-used">3. Check whether it can be used<a class="headerlink" href="#3-check-whether-it-can-be-used" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">isAvailable</span><span class="p">()</span>
@@ -3455,6 +3458,7 @@ URL building will throw an error because it concatenates <code>nil</code> — an
 <div class="highlight"><pre><span></span><code><span class="nv">md5</span><span class="p">.</span><span class="nf">sumhexa</span><span class="p">(</span><span class="nv">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">request_path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">private_key</span><span class="p">)</span>
 </code></pre></div>
 <p>Here <code>request_path</code> is the <strong>full path + parameters excluding the signature itself</strong>. Each method in the library assembles it itself, so you don't need to worry about it.</p>
+<p>Query parameter values are percent-encoded first, and the signature is computed over the encoded string, so the two always agree.</p>
 <details class="quote">
 <summary><code>generateSignature</code> and <code>apiRequest</code></summary>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">generateSignature</span><span class="p">(</span><span class="nv">request_path</span><span class="p">)</span>
@@ -3462,33 +3466,46 @@ URL building will throw an error because it concatenates <code>nil</code> — an
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">md5</span><span class="p">.</span><span class="nf">sumhexa</span><span class="p">(</span><span class="nv">input</span><span class="p">)</span>
 <span class="kr">end</span>
 
-<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+<span class="c1">-- On failure returns false, message, kind, where kind is &quot;transport&quot; (unreachable, bad</span>
+<span class="c1">-- HTTP status, unparseable body) or &quot;api&quot; (the server explicitly refused).</span>
+<span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">path</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">https</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="nv">https</span><span class="p">.</span><span class="py">request</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;function&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">SE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="p">.</span><span class="py">getOS</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">SE</span><span class="p">.</span><span class="py">system</span><span class="p">.</span><span class="nf">getOS</span><span class="p">())</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;Unknown&quot;</span>
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">reason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">https_error</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;missing native https module&quot;</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;GameJolt API unavailable on &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">platform</span><span class="p">)..</span><span class="s2">&quot;: &quot;</span><span class="o">..</span><span class="nv">reason</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;GameJolt API unavailable on &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">platform</span><span class="p">)..</span><span class="s2">&quot;: &quot;</span><span class="o">..</span><span class="nv">reason</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="c1">-- lua-https (https.dll) API: returns code, body, headers</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">response</span><span class="p">,</span><span class="w"> </span><span class="nv">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">https</span><span class="p">.</span><span class="nf">request</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&amp;signature=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">generateSignature</span><span class="p">(</span><span class="nv">path</span><span class="p">)</span>
 
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">code</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTP error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">code</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- lua-https (https.dll) API: returns code, body, headers. DNS and TLS failures raise</span>
+<span class="w">    </span><span class="c1">-- instead of returning a code in some builds, hence the pcall.</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">raised</span><span class="p">,</span><span class="w"> </span><span class="nv">code</span><span class="p">,</span><span class="w"> </span><span class="nv">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">pcall</span><span class="p">(</span><span class="nv">https</span><span class="p">.</span><span class="py">request</span><span class="p">,</span><span class="w"> </span><span class="nv">url</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">raised</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTPS request failed: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">code</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">code</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTPS request failed: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">body</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span><span class="w"> </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">code</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HTTP error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">code</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span><span class="w"> </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="p">,</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">json</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">body</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nv">data</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;JSON decode error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">err</span><span class="p">)..</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Response: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">body</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="p">,</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">json</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">response</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">data</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;JSON decode error: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">err</span><span class="p">)..</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Response: &quot;</span><span class="o">..</span><span class="nb">tostring</span><span class="p">(</span><span class="nv">response</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">-- A body that parses but carries no response envelope is not a valid success.</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nv">payload</span><span class="p">)</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Malformed response: missing response envelope&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;transport&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="p">.</span><span class="py">success</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span><span class="p">.</span><span class="py">message</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;API error&quot;</span>
+<span class="w">    </span><span class="c1">-- GameJolt reports success as the string &quot;true&quot;/&quot;false&quot;, but tolerate a bare boolean</span>
+<span class="w">    </span><span class="c1">-- so neither shape slips past the check.</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">payload</span><span class="p">.</span><span class="py">success</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">payload</span><span class="p">.</span><span class="py">success</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">payload</span><span class="p">.</span><span class="py">message</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;API error&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;api&quot;</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">data</span><span class="p">.</span><span class="py">response</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">payload</span>
 <span class="kr">end</span>
 </code></pre></div>
 </details>
+<p><code>apiRequest</code> takes the <strong>path without <code>signature</code></strong>; both the URL and the signature are assembled internally, so callers never build either.</p>
 <h3 id="unified-return-value-convention">Unified return-value convention<a class="headerlink" href="#unified-return-value-convention" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -3503,12 +3520,16 @@ URL building will throw an error because it concatenates <code>nil</code> — an
 <td><code>data.response</code> (a table), <strong>no second return value</strong></td>
 </tr>
 <tr>
-<td>Failure</td>
-<td><code>false, error message string</code></td>
+<td>Transport failure (no https module, network error, non-200 status, unparseable body)</td>
+<td><code>false, error message, "transport"</code></td>
+</tr>
+<tr>
+<td>Server refusal (business-level failure)</td>
+<td><code>false, error message, "api"</code>, where the message is the <code>message</code> returned by the endpoint</td>
 </tr>
 </tbody>
 </table>
-<p>So when calling, either check <code>false</code> first, or wrap it yourself like some methods do:</p>
+<p>The third return value <code>kind</code> separates "could not reach the server" from "reached it and got refused". The library uses it to decide whether the heartbeat should continue; callers can ignore it.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">res</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">fetchUser</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;somebody&quot;</span><span class="p">)</span>
 <span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">res</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;failed:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="p">)</span>
@@ -3516,11 +3537,10 @@ URL building will throw an error because it concatenates <code>nil</code> — an
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">users</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nv">username</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
-<div class="admonition bug">
-<p class="admonition-title">On success the second return value is also nil — don't treat it as an error code</p>
-<p>For example, <code>fetchUser</code> returns only <code>data.response</code> on success, and the second return value is <code>nil</code>.
-Writing <code>local res, err = ...; if err then ...</code> is safe, but <code>if (not res) then</code> can also misfire when
-some interface returns an empty table — using <code>res == false</code> uniformly is the safest.</p>
+<div class="admonition note">
+<p class="admonition-title">Failures always start with <code>false</code></p>
+<p>Success returns nothing but a table; failure always begins with <code>false</code>.
+<code>if (not res) then</code> also works, but <code>res == false</code> matches the convention better: when <code>res</code> is a table, the call succeeded.</p>
 </div>
 <hr />
 <h2 id="method-overview">Method overview<a class="headerlink" href="#method-overview" title="Permanent link">&para;</a></h2>
@@ -3528,9 +3548,10 @@ some interface returns an empty table — using <code>res == false</code> unifor
 <div class="admonition example">
 <p class="admonition-title">General</p>
 <ul>
-<li><code>init(app_id, private_key)</code> sets <code>app_id</code> / <code>private_key</code> / <code>base_url</code> and returns whether both are non-empty.</li>
+<li><code>init(app_id, private_key)</code> sets <code>app_id</code> / <code>private_key</code> / <code>base_url</code>, returns whether both are non-empty, and clears any previous login state.</li>
 <li><code>isAvailable()</code> whether the native <code>https</code> module is ready. On failure the second return value is an explanation with the platform name.</li>
-<li><code>isLoggedIn()</code> whether <code>user_token</code> and <code>username</code> are both set (<strong>does not validate correctness</strong>, see warning below).</li>
+<li><code>isLoggedIn()</code> whether a pair of credentials is stored <strong>and was accepted by the server</strong>; see below.</li>
+<li><code>logout()</code> drops the local <code>username</code> / <code>user_token</code> and stops the heartbeat. Local only, sends no request.</li>
 </ul>
 </div>
 <h3 id="users">Users<a class="headerlink" href="#users" title="Permanent link">&para;</a></h3>
@@ -3538,29 +3559,37 @@ some interface returns an empty table — using <code>res == false</code> unifor
 <p class="admonition-title">Users</p>
 <ul>
 <li><code>fetchUser(user_id, username)</code> looks up user info; pass either of the two parameters, <strong>login not required</strong>.</li>
-<li><code>authUser(username, user_token)</code> validates the username + token. On success, <code>gamejolt.username</code> / <code>gamejolt.user_token</code> are kept for later interfaces.</li>
+<li><code>authUser(username, user_token)</code> validates the username + token. The credentials are stored for later interfaces only after the server accepts them.</li>
+<li><code>logout()</code> discards the local credentials and returns to the logged-out state.</li>
 </ul>
 </div>
-<div class="admonition bug">
-<p class="admonition-title"><code>isLoggedIn()</code> is still true after <code>authUser</code> fails</p>
-<p>The source code <strong>stores the username/token first, then sends the request</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">username</span><span class="p">,</span><span class="w"> </span><span class="nv">user_token</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">username</span><span class="w">       </span><span class="c1">-- stored first</span>
-<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">user_token</span>
-<span class="w">    </span><span class="o">..</span><span class="p">.</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">success</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">success</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span>
+<div class="admonition note">
+<p class="admonition-title"><code>authUser</code> validates first, stores afterwards</p>
+<p>The previous implementation stored the username/token before sending the request and never rolled them back,
+so <code>isLoggedIn()</code> stayed <code>true</code> after <code>authUser</code> returned <code>false</code>, and every later call went out with an invalid token.
+It now <strong>commits only after validation passes</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/users/auth/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;username=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">clean_user</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;user_token=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">clean_token</span><span class="p">)</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">result</span><span class="p">,</span><span class="w"> </span><span class="nv">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">apiRequest</span><span class="p">(</span><span class="nv">path</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">logout</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">message</span>
 <span class="kr">end</span>
+
+<span class="nv">gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">clean_user</span>
+<span class="nv">gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">clean_token</span>
+<span class="nv">gamejolt</span><span class="p">.</span><span class="py">_verified</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="kr">return</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
-<p>On network failure / wrong token it returns <code>false, err</code>, but the two fields <strong>have already been written</strong>,
-so <code>isLoggedIn()</code> still returns <code>true</code>, and all subsequent interfaces that need login will request with the wrong token.</p>
-<p>Wrap it yourself:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
-<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
-<span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
-<span class="kr">end</span>
-</code></pre></div>
+<p>This gives a few guaranteed behaviors:</p>
+<ul>
+<li><code>isLoggedIn()</code> returning <code>true</code> means the credentials <strong>passed <code>/users/auth/</code> at least once</strong></li>
+<li>a failed <code>authUser</code> restores the library to the logged-out state; callers do <strong>not</strong> need to nil out the fields</li>
+<li>username and token are trimmed of surrounding whitespace first; blank or non-string input returns <code>false</code> directly</li>
+<li>if a re-login fails, the previous login is dropped rather than leaving half-updated credentials behind</li>
+</ul>
 </div>
 <h3 id="trophies-achievements">Trophies (achievements)<a class="headerlink" href="#trophies-achievements" title="Permanent link">&para;</a></h3>
 <div class="admonition example">
@@ -3633,6 +3662,16 @@ so <code>isLoggedIn()</code> still returns <code>true</code>, and all subsequent
 <p class="admonition-title"><code>interval</code> is seconds, not milliseconds</p>
 <p><code>state.elapsed = state.elapsed + dt</code>, and <code>dt</code> is in seconds. Writing <code>30000</code> would give a heartbeat every 30000 seconds.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">A heartbeat refused by the server stops the heartbeat and logs the player out</p>
+<p>The reason for each failed ping is reported by the third return value, <code>kind</code>:</p>
+<ul>
+<li><code>"transport"</code> unreachable, non-200 status, and so on — only <code>last_error</code> is recorded, and the next tick retries</li>
+<li><code>"api"</code> the server explicitly refused (invalid credentials, expired session) — <code>_session_auto.enabled</code> is set to <code>false</code> and <code>_verified</code> to <code>false</code></li>
+</ul>
+<p>In the second case <code>isLoggedIn()</code> turns <code>false</code>, which keeps the game from retrying invalid credentials for the rest of the run.
+Calling <code>sessionUpdate()</code> again after a successful <code>authUser</code> restores it.</p>
+</div>
 <h3 id="data-storage-cloud-save-global-data">Data storage (cloud save / global data)<a class="headerlink" href="#data-storage-cloud-save-global-data" title="Permanent link">&para;</a></h3>
 <p>A simple key-value store.</p>
 <div class="admonition example">
@@ -3656,20 +3695,19 @@ so <code>isLoggedIn()</code> still returns <code>true</code>, and all subsequent
 <span class="c1">-- A game-global announcement (no login required)</span>
 <span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">dataStore</span><span class="p">(</span><span class="s2">&quot;motd&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Server maintenance today&quot;</span><span class="p">)</span>
 </code></pre></div>
-<div class="admonition danger">
-<p class="admonition-title"><code>key</code> and <code>data</code> are not URL-encoded at all</p>
-<p>The source code concatenates raw strings:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">base_url</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;/data-store/set/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
-<span class="w">            </span><span class="s2">&quot;&amp;key=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&amp;data=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="p">...</span>
+<div class="admonition note">
+<p class="admonition-title"><code>key</code> and <code>data</code> are percent-encoded</p>
+<p>Every query parameter value goes through <code>urlencode</code>, and the signature is computed afterwards:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/data-store/set/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;key=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">key</span><span class="p">)</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;&amp;data=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">data</span><span class="p">)</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">credentials</span>
 </code></pre></div>
-<p>If <code>key</code> or <code>data</code> contains <code>&amp;</code>, <code>=</code>, <code>#</code>, spaces, or Chinese characters, the URL will be truncated / misparsed,
-and since <strong>the signature is computed from the assembled string</strong>, the server won't match it and returns a signature error directly.</p>
-<p>Workarounds:</p>
-<ul>
-<li>use only <code>[A-Za-z0-9_-]</code> for the key</li>
-<li><code>json.encode</code> the data first, then apply your <strong>own</strong> percent-encoding (or base64) before sending</li>
-<li>in short, don't put player-entered text in directly</li>
-</ul>
+<p>Spaces, Chinese characters, <code>&amp;</code>, <code>=</code>, and <code>#</code> inside <code>key</code> / <code>data</code> therefore cannot truncate the URL or break the signature.
+Encoding structured data with <code>json.encode</code> before storing it is still recommended, so it parses cleanly when read back.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">A <code>user_data</code> call checks the login first</p>
+<p>The previous implementation concatenated <code>nil</code> credentials and threw when nobody was logged in. With <code>user_data</code> set to <code>true</code>
+and no active login, it now returns <code>false, "GameJolt: not authenticated, call gamejolt.authUser(username, user_token) first"</code>.</p>
 </div>
 <h3 id="score-tables">Score tables<a class="headerlink" href="#score-tables" title="Permanent link">&para;</a></h3>
 <div class="admonition example">
@@ -3677,7 +3715,9 @@ and since <strong>the signature is computed from the assembled string</strong>, 
 <ul>
 <li><code>fetchScoresLocal(table_id)</code> pulls the top N entries, <strong>no login required</strong>. If <code>table_id</code> is omitted, it takes the game's main table.</li>
 <li><code>fetchScoresGlobal(table_id)</code> requests with <code>username + user_token</code>; the result includes the player's own rank / neighbors, <strong>login required</strong>.</li>
-<li><code>submitScore(score, table_id, sort, extra_data)</code> submits a score. <code>sort</code> is the value used for display; <code>extra_data</code> is extra text (e.g. time used, level).</li>
+<li><code>submitScore(score, table_id, sort, extra_data, as_guest)</code> submits a score. <code>sort</code> is the value used for display; <code>extra_data</code> is extra text (e.g. time used, level).</li>
+<li>while logged in, the credentials are appended automatically and the score is filed under the player's account</li>
+<li>with nobody logged in the score goes in as a guest; pass <code>true</code> for the fifth argument, <code>as_guest</code>, to force a guest submission even while authenticated</li>
 </ul>
 </div>
 <div class="highlight"><pre><span></span><code><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">submitScore</span><span class="p">(</span><span class="mi">12345</span><span class="p">,</span><span class="w"> </span><span class="mi">535</span><span class="p">,</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;LV19|Genocide&quot;</span><span class="p">)</span>
@@ -3686,11 +3726,23 @@ and since <strong>the signature is computed from the assembled string</strong>, 
 <span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">res</span><span class="p">.</span><span class="py">scores</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span><span class="w"> </span><span class="nb">print</span><span class="p">(</span><span class="nv">s</span><span class="p">.</span><span class="py">score</span><span class="p">,</span><span class="w"> </span><span class="nv">s</span><span class="p">.</span><span class="py">user</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
-<div class="admonition bug">
-<p class="admonition-title"><code>submitScore</code> does not carry username/token — it submits a guest score</p>
-<p>When assembling the URL, <code>username</code> / <code>user_token</code> are <strong>not</strong> appended (compare <code>fetchScoresGlobal</code>, which does attach them),
-so even if you have called <code>authUser</code>, the score is submitted as a <strong>guest</strong> and won't be attached to the player's account.</p>
-<p>To submit an authenticated score, write your own credentialed version following the library's approach, or modify this library.</p>
+<div class="admonition note">
+<p class="admonition-title">Credentials go after every optional parameter</p>
+<p><code>submitScore</code> assembles <code>table_id</code> / <code>sort</code> / <code>extra_data</code> first and appends the credentials last, so the two never interfere:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">credentials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">as_guest</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="nf">isLoggedIn</span><span class="p">())</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">credentials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">userParams</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/scores/add/?game_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">gamejolt</span><span class="p">.</span><span class="py">app_id</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="s2">&quot;&amp;score=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">score</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="p">(</span><span class="nv">table_id</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;&amp;table_id=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">table_id</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="p">(</span><span class="nv">sort</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;&amp;sort=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">sort</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="p">(</span><span class="nv">extra_data</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;&amp;extra_data=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nf">urlencode</span><span class="p">(</span><span class="nv">extra_data</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">..</span>
+<span class="w">             </span><span class="nv">credentials</span>
+</code></pre></div>
+<p>If the session drops (for example a heartbeat the server refused), the credentials disappear on their own and later submissions fall back to guest scores with no call-site changes.
+A missing <code>score</code> returns <code>false, "GameJolt: score is required"</code> instead of concatenating <code>nil</code> into the URL.</p>
 </div>
 <hr />
 <h2 id="a-complete-login-flow">A complete login flow<a class="headerlink" href="#a-complete-login-flow" title="Permanent link">&para;</a></h2>
@@ -3700,8 +3752,7 @@ so even if you have called <code>authUser</code>, the score is submitted as a <s
 <span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">ok</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">authUser</span><span class="p">(</span><span class="nv">name</span><span class="p">,</span><span class="w"> </span><span class="nv">token</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nv">ok</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">username</span><span class="p">,</span><span class="w"> </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="py">user_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
-<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span>
+<span class="w">        </span><span class="kr">return</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nv">err</span><span class="w">          </span><span class="c1">-- the library already logged out; no manual cleanup needed</span>
 <span class="w">    </span><span class="kr">end</span>
 
 <span class="w">    </span><span class="nv">Gamejolt</span><span class="p">.</span><span class="nf">sessionUpdate</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">)</span><span class="w">      </span><span class="c1">-- auto heartbeat afterwards</span>
@@ -3713,6 +3764,7 @@ so even if you have called <code>authUser</code>, the score is submitted as a <s
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">true</span>
 <span class="kr">end</span>
 </code></pre></div>
+<p>Use <code>logout()</code> to drop the credentials, or <code>sessionClose()</code> to stop the session while staying logged in.</p>
 <hr />
 <h2 id="pitfall-summary">Pitfall summary<a class="headerlink" href="#pitfall-summary" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
@@ -3729,10 +3781,15 @@ and <strong>the whole game is frozen for that frame</strong>.</p>
 <p class="admonition-title">Failures don't throw — they only return <code>false</code></p>
 <p>If you don't check the return value, failures are silently ignored. All calls are recommended to be written as <code>if (res == false) then ...</code>.</p>
 </div>
-<div class="admonition warning">
+<div class="admonition note">
 <p class="admonition-title">The <code>success</code> returned by GameJolt is a string</p>
-<p>The library checks <code>data.response.success == "false"</code> — note it is the string <code>"false"</code>, not a boolean.
-This follows the actual return of the GameJolt API, so don't "fix" it.</p>
+<p>GameJolt actually returns the strings <code>"true"</code> / <code>"false"</code>. The library checks
+<code>payload.success == false or payload.success == "false"</code>, so both shapes are caught and there is nothing to convert.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Failed requests never escape into <code>love.update</code></p>
+<p><code>https.request</code> runs inside a <code>pcall</code>. In some lua-https builds DNS and TLS failures <strong>raise</strong> instead of returning an error code;
+the wrapper turns them into <code>false, error message, "transport"</code> so a connection problem cannot take down the whole run.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Unavailable directly on non-Windows platforms</p>

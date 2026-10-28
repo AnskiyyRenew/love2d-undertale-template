@@ -3228,15 +3228,16 @@
 <li><code>[font:x]</code> 将字体设置为 <code>x</code> 。路径从 <code>Resources/Fonts/</code> 开始算，但<strong>会先查 <code>Game/Resources/Fonts/</code></strong> ，同名文件 Game 区优先。设置字体会关闭 bondfont，恢复需重新启用。</li>
 <li><code>[effect:name, int]</code> 设置字符的特效。<ul>
 <li><code>name</code> 特效的名字： <code>shake</code> 原地颤动、 <code>rotate</code> 进行轻微旋转，其他名字等于没有特效。</li>
-<li><code>int</code> 特效强度，默认 <code>1</code> ，数字越大强度越大。</li>
+<li><code>int</code> 特效强度，数字越大强度越大。<strong>逗号与数值都必须写出</strong>： <code>[effect:shake, 1]</code> 。只写 <code>[effect:shake]</code> 时整个标签不生效（解析依赖逗号分隔符）。数值无法转为数字时按 <code>1</code> 处理。</li>
 </ul>
 </li>
 <li><code>[outline:r, g, b, a, t]</code> 设置文本的外边框。<ul>
-<li><code>r, g, b, a</code> 边框的颜色与透明度。</li>
-<li><code>t</code> 边框的厚度。</li>
+<li><code>r, g, b, a</code> 边框的颜色与透明度，取值 <code>0 ~ 1</code> ，直接交给 <code>setColor</code> 。</li>
+<li><code>t</code> 边框的厚度，单位是像素。</li>
+<li>五段都只认<strong>整数</strong>，写 <code>0.5</code> 这类小数会让整个标签静默失效。</li>
 </ul>
 </li>
-<li><code>[voice:name]</code> 设置打字音效，文件在 <code>Resources/Sounds/Voices/</code> 里，写文件名即可。</li>
+<li><code>[voice:name]</code> 设置打字音效，文件在 <code>Resources/Sounds/Voices/</code> 里，写文件名即可。默认音效是 <code>v_monster.wav</code> ，设置后音效列表被替换成这一个。</li>
 <li><code>[portrait:frames|interval|mode]</code> 设置打字时同时播放的动画，一般为说话时有一个角色播放说话动画。<ul>
 <li><code>frames</code> 帧图片，<strong>用英文逗号分隔</strong>，例如 <code>a.png, b.png</code> 。</li>
 <li><code>interval</code> 每帧多少秒，默认 <code>1/30</code> 。</li>
@@ -3251,7 +3252,7 @@
 <li>气泡属于显示它的那一句，因此 <code>[next]</code> 会把气泡和文本一起清掉；下一句需要气泡时需重新使用 <code>[showbubble:]</code> 。</li>
 </ul>
 </li>
-<li><code>[showbubble:dir, pos]</code> 显示气泡对话框。 <code>dir</code> 是尾巴朝向，可取 <code>left</code> / <code>right</code> / <code>up</code> / <code>down</code> （默认 <code>left</code> ）； <code>pos</code> 是尾巴沿着边框的位置 <code>0 ~ 1</code> ，默认 <code>0.5</code> 。</li>
+<li><code>[showbubble:dir, pos]</code> 显示气泡对话框。 <code>dir</code> 是尾巴朝向，可取 <code>left</code> / <code>right</code> / <code>up</code> / <code>down</code> （默认 <code>left</code> ）； <code>pos</code> 是尾巴沿着边框的位置 <code>0 ~ 1</code> ，默认 <code>0.5</code> 。<strong>逗号与 <code>pos</code> 都要写出</strong>，只写 <code>[showbubble:left]</code> 不会生效。</li>
 <li><code>[hidebubble]</code> 隐藏气泡对话框。</li>
 <li><code>[func:name]</code> 调用名为 <code>name</code> 的函数。<strong>查表顺序</strong>：先查本打字机的 <code>funcs</code> 注册表（用 <code>typer:SetFunc</code> 注册过），未命中再回退到 <code>_G[name]</code> 全局。local / 闭包 / upvalue 函数只要通过 <code>:SetFunc</code> 注册过，也能从文本中调用，无需挂到全局命名空间。</li>
 <li><code>[func:name|a, b, c]</code> 调用名为 <code>name</code> 的函数，并可以进行传参操作，使用英文逗号进行分割。查表顺序同上。<ul>
@@ -3260,7 +3261,7 @@
 <li>找不到时打印 <code>[EText] function not found in typer.funcs or _G: &lt;name&gt;</code> 并跳过。</li>
 </ul>
 </li>
-<li><code>^</code> 可以使用此符号直接将所有样式重置到默认值。</li>
+<li><code>^</code> 把颜色、透明度、边框、缩放、特效这五项重置为默认值，<strong>并额外停顿 <code>0.3</code> 秒</strong>（与 <code>[wait:]</code> 一样走独立计时器，快进时跳过）。字体与字号<strong>不在</strong>重置范围内，需要改回默认值时再写一次 <code>[font:]</code> / <code>[size:]</code> 。</li>
 </ul>
 </details>
 <div class="admonition example">
@@ -3279,6 +3280,22 @@
 <div class="admonition tip">
 <p class="admonition-title">多个标签可连续排列</p>
 <p>例如 <code>[font:x][colorHEX:ffff00][effect:shake, 2]</code> ，效果依次叠加。</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">文本中的特殊字符</p>
+<p>除方括号标签外，文本里还有几个被引擎直接处理的字符：</p>
+<ul>
+<li><code>\n</code> 换行，光标回到行首并下移一行。</li>
+<li><code>\t</code> 制表符，宽度等于四个空格。</li>
+<li><code>*</code> 句首的星号加空格被当作对白前缀。引擎会把 <code>*X</code> 补全成 <code>* X</code> ，且折行后的每一行带<strong>两个空格的悬挂缩进</strong>。面板类文字不要以 <code>*</code> 开头，缩进会把字挤出面板，见 <a href="../../040_overworld/060_shop/index.html">商店</a> 。</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">自动换行</p>
+<p><code>EText</code> 的 <code>typer.auto_wrap</code> 默认<strong>关闭</strong>，打开后按 <code>size[1]</code> 折行，规则与 <code>InstText</code> 一致：英文按单词折、中文等宽字符逐字折。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Typers</span><span class="p">.</span><span class="py">EText</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="s2">&quot;很长很长、肯定放不下的一句话&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">270</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">})</span>
+<span class="nv">t</span><span class="p">.</span><span class="py">auto_wrap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
 </div>
 <hr />
 <h3 id="ntext">NText 打字机<a class="headerlink" href="#ntext" title="Permanent link">&para;</a></h3>

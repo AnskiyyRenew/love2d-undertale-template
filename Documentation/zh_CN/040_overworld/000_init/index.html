@@ -3449,30 +3449,43 @@
 <p>引擎侧<strong>根本没有</strong> <code>Scripts/Logics/items.lua</code> ，所以列表里那一档永远命中不了，物品表<strong>事实上只有 <code>Game/Logics/items.lua</code> 一个来源</strong>。<br>
 两份都找不到时会打印 <code>[Overworld] WARNING: items table not found under Game.Logics or Scripts.Logics.</code> ，随后调用 <code>ITEMS.FindItemByID</code> 会因索引 <code>nil</code> 而崩溃。</p>
 </div>
+<p>物品定义是纯数据表，每个条目含 <code>id</code> / <code>name</code> / <code>_color</code> 。动作（ <code>use</code> / <code>info</code> / <code>drop</code> ）与电话拨号统一走下面两张以 <strong>id 为 key</strong> 的函数表，值是 <code>function(id)</code> 形式的闭包，函数体内通常调用 <code>Overworld.dialogNew</code> ； <code>items.lua</code> 还提供 <code>drop_item(id)</code> / <code>show_sprite(path)</code> 两个本地 helper（前者移出背包，后者夺控制画贴图并按取消键清除）。</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="p">{</span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;MonsterCandy&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Monster Candy&quot;</span><span class="p">},</span>
 <span class="w">    </span><span class="p">{</span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span><span class="w">       </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}},</span>
 <span class="w">    </span><span class="c1">-- ...</span>
 <span class="p">}</span>
 
+<span class="c1">-- 物品动作表（以 id 为 key）。每个 action 是 fn(id)。</span>
 <span class="nv">db</span><span class="p">.</span><span class="py">_actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nv">use</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* You ate the Spider...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;* I CAN&#39;T UNDERSTAND.&quot;</span><span class="p">},</span>
-<span class="w">        </span><span class="nv">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* A spider.&quot;</span><span class="p">},</span>
-<span class="w">        </span><span class="nv">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* You dropped the Spider...</span><span class="se">\n</span><span class="s2">* But nothing happened.&quot;</span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nv">Spider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">use</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">id</span><span class="p">)</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">({</span><span class="s2">&quot;* You ate the Spider...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;* I CAN&#39;T UNDERSTAND.&quot;</span><span class="p">})</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">id</span><span class="p">)</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">(</span><span class="s2">&quot;* A spider.&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">id</span><span class="p">)</span><span class="w"> </span><span class="nf">drop_item</span><span class="p">(</span><span class="nv">id</span><span class="p">);</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">(</span><span class="s2">&quot;* You dropped the Spider...&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="c1">-- 电话动作表（以 id 为 key）。每个值是 fn(id)。</span>
+<span class="nv">db</span><span class="p">.</span><span class="py">_cell_actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">-- Toriel_1 = function(id) Overworld.dialogNew(&quot;* Ring ring...&quot;) end,</span>
 <span class="p">}</span>
 </code></pre></div>
 <div class="admonition example">
 <p class="admonition-title">ITEMS 方法</p>
 <ul>
 <li><code>ITEMS.FindItemByID(id)</code> 按 id 取物品定义，返回含 <code>id</code> / <code>name</code> / <code>_color</code> 的表。</li>
-<li><code>ITEMS.GetActionByID(id, action)</code> 取某物品的一段文本。<ul>
+<li><code>ITEMS.GetActionByID(id, action)</code> 按 id + action 取 <code>_actions</code> 里注册的函数（兼容旧接口）。</li>
+<li><code>ITEMS.DoItemAction(id, action)</code> 三级菜单路由：按 id 取注册的 <code>use</code> / <code>info</code> / <code>drop</code> 函数并执行。<strong>未注册的 id 或 action 走默认回退</strong>，按 id 查 name 组装一条通用提示（ <code>drop</code> 时同时移出背包）。</li>
+<li><code>ITEMS.DoCellAction(id)</code> 电话路由：按 id 取 <code>_cell_actions</code> 里注册的函数并执行。<strong>未注册走默认回退</strong>（默认 <code>Overworld.dialogNew</code> ）。</li>
+<li><code>ITEMS.FindCellNameByID(id)</code> 按 id 查电话显示名（电话名只存于 <code>DATA.player.cells</code> ）。<ul>
 <li><code>action</code> <code>"use"</code> / <code>"info"</code> / <code>"drop"</code> 。</li>
 </ul>
 </li>
 </ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">默认回退</p>
+<p>未在 <code>_actions</code> 注册的物品不会报错： <code>use</code> / <code>info</code> 取物品 name 组装通用提示， <code>drop</code> 移出背包后提示。大量一次性物品无需逐条注册，只给需要专属行为（例如贴图展示）的物品加条目即可。</p>
 </div>
 <p>背包里存的<strong>只是 id 字符串</strong>，显示时再 <code>FindItemByID</code> 查名字和颜色。</p>
 <hr />
@@ -3495,7 +3508,8 @@
 <li><code>Overworld.stat</code> 菜单模块。</li>
 <li><code>Overworld.debug</code> 是否开启调试绘制，默认 <code>false</code> 。</li>
 <li><code>Overworld.follow_player</code> 镜头是否自动跟随玩家，默认 <code>true</code> 。</li>
-<li><code>Overworld.ui_prefer</code> 对话框默认出现在上还是下， <code>"down"</code> （默认）或 <code>"up"</code> 。</li>
+<li><code>Overworld.ui_prefer</code> 对话框与菜单默认出现在上还是下， <code>"auto"</code> （默认，按玩家屏幕位置判定）／<code>"down"</code> ／<code>"up"</code> 。</li>
+<li><code>Overworld.ui_threshold</code> <code>"auto"</code> 的判定线，画布坐标 Y，默认 <code>320</code> 。</li>
 </ul>
 </div>
 <hr />

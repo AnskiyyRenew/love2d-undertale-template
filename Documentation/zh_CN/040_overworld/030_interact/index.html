@@ -3263,12 +3263,20 @@
 <ul>
 <li><code>Overworld.dialogNew(texts, position)</code> 弹一个对话框，返回 <code>dialog</code> 对象。<ul>
 <li><code>texts</code> 文本数组。</li>
-<li><code>position</code> <code>"down"</code> （屏幕下方，默认）或 <code>"up"</code> （上方）。</li>
+<li><code>position</code> <code>"down"</code> （屏幕下方）或 <code>"up"</code> （上方）。省略时由 <code>Overworld.ui_prefer</code> 决定。</li>
 </ul>
 </li>
-<li><code>Overworld.ui_prefer</code> 不传 <code>position</code> 时用这个默认值。</li>
+<li><code>Overworld.ui_prefer</code> 不传 <code>position</code> 时采用的值。<ul>
+<li><code>"auto"</code> （默认）按玩家在画面中的位置判定：低于 <code>ui_threshold</code> 时出在上方，否则出在下方。</li>
+<li><code>"down"</code> ／ <code>"up"</code> 固定一侧，不再自动判定。</li>
+</ul>
+</li>
+<li><code>Overworld.ui_threshold</code> <code>"auto"</code> 的判定线，画布坐标 Y，默认 <code>320</code> （480 的三分之二）。</li>
+<li><code>Overworld.ResolveUIPosition()</code> 返回这一帧会采用的值， <code>"up"</code> 或 <code>"down"</code> 。</li>
+<li><code>Overworld.FlipY(y)</code> 把画布 Y 绕中线 <code>240</code> 镜像，即 <code>480 - y</code> 。</li>
 </ul>
 </div>
+<p>两个位置共用同一个框与同一份文字偏移：切换时只移动框，框内文字相对框的偏移量保持不变，因此文字不会跟着镜像翻转。</p>
 <p>返回的 <code>dialog</code> 有两个字段： <code>block</code> （那个白边黑底的框）与 <code>text</code> （打字机对象）。</p>
 <p>引擎默认在文本播完后销毁框并解锁玩家。若需要在文本播完后执行其他逻辑，覆盖 <code>text._onComplete</code> ：</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dialog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">({</span><span class="s2">&quot;* 你捡起了一块石头。&quot;</span><span class="p">})</span>

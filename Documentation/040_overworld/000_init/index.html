@@ -3449,30 +3449,43 @@ When debugging, comment out those two lines, or delete the save variable first.<
 <p>The engine side <strong>simply has no</strong> <code>Scripts/Logics/items.lua</code>, so that entry in the list can never be hit — in fact the item table <strong>only has <code>Game/Logics/items.lua</code> as a source</strong>. <br>
 When both are missing, it prints <code>[Overworld] WARNING: items table not found under Game.Logics or Scripts.Logics.</code>, and then any use of <code>ITEMS.FindItemByID</code> will crash from indexing <code>nil</code>.</p>
 </div>
+<p>Item definitions are pure data tables, each with <code>id</code> / <code>name</code> / <code>_color</code>. Actions (<code>use</code> / <code>info</code> / <code>drop</code>) and phone calls are routed through two tables keyed by <strong>id</strong>, whose values are <code>function(id)</code> closures that usually call <code>Overworld.dialogNew</code>; <code>items.lua</code> also provides the <code>drop_item(id)</code> / <code>show_sprite(path)</code> helpers (the former removes an item from the inventory, the latter seizes control, draws a sprite, and clears it on cancel).</p>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="p">{</span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;MonsterCandy&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Monster Candy&quot;</span><span class="p">},</span>
 <span class="w">    </span><span class="p">{</span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span><span class="w">       </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">}},</span>
 <span class="w">    </span><span class="c1">-- ...</span>
 <span class="p">}</span>
 
+<span class="c1">-- Item action table (keyed by id); each action is a fn(id).</span>
 <span class="nv">db</span><span class="p">.</span><span class="py">_actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="nv">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Spider&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nv">use</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* You ate the Spider...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;* I CAN&#39;T UNDERSTAND.&quot;</span><span class="p">},</span>
-<span class="w">        </span><span class="nv">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* A spider.&quot;</span><span class="p">},</span>
-<span class="w">        </span><span class="nv">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;* You dropped the Spider...</span><span class="se">\n</span><span class="s2">* But nothing happened.&quot;</span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nv">Spider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">use</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">id</span><span class="p">)</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">({</span><span class="s2">&quot;* You ate the Spider...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;* I CAN&#39;T UNDERSTAND.&quot;</span><span class="p">})</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">id</span><span class="p">)</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">(</span><span class="s2">&quot;* A spider.&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">id</span><span class="p">)</span><span class="w"> </span><span class="nf">drop_item</span><span class="p">(</span><span class="nv">id</span><span class="p">);</span><span class="w"> </span><span class="nv">Overworld</span><span class="p">.</span><span class="nf">dialogNew</span><span class="p">(</span><span class="s2">&quot;* You dropped the Spider...&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="c1">-- Cell action table (keyed by id); each value is fn(id).</span>
+<span class="nv">db</span><span class="p">.</span><span class="py">_cell_actions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">-- Toriel_1 = function(id) Overworld.dialogNew(&quot;* Ring ring...&quot;) end,</span>
 <span class="p">}</span>
 </code></pre></div>
 <div class="admonition example">
 <p class="admonition-title">ITEMS methods</p>
 <ul>
 <li><code>ITEMS.FindItemByID(id)</code> gets the item definition by id, returning a table with <code>id</code> / <code>name</code> / <code>_color</code>.</li>
-<li><code>ITEMS.GetActionByID(id, action)</code> gets a piece of text for an item.<ul>
+<li><code>ITEMS.GetActionByID(id, action)</code> fetches the fn registered in <code>_actions</code> (legacy compat).</li>
+<li><code>ITEMS.DoItemAction(id, action)</code> third-level menu router: looks up the registered <code>use</code> / <code>info</code> / <code>drop</code> fn by id and runs it. <strong>Unregistered id or action falls through to the default</strong>, which assembles a generic line from the name (and removes the item on <code>drop</code>).</li>
+<li><code>ITEMS.DoCellAction(id)</code> cell router: looks up the fn registered in <code>_cell_actions</code> and runs it. <strong>Unregistered falls through to the default</strong> (<code>Overworld.dialogNew</code>).</li>
+<li><code>ITEMS.FindCellNameByID(id)</code> looks up a cell's display name by id (cell names live only in <code>DATA.player.cells</code>).<ul>
 <li><code>action</code> is <code>"use"</code> / <code>"info"</code> / <code>"drop"</code>.</li>
 </ul>
 </li>
 </ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Default fallback</p>
+<p>Items not registered in <code>_actions</code> do not error: <code>use</code> / <code>info</code> assemble a generic line from the name, and <code>drop</code> removes the item before notifying. Bulk one-off items need no per-id entry — register only those that need custom behaviour (e.g. showing a sprite).</p>
 </div>
 <p>The inventory only stores <strong>id strings</strong>; the name and color are looked up via <code>FindItemByID</code> at display time.</p>
 <hr />
@@ -3495,7 +3508,8 @@ When both are missing, it prints <code>[Overworld] WARNING: items table not foun
 <li><code>Overworld.stat</code> the menu module.</li>
 <li><code>Overworld.debug</code> whether debug drawing is enabled, default <code>false</code>.</li>
 <li><code>Overworld.follow_player</code> whether the camera auto-follows the player, default <code>true</code>.</li>
-<li><code>Overworld.ui_prefer</code> whether the dialog box appears at the top or bottom by default, <code>"down"</code> (default) or <code>"up"</code>.</li>
+<li><code>Overworld.ui_prefer</code> whether dialogs and the menu appear at the top or bottom by default, <code>"auto"</code> (default, derived from the player's position on screen) / <code>"down"</code> / <code>"up"</code>.</li>
+<li><code>Overworld.ui_threshold</code> the auto-detection line in canvas Y, default <code>320</code>.</li>
 </ul>
 </div>
 <hr />
