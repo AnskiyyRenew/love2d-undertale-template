@@ -66,6 +66,11 @@ The "^" character still works as a reset-to-default marker, same as NText.
 Every "* " at the start of a sentence is treated as a dialogue prefix (star prefix).
 
 ]]
+-- Shared mask / shader helpers (see render.lua). Resolved through the engine
+-- module path rather than relative to this file, so a Game-area copy of a
+-- typer (whole-file override) still finds it.
+local render = require("Scripts.Libraries.Typers.render")
+
 local typers = {
     insts = {}
 }
@@ -1102,45 +1107,57 @@ function typers.New(text, position, layer, size, mode)
 
     function typer:Draw()
         local letters = typer.letters
-        for i = 1, #letters do
-            local letter = letters[i]
-            local font = getFont(typer.font, typer.fontsize)
-            local effect = letter.effect
+        if (not letters) or (#letters == 0) then return end
 
-            local eff_x, eff_y = 0, 0
+        -- `ox` / `oy` shift every letter: the shader pass draws the text at
+        -- -x, -y inside its own canvas, every other path passes 0, 0.
+        local function emit(ox, oy)
+            for i = 1, #letters do
+                local letter = letters[i]
+                local font = getFont(typer.font, typer.fontsize)
+                local effect = letter.effect
 
-            if (effect.name == "shake") then
-                local int = (effect.intensity or 1)
-                eff_x = math.random(-int, int)
-                eff_y = math.random(-int, int)
-            elseif (effect.name == "rotate") then
-                local int = (effect.intensity or 1)
+                local eff_x, eff_y = 0, 0
+
+                if (effect.name == "shake") then
+                    local int = (effect.intensity or 1)
+                    eff_x = math.random(-int, int)
+                    eff_y = math.random(-int, int)
+                elseif (effect.name == "rotate") then
+                    local int = (effect.intensity or 1)
+                end
+
+                local main_x = typer.x + letter.x + eff_x + ox
+                local main_y = typer.y + letter.y + eff_y + oy
+                SE.graphics.setFont(font)
+                if (letter.outline) then
+                    local ol = letter.outline
+                    local t = ol[5] or 1
+                    local s = letter.scale or 1
+                    SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
+                    -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
+                    -- square t-pixel offsets). setLineWidth has no effect on draw.
+                    SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
+                end
+                SE.graphics.setColor(letter.color[1], letter.color[2], letter.color[3], letter.alpha)
+                SE.graphics.draw(letter.text_obj, main_x, main_y, 0, letter.scale or 1, letter.scale or 1)
             end
-
-            local main_x = typer.x + letter.x + eff_x
-            local main_y = typer.y + letter.y + eff_y
-            SE.graphics.setFont(font)
-            if (letter.outline) then
-                local ol = letter.outline
-                local t = ol[5] or 1
-                local s = letter.scale or 1
-                SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
-                -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
-                -- square t-pixel offsets). setLineWidth has no effect on draw.
-                SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
-            end
-            SE.graphics.setColor(letter.color[1], letter.color[2], letter.color[3], letter.alpha)
-            SE.graphics.draw(letter.text_obj, main_x, main_y, 0, letter.scale or 1, letter.scale or 1)
         end
+
+        render.draw(emit, function ()
+            local bx, by, bw, bh = render.letter_bounds(letters)
+            return typer.x + bx, typer.y + by, bw, bh
+        end, typer.stencils, typer.shaders)
     end
 
+    render.install(typer)
     Layers.add(typer)
     table.insert(typers.insts, typer)
     return typer

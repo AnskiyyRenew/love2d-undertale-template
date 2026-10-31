@@ -45,6 +45,11 @@ Builder API (available via `self` inside the builder function):
 
 
 ]]
+-- Shared mask / shader helpers (see render.lua). Resolved through the engine
+-- module path rather than relative to this file, so a Game-area copy of a
+-- typer (whole-file override) still finds it.
+local render = require("Scripts.Libraries.Typers.render")
+
 local typers = {
     insts = {}
 }
@@ -895,46 +900,64 @@ function typers.New(fn, position, layer, size, mode)
 
     function typer:Draw()
         local letters = typer.letters
-        for i = 1, #letters do
-            local letter = letters[i]
-            local font = getFont(typer.font, typer.fontsize)
-            local effect = letter.effect
+        if (not letters) or (#letters == 0) then return end
 
-            local eff_x, eff_y = 0, 0
-            local draw_scale = letter.scale or typer.scale or 1
-
-            if (effect.name == "shake") then
-                local int = (effect.intensity or 1)
-                eff_x = math.random(-int, int)
-                eff_y = math.random(-int, int)
-            elseif (effect.name == "rotate") then
-                local int = (effect.intensity or 1)
-            end
-
-            local main_x = typer.x + letter.x + eff_x
-            local main_y = typer.y + letter.y + eff_y
-            SE.graphics.setFont(font)
-            if (letter.outline) then
-                local ol = letter.outline
-                local t = ol[5] or 1
-                local s = draw_scale
-                SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
-                -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
-                -- square t-pixel offsets). setLineWidth has no effect on draw.
-                SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
-                SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
-            end
-            SE.graphics.setColor(letter.color[1], letter.color[2], letter.color[3], letter.alpha)
-            SE.graphics.draw(letter.text_obj, main_x, main_y, 0, draw_scale, draw_scale)
+        -- SText falls back to the typer-wide scale when a letter carries none,
+        -- so both the draw and the bounds measurement go through this.
+        local function scale_of(letter)
+            return letter.scale or typer.scale or 1
         end
+
+        -- `ox` / `oy` shift every letter: the shader pass draws the text at
+        -- -x, -y inside its own canvas, every other path passes 0, 0.
+        local function emit(ox, oy)
+            for i = 1, #letters do
+                local letter = letters[i]
+                local font = getFont(typer.font, typer.fontsize)
+                local effect = letter.effect
+
+                local eff_x, eff_y = 0, 0
+                local draw_scale = scale_of(letter)
+
+                if (effect.name == "shake") then
+                    local int = (effect.intensity or 1)
+                    eff_x = math.random(-int, int)
+                    eff_y = math.random(-int, int)
+                elseif (effect.name == "rotate") then
+                    local int = (effect.intensity or 1)
+                end
+
+                local main_x = typer.x + letter.x + eff_x + ox
+                local main_y = typer.y + letter.y + eff_y + oy
+                SE.graphics.setFont(font)
+                if (letter.outline) then
+                    local ol = letter.outline
+                    local t = ol[5] or 1
+                    local s = draw_scale
+                    SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
+                    -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
+                    -- square t-pixel offsets). setLineWidth has no effect on draw.
+                    SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x,      main_y + t, 0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x - t, main_y - t,  0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x - t, main_y + t,  0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x + t, main_y - t,  0, s, s)
+                    SE.graphics.draw(letter.text_obj, main_x + t, main_y + t,  0, s, s)
+                end
+                SE.graphics.setColor(letter.color[1], letter.color[2], letter.color[3], letter.alpha)
+                SE.graphics.draw(letter.text_obj, main_x, main_y, 0, draw_scale, draw_scale)
+            end
+        end
+
+        render.draw(emit, function ()
+            local bx, by, bw, bh = render.letter_bounds(letters, {scale_of = scale_of})
+            return typer.x + bx, typer.y + by, bw, bh
+        end, typer.stencils, typer.shaders)
     end
 
+    render.install(typer)
     Layers.add(typer)
     table.insert(typers.insts, typer)
     return typer

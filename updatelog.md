@@ -1,72 +1,18 @@
 # Update Log
 
-> Changes since tag `v3.0.0` (`dfbdb1a`) — to be used as the release note for the next build.
+> Changes since tag `v3.0.1-stable` (`56b162d`) — to be used as the release note for the next build.
 
 ## New Features
-- Added the GUI library (`Scripts/Libraries/GUI/`), loaded as the global `GUI`: `Window`, `Label`, `Button`, `Slider`, `TextInput`, `Dropdown`, an `Input` mouse helper and the low-level `primitives`
-- Added shape-aware collision: `sprite:SetHitboxShape("ellipse")` / `"rect"`, `sprites.GetHitboxShape`, `Player.SetHitboxShape` and the `Collisions.ShapeWithShape` / `ShapeWithPoint` / `ShapeName` / `IsEllipse` dispatchers
-- Added a native secret store for the GameJolt private key (`Packager/Secrets/` + `Scripts/Libraries/Utils/Secrets.lua`): the key is compiled into a `.dll` / `.so` and read back through LuaJIT FFI, degrading quietly to `nil` when the library is missing
-- Added an overworld save-data bridge to the battle system: `battle.SyncFromOverworld()`, `battle.SyncToOverworld()`, `battle.HasOverworldData()` and the `auto_overworld_sync` flag for scripted fights
-- Added wall-touch queries to the arena: `arenas.PlayerOnWallLeft`, `arenas.PlayerOnWallRight`, `arenas.PlayerOnWall` and `arenas.GetWallSide`
-- Added text measurement to every typer module: `typer:GetWidth()`, `typer:GetHeight()` and `typer:GetLettersSize()`, plus `Typers.GetLettersSize(typer)` which accepts an instance of any of the four modules
-- Added `typer:SetFunc(name, fn)` to EText, so `[func:name]` can call registered closures and module locals instead of only `_G` functions
-- Added `Typers.CCRemove(cc)` for disposing a floating CC text, and the default CC animation now releases itself once it has finished
-- Added asset preloading: `audio.PreloadFile(path, kind)`, `sprites.PreloadFile(path)` and the `SE.Preload` / `SE.PreloadAll` wrappers
-- Added `BluePlatform:SetStencils()` and a `Step` callback
-- Added a Celeste-style platformer soul example at `Game/Souls/celeste.lua` (walk, jump, wall grab / slide / jump, 8-direction dash with double dash, stamina)
-- Added `Gamejolt.logout()`, which discards the stored credentials locally and stops the session heartbeat
-- Added a third return value to every GameJolt endpoint: `kind` is `"transport"` when the request never produced a usable answer and `"api"` when the server explicitly refused it
-- Added an optional `as_guest` argument to `Gamejolt.submitScore(score, table_id, sort, extra_data, as_guest)`; scores are filed under the logged-in account unless it is set
-- Overworld overlays now pick their side automatically: `Overworld.ui_prefer` defaults to `"auto"`, and a dialog or the stat menu opens above the player once the player drops below `Overworld.ui_threshold` (canvas Y, default `320`). `Overworld.ResolveUIPosition()`, `Overworld.GetPlayerScreenY()` and `Overworld.FlipY(y)` are exposed for custom overlays, and `"up"` / `"down"` still pin one side
-- The stat menu's left column mirrors across the screen midline in the `"up"` layout: the status box moves under the button box while the button box (centred on `240`) stays put, and the text inside keeps its offset so the lines are never flipped
-- Added third-level menu action routing for the overworld stat menu: `ITEMS.DoItemAction(id, action)` and `ITEMS.DoCellAction(id)` look up registered functions by id (in `Game/Logics/items.lua`'s `_actions` / `_cell_actions`) and run them, falling through to a default `Overworld.dialogNew` line when an id or action is unregistered. The `CELL` page is now navigable, and confirm dials the selected contact
+- Added stencil (mask) and shader support to all four typer modules, sharing one implementation in `Scripts/Libraries/Typers/render.lua`: `typer:SetStencils({mask})`, `typer:SetShaders({shader})`, `GetStencils` / `GetShaders`, `ClearStencils` / `ClearShaders` and `AddShader` / `RemoveShader` — the same calls a sprite takes. Both are optional and cost nothing while unset: the draw path behaves exactly as before until something is applied
+- The typer shader pass bakes the text block into an offscreen canvas sized to its bounding box before running the chain. Every glyph is drawn from a font atlas, so a shader reading `tex_coords` would otherwise see atlas-relative UVs instead of 0..1 across the glyph (`WaveDistort` mapped them through `tex_size` and `Gradiant` lerped across the axis — both sampled the wrong texels). Shaders written for sprites now behave identically on text, glyphs keep their exact positions, and masks stack on top: the shader runs first, then the baked canvas is blitted through the mask. Canvases are cached and rounded up to 32px steps (up to 12 sizes), so text that grows while typing reuses one surface instead of allocating per frame
+- Added an `immediate` argument to `timers.runFrame(func, interval, count, immediate)` and `timers.runSecond(...)`: when true, `func` fires once at creation and counts toward `count`, before the normal interval takes over — `runFrame(func, 60, 3, true)` fires immediately, then on frame 60 and frame 120
+- Added `Scripts/Scenes/TEST/scene_typerfx.lua`, a visual check for the typer mask / shader support: a baseline block, mask-only, shader-only, both combined, and an animated `Wave` shader over an `EText`. Enable it by pointing `FirstRoom` at `TEST.scene_typerfx`
 
 ## Bug Fixes
-- Fixed stencil masks leaking across frames and waves: `Masks.Clear()` now zeroes the stencil buffer instead of only disabling the test, and `love.draw` clears the stencil buffer every frame
-- Fixed the whole canvas turning permanently black: `Masks.Clear()` re-disables the stencil test after `pop("all")` restores the enabled state saved on entry
-- Fixed `arenas.Clear()` blanking every registered mask, which dropped the main battle box's clipping after the first turn; a destroyed arena now unregisters only its own mask
-- Fixed the player's collision half-size being hardcoded to 8px; it is now derived from the sprite's real size and scale, so a crouched soul no longer floats above platforms
-- Fixed bone edge placement ignoring `ypivot`: `ToDown`, `ToUp`, `ToLeft` and `ToRight` now keep the bone flush with the arena edge for any pivot
-- Fixed bullet-vs-soul tests ignoring an ellipse hitbox; the player test now goes through `Collisions.ShapeWithShape`
-- Fixed `BluePlatform`'s `mode` gating movement entirely; it now gates only the sideways carry
-- Fixed the shop's black background panel not inheriting the white panel's `y`
-- Removed a stale `Player.SetSoul("blue")` call from the sample wave
-- Fixed GameJolt logins never being rolled back: `Gamejolt.authUser()` stored the username and token before validating them and kept them on failure, so `isLoggedIn()` stayed `true` after a rejected login and every later request went out with dead credentials. Credentials are now committed only after `/users/auth/` accepts them, and a failed attempt returns the library to the logged-out state
-- Fixed `Gamejolt.isLoggedIn()` answering `true` for empty strings or non-string input; it now requires non-empty credentials that the API accepted at least once
-- Fixed `Gamejolt.authUser()` reporting success on a response that carried no `response` envelope: the check was `success ~= false`, and `nil ~= false` is true. `apiRequest` now requires a table payload, and `success` is caught as both `"false"` and boolean `false`
-- Fixed GameJolt requests being able to take down a frame: `https.request` runs inside `pcall`, so DNS and TLS failures return `false, message, "transport"` instead of raising into `love.update`
-- Fixed GameJolt query values being concatenated raw; every parameter is percent-encoded and the signature is computed over the encoded string, so keys, data and usernames holding spaces, `&`, `=` or CJK characters no longer break the URL or fail the signature check
-- Fixed GameJolt endpoints throwing while concatenating `nil` when called before `init()` or before logging in; both now return `false` with a message
-- Fixed `Gamejolt.submitScore()` submitting as a guest even after a successful `authUser()`; credentials are appended whenever someone is logged in
-- Fixed the session heartbeat retrying forever with credentials the server had already refused: an `"api"` failure stops the heartbeat and drops back to logged out, while transport failures still retry
-- Fixed `Gamejolt.init()` carrying the previous player's credentials over to another `app_id`
-- Fixed the stat menu's third-level confirm never actually firing: `stat.Destroy()` set `Char.controlling = false` right before `Overworld.dialogNew(...)`, but `dialogNew` returns early when `Char.controlling` is `false`, so the dialog never opened. The confirm now routes through `ITEMS.DoItemAction` and lets `dialogNew` seize control itself
-- Fixed `stat.Destroy()` leaving the second-level menu on screen: only `elements` was cleared, so the item list / USE-INFO-DROP row / cell list stayed visible under a popped dialog. `temp_elements` is now cleared too, and the selection state (`in_item` / `in_item_menu` / `in_cell` / `_page`) is reset on close
-- Fixed an empty inventory still entering the item list page on confirm; confirm on `ITEM` is now a no-op when `#DATA.player.items == 0`, staying on the top menu
+- Fixed the battle turn never receiving `dt`: `ui.Update(dt)` called `state.Update()` without forwarding the delta, so the delta was `nil` inside `state.Update` and stayed `nil` for everything downstream — `Battle._wave.Update(dt)` (DEFENDING), `Battle.attack.Update(dt)` (ATTACKING) and `Battle.FleeUpdate(dt)` (FLEEING). Any wave code that actually reads `dt` — a shader's `update(dt)`, a timer, or movement integration — silently ran on `nil`, which is what surfaced as an error when a converted Shadertoy shader was driven from a wave's `Update`. The delta is now forwarded from `ui.Update` into `state.Update`, so `dt` is the real frame time again in all three states. This was a long-standing bug rather than a regression: it went unnoticed because most wave code does not read `dt` at all
 
 ## Partial Changes
-- `BORDER_MODE` now defaults to `false` in `conf.lua`
-- The default player `_hitbox` changed from `{4, 4}` to `{2, 2}`
-- The F7 collision overlay draws ellipse hitboxes as outlines
-- `scene_battle_ow` is now a thin, idempotent reference wrapper over the Battle-library sync, so every battle scene gets the overworld hand-off instead of only this one
-- Level-ups read `DATA.lv_data` and add the gained max HP to the current HP, Undertale-style
-- `audio.PlaySound` and `audio.PlayMusic` clone a preloaded template Source instead of decoding the file on every call
-- `.gitignore` keeps `secrets.local.json`, `build/` and `Resources/Libs/Secrets/` local; only the example template is committed
-- Removed accidentally committed `__pycache__` files
-- Root `README.md` rewritten
-- Documentation regenerated as a bilingual (en + zh_CN) offline build
-- `Gamejolt.sessionClose()` stops the heartbeat but keeps the credentials; `Gamejolt.logout()` is the call that drops them
-- GameJolt failures return `false, message, kind` instead of `false, message`; `Gamejolt.authUser()` still returns only `boolean, message`
-- `apiRequest` takes the unsigned request path instead of a complete URL, so the URL and its signature are assembled in one place
-- The GameJolt documentation page is rewritten in both languages: the workarounds documented for `authUser` and for data-store encoding are no longer needed
-- `items.lua`'s `_actions` restructured from an array of `{id=, use=string, …}` records into a dictionary keyed by id whose values are `function(id)` closures; `GetActionByID` now queries the dictionary (legacy compat). Added `_cell_actions` for phone actions and `FindCellNameByID`
-- The `item2` sub-menu swallows the entry frame via an `input_lock` flag (mirroring `shop.lua`), so the confirm press that opens Use/Info/Drop can't instantly fire the chosen action on the same frame
-
-<!--
-Included commits (v3.0.0..HEAD):
-  9a09239 offline doc
-  4cbc622 bilingual offline docs + engine sync
-  76d9df7 Native secret store, Celeste soul, shape-aware collision and mask leak fixes
-  ec66f09 fix(masks): re-disable stencil test after pop("all") to stop black canvas
-  fec5a2b Typer text measurement, arena mask cleanup and regenerated docs
--->
+- `_VER` in `conf.lua` bumped to `3.0.1-stable`
+- The four typer modules now route their draw through `render.draw(emit, bounds, stencils, shaders)` rather than each carrying its own letter loop; the emitted draw calls are unchanged when neither a mask nor a shader is set
+- `masks.New`'s `image` parameter is annotated as nullable (`love.Image|table|nil`) in its LuaDoc
+- `Scripts/Libraries/Timer.lua` documented in Chinese

@@ -1,5 +1,5 @@
 -- Soul Engine Configuration File
-_VER = "3.0.0-stable"
+_VER = "3.0.1-stable"
 
 -- Set to true when building the game for release
 _RELEASED = false

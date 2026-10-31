@@ -8,7 +8,7 @@ local masks = {}
 ---@param h number  rect/ellipse: bbox height; image: target height (0 = native image height)
 ---@param r number  Rotation in degrees
 ---@param value number  Stencil layer value
----@param image love.Image|table  Optional. love.Image or sprite table (with .image). Used for "image" shape.
+---@param image love.Image|table|nil  Optional. love.Image or sprite table (with .image). Used for "image" shape.
 ---@return table
 function masks.New(shape, x, y, w, h, r, value, image)
     local self = {
