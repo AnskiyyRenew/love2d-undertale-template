@@ -291,7 +291,7 @@ end
 function ui.Update(dt)
     buttons.Update()
     ui.button_selecting = buttons.button_selecting
-    state.Update()
+    state.Update(dt)
 
     ui.barUpdate()
 
