@@ -82,9 +82,10 @@ end
 --- Convert ShaderToy code into a LÖVE Shader instance.
 --- The conversion is executed by the convert module, limited by the rules module.
 ---@param code string The original ShaderToy GLSL code.
+---@param options table|number|nil Optional host-channel settings (see convert.lua).
 ---@return ShaderToyShader The created shader wrapper with conversion metadata.
-function shadertoy.convert(code)
-    local converted = convert.convert(code, rules)
+function shadertoy.convert(code, options)
+    local converted = convert.convert(code, rules, options)
 
     local shader = {
         original = code,
@@ -96,6 +97,9 @@ function shadertoy.convert(code)
         -- Real textures are assigned via setChannel / setAudioChannel,
         -- and default noise textures are generated below.
         textures = {},
+        -- Channels listed here sample the sprite's main texture, so they never
+        -- own an external texture and must be skipped by the noise/send paths.
+        hostChannels = converted.hostChannels or {},
         time = 0,
         frame = 0,
         shader = nil,
@@ -104,7 +108,8 @@ function shadertoy.convert(code)
     setmetatable(shader, shadertoy.functions)
 
     for i = 0, rules.CHANNEL_COUNT - 1 do
-        if shader.runtimeFlags["iChannel" .. i] and not shader.textures[i] then
+        if shader.runtimeFlags["iChannel" .. i] and
+           not shader.hostChannels[i] and not shader.textures[i] then
             shader.textures[i] = shader:generateNoiseTexture(rules.DEFAULT_NOISE_SIZE)
         end
     end
@@ -207,6 +212,11 @@ end
 ---@param id integer The texture channel index (0-3).
 ---@param filepath string Path to the audio file.
 function shadertoy.functions:setAudioChannel(id, filepath)
+    if self.hostChannels and self.hostChannels[id] then
+        print("[WARNING] shadertoy:setAudioChannel - channel " .. id ..
+              " is bound to the host texture; call ignored")
+        return
+    end
     local source = SE.audio.newSource(filepath, "stream")
     source:setLooping(true)
     source:play()
@@ -299,7 +309,7 @@ function shadertoy.functions:update(dt)
     if self.runtimeFlags.iChannelResolution then
         for i = 0, rules.CHANNEL_COUNT - 1 do
             local tex = self.textures[i]
-            if tex then
+            if tex and not self.hostChannels[i] then
                 local w, h = tex:getDimensions()
                 s:send("iChannelResolution" .. i, {w, h, 0})
             end
@@ -307,7 +317,7 @@ function shadertoy.functions:update(dt)
     end
 
     for i = 0, rules.CHANNEL_COUNT - 1 do
-        if self.textures[i] then
+        if self.textures[i] and not self.hostChannels[i] then
             s:send("iChannel" .. i, self.textures[i])
         end
     end
@@ -320,6 +330,11 @@ end
 ---@param id integer The texture channel index (0-3).
 ---@param texture table The texture to assign to the channel.
 function shadertoy.functions:setChannel(id, texture)
+    if self.hostChannels and self.hostChannels[id] then
+        print("[WARNING] shadertoy:setChannel - channel " .. id ..
+              " is bound to the host texture; call ignored")
+        return
+    end
     self.textures[id] = texture
 end
 

@@ -215,21 +215,23 @@ function buttons.SetSprites(sprs)
     buttons.ResetButtons()
 end
 
+---Replace the per-button animation tables.
+---
+---Each state is a list indexed by button: `{ {frames, interval}, ... }`, where
+---`frames` is the frame list handed to Sprite:SetAnimation and `interval` is in
+---seconds. A button without an entry for a given state falls back to its static
+---sprite in `buttons.sprites`.
+---
+---The new data is pushed onto the live sprites immediately, mirroring
+---SetSprites(). Update() only re-applies the visual state when
+---`last_applied_index` changes, so storing the table alone would leave the old
+---static images on screen until the player moved the cursor.
+---@param anims table|nil `{ idle = {...}, selecting = {...} }`; nil clears them.
 function buttons.SetAnimations(anims)
-    buttons.animations = (anims or {
-        idle = {
-            {{
-                "poseur.png",
-                "bullet.png"
-            }, 0.1}
-        },
-        selecting = {
-            {{
-                "heart.png",
-                "Overworld/spr_exc.png"
-            }, 0.1}
-        }
-    })
+    buttons.animations = (anims or {})
+
+    applyButtonVisualState(buttons.button_selecting)
+    last_applied_index = buttons.button_selecting
 end
 
 function buttons.Update()

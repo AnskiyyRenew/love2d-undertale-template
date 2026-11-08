@@ -603,6 +603,88 @@ function battle.Defending()
 end
 
 -- ---------------------------------------------------------------------------
+-- Debug: jump straight to a wave, and end the current turn early
+--
+-- Testing turn 9 normally means playing turns 1-8 first. Both helpers below
+-- re-use the transitions the normal flow uses instead of poking at
+-- Battle._wave, so nothing is left half torn down:
+--
+--   leaving DEFENDING  -> ACTIONSELECT   wave objects destroyed, arena restored,
+--                                        wave module dropped from the cache
+--   entering DEFENDING -> Defending()    LoadWave + mainarena setup
+--
+-- Jumping from ATTACKING or a menu simply goes through ACTIONSELECT first; the
+-- UI rebuilds itself from Battle.state, so a single transition is enough. The
+-- one thing not undone is a FIGHT attack still in flight (the attack pattern's
+-- own typer); the next ATTACKING restarts it anyway.
+-- ---------------------------------------------------------------------------
+
+---End the running enemy turn right now, as if its wave had called EndWave().
+---Development builds only.
+---@return boolean ended
+function battle.DebugEndWave()
+    if (_RELEASED) then return false end
+    if (battle.state ~= "DEFENDING") then return false end
+    if (type(battle._wave) ~= "table") then return false end
+
+    if (battle._wave.EndWave) then
+        battle._wave.EndWave()
+    end
+    -- The UI state normally clears ENDED when it notices the flag; a jump skips
+    -- that frame, and a stale ENDED = true would end the NEXT wave immediately.
+    battle._wave.ENDED = false
+
+    battle.ChangeState("ACTIONSELECT")
+    print("[Battle - Debug] wave ended early: " .. tostring(battle.wave))
+    return true
+end
+
+---Load `wave_name` and enter DEFENDING immediately, skipping every earlier turn.
+---@param wave_name string Wave name as an encounter's `wave` field takes it.
+---@return boolean ok
+---@return string|nil error_message
+function battle.DebugJumpWave(wave_name)
+    if (_RELEASED) then return false, "release build" end
+    if (type(wave_name) ~= "string" or wave_name == "") then
+        return false, "empty wave name"
+    end
+    if (not battle.game or not battle.game.enemies) then
+        return false, "no encounter loaded"
+    end
+    if (battle._end or battle.state == "WIN") then
+        return false, "battle is already over"
+    end
+
+    -- Tear the current turn down the normal way (bullets spawned by it must be
+    -- destroyed, not just forgotten).
+    if (battle.state == "DEFENDING" and type(battle._wave) == "table") then
+        if (battle._wave.EndWave) then
+            battle._wave.EndWave()
+        end
+        battle._wave.ENDED = false
+    end
+    if (battle.state ~= "ACTIONSELECT") then
+        battle.ChangeState("ACTIONSELECT")
+    end
+
+    -- Drop the cached module so the file's top-level code runs again: jumping to
+    -- the wave that is already loaded must not replay a stale closure/state.
+    clearWaveModule(wave_name)
+
+    battle.wave = wave_name
+    -- Otherwise UpdateRestore would reveal the narration text in the middle of
+    -- the wave we just started.
+    battle.restoring_arena = false
+    battle.narration_text:SetText("")
+
+    battle.ChangeState("DEFENDING")
+
+    print("[Battle - Debug] jumped to wave '" .. wave_name ..
+        "' (" .. tostring(battle.waveModule) .. ")")
+    return true, nil
+end
+
+-- ---------------------------------------------------------------------------
 -- Animation dispatch
 --
 -- An enemy animation is a plain table with NO metatable, split in two:

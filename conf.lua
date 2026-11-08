@@ -6,7 +6,7 @@ _RELEASED = false
 
 -- The game's information
 _INFO = {
-    TITLE = "Soul Engine - v3.0.0",
+    TITLE = "Soul Engine - v3.0.1",
     VERSION = "0.0.0", -- THIS IS YOUR GAME'S VERSION, the "_VER" upon means the engine's version.
     AUTHOR = "end",
     CONTACT = "NaN",
@@ -78,7 +78,7 @@ function love.conf(t)
     t.window.fullscreen = false         -- Enable fullscreen (boolean)
     t.window.fullscreentype = "desktop" -- Choose "desktop" or "exclusive" fullscreen mode (string)
     t.window.vsync = 0                  -- Vertical sync mode (number)
-    t.window.msaa = 4                   -- Number of samples to use for multisample anti-aliasing (number)
+    t.window.msaa = 0                   -- MSAA samples (0 on Android: 4x costs too much fill rate on mobile GPUs)
     t.window.depth = nil                -- Number of bits per sample in the depth buffer
     t.window.stencil = nil              -- Number of bits per sample in the stencil buffer
     t.window.displayindex = 1                -- Index of the monitor the window is displayed on (number)

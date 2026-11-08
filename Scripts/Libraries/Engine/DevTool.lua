@@ -561,13 +561,14 @@ local ASCII_BY_NAME = {
 local function loveKeyChar(name, shift)
     if not name then return nil end
     if #name == 1 then
+        -- LÖVE key constants name the UNSHIFTED physical key ("-", not "minus"),
+        -- so punctuation needs the same shifted-symbol table as digits.
+        -- Previously punctuation fell through to `return name` and ignored Shift,
+        -- making SHIFT_MAP["-"]="_" (and every other shifted symbol) unreachable.
         if name:match("%a") then
             return shift and string.upper(name) or name
         end
-        if name:match("%d") then
-            return shift and (SHIFT_MAP[name] or name) or name
-        end
-        return name
+        return shift and (SHIFT_MAP[name] or name) or name
     end
     local base = ASCII_BY_NAME[name]
     if not base then return nil end
@@ -993,7 +994,7 @@ local function drawQuickBar(g)
 
     g.setFont(DevTool.fontSmall)
     g.setColor(COL.dim)
-    g.print("Quick edit [path] Enter=read -> [value] Enter=write | Tab=switch | Esc=exit | Shift=UPPER", PAD_X, QUICK_TOP + 4)
+    g.print("Quick edit [path] Enter=read -> [value] Enter=write | Tab=switch | Esc=exit | Shift=symbols/UPPER", PAD_X, QUICK_TOP + 4)
 
     local L = {
         pathX = PAD_X,            pathW = 300,

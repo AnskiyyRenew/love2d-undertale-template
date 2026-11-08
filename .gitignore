@@ -30,3 +30,8 @@ soulengine-doc3/
 Packager/Secrets/secrets.local.json
 Packager/Secrets/build/
 Resources/Libs/Secrets/
+
+# Android signing material (keystore + its password). Local only: committing a
+# signing key to a public repo is worse than losing it. Back this folder up
+# somewhere safe - an APK signed with a lost key can never be updated.
+Packager/android/

@@ -43,9 +43,13 @@ GUI = ImportFile("GUI")
 if (not _RELEASED) then
     Debugger = ImportFile("Engine.Debugger")
     DevTool = ImportFile("Engine.DevTool")
+    -- In-game developer mode: the e-n-d sequence unlocks it, F10 opens the wave
+    -- picker. See Scripts/Libraries/Engine/DevMode.lua.
+    DevMode = ImportFile("Engine.DevMode")
 else
     Debugger = nil
     DevTool = nil
+    DevMode = nil
 end
 Gamejolt = ImportFile("GamejoltAPI")
 Discord = ImportFile("DiscordRPC")
@@ -57,7 +61,7 @@ ImportFile("Engine.2_0")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
 Border = ImportFile("Utils.Border")
-Border.SetEnabled(true)
+Border.SetEnabled(false)
 Border.FadeIn(0)
 math.randomseed()
 
@@ -256,6 +260,7 @@ function love.update(dt)
     Audio.Update(dt)
     if (Debugger and Debugger.Update) then Debugger.Update() end
     if (DevTool and DevTool.Update) then DevTool.Update(dt) end
+    if (DevMode and DevMode.Update) then DevMode.Update(dt) end
     Gamejolt.update(dt)
     Discord.update(dt)
 
@@ -297,6 +302,9 @@ function love.draw()
         scene_.draw()
     end
     Camera:unload()
+    -- Developer mode overlay, drawn in canvas space (a scene switch or a camera
+    -- move must not shift it), above the game but below the window scaling.
+    if (DevMode and DevMode.Draw) then DevMode.Draw() end
 
     local shaders = Global.GetVariable("ScreenShaders") or {}
     local source = MAIN_CANVAS
@@ -332,6 +340,11 @@ function love.draw()
 
     SE.graphics.setColor(1, 1, 1, 1)
     SE.graphics.draw(source)
+    if (not Border.enabled) then
+        local r, g, b = unpack(Global.GetVariable("MainColor"))
+        SE.graphics.setLineWidth(2)
+        SE.graphics.rectangle("line", -1, -1, 642, 482)
+    end
     SE.graphics.pop()
 
     if (Debugger and Debugger.Draw) then Debugger.Draw() end
@@ -405,6 +418,13 @@ function love.keypressed(key, scancode, isrepeat)
         end
     end
 
+    -- DevMode: the panel is drawn on top of the game and swallows its own keys
+    -- (arrows / confirm must not reach the battle menu underneath). Outside the
+    -- panel it only listens for the unlock sequence and F10, and returns false.
+    if (DevMode and DevMode.HandleKey and DevMode.HandleKey(key, isrepeat)) then
+        return
+    end
+
     -- DevTool: SDL child-window keyboard events are unreliable in this build, so keys
     -- are forwarded from the main window to the tool (only while the tool has keyboard
     -- focus or the mouse hovers it); the game scene still receives the keys as usual.
@@ -425,6 +445,11 @@ function love.textinput(text)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
+    -- DevMode panel sits above everything: it swallows every click while open.
+    if (DevMode and DevMode.MousePressed and DevMode.MousePressed(x, y, button)) then
+        return
+    end
+
     local consumed = false
     if (button == 1 and not istouch) then
         -- Desktop simulation: clicking the virtual keyboard acts like touch
@@ -434,6 +459,10 @@ function love.mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
+    if (DevMode and DevMode.MouseReleased and DevMode.MouseReleased(x, y, button)) then
+        return
+    end
+
     local consumed = false
     if (button == 1 and not istouch) then
         consumed = VirtualKeyboard.MouseReleased(x, y)
@@ -442,6 +471,7 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
+    if (DevMode and DevMode.MouseMoved) then DevMode.MouseMoved(x, y) end
     -- Desktop simulation: dragging over the virtual d-pad acts like a sliding finger
     VirtualKeyboard.MouseMoved(x, y)
     if (scene_.mousemoved and not scene_.pausing) then scene_.mousemoved(x, y, dx, dy, istouch) end
@@ -483,6 +513,9 @@ function love.joystickremoved(joystick)
 end
 
 function love.wheelmoved(x, y)
+    if (DevMode and DevMode.WheelMoved and DevMode.WheelMoved(x, y)) then
+        return
+    end
     if (scene_.wheelmoved and not scene_.pausing) then scene_.wheelmoved(x, y) end
 end
 

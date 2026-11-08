@@ -53,7 +53,6 @@ end
 
 ---@param dur number|nil
 function Border.FadeIn(dur)
-    Border.enabled = true
     dur = (dur and dur > 0) and dur or 1
     target = 1
     speed = 1 / dur
