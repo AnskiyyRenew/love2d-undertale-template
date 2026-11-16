@@ -69,5 +69,24 @@
   "VirtualKeyboard.no_json": "JSON library missing",
   "VirtualKeyboard.export_failed": "Export failed",
   "VirtualKeyboard.import_failed": "Import failed",
-  "VirtualKeyboard.failed": "Failed"
+  "VirtualKeyboard.failed": "Failed",
+
+  "DevMode.Title": "DEV MODE",
+  "DevMode.Root.Game": "Game/Waves   game",
+  "DevMode.Root.Engine": "Scripts/Waves   engine",
+  "DevMode.Info": "Turn scripts (click to select, S to skip the turn)",
+  "DevMode.State.Wave": "wave:",
+  "DevMode.State.State": "state:",
+  "DevMode.State.Invincible": "INVINCIBLE",
+  "DevMode.Invincible": "Invincible: %s",
+  "DevMode.On": "on",
+  "DevMode.Off": "off",
+  "DevMode.Hint": "Enter jump   S end turn   I invincible (%s)   Esc close",
+  "DevMode.Error.BattleMissing": "Battle not loaded",
+  "DevMode.Error.EntryMissing": "This project's Battle is missing %s; sync Battle/init.lua",
+  "DevMode.Error.NoBattle": "Not in a battle",
+  "DevMode.Error.NoBattleJump": "Not in a battle; cannot jump",
+  "DevMode.Error.NotEnemyTurn": "Not in the enemy turn",
+  "DevMode.Error.JumpFailed": "Jump failed: %s",
+  "DevMode.WaveEnded": "Enemy turn ended"
 }

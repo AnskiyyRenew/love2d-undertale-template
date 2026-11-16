@@ -25,6 +25,10 @@
     The overlay draws in CANVAS space (inside the 640x480 canvas, before it is
     scaled to the window), which is why mouse input is converted with
     GUI.Input.ScreenToCanvas and the drawing needs no screen-scale maths.
+
+    Every visible string comes from the DevMode.* keys of Localization/<lang>.json
+    (engine side; a game may override keys in Game/Localization/<lang>.json).
+    Lookups are lazy because main.lua imports this module before Localize.
 ]]
 
 -- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua;
@@ -57,6 +61,29 @@ local devmode = {
     _notice = nil,
     _notice_time = 0,
 }
+
+-- ---------------------------------------------------------------------------
+-- Localization
+-- ---------------------------------------------------------------------------
+-- main.lua imports DevMode before Localize, so the global is resolved at each
+-- lookup instead of being captured here. Looking it up lazily also means an
+-- F2 language reload is visible on the next draw. Keys live in the engine's
+-- Localization/<lang>.json; Game/Localization/<lang>.json can override them.
+---@param key string A DevMode.* key from the language files.
+---@param formats table|string|nil Passed through to Localize.localizeText.
+---@return string text The translation, or the key when Localize is unavailable.
+local function L(key, formats)
+    local l = rawget(_G, "Localize")
+    if (type(l) ~= "table" or type(l.localizeText) ~= "function") then
+        return key
+    end
+
+    local ok, text = pcall(l.localizeText, key, formats)
+    if (ok and type(text) == "string" and text ~= "") then
+        return text
+    end
+    return key
+end
 
 -- ---------------------------------------------------------------------------
 -- Layout (canvas space, 640x480)
@@ -169,8 +196,8 @@ end
 -- Battle/init.lua): Game area first, engine directory as the fallback. A folder
 -- is a namespace, so the module name of a row is prefix .. "." .. relative path.
 local WAVE_ROOTS = {
-    { dir = "Game/Waves",    prefix = "Game.Waves",    label = "Game/Waves  游戏" },
-    { dir = "Scripts/Waves", prefix = "Scripts.Waves", label = "Scripts/Waves  引擎" },
+    { dir = "Game/Waves",    prefix = "Game.Waves",    labelKey = "DevMode.Root.Game" },
+    { dir = "Scripts/Waves", prefix = "Scripts.Waves", labelKey = "DevMode.Root.Engine" },
 }
 
 local function listDir(path)
@@ -249,7 +276,7 @@ function devmode.Rebuild()
         local is_open = devmode._expanded[root.dir] == true
 
         table.insert(rows, {
-            kind = "folder", depth = 0, label = root.label, path = root.dir, open = is_open,
+            kind = "folder", depth = 0, label = L(root.labelKey), path = root.dir, open = is_open,
         })
 
         if (is_open) then
@@ -305,10 +332,10 @@ end
 ---@return string|nil
 local function entryMissing(entry)
     if (type(Battle) ~= "table") then
-        return "Battle 未加载"
+        return L("DevMode.Error.BattleMissing")
     end
     if (type(Battle[entry]) ~= "function") then
-        return "此项目的 Battle 缺少 " .. entry .. "，需同步 Battle/init.lua"
+        return L("DevMode.Error.EntryMissing", { entry })
     end
     return nil
 end
@@ -397,7 +424,7 @@ end
 
 local function jumpTo(row)
     if (not battleReady()) then
-        devmode.Notify("当前不在战斗中，无法跳转")
+        devmode.Notify(L("DevMode.Error.NoBattleJump"))
         return
     end
     local missing = entryMissing("DebugJumpWave")
@@ -410,13 +437,13 @@ local function jumpTo(row)
     if (ok) then
         devmode.Close()
     else
-        devmode.Notify("跳转失败：" .. tostring(err))
+        devmode.Notify(L("DevMode.Error.JumpFailed", { tostring(err) }))
     end
 end
 
 local function endWave()
     if (not battleReady()) then
-        devmode.Notify("当前不在战斗中")
+        devmode.Notify(L("DevMode.Error.NoBattle"))
         return
     end
     local missing = entryMissing("DebugEndWave")
@@ -426,10 +453,10 @@ local function endWave()
     end
 
     if (Battle.DebugEndWave()) then
-        devmode.Notify("已结束当前回合")
+        devmode.Notify(L("DevMode.WaveEnded"))
         devmode.Close()
     else
-        devmode.Notify("当前不在敌人回合")
+        devmode.Notify(L("DevMode.Error.NotEnemyTurn"))
     end
 end
 
@@ -472,7 +499,9 @@ end
 
 function devmode.ToggleInvincible()
     devmode.invincible = not devmode.invincible
-    devmode.Notify("无敌：" .. (devmode.invincible and "开" or "关"))
+    devmode.Notify(L("DevMode.Invincible", {
+        devmode.invincible and L("DevMode.On") or L("DevMode.Off")
+    }))
 end
 
 -- ---------------------------------------------------------------------------
@@ -791,13 +820,14 @@ function devmode.Draw()
     SE.graphics.rectangle("line", PANEL.x, PANEL.y, PANEL.w, PANEL.h)
 
     -- Title + live battle state
-    drawText("DEV MODE", ROW_X, TITLE_Y, COL.title)
-    local state_text = "wave: " .. tostring(currentWave() or "-") ..
-        "   state: " .. tostring((type(Battle) == "table") and Battle.state or "-") ..
-        (devmode.invincible and "   INVINCIBLE" or "")
+    drawText(L("DevMode.Title"), ROW_X, TITLE_Y, COL.title)
+    local state_text = L("DevMode.State.Wave") .. " " .. tostring(currentWave() or "-") ..
+        "   " .. L("DevMode.State.State") .. " " ..
+        tostring((type(Battle) == "table") and Battle.state or "-") ..
+        (devmode.invincible and ("   " .. L("DevMode.State.Invincible")) or "")
     drawTextRight(state_text, PANEL.x + PANEL.w - 12, TITLE_Y, COL.info)
 
-    drawText("回合脚本（鼠标点击选择，S 跳过本回合）", ROW_X, INFO_Y, COL.info)
+    drawText(L("DevMode.Info"), ROW_X, INFO_Y, COL.info)
 
     -- Row list
     SE.graphics.setScissor(PANEL.x + 2, LIST_Y, PANEL.w - 4, LIST_H)
@@ -857,9 +887,9 @@ function devmode.Draw()
         footer = devmode._notice
         drawText(footer, ROW_X, HINT_Y, COL.notice)
     else
-        drawText("Enter 跳转   S 结束本回合   I 无敌(" ..
-            (devmode.invincible and "开" or "关") .. ")   Esc 关闭",
-            ROW_X, HINT_Y, COL.hint)
+        drawText(L("DevMode.Hint", {
+            devmode.invincible and L("DevMode.On") or L("DevMode.Off")
+        }), ROW_X, HINT_Y, COL.hint)
     end
 
     -- Row count on the right of the footer

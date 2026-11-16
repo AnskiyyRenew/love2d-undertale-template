@@ -69,5 +69,24 @@
   "VirtualKeyboard.no_json": "缺少 JSON 库",
   "VirtualKeyboard.export_failed": "导出失败",
   "VirtualKeyboard.import_failed": "导入失败",
-  "VirtualKeyboard.failed": "操作失败"
+  "VirtualKeyboard.failed": "操作失败",
+
+  "DevMode.Title": "开发者模式",
+  "DevMode.Root.Game": "Game/Waves  游戏",
+  "DevMode.Root.Engine": "Scripts/Waves  引擎",
+  "DevMode.Info": "回合脚本（鼠标点击选择，S 跳过本回合）",
+  "DevMode.State.Wave": "波次：",
+  "DevMode.State.State": "状态：",
+  "DevMode.State.Invincible": "无敌",
+  "DevMode.Invincible": "无敌：%s",
+  "DevMode.On": "开",
+  "DevMode.Off": "关",
+  "DevMode.Hint": "Enter 跳转   S 结束本回合   I 无敌(%s)   Esc 关闭",
+  "DevMode.Error.BattleMissing": "Battle 未加载",
+  "DevMode.Error.EntryMissing": "此项目的 Battle 缺少 %s，需同步 Battle/init.lua",
+  "DevMode.Error.NoBattle": "当前不在战斗中",
+  "DevMode.Error.NoBattleJump": "当前不在战斗中，无法跳转",
+  "DevMode.Error.NotEnemyTurn": "当前不在敌人回合",
+  "DevMode.Error.JumpFailed": "跳转失败：%s",
+  "DevMode.WaveEnded": "已结束当前回合"
 }

@@ -201,21 +201,17 @@ function tween.Update(dt)
         -- Delay phase: delay has not been exhausted yet, only decrement without counting time
         if animation.delay > 0 then
             animation.delay = animation.delay - 1
-            goto continue
-        end
 
         -- Animation finished (time exceeds destroyAfter): write the final value and remove it
-        if animation.time > animation.destroyAfter then
+        elseif animation.time > animation.destroyAfter then
             local ok, err = pcall(animation.variableSetter, animation.final)
             if not ok then
                 print("[Tween] variableSetter error on finish: " .. tostring(err))
             end
             table.remove(tween.animations, i)
-            goto continue
-        end
 
         -- Normal playback phase
-        do
+        else
             local progress = animation.time / animation.duration
             local easingFunc = builtinEasings[animation.easingName]
                             or tween.customEasings[animation.easingName]
@@ -223,23 +219,19 @@ function tween.Update(dt)
             if not easingFunc then
                 print("[Tween] Unknown easing: '" .. animation.easingName .. "', removing animation.")
                 table.remove(tween.animations, i)
-                goto continue
+            else
+                local easedProgress = easingFunc(progress)
+                local current = animation.begin + (animation.final - animation.begin) * easedProgress
+
+                local ok, err = pcall(animation.variableSetter, current)
+                if not ok then
+                    print("[Tween] variableSetter error: " .. tostring(err) .. " - animation removed.")
+                    table.remove(tween.animations, i)
+                else
+                    animation.time = animation.time + 1
+                end
             end
-
-            local easedProgress = easingFunc(progress)
-            local current = animation.begin + (animation.final - animation.begin) * easedProgress
-
-            local ok, err = pcall(animation.variableSetter, current)
-            if not ok then
-                print("[Tween] variableSetter error: " .. tostring(err) .. " — animation removed.")
-                table.remove(tween.animations, i)
-                goto continue
-            end
-
-            animation.time = animation.time + 1
         end
-
-        ::continue::
     end
 end
 
