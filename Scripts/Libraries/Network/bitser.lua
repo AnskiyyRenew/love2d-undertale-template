@@ -261,19 +261,14 @@ end
 local function deserialize_value(seen)
 	local t = Buffer_read_byte()
 	if t < 128 then
-		--small int
 		return t - 27
 	elseif t < 192 then
-		--small reference
 		return seen[t - 127]
 	elseif t < 224 then
-		--small string
 		return add_to_seen(Buffer_read_string(t - 192), seen)
 	elseif t < 240 then
-		--small resource
 		return add_to_seen(resource_registry[Buffer_read_string(t - 224)], seen)
 	elseif t == 240 then
-		--table
 		local v = add_to_seen({}, seen)
 		local len = deserialize_value(seen)
 		for i = 1, len do
@@ -286,13 +281,11 @@ local function deserialize_value(seen)
 		end
 		return v
 	elseif t == 241 then
-		--long resource
 		local idx = reserve_seen(seen)
 		local value = resource_registry[deserialize_value(seen)]
 		seen[idx] = value
 		return value
 	elseif t == 242 then
-		--instance
 		local instance = add_to_seen({}, seen)
 		local classname = deserialize_value(seen)
 		local class = class_registry[classname]
@@ -312,28 +305,20 @@ local function deserialize_value(seen)
 		end
 		return deserializer(instance, class)
 	elseif t == 243 then
-		--reference
 		return seen[deserialize_value(seen) + 1]
 	elseif t == 244 then
-		--long string
 		return add_to_seen(Buffer_read_string(deserialize_value(seen)), seen)
 	elseif t == 245 then
-		--long int
 		return Buffer_read_data("int32_t[1]", 4)[0]
 	elseif t == 246 then
-		--double
 		return Buffer_read_data("double[1]", 8)[0]
 	elseif t == 247 then
-		--nil
 		return nil
 	elseif t == 248 then
-		--false
 		return false
 	elseif t == 249 then
-		--true
 		return true
 	elseif t == 250 then
-		--short int
 		return Buffer_read_data("int16_t[1]", 2)[0]
 	else
 		error("unsupported serialized type " .. t)
@@ -385,27 +370,20 @@ end, registerClass = function(name, class, classkey, deserializer)
 	end
 	if not classkey then
 		if class.__instanceDict then
-			-- assume MiddleClass
 			classkey = 'class'
 		elseif class.__baseclass then
-			-- assume SECL
 			classkey = '__baseclass'
 		end
-		-- assume hump.class, Slither, or something else that doesn't store the
-		-- class directly on the instance
+		-- hump.class / Slither keep no class reference on the instance.
 	end
 	if not deserializer then
 		if class.__instanceDict then
-			-- assume MiddleClass
 			deserializer = deserialize_MiddleClass
 		elseif class.__baseclass then
-			-- assume SECL
 			deserializer = deserialize_SECL
 		elseif class.__index == class then
-			-- assume hump.class
 			deserializer = deserialize_humpclass
 		elseif class.__name__ then
-			-- assume Slither
 			deserializer = deserialize_Slither
 		else
 			error("no deserializer given for unsupported class library")

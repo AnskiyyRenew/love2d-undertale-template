@@ -33,15 +33,10 @@ local function clamp(value, min, max)
     return math.max(min, math.min(value, max))
 end
 
--- Drop a single arena's mask from arenas.stencils without touching the others.
--- A plus arena registers its mask on New(); Destroy() calls this so the array
--- only ever holds masks that belong to a live arena.
+-- Drop a single arena's mask from arenas.stencils.
 --
--- The array is mutated in place rather than replaced: minus arenas capture it by
--- reference (SetStencils copies the mask objects, not the table), so a fresh
--- table would leave existing sprites pointing at a dead list. Flagging
--- isactive = false additionally neutralises those older copies, since
--- Masks.Draw skips inactive masks.
+-- The array is mutated in place, never replaced: minus arenas capture it by
+-- reference. isactive = false neutralises the copies older sprites still hold.
 local function unregister_mask(mask)
     if (not mask) then return end
 
@@ -55,10 +50,9 @@ local function unregister_mask(mask)
     end
 end
 
--- Returns the half-extent (half-width, half-height) of a sprite based on its
--- image size and current scale. The player heart is 16x16 at scale 1, so the
--- default is (8, 8); when yscale shrinks (crouch), the y half shrinks with it.
--- A floor of 2px keeps collision sane for very small scales.
+-- Half-extent of a sprite from its image size and scale. The player heart is
+-- 16x16 at scale 1, hence the (8, 8) default; the 2px floor keeps collisions
+-- sane at tiny scales.
 local function sprite_half(sprite)
     if (not sprite) then return 8, 8 end
     local bw = (sprite.width or 16)
@@ -121,11 +115,10 @@ local function check_nearest_arena()
     return nearest
 end
 
--- Check if a world-space point is valid for the player to stand on:
---   1) Must be inside at least one active plus arena (shrunk by the player's half-size)
---   2) Must NOT be inside any active minus arena (expanded by visual margin + player half-size)
+-- A world-space point is valid when it is inside an active plus arena AND
+-- outside every active minus arena (both shrunk/expanded by the player's
+-- half-size).
 local function is_point_valid(px, py)
-    -- Check if inside any active plus arena
     local in_plus = false
     local half_x, half_y = sprite_half(Player.sprite)
 
@@ -155,7 +148,7 @@ local function is_point_valid(px, py)
 
     if (not in_plus) then return false end
 
-    -- Check if NOT inside any active minus arena (expanded by (w+10)/2 + player half-size per side)
+    -- Minus arenas expand by the 10px visual margin plus the player half-size.
     for _, a in ipairs(arenas.insts)
     do
         if (a.is_active and a.mode == "minus") then
@@ -181,14 +174,12 @@ local function is_point_valid(px, py)
     return true
 end
 
--- Circular diffusion brute-force search for the nearest valid landing point.
--- Starts from (px, py) and checks concentric circles with increasing radius.
--- Returns (px, py) if no valid point is found within max_radius.
+-- Circular brute-force search for the nearest valid landing point, out to
+-- max_radius; returns (px, py) when nothing valid is found.
 local function find_nearest_valid(px, py)
     local step = 4
     local max_radius = 300
 
-    -- Check the center point first
     if (is_point_valid(px, py)) then
         return px, py
     end
@@ -209,13 +200,12 @@ local function find_nearest_valid(px, py)
         end
     end
 
-    -- Fallback: return original position if nothing found
+    -- Fallback: original position.
     return px, py
 end
 
--- Shared arena probe. `ox`/`oy` is an offset from the player's centre; the arena
--- tests are direction-agnostic, so the same code serves the foot
--- (PlayerOnGround, gravity side) and the head (PlayerOnCeiling, opposite side).
+-- Shared arena probe. `ox`/`oy` is an offset from the player's centre, so the
+-- foot (PlayerOnGround) and the head (PlayerOnCeiling) share this code.
 local function side_touching(player, ox, oy)
     local px, py = player.x + ox, player.y + oy
 
@@ -229,9 +219,7 @@ local function side_touching(player, ox, oy)
             local w, h = a.width, a.height
 
             if (a.mode == "plus") then
-                -- Touching when the probe leaves the arena on any side. Since the
-                -- probe points along a fixed local axis it naturally crosses the
-                -- edge on that side, so this detects all four walls.
+                -- Touching when the probe leaves the arena on any side.
                 if (a.shape == "rectangle") then
                     if (lx < -w / 2 or lx > w / 2 or ly < -h / 2 or ly > h / 2) then
                         return true
@@ -243,11 +231,9 @@ local function side_touching(player, ox, oy)
                     end
                 end
             elseif (a.mode == "minus") then
-                -- Touching when the probe enters the range.
-                -- NOTE: the collision in Arenas.Update keeps the player's centre out of the
-                -- expanded forbidden zone (thickness*2 + player half-size per side), so after the first frame
-                -- the probe can never reach the raw [-w/2, w/2] x [-h/2, h/2] range. Expand the
-                -- detection zone by a fixed 4px margin (not the arena's visual thickness)
+                -- Touching when the probe enters the range. Arenas.Update keeps
+                -- the player's centre outside the expanded forbidden zone, so the
+                -- raw [-w/2, w/2] range is never reached: widen it by 4px.
                 local half_w = w / 2 + 4
                 local half_h = h / 2 + 4
 
@@ -270,18 +256,15 @@ end
 function arenas.PlayerOnGround(player)
     local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
 
-    -- The probe distance is the player's half-height (along its local "down")
-    -- plus a 2px margin so the foot pokes slightly past the boundary. The
-    -- half-height scales with yscale, so a crouched soul (yscale < 1) probes a
-    -- shorter distance and no longer floats above the floor.
+    -- Probe distance is the player's half-height plus 2px, so the foot pokes
+    -- past the boundary; a crouched soul probes a shorter distance.
     local _, half_y = sprite_half(player)
     local dist = half_y + 2
     return side_touching(player, -psin * dist, pcos * dist)
 end
 
 ---Like PlayerOnGround, but probes the player's local "up": true when the top of
----the head touches an arena edge (e.g. the ceiling of the battle box, or the
----underside of a minus obstacle). Used by the blue soul's ceiling float.
+---the head touches an arena edge. Used by the blue soul's ceiling float.
 ---@param player table
 ---@return boolean
 function arenas.PlayerOnCeiling(player)
@@ -588,14 +571,12 @@ function arenas.Update(dt)
 
     for _, arena in ipairs(arenas.insts)
     do
-        -- To target
         arena.x = smooth_value(arena.x, arena.target.x, arena.speeds.x)
         arena.y = smooth_value(arena.y, arena.target.y, arena.speeds.y)
         arena.width = smooth_value(arena.width, arena.target.width, arena.speeds.width)
         arena.height = smooth_value(arena.height, arena.target.height, arena.speeds.height)
         arena.rotation = smooth_value(arena.rotation, arena.target.rotation, arena.speeds.rotation)
 
-        -- Sprite things
         arena.white:MoveTo(arena.x, arena.y)
         arena.black:MoveTo(arena.x, arena.y)
         arena.black:Scale(arena.width, arena.height)
@@ -622,7 +603,6 @@ function arenas.Update(dt)
             p:Move(arena.black.speed.x, arena.black.speed.y)
         end
 
-        -- Collision
         if (not arena.is_active) then return end
 
         local mode = arena.mode
@@ -672,13 +652,11 @@ function arenas.Update(dt)
                 local lx = dx * cos + dy * sin
                 local ly = dy * cos - dx * sin
 
-                -- Expanded forbidden zone: minus rectangle + player half-size on each side
+                -- Forbidden zone: the minus rectangle plus the player half-size.
                 local min_lx, max_lx = -(w + arena.thickness * 2) / 2 - p_half_x, (w + arena.thickness * 2) / 2 + p_half_x
                 local min_ly, max_ly = -(h + arena.thickness * 2) / 2 - p_half_y, (h + arena.thickness * 2) / 2 + p_half_y
 
-                -- Check if the player's centre is inside the forbidden zone
                 if (lx >= min_lx and lx <= max_lx and ly >= min_ly and ly <= max_ly) then
-                    -- Distance to each edge of the expanded rectangle
                     local d_left   = lx - min_lx
                     local d_right  = max_lx - lx
                     local d_bottom = ly - min_ly
@@ -686,20 +664,18 @@ function arenas.Update(dt)
 
                     local min_dist = math.min(d_left, d_right, d_bottom, d_top)
 
-                    -- Snap lx/ly past the nearest edge (+1px) so the boundary check
-                    -- on the next frame does not re-detect the player as inside
+                    -- Snap past the nearest edge (+1px), or the next frame's
+                    -- boundary check re-detects the player as inside.
                     if (min_dist == d_left)   then lx = min_lx - 1
                     elseif (min_dist == d_right)  then lx = max_lx + 1
                     elseif (min_dist == d_bottom) then ly = min_ly - 1
                     else                              ly = max_ly + 1
                     end
 
-                    -- Convert local coordinates back to world space and move the player
                     p.x = arena.x + lx * cos - ly * sin
                     p.y = arena.y + lx * sin + ly * cos
 
-                    -- If after being pushed out the player is outside the valid playable area,
-                    -- circular-diffusion search for the nearest valid landing spot
+                    -- Pushed outside the playable area: find the nearest valid spot.
                     if (not is_point_valid(p.x, p.y)) then
                         local nx, ny = find_nearest_valid(p.x, p.y)
                         p.x, p.y = nx, ny
@@ -718,14 +694,10 @@ function arenas.Clear()
         end
     end
 
-    -- Only the masks of the arenas that were actually destroyed go away:
-    -- Destroy() unregisters each one individually. insts[1] is the main battle
-    -- box and deliberately outlives Clear(), so its plus mask has to survive --
-    -- blanking arenas.stencils outright dropped that mask too, which is why the
-    -- box stopped clipping bullets after the first turn.
+    -- insts[1] is the main battle box and outlives Clear(), so its plus mask
+    -- must survive: only the masks still owned by a live arena are kept.
     --
-    -- The array is rebuilt in place instead of being replaced by a new table so
-    -- minus arenas that already captured it stay in sync.
+    -- The array is rebuilt in place, because minus arenas hold it by reference.
     local alive = {}
 
     for _, a in ipairs(arenas.insts)

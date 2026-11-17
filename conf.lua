@@ -1,111 +1,96 @@
 -- Soul Engine Configuration File
-_VER = "3.0.1-stable"
+_VER = "3.0.2-stable"
 
 -- Set to true when building the game for release
 _RELEASED = false
 
--- The game's information
 _INFO = {
-    TITLE = "Soul Engine - v3.0.1",
-    VERSION = "0.0.0", -- THIS IS YOUR GAME'S VERSION, the "_VER" upon means the engine's version.
+    TITLE = "Soul Engine - v3.0.2",
+    VERSION = "0.0.0", -- your game's version (_VER above is the engine's)
     AUTHOR = "end",
     CONTACT = "NaN",
     WEBSITE = "NaN",
 }
 
--- This is your window size. Change these values to set your desired resolution.
--- The Border art is authored for a 960x540 window: a 640x480 game screen with a
--- 160/160/30/30 decorative frame around it (see Resources/Sprites/Border).
+-- Game screen size. The Border art is authored for 960x540: a 640x480 game
+-- screen with a 160/160/30/30 decorative frame around it.
 LOGICAL_WIDTH, LOGICAL_HEIGHT = 640, 480
 CANVAS_WIDTH, CANVAS_HEIGHT = 640, 480
 
--- The Border art's native size. The frame's inner opening is the canvas
--- centred inside this rectangle (default opening ox=(BW-CW)/2, oy=(BH-CH)/2).
--- Used by BORDER_MODE (see below) and by the Border library when aligning the
--- frame to the canvas.
+-- Border art native size; its inner opening is the canvas centred inside it.
 BORDER_WIDTH, BORDER_HEIGHT = 960, 540
 
--- How much the GAME SCREEN (the CANVAS_WIDTH x CANVAS_HEIGHT canvas) is scaled.
--- It is ALWAYS kept dead-centre, and the Border frame is locked to it, so the
--- frame's opening can never drift away from the game screen:
---     "integer" → whole-number scaling (pixel-perfect; the frame fits exactly
---                 when the window is canvas + margins, e.g. 960x540 → 1x or
---                 1920x1080 → 2x). Shrinks proportionally for smaller windows.
---     "auto"    → fill as much of the window / screen as possible (fractional)
---     false/nil → 1:1, no scaling
+-- How the game canvas is scaled. It is always dead-centre and the Border frame
+-- is locked to it, so the opening can never drift away from the game screen.
+--   "integer" -> whole-number scale (pixel-perfect, shrinks for small windows)
+--   "auto"    -> fill as much of the window / screen as possible
+--   false/nil -> 1:1, no scaling
 SCREEN_SCALE = "auto"
 
--- Legacy switch, only used when SCREEN_SCALE is nil: true = "auto" while
--- fullscreen and 1:1 otherwise. Prefer SCREEN_SCALE.
+-- Legacy switch, only used when SCREEN_SCALE is nil.
 FILL_SCREEN = true
 
--- BORDER_MODE: when true, instead of fitting the 640x480 canvas to the window,
--- the 960x540 Border art is fit to the window and the canvas drops into the
--- frame's inner opening (so the frame can wrap the game screen without
--- overflowing). The canvas uses the SAME scale as the frame, and its top-left
--- is locked to the opening's top-left. When false, the canvas is fit to the
--- window on its own and the Border frame is NOT drawn (the previous "auto"
--- behaviour). Has no effect unless SCREEN_SCALE is "auto" / true / "integer".
+-- true: fit the Border art to the window and drop the canvas into its inner
+-- opening (same scale, top-left locked). false: fit the canvas alone and draw
+-- no frame. Only applies when SCREEN_SCALE is "auto" / true / "integer".
 BORDER_MODE = false
 
--- Enable error handler to show custom error screen
--- If you don't know which error crashed the game. Then you need to set it to false.
+-- Custom error screen; set false to see the raw LÖVE error instead.
 USE_ERRHANDLER = true
 
 function love.conf(t)
-    t.identity = nil                    -- The name of the save directory (string)
-    t.appendidentity = false            -- Search for files in the source directory before the save directory (boolean)
-    t.version = "12.0"                  -- The LÖVE version this game was made for (string)
-    t.console = not _RELEASED           -- Attach a console (boolean, Windows only)
-    t.accelerometerjoystick = true      -- Expose the accelerometer as a Joystick to enable it on iOS and Android (boolean)
-    t.externalstorage = false           -- Save files to (and read them from) external storage on Android (boolean)
-    t.graphics.gammacorrect = false              -- Enable gamma-correct rendering when the system supports it (boolean)
+    t.identity = nil
+    t.appendidentity = false
+    t.version = "12.0"
+    t.console = not _RELEASED
+    t.accelerometerjoystick = true
+    t.externalstorage = false
+    t.graphics.gammacorrect = false
 
-    t.audio.mic = false                 -- Request and use the microphone on Android (boolean)
-    t.audio.mixwithsystem = false       -- Keep background music playing while LÖVE is open (boolean, iOS and Android only)
+    t.audio.mic = false
+    t.audio.mixwithsystem = false
 
-    t.window.title = _INFO.TITLE        -- The window title (string)
-    t.window.icon = "icon.png"          -- File path to the image used as the window icon (string)
-    -- The window opens at the Border art's native size when BORDER_MODE is on
-    -- (960x540, so the frame fits 1:1 at startup), otherwise at the canvas
-    -- size (640x480) -- the game screen with no frame around it.
+    t.window.title = _INFO.TITLE
+    t.window.icon = "icon.png"
+    -- Border size when BORDER_MODE is on (the frame fits 1:1 at startup),
+    -- otherwise the canvas size (game screen with no frame around it).
     t.window.width = BORDER_MODE and BORDER_WIDTH or LOGICAL_WIDTH
     t.window.height = BORDER_MODE and BORDER_HEIGHT or LOGICAL_HEIGHT
-    t.window.borderless = false         -- Remove the window border (boolean)
-    t.window.resizable = false          -- Let the user resize the window (boolean)
-    t.window.minwidth = 1               -- Minimum window width, if the window is resizable (number)
-    t.window.minheight = 1              -- Minimum window height, if the window is resizable (number)
-    t.window.fullscreen = false         -- Enable fullscreen (boolean)
-    t.window.fullscreentype = "desktop" -- Choose "desktop" or "exclusive" fullscreen mode (string)
-    t.window.vsync = 0                  -- Vertical sync mode (number)
-    t.window.msaa = 0                   -- MSAA samples (0 on Android: 4x costs too much fill rate on mobile GPUs)
-    t.window.depth = nil                -- Number of bits per sample in the depth buffer
-    t.window.stencil = nil              -- Number of bits per sample in the stencil buffer
-    t.window.displayindex = 1                -- Index of the monitor the window is displayed on (number)
-    t.highdpi = false            -- Enable high DPI mode on Retina displays (boolean)
-    t.window.usedpiscale = false         -- Enable automatic DPI scaling when highdpi is set to true (boolean)
+    t.window.borderless = false
+    t.window.resizable = false
+    t.window.minwidth = 1
+    t.window.minheight = 1
+    t.window.fullscreen = false
+    t.window.fullscreentype = "desktop"
+    t.window.vsync = 0
+    t.window.msaa = 0                   -- keep 0 on mobile: 4x costs too much fill rate
+    t.window.depth = nil
+    t.window.stencil = nil
+    t.window.displayindex = 1
+    t.highdpi = false
+    t.window.usedpiscale = false
     t.window.dpiscale = 1
-    t.window.x = nil                    -- The x-coordinate position of the window in the given display (number)
-    t.window.y = nil                    -- The y-coordinate position of the window in the given display (number)
+    t.window.x = nil
+    t.window.y = nil
 
-    t.modules.audio = true              -- Enable the audio module (boolean)
-    t.modules.data = true               -- Enable the data module (boolean)
-    t.modules.event = true              -- Enable the event module (boolean)
-    t.modules.font = true               -- Enable the font module (boolean)
-    t.modules.graphics = true           -- Enable the graphics module (boolean)
-    t.modules.image = true              -- Enable the image module (boolean)
-    t.modules.joystick = true           -- Enable the joystick module (boolean)
-    t.modules.keyboard = true           -- Enable the keyboard module (boolean)
-    t.modules.math = true               -- Enable the math module (boolean)
-    t.modules.mouse = true              -- Enable the mouse module (boolean)
-    t.modules.physics = true            -- Enable the physics module (boolean)
-    t.modules.sound = true              -- Enable the sound module (boolean)
-    t.modules.system = true             -- Enable the system module (boolean)
-    t.modules.thread = true             -- Enable the thread module (boolean)
-    t.modules.timer = true              -- Enable the timer module (boolean); disabling it makes the delta time in love.update 0
-    t.modules.touch = true              -- Enable the touch module (boolean)
-    t.modules.video = true              -- Enable the video module (boolean)
-    t.modules.window = true             -- Enable the window module (boolean)
+    t.modules.audio = true
+    t.modules.data = true
+    t.modules.event = true
+    t.modules.font = true
+    t.modules.graphics = true
+    t.modules.image = true
+    t.modules.joystick = true
+    t.modules.keyboard = true
+    t.modules.math = true
+    t.modules.mouse = true
+    t.modules.physics = true
+    t.modules.sound = true
+    t.modules.system = true
+    t.modules.thread = true
+    t.modules.timer = true              -- disabling it makes the dt in love.update 0
+    t.modules.touch = true
+    t.modules.video = true
+    t.modules.window = true
 end
 
 if (not USE_ERRHANDLER) then
@@ -174,10 +159,8 @@ function love.errorhandler(msg)
             love.graphics.setColor(1, 1, 1)
             love.graphics.clear(0.15, 0.1, 0.15)
 
-            -- The dog sprite is loaded lazily here, NOT during conf.lua load time:
-            -- love.graphics is nil while conf.lua runs (modules load afterwards),
-            -- so loading it there used to crash conf.lua before love.errorhandler
-            -- could even be defined.
+            -- Loaded lazily: love.graphics is nil while conf.lua runs, so the
+            -- sprite can only be created here.
             if (not tdog) then
                 local dogFile = "Resources/Sprites/Attacks/Dogs/" .. dogs[math.random(#dogs)] .. ".png"
                 local ok, img = pcall(love.graphics.newImage, dogFile)

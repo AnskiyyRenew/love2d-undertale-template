@@ -35,13 +35,13 @@ function atk.SetMaxDamage(dmg)
     damage = dmg
 end
 
--- Animations drive themselves: an instance carries its own bound methods (see
--- Battle.BindAnimation), so the callers below just write `anim.Hurt()` /
--- `anim.OnAttack(data)`. A bare module that was never bound is skipped.
+-- Animations carry their own bound methods (see Battle.BindAnimation), so
+-- callers just write `anim.Hurt()` / `anim.OnAttack(data)`. An unbound module
+-- is skipped.
 
--- Interface pulled out by this attack pattern: signal that the targeted enemy
--- has been hit. The battle system dispatches to the enemy's animation Hurt()
--- based on enemy.id, so this attack never couples to a specific animation.
+-- Interface: signal that the targeted enemy has been hit. The battle system
+-- dispatches to the enemy's Hurt() by enemy.id, so this never couples to a
+-- specific animation.
 function atk.Hurt()
     if (not enemy or not enemy.id) then
         return
@@ -53,16 +53,9 @@ function atk.Hurt()
     end
 end
 
--- Interface: signal the targeted enemy's animation that an attack has just been
--- LAUNCHED (the moment the player confirms the strike, before the hit lands).
--- Animations may implement `OnAttack(self, data)` to react (brace / dodge /
--- telegraph / counter, ...). `data` carries the strike details:
---   data.enemy    → the targeted enemy table
---   data.damage   → the planned damage for this hit
---   data.perfect  → true when the timing landed in the perfect zone
---   data.offset   → distance from the perfect zone (0 = perfect)
---   data.position → {x, y} of the enemy on screen
---   data.attack   → this attack pattern instance (atk)
+-- Interface: signal the enemy's animation that the strike was LAUNCHED (before
+-- the hit lands). `data` carries enemy / damage / perfect / offset / position /
+-- attack (this pattern).
 function atk.Attack(data)
     if (not enemy or not enemy.animation) then
         return
@@ -93,7 +86,6 @@ function atk.Update(dt)
             attacked = true
             missed = true
         elseif (Keyboard.GetState("confirm") == 1) then
-            -- Calculate
             bar.velocity.x = 0
             local bonus_factor = math.abs(bar.x - tar.x)
             if (not atk._max) then
@@ -104,7 +96,6 @@ function atk.Update(dt)
                 end
             end
 
-            -- Slice.
             Audio.PlaySound("snd_slice.wav")
             local slice = Sprites.CreateSprite("UI/Battle Screen/Player Attack/spr_slice_o_0.png", "TopAll")
             slice:SetAnimation({
@@ -117,8 +108,6 @@ function atk.Update(dt)
             slice:MoveTo(enemy.position[1], enemy.position[2])
             attacked = true
 
-            -- Broadcast to the targeted enemy's animation that the attack was
-            -- launched, passing the strike details so monsters can react.
             atk.Attack({
                 enemy = enemy,
                 damage = damage,
@@ -141,7 +130,6 @@ function atk.Update(dt)
                     local _target = (enemy.hp - damage) / enemy.maxhp * 100
                     UI.newMonsterBar({enemy.position[1], enemy.position[2]}, _start, _target)
 
-                    -- Trigger the targeted enemy's hurt animation (dispatched by id)
                     atk.Hurt()
                 end
                 UI.newBounceText((damage > 0 and damage or "MISS"), {enemy.position[1], enemy.position[2]}, (damage <= 0 and {1, 1, 1}))

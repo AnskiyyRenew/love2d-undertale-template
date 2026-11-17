@@ -1,34 +1,18 @@
 --[[
     GUI Input - mouse input helper (screen -> canvas space, edge-detected)
 
-    The engine renders everything onto a 640x480 canvas, then scales it to the
-    window (see main.lua: DrawX / DrawY / ScreenScale). Raw mouse coordinates
-    from love.mouse* arrive in WINDOW space; GUI components live in CANVAS
-    space. This helper does the screen->canvas conversion and edge-detects
-    button state so a scene can poll IsPressed / IsReleased / IsDown once per
-    frame, mirroring the manual `prev` table pattern the keyboard code already
-    uses.
+    Raw love.mouse coordinates are WINDOW space; GUI components live in the
+    640x480 CANVAS space (conversion via main.lua's DrawX / DrawY / ScreenScale).
+    Edge-detects button state so a scene can poll IsPressed / IsReleased /
+    IsDown once per frame, mirroring the keyboard's `prev` table pattern.
 
-    Lifecycle (the scene wires these four love callbacks):
-      scene.mousepressed(x,y,btn,...)   -> GUI.Input.OnPressed(x,y,btn)
-      scene.mousereleased(x,y,btn,...)  -> GUI.Input.OnReleased(x,y,btn)
-      scene.mousemoved(x,y,...)         -> GUI.Input.OnMoved(x,y)
-      scene.wheelmoved(x,y)             -> GUI.Input.OnWheel(x,y)
-      scene.update(dt)                  -> GUI.Input.Update()   -- at the TOP
-    Then read:
-      GUI.Input.GetCanvasMouse()   -> cx, cy   (current cursor in canvas space)
-      GUI.Input.IsDown(1)          -> bool      (held right now)
-      GUI.Input.IsPressed(1)       -> bool      (down-edge this frame)
-      GUI.Input.IsReleased(1)      -> bool      (up-edge this frame)
-      GUI.Input.GetWheel()         -> int        (+1 up / -1 down / 0)
+    The scene wires the four love callbacks (OnPressed / OnReleased / OnMoved /
+    OnWheel) and calls Update() at the TOP of scene.update, before any reads.
     Left mouse button = 1.
 
-    State model: `held` is real-time (mutated directly by OnPressed/OnReleased,
-    so IsDown reflects the live state even mid-frame); `pressed` / `released`
-    / `wheel` are frozen per-frame at the start of Update(), so IsPressed /
-    IsReleased stay true for exactly the frame that follows the event. Events
-    that arrive async between frames accumulate in `pending` and are swapped in
-    on the next Update().
+    State model: `held` is real-time; `pressed` / `released` / `wheel` are
+    frozen per-frame at the start of Update(), so the edges stay true for
+    exactly the frame that follows the event.
 ]]
 
 local Input = {}
@@ -102,7 +86,6 @@ function Input.Update()
     state.wheel    = pending.wheel
     local sx, sy = SE.mouse.getPosition()
     state.pos.x, state.pos.y = Input.ScreenToCanvas(sx, sy)
-    -- reset per-frame buffers for the next frame's async events
     pending.pressed  = {}
     pending.released = {}
     pending.wheel    = 0

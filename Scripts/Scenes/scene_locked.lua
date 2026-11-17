@@ -35,7 +35,6 @@ function scene.draw()
     SE.graphics.setColor(1, 0, 0)
     SE.graphics.print("AN ERROR OCCURRED", 40, 72)
 
-    -- Draw detailed error info if present
     drawErrorInfo(scene._load_error or (Scenes and Scenes.last_load_error), scene._failed_scene or (Scenes and Scenes.last_failed_scene))
 end
 

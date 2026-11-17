@@ -1,9 +1,9 @@
 local luaextended = {}
 
--- Function to remove a value from a table.
+---Remove every occurrence of a value from a table, then optionally call func.
 ---@param t table
 ---@param value any
----@param func function|nil A function to call before removing the value.
+---@param func function|nil Called once after removal.
 function luaextended.rmVarTable(t, value, func)
     for i = #t, 1, -1 do
         if t[i] == value then

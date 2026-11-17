@@ -1,14 +1,11 @@
 local scene = {}
 
--- Import battle module
 Battle = ImportFile("Battle")
 Battle.SetEndRoom("scene_end")
 Game = Battle.SetGame("dummy")
 Blasters = ImportFile("Attacks.Blasters")
 
--- Give each enemy its own independent animation instance. The animation
--- module is a factory, so every call to InitAnimation creates a fresh
--- instance with its own sprite — enemy #1 and enemy #2 no longer share one.
+-- InitAnimation is a factory: each enemy needs its own instance.
 --Game:InitAnimation(1, {320, 120})
 --Game:InitAnimation(2, {120, 140})
 local enemies = Game.enemies
@@ -58,7 +55,6 @@ end
 
 local function EnteringState(oldstate, newstate)
     Battle.defaultEnteringState(oldstate, newstate)
-    --print("[Battle] " .. oldstate .. " → " .. newstate)
 end
 
 local function OnHit(bullet)
@@ -79,7 +75,7 @@ local function OnHit(bullet)
     end
 end
 
--- Don't touch these.
+-- Overrides the battle module reads by name; do not rename.
 Battle.DefenseEnding = DefenseEnding
 Battle.HandleActions = HandleActions
 Battle.HandleItems = HandleItems
@@ -90,7 +86,6 @@ Battle.OnHit = OnHit
 
 
 
--- Scene backgrounds
 local shader = ImportFile("Gradiant", "shader")
 shader:send("topLeftColor", {1, 0, 1, 0.5})
 shader:send("bottomLeftColor", {1, 0, 1, 0.5})

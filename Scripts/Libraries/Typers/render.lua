@@ -1,43 +1,18 @@
 --[[
-
-Stencil (mask) and shader support shared by the four typer modules.
-
-Every typer instance carries both lists and exposes the same API a sprite has:
-
-    typer:SetStencils({mask})     -- clip the text to the mask areas
-    typer:SetShaders({shader})    -- run the text through a shader chain
-    typer:GetStencils() / GetShaders()
-    typer:ClearStencils() / ClearShaders()
-    typer:AddShader(shader) / RemoveShader(shader)
-
-Both are optional and cost nothing when unused: with neither set the draw
-function runs exactly as before, without measuring or allocating anything.
-
-Why the shader path needs a canvas: every glyph is drawn from a font atlas, so
-a shader reading `tex_coords` sees atlas-relative UVs instead of 0..1 across
-the glyph (WaveDistort maps them through `tex_size`, Gradiant lerps across the
-axis - both would sample the wrong texels). The text block is therefore baked
-into an offscreen canvas sized to its bounding box, the chain runs over that
-canvas, and the result is blitted back unscaled. Shaders written for sprites
-then behave the same way on text, and the glyphs keep their exact positions.
-
-Masks and shaders combine: the shader pass runs first (outside any stencil
-test), then the baked canvas is blitted through the mask.
-
-This file is required directly by each typer module - not through init.lua,
-which requires every module and would make a back-require circular.
-
+Stencil (mask) and shader support shared by the four typer modules. Required
+directly by each typer module, not through init.lua (that would be circular).
+Shaders need a baked canvas because glyph UVs are atlas-relative, not 0..1;
+masks and shaders combine: shader first, then the canvas goes through the mask.
 ]]
 local render = {}
 
 local MASKS_WARNING = "[WARNING] typer:SetStencils - invalid mask object"
 local SHADERS_WARNING = "[WARNING] typer:SetShaders - invalid shader object"
 
--- Cached canvases are rounded up to this many pixels, so a typer whose text
--- grows while typing keeps reusing one canvas instead of allocating per frame.
+-- Canvases are rounded up to this many pixels, so a growing text reuses one
+-- canvas instead of allocating per frame.
 local CANVAS_STEP = 32
--- Distinct canvas sizes kept alive before the oldest entry is released. A
--- typer using shaders usually only needs one or two sizes.
+-- Distinct canvas sizes kept alive before the oldest entry is released.
 local CANVAS_CACHE_MAX = 12
 
 local canvas_cache = {}
@@ -62,8 +37,7 @@ local function release_entry(entry)
 end
 
 --- Two canvases of at least w x h, used as the ping-pong pair of a shader
---- chain. Returns nil when no canvas could be created, so the caller can fall
---- back to drawing the text unshaded instead of drawing nothing.
+--- chain. Returns nil when no canvas could be created.
 local function acquire_canvases(w, h)
     local bw = math.max(CANVAS_STEP, math.ceil(w / CANVAS_STEP) * CANVAS_STEP)
     local bh = math.max(CANVAS_STEP, math.ceil(h / CANVAS_STEP) * CANVAS_STEP)
@@ -101,8 +75,7 @@ local function mask_list(value)
         return {}
     end
 
-    -- A single mask passed on its own also works: {shape = "rect", ...}. A list
-    -- never has a `shape` field, so this cannot swallow a real list.
+    -- A single mask works too: {shape = "rect", ...}. A list never has `shape`.
     if (value.shape) then value = {value} end
 
     local list = {}
@@ -135,8 +108,7 @@ local function shader_list(value)
 end
 
 --- Attach the mask / shader API to a typer instance and create its two lists.
---- Called once per instance by every module's New(), so the four typers share a
---- single implementation instead of four copies that drift apart.
+--- Called once per instance by every module's New().
 function render.install(typer)
     typer.stencils = {}
     typer.shaders = {}
@@ -189,21 +161,12 @@ function render.install(typer)
     end
 end
 
---- Bounding box of `letters` in the typer's local space, i.e. before `typer.x`
---- and `typer.y` are added. Returns x, y, w, h as four numbers, or 0, 0, 0, 0
---- when there is nothing to measure.
----
---- The box includes the outline width and the shake amplitude, so one bake
---- covers every copy the draw function emits even though shake offsets are
---- re-rolled on each pass.
+--- Bounding box of `letters` in local space (before `typer.x` / `typer.y`), as
+--- x, y, w, h; `0, 0, 0, 0` when there is nothing to measure. Includes the
+--- outline width and shake amplitude, so one bake covers every drawn copy.
 ---
 ---@param letters table  The instance's letter list.
----@param opts table|nil
----   `align`     function(line_width) -> x offset, when the typer centres or
----               right-aligns each line.
----   `scale_of`  function(letter) -> draw scale, when the scale is not simply
----               `letter.scale` (SText falls back to `typer.scale`).
----   `pad`       number, extra margin in pixels.
+---@param opts table|nil  Optional `align`, `scale_of` and `pad` hooks.
 function render.letter_bounds(letters, opts)
     opts = opts or {}
     local align = opts.align
@@ -261,17 +224,15 @@ function render.letter_bounds(letters, opts)
 end
 
 --- Bake the text into a canvas, run the shader chain over it and blit the
---- result at (x, y). Returns false when no canvas was available, in which case
---- nothing has been drawn yet.
+--- result at (x, y). Returns false when no canvas was available.
 local function draw_shaded(draw_fn, x, y, w, h, shaders)
     local entry = acquire_canvases(w, h)
     if (not entry) then return false end
 
     local prev_canvas = SE.graphics.getCanvas()
 
-    -- The bake has to happen in the typer's own coordinate space: the camera
-    -- transform is active around Layers.draw, and leaving it applied while
-    -- drawing into the canvas would bake the text at a camera-relative offset.
+    -- Bake in the typer's own coordinate space: the camera transform is active
+    -- around Layers.draw and would offset the text inside the canvas.
     SE.graphics.push()
     SE.graphics.origin()
 
@@ -293,8 +254,8 @@ local function draw_shaded(draw_fn, x, y, w, h, shaders)
     SE.graphics.setCanvas(prev_canvas)
     SE.graphics.pop()
 
-    -- Unscaled blit, so every glyph keeps the exact position it was baked at;
-    -- the colour each glyph was baked with travels inside the canvas.
+    -- Unscaled blit, so every glyph keeps its baked position; each glyph's
+    -- colour travels inside the canvas.
     SE.graphics.setColor(1, 1, 1, 1)
     SE.graphics.draw(source, x, y)
     return true
@@ -303,9 +264,7 @@ end
 --- Draw a typer with its masks and shaders applied.
 ---
 --- `draw_fn(offset_x, offset_y)` draws the text with both offsets added to every
---- letter position. `bounds` is a function returning x, y, w, h (see
---- letter_bounds); it is only called when a shader is set, so the mask-only and
---- plain paths do not pay for the measurement.
+--- letter. `bounds` returns x, y, w, h and is only called when a shader is set.
 ---
 ---@param draw_fn function
 ---@param bounds function|nil

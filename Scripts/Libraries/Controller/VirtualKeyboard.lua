@@ -1,30 +1,9 @@
 --[[
-    VirtualKeyboard.lua - Mesh-rendered on-screen touch controller.
-
-    Layout (normalized coordinates, so it survives any resolution / DPI):
-
-        * dpad     - one big disc, bottom-left, split into 8 sectors of 45 deg.
-                     A finger that lands anywhere on the disc and SLIDES around
-                     switches direction without ever lifting: sliding from the
-                     top sector into the right sector releases "up" and presses
-                     "right". Diagonal sectors press both keys at once, so the
-                     pad stays an 8-way d-pad (no analog, no 360 degrees).
-        * buttons  - round keys. Z / X / C sit in a triangle at the bottom-right,
-                     plus extra function keys (menu at the top-left, layout
-                     editor next to it, ...).
-
-    Everything is drawn from Meshes that are built ONCE in unit space
-    (radius = 1) and only transformed at draw time, so no geometry is rebuilt
-    per frame and the shapes stay smooth at any size.
-
-    Auto-enabled on touch devices; on desktop force it on with
-    Global.GetVariable("ControllerSimulation").virtualKeyboard == true and click
-    with the mouse (a mouse drag is treated exactly like a sliding finger).
-
-    Presses go through the same simulated-input path as Keyboard (or Joystick),
-    so game logic reading GetState() sees the exact same feedback:
-        1 = just pressed, 2 = held, -1 = just released, 0 = released.
---]]
+    VirtualKeyboard.lua - mesh-rendered on-screen touch controller (8-way d-pad
+    disc + round buttons, normalized layout). Draws in screen space; presses go
+    through Keyboard/Joystick simulation.
+    Entry: Update / Draw / TouchPressed / TouchMoved / TouchReleased (Mouse* on desktop).
+]]
 
 local VirtualKeyboard = {
     enabled = false,          -- master on/off
@@ -89,7 +68,7 @@ local VirtualKeyboard = {
     toastUntil = 0,
 }
 
--- Backwards compatible alias: the old build exposed "buttons".
+-- Alias kept for callers that used the old name: same array as `controls`.
 VirtualKeyboard.buttons = VirtualKeyboard.controls
 
 local MOUSE_TOUCH_ID = "__vk_mouse"
@@ -97,15 +76,14 @@ local TWO_PI = math.pi * 2
 local STEP = math.pi / 4        -- 45deg: one dpad sector
 local QUARTER = math.pi / 2     -- 90deg: quarter turn
 
--- Radius (fraction of the disc) of the neutral hub AND of the sectors' inner
--- edge. Keeping them equal is what stops a dark ring showing around the hub.
+-- Neutral hub radius; it must equal the sectors' inner edge or a dark ring
+-- shows around the hub.
 local HUB = 0.26
 local APOTHEM = math.cos(math.pi / 8)   -- distance to an octagon face, r = 1
 
--- Direction key sets, one per scheme, indexed by sector:
--- 0 = right, then clockwise on screen (y grows downwards), so index * 45deg IS
--- the direction's angle in screen space. A disc picks its scheme with the
--- `scheme` field, so a layout can carry an arrow disc AND a WASD disc.
+-- Direction key sets, one per scheme, indexed by sector. Index 0 = right, then
+-- clockwise on screen (y grows downwards), so index * 45deg IS the direction's
+-- angle in screen space. Each disc picks its scheme via its `scheme` field.
 local DIR_SCHEMES = {
     arrows = {
         [0] = { "right" },
@@ -165,10 +143,9 @@ function VirtualKeyboard.SetDpadScheme(id, scheme)
     return false
 end
 
--- Default layout. nx / ny = centre as a fraction of the screen, fr = radius as
--- a fraction of min(screen width, screen height) so controls keep a sane pixel
--- size in both portrait and landscape.
--- kind: "dpad" | "button". fn = "layout" marks the layout-editor key.
+-- Default layout: nx / ny = centre as a fraction of the screen, fr = radius as
+-- a fraction of min(width, height), so the pixel size stays sane in both
+-- orientations. kind: "dpad" | "button"; fn = "layout" marks the editor key.
 local defaultLayout = {
     { id = "dpad",  kind = "dpad",   nx = 0.20, ny = 0.72, fr = 0.170, color = { 1.00, 1.00, 1.00 } },
     { id = "z",     kind = "button", nx = 0.88, ny = 0.84, fr = 0.075, key = "z", label = "Z", color = { 0.22, 0.52, 0.85 } },
@@ -176,34 +153,29 @@ local defaultLayout = {
     { id = "c",     kind = "button", nx = 0.80, ny = 0.66, fr = 0.075, key = "c", label = "C", color = { 0.45, 0.34, 0.78 } },
     { id = "menu",  kind = "button", nx = 0.055, ny = 0.080, fr = 0.045, icon = "bars", fn = "menu",  color = { 0.35, 0.38, 0.46 } },
     { id = "edit",  kind = "button", nx = 0.140, ny = 0.080, fr = 0.042, icon = "move", fn = "layout", color = { 0.30, 0.44, 0.38 } },
-    -- top-right corner, mirroring the two menu keys: ESC and the engine's F2
-    -- (back to the logo room). Both are real keys, so they also raise
-    -- love.keypressed -- which is the only thing F2/ESC consumers listen to.
+    -- top-right corner, mirroring the two menu keys. ESC and F2 are real keys,
+    -- so they also raise love.keypressed -- the only thing their consumers
+    -- listen to.
     { id = "esc",   kind = "button", nx = 0.860, ny = 0.080, fr = 0.045, key = "escape", label = "ESC", color = { 0.58, 0.36, 0.34 } },
     { id = "f2",    kind = "button", nx = 0.945, ny = 0.080, fr = 0.045, key = "f2", label = "F2", color = { 0.34, 0.44, 0.58 } },
 }
 
--- Every key the engine knows about, most-used first, so a button can be mapped
--- to literally anything (V, H, F5, mouse1, ...).
--- Real key names and the engine's bind names both work: "confirm"/"cancel"/
--- "menu" are what game code usually reads.
+-- Every key the key picker offers, most-used first. Real key names and bind
+-- names both work ("confirm" / "cancel" / "menu" are what game code reads).
 local keyChoices = {}
 do
     local seen = {}
     local function addKey(k)
         if (not seen[k]) then seen[k] = true; keyChoices[#keyChoices + 1] = k end
     end
-    -- the ones people reach for first
     for _, k in ipairs({
         "z", "x", "c", "up", "down", "left", "right",
         "confirm", "cancel", "menu", "shift", "ctrl", "alt",
         "space", "return", "escape", "tab", "backspace",
     }) do addKey(k) end
-    -- full alphabet, then digits, then function keys
     for i = 97, 122 do addKey(string.char(i)) end
     for i = 48, 57 do addKey(string.char(i)) end
     for i = 1, 12 do addKey("f" .. i) end
-    -- everything else on a keyboard
     for _, k in ipairs({
         "lshift", "rshift", "lctrl", "rctrl", "lalt", "ralt",
         "capslock", "numlock", "scrolllock", "insert", "delete",
@@ -216,10 +188,6 @@ end
 
 -- Never removable: without them the overlay could not be operated any more.
 local protectedIds = { menu = true, edit = true }
-
-----------------------------------------------------------------------
--- Small helpers
-----------------------------------------------------------------------
 
 local function clamp(v, lo, hi)
     if (v < lo) then return lo end
@@ -243,12 +211,7 @@ local function mixColor(a, b, t)
     }
 end
 
-----------------------------------------------------------------------
--- Labels / toast (menu + editor feedback)
-----------------------------------------------------------------------
-
--- Chinese needs a CJK font; if it cannot be loaded the overlay falls back to
--- the ASCII wording below, which any font can draw.
+-- Without a CJK font the overlay falls back to the ASCII wording below.
 local LABEL_SETS = {
     en = {
         title = "VIRTUAL PAD", add_button = "Add button", add_dpad = "Add d-pad",
@@ -272,18 +235,11 @@ local LABEL_SETS = {
     },
 }
 
-----------------------------------------------------------------------
--- Label lookup (Localize -> built-in tables -> raw key)
-----------------------------------------------------------------------
-
---- The engine's localization table, or false when it is not running.
---- Resolved lazily: `Localize` is a global created by main.lua, and the
---- overlay may be loaded before that happens.
+--- The engine's localization table, or nil when it is not running yet.
+--- `Localize` is a global created by main.lua, so it is resolved lazily.
 local localizeRef
 local function currentLocalize()
     if (localizeRef) then return localizeRef end
-    -- only a positive result is cached: `Localize` is a global that main.lua
-    -- creates, and the overlay may be loaded (or first drawn) before that
     local l = rawget(_G, "Localize")
     if (type(l) == "table" and l.localizeText) then localizeRef = l end
     return localizeRef
@@ -299,9 +255,8 @@ local function resolveLanguage()
     return "en"
 end
 
--- Lookups are cached because Localize prints a warning for every missing key
--- and the menu redraws every frame. The cache is dropped whenever the game
--- language changes (see ClearLabelCache).
+-- Localize warns on every missing key and the menu redraws every frame, so
+-- lookups are cached; ClearLabelCache drops the cache on a language change.
 local labelCache = {}
 local labelCacheLang
 
@@ -353,32 +308,14 @@ local function toast(key)
     VirtualKeyboard.toastUntil = now + 1.8
 end
 
-----------------------------------------------------------------------
--- Simulated input (identical behaviour for Keyboard and Joystick targets)
-----------------------------------------------------------------------
-
-----------------------------------------------------------------------
--- Key events
---
--- Simulating a key only feeds the engine's POLLED state (Keyboard.GetState).
--- Anything the game reads from an EVENT -- love.keypressed("f2"), "escape",
--- the dev keys -- would therefore never see a virtual press, which looks
--- exactly like "my button does nothing". So a virtual press also queues the
--- matching love.keypressed / love.keyreleased, mirroring a real key.
---
--- The queue is drained from Update(), i.e. once the input phase is over and
--- before the scene reads its input: firing it from inside the touch handler
--- itself would let a handler switch scenes and then hand the very same touch
--- to the new scene.
-----------------------------------------------------------------------
-
+-- A virtual press must also queue love.keypressed / love.keyreleased, otherwise
+-- event consumers never see it; Update() drains the queue after the input phase.
 local eventQueue = {}
 local eventPending = {}     -- key -> true while its press is still undelivered
 local flushing = false      -- guard against a handler queuing during a flush
 
---- Can this name be delivered as a real key event? Bind names ("confirm",
---- "menu", ...) exist only inside the engine and never arrive as events, and
---- mouse buttons are not keys either, so those stay state-only.
+--- Can this name be delivered as a real key event? Bind names and mouse
+--- buttons only exist inside the engine, so they stay state-only.
 local function isEventKey(key)
     if (type(key) ~= "string" or key == "") then return false end
     if (key:sub(1, 5):lower() == "mouse") then return false end
@@ -428,9 +365,8 @@ local function releaseKey(key)
     end
 end
 
---- Press exactly the given set of keys, releasing whatever is no longer wanted.
---- Shared keys (e.g. "up" when sliding up -> up-right) stay held, so the
---- character never stutters while the finger crosses a sector boundary.
+--- Press exactly `keys`, releasing whatever is no longer wanted. Shared keys
+--- stay held, so the character never stutters when the finger crosses a sector.
 local function applyKeys(ctrl, keys)
     local wanted = {}
     if (keys) then
@@ -449,10 +385,6 @@ local function applyKeys(ctrl, keys)
         end
     end
 end
-
-----------------------------------------------------------------------
--- Controls
-----------------------------------------------------------------------
 
 local function makeControl(def)
     local ctrl = {
@@ -490,8 +422,8 @@ local function buildDefaultControls()
     VirtualKeyboard.buttons = VirtualKeyboard.controls
 end
 
---- Make sure the menu key and the layout key are always present (an imported
---- layout must not be able to remove the only way to reach the editor).
+--- Keep the menu key and the layout key present; an imported layout must not be
+--- able to remove the only way to reach the editor.
 local function ensureSystemControls()
     local hasMenu, hasEdit = false, false
     for _, c in ipairs(VirtualKeyboard.controls) do
@@ -508,9 +440,7 @@ local function ensureSystemControls()
 end
 
 -- Saved-layout format version. Bump it whenever the DEFAULT layout gains a
--- control: ApplyLayoutTable then merges those defaults back into an older save
--- once (otherwise a player who already has a vk_layout.json would simply never
--- see the new key). Saves written at this version are taken exactly as they are.
+-- control, otherwise an existing vk_layout.json never sees the new key.
 local LAYOUT_VERSION = 2
 
 --- Re-add any default control an older save is missing (positions of the rest
@@ -571,8 +501,7 @@ function VirtualKeyboard.RemoveControl(id)
     return false
 end
 
---- Add a round button mapped to `key` and drop straight into edit mode so it
---- can be dragged into place.
+--- Add a round button mapped to `key`, then drop into edit mode to place it.
 ---@param key string
 ---@return table
 function VirtualKeyboard.AddKeyButton(key)
@@ -669,12 +598,7 @@ function VirtualKeyboard.ResetLayout()
     end
 end
 
-----------------------------------------------------------------------
--- Layout persistence (JSON, via Utils/SafeJson + love.filesystem)
-----------------------------------------------------------------------
-
---- The engine's JSON helper (Utils/SafeJson -> dkjson). Resolved lazily: the
---- library is only touched when an import/export actually happens.
+--- The engine's JSON helper (Utils/SafeJson -> dkjson), resolved lazily.
 local jsonLibCache
 local function jsonLib()
     if (jsonLibCache ~= nil) then return jsonLibCache or nil end
@@ -713,8 +637,8 @@ function VirtualKeyboard.GetLayoutTable()
     return { format = "soulengine.vklayout", version = LAYOUT_VERSION, controls = controls }
 end
 
---- Apply a layout table (the inverse of GetLayoutTable). Unknown ids are
---- created, controls missing from the table are dropped.
+--- Apply a layout table (inverse of GetLayoutTable): missing controls are
+--- dropped, unknown ids are created.
 function VirtualKeyboard.ApplyLayoutTable(data)
     if (type(data) ~= "table" or type(data.controls) ~= "table") then return false end
     local controls = {}
@@ -755,7 +679,7 @@ function VirtualKeyboard.LoadLayout()
 end
 
 --- Write the layout as JSON into the save directory (and to the clipboard when
---- the platform has one) so it can be copied off the device.
+--- available) so it can be copied off the device.
 function VirtualKeyboard.ExportLayout()
     local lib = jsonLib()
     if (not lib) then toast("no_json"); return false end
@@ -772,8 +696,7 @@ function VirtualKeyboard.ExportLayout()
     return written
 end
 
---- Read a layout from the save directory; if there is none, fall back to
---- whatever JSON is sitting on the clipboard.
+--- Read a layout from the save directory, falling back to the clipboard JSON.
 function VirtualKeyboard.ImportLayout()
     local lib = jsonLib()
     if (not lib) then toast("no_json"); return false end
@@ -795,10 +718,6 @@ function VirtualKeyboard.ImportLayout()
     return true
 end
 
-----------------------------------------------------------------------
--- Menu (add / delete / import / export / edit)
-----------------------------------------------------------------------
-
 --- Open / close the menu. Opening also leaves delete mode and releases input.
 function VirtualKeyboard.SetMenuOpen(bool)
     bool = not not bool
@@ -808,7 +727,6 @@ function VirtualKeyboard.SetMenuOpen(bool)
         VirtualKeyboard.deleteMode = false
         VirtualKeyboard.menuPage = "root"
         VirtualKeyboard.ReleaseAll()
-        -- the game language may have changed since the panel was last open
         VirtualKeyboard.ClearLabelCache()
     end
     VirtualKeyboard.MenuLayout()
@@ -849,7 +767,6 @@ local function buildMenuItems()
     local page = VirtualKeyboard.menuPage
 
     if (page == "addpad") then
-        -- which key set should the new disc emit
         local names = VirtualKeyboard.GetSchemes()
         for i, name in ipairs(names) do
             items[i] = {
@@ -863,7 +780,6 @@ local function buildMenuItems()
         items[#items + 1] = { id = "back", label = "back", act = function() openPage("root") end }
 
     elseif (page == "addkey") then
-        -- every key, paged so the panel always fits on screen
         local perPage = VirtualKeyboard.keysPerPage
         local first = VirtualKeyboard.keyPage * perPage + 1
         local last = math.min(#keyChoices, first + perPage - 1)
@@ -906,7 +822,6 @@ function VirtualKeyboard.MenuLayout()
     local items = buildMenuItems()
     VirtualKeyboard.menuItems = items
 
-    -- more columns on the picker pages: keys and schemes have short labels
     local cols = 1
     if (VirtualKeyboard.menuPage == "addkey") then cols = VirtualKeyboard.keyColumns
     elseif (VirtualKeyboard.menuPage == "addpad") then cols = 2 end
@@ -946,10 +861,6 @@ local function inMenuPanel(x, y)
     return (r ~= nil and x >= r.x and x <= r.x + r.w and y >= r.y and y <= r.y + r.h)
 end
 
-----------------------------------------------------------------------
--- Geometry: meshes are built once in unit space (radius = 1)
-----------------------------------------------------------------------
-
 local MESH = {}
 local fontCache = {}
 
@@ -988,16 +899,9 @@ local function buildBandMesh(r0, r1, a0, a1, segments)
 
 end
 
-----------------------------------------------------------------------
--- Octagon geometry (the d-pad's look)
---
--- The disc is a regular octagon whose FLAT FACES sit on the eight sector
--- centres: vertices at (k + 0.5) * 45deg, so each face is exactly one
--- direction and the shape reads as a d-pad without any arrows. The hit
--- testing is untouched -- it stays radius + angle based (a circle), which is
--- why the debug overlay still draws round guides.
-----------------------------------------------------------------------
-
+-- The disc is a regular octagon whose flat faces sit on the eight sector
+-- centres (vertices at (k + 0.5) * 45deg). Hit testing stays a circle (radius +
+-- angle), which is why the debug overlay draws round guides.
 --- A regular octagon of circumradius 1, flat face towards +x / +y / ... .
 local function buildOctagonMesh()
     local verts = {}
@@ -1024,9 +928,8 @@ local function buildOctagonRingMesh(rOuter, rInner)
     return SE.graphics.newMesh(verts, "triangles")
 end
 
--- Outline meshes are built in screen-pixel space (drawn at scale 1) because the
--- stroke has to be a fixed number of pixels thick. Keyed by the two radii, so
--- a given disc size reuses one mesh; only a window resize builds a new one.
+-- Outline meshes live in screen-pixel space (scale 1) so the stroke stays a
+-- fixed pixel width; keyed by radius+width, one mesh per disc size.
 local outlineCache = {}
 local outlineCount = 0
 
@@ -1046,9 +949,8 @@ local function getOutlineMesh(inner, width)
 end
 
 
---- One d-pad sector, centred on +x (rotate by i * 45deg for sector i).
---- The outer boundary is the octagon's flat face, so a lit sector ends
---- exactly at the edge instead of poking out of it.
+--- One d-pad sector centred on +x (rotate by i * 45deg for sector i). Its outer
+--- boundary is the octagon's flat face, so a lit sector ends exactly at the edge.
 local function buildSectorMesh(rInner, half, segments)
     local verts = {}
     -- the face runs at x = cos(22.5deg); the wedge stops just short of the
@@ -1066,9 +968,8 @@ local function buildSectorMesh(rInner, half, segments)
     return SE.graphics.newMesh(verts, "triangles")
 end
 
--- Arrow pointing along +x, in unit-disc space (0.34 .. 0.82 of the radius).
--- No longer drawn on the disc (the octagon shows the directions); it is still
--- the glyph for the "move" icon.
+-- Arrow pointing along +x in unit-disc space (0.34 .. 0.82 of the radius); the
+-- glyph for the "move" icon.
 local ARROW_POINTS = {
     0.78, 0.00,
     0.48, -0.16,
@@ -1097,22 +998,16 @@ end
 
 local function buildMeshes()
     if (MESH.built) then return end
-    -- round shapes: buttons, and the debug guides (the hit area IS a circle)
     MESH.circle = buildCircleMesh(64)
     MESH.ring = buildBandMesh(0.93, 1.00, 0, TWO_PI, 72)
-    -- the d-pad: octagonal body, octagonal rim, one flat wedge per direction
     MESH.octagon = buildOctagonMesh()
     MESH.octRing = buildOctagonRingMesh(1.00, 0.93)
-    -- Sector highlight: 45deg minus a small gap so the 8 faces read separately.
+    -- wedge = 45deg minus a small gap, so the 8 faces read separately
     MESH.wedge = buildSectorMesh(HUB, STEP * 0.5, 10)
     MESH.arrow = buildArrowMesh()
     MESH.rect = buildRectMesh()
     MESH.built = true
 end
-
-----------------------------------------------------------------------
--- Text: bondfont style -- mono 27 for ASCII, SimSun 13 x2 for the rest
-----------------------------------------------------------------------
 
 --- True when the string holds anything outside ASCII (Chinese and friends).
 local function hasWideChar(s)
@@ -1190,15 +1085,10 @@ local function drawTextCentered(text, cx, cy, size)
     drawText(text, cx - f:getWidth(text) * s * 0.5, cy - h * 0.5, size)
 end
 
---- Font / scale / line height a string would be drawn with. Exposed for
---- tooling and tests: it is how you check which of the two families wins.
+--- Font / scale / line height a string would be drawn with (font check helper).
 function VirtualKeyboard.FontFor(text, size)
     return fontFor(text, size)
 end
-
-----------------------------------------------------------------------
--- Enable / visibility / targets
-----------------------------------------------------------------------
 
 function VirtualKeyboard.IsTouchDevice()
     if (love and love.system and love.system.getOS) then
@@ -1250,14 +1140,13 @@ function VirtualKeyboard.SetHysteresis(v)
 end
 
 --- Draw the real hit area on top of the overlay (grab circle, sector
---- boundaries, dead zone and the last press point). Handy while tuning.
+--- boundaries, dead zone, last press point).
 function VirtualKeyboard.SetDebug(bool)
     VirtualKeyboard.debug = not not bool
 end
 
 --- Outline around the d-pad octagon. `width` is in screen pixels (0 disables);
---- `color` is an {r, g, b} triple. Both may be overridden per control with the
---- `outlineWidth` / `outlineColor` fields in the layout table.
+--- per-control `outlineWidth` / `outlineColor` override both.
 function VirtualKeyboard.SetOutline(width, color)
     if (width ~= nil) then
         VirtualKeyboard.outlineWidth = math.max(0, tonumber(width) or 0)
@@ -1266,10 +1155,6 @@ function VirtualKeyboard.SetOutline(width, color)
         VirtualKeyboard.outlineColor = { color[1], color[2], color[3] }
     end
 end
-
-----------------------------------------------------------------------
--- Layout / update
-----------------------------------------------------------------------
 
 --- Recompute pixel geometry from the normalized layout (cheap: called per frame).
 function VirtualKeyboard.Layout()
@@ -1309,8 +1194,8 @@ function VirtualKeyboard.SetEditMode(bool)
 end
 
 function VirtualKeyboard.Update()
-    -- Deliver queued key events first: by now the input phase is over, and the
-    -- scene is about to read its input this frame.
+    -- Deliver queued key events first: the input phase is over, the scene is
+    -- about to read its input this frame.
     flushEvents()
     if (VirtualKeyboard.autoDetect and not VirtualKeyboard.enabled and VirtualKeyboard.IsTouchDevice()) then
         VirtualKeyboard.enabled = true
@@ -1327,10 +1212,6 @@ function VirtualKeyboard.Update()
     if (VirtualKeyboard.menuOpen) then VirtualKeyboard.MenuLayout() end
 end
 
-----------------------------------------------------------------------
--- Hit testing / direction
-----------------------------------------------------------------------
-
 ---@param x number
 ---@param y number
 ---@param kindOnly string|nil when set, only controls of this kind are considered
@@ -1339,8 +1220,8 @@ local function hitTest(x, y, kindOnly)
     for i = #VirtualKeyboard.controls, 1, -1 do
         local ctrl = VirtualKeyboard.controls[i]
         if (ctrl.enabled and (not kindOnly or ctrl.kind == kindOnly)) then
-            -- The dpad's 8 sectors reach past the drawn rim (grabScale), so a
-            -- finger that lands just outside the disc still steers.
+            -- dpad sectors reach past the drawn rim (grabScale), so a finger just
+            -- outside the disc still steers.
             local pad = (ctrl.kind == "dpad") and VirtualKeyboard.grabScale or VirtualKeyboard.hitPadding
             local dx, dy = x - ctrl.cx, y - ctrl.cy
             local rr = ctrl.r * pad
@@ -1354,10 +1235,8 @@ end
 
 local TAN22_5 = math.tan(math.pi / 8)   -- 0.4142: half a sector (22.5deg)
 
---- Which of the 8 sectors a vector falls into, WITHOUT any atan.
---- atan2 exists on LuaJIT but not on the Lua 5.4 fallback build of LOVE, so the
---- sector is picked with two slope comparisons instead -- portable everywhere
---- (desktop, Android, either Lua flavour) and cheaper.
+--- Which of the 8 sectors a vector falls into, without atan: atan2 is missing on
+--- the Lua 5.4 fallback build of LOVE, so two slope comparisons decide it.
 ---@param dx number
 ---@param dy number
 ---@return integer 0=right, 1=down-right, 2=down ... 7=up-right
@@ -1370,14 +1249,9 @@ local function sectorOf(dx, dy)
 end
 
 --- Recompute the sector a finger sits in and press / release accordingly.
----
---- Two rules keep it from feeling hair-trigger:
----   * the sector is decided by DIRECTION only, so it keeps working no matter
----     how far the finger slides past the rim (the wedge is unbounded outward);
----   * once a sector is held, the finger must rotate more than half a sector
----     PLUS `hysteresis` before it flips -- otherwise the direction chatters
----     the moment the finger drifts near a boundary (worst close to the centre).
----     The "how far past the line" test is a cross product, again no atan.
+--- The sector is decided by direction only (works however far past the rim the
+--- finger slides), and a held sector needs more than half a sector PLUS
+--- `hysteresis` of rotation before it flips, or the direction chatters.
 local function updateDirection(ctrl, x, y)
     local dx, dy = x - ctrl.cx, y - ctrl.cy
     local dist = math.sqrt(dx * dx + dy * dy)
@@ -1387,8 +1261,8 @@ local function updateDirection(ctrl, x, y)
         if (ctrl.dir >= 0 and dir ~= ctrl.dir) then
             local delta = ((dir - ctrl.dir + 4) % 8) - 4   -- shortest way round
             if (delta == 1 or delta == -1) then
-                -- only the neighbouring sector is "sticky"; a fast swipe across
-                -- two sectors switches immediately
+                -- only the neighbouring sector is "sticky"; a swipe across two
+                -- sectors switches immediately
                 local t = ctrl.dir * STEP + delta * (STEP * 0.5 + VirtualKeyboard.hysteresis)
                 local cross = math.cos(t) * dy - math.sin(t) * dx
                 if (delta * cross <= 0) then dir = ctrl.dir end
@@ -1401,12 +1275,8 @@ local function updateDirection(ctrl, x, y)
     end
 end
 
-----------------------------------------------------------------------
--- Touch / mouse input
-----------------------------------------------------------------------
-
 --- Drop a binding and release whatever it was holding. Does NOT run the tap
---- semantics (edit-mode toggle), so it is safe to call for a stale binding.
+--- semantics (edit-mode toggle), so it is safe for a stale binding.
 ---@return table|nil slot
 local function releaseTouch(id)
     local slot = VirtualKeyboard.boundTouches[id]
@@ -1422,10 +1292,9 @@ end
 
 function VirtualKeyboard.TouchPressed(id, x, y)
     if (not VirtualKeyboard.enabled or not VirtualKeyboard.visible) then return false end
-    -- A press for an id that is still bound means a release never arrived
-    -- (mouse let go outside the window, dropped touch event, ...). Drop the
-    -- stale binding instead of ignoring the press -- otherwise every later
-    -- click is swallowed and the direction stays frozen on the old value.
+    -- A press for an id that is still bound means a release never arrived (mouse
+    -- released outside the window, dropped touch event). Drop the stale binding:
+    -- ignoring the press would swallow every later click.
     releaseTouch(id)
 
     VirtualKeyboard.lastPress = { x = x, y = y }
@@ -1515,8 +1384,7 @@ function VirtualKeyboard.TouchMoved(id, x, y)
     if (ctrl.kind == "dpad") then
         updateDirection(ctrl, x, y)
     else
-        -- Slide between round keys without lifting: dragging off Z onto X
-        -- releases Z and presses X from scratch, and sliding back re-presses Z.
+        -- Sliding off Z onto X releases Z and presses X from scratch.
         local other = hitTest(x, y, "button")
         if (other and other ~= ctrl) then
             applyKeys(ctrl, nil)
@@ -1533,7 +1401,6 @@ function VirtualKeyboard.TouchMoved(id, x, y)
 end
 
 function VirtualKeyboard.TouchReleased(id, x, y)
-    -- touches that were spent on the menu / delete mode end here
     if (VirtualKeyboard.uiTouches[id]) then
         VirtualKeyboard.uiTouches[id] = nil
         return true
@@ -1568,7 +1435,7 @@ function VirtualKeyboard.MousePressed(sx, sy)
     return VirtualKeyboard.TouchPressed(MOUSE_TOUCH_ID, sx, sy)
 end
 
---- Desktop helper: dragging with the button held == sliding a finger.
+--- Desktop helper: a drag with the button held == sliding a finger.
 function VirtualKeyboard.MouseMoved(sx, sy)
     return VirtualKeyboard.TouchMoved(MOUSE_TOUCH_ID, sx, sy)
 end
@@ -1577,25 +1444,19 @@ function VirtualKeyboard.MouseReleased(sx, sy)
     return VirtualKeyboard.TouchReleased(MOUSE_TOUCH_ID, sx, sy)
 end
 
-----------------------------------------------------------------------
--- Drawing
-----------------------------------------------------------------------
-
 local function drawDisc(ctrl)
     local a = alphaOf(ctrl)
     local r = ctrl.r
     local cx, cy = ctrl.cx, ctrl.cy
 
-    -- body + neutral centre. The hub is sized so its FLAT FACES land on the
-    -- sectors' inner radius: an octagon inscribed at 0.26 would only reach
-    -- 0.26 * cos(22.5deg) at the faces and leave a dark ring around the hub.
+    -- The hub is scaled by 1/APOTHEM so its flat faces land on the sectors'
+    -- inner radius; an octagon inscribed at 0.26 leaves a dark ring.
     setColor(VirtualKeyboard.baseColor, a)
     SE.graphics.draw(MESH.octagon, cx, cy, 0, r, r)
     setColor(VirtualKeyboard.idleColor, a * 0.75)
     local hub = r * HUB / APOTHEM
     SE.graphics.draw(MESH.octagon, cx, cy, 0, hub, hub)
 
-    -- eight sectors -- the lit one is the whole face, no arrow needed
     for i = 0, 7 do
         local active = (i == ctrl.dir)
         if (active) then
@@ -1639,7 +1500,7 @@ local function drawLabel(ctrl, a)
     local text = ctrl.label
     if (not text or text == "") then return end
     setColor(VirtualKeyboard.textColor, clamp(a + 0.35, 0, 1))
-    -- shrink longer labels ("ESC", "BACKSPACE", ...) so they stay inside the rim
+    -- shrink long labels ("ESC", "BACKSPACE") so they stay inside the rim
     local size = ctrl.r * 0.95
     local maxW = ctrl.r * 1.55
     while (size > 8 and textWidth(text, size) > maxW) do size = size - 1 end
@@ -1683,7 +1544,7 @@ local function drawMenu()
     if (not r) then return end
     local pad = (VirtualKeyboard.menuItems[1] and VirtualKeyboard.menuItems[1].x - r.x) or 8
 
-    -- panel: rim then body, both from the unit rect mesh
+    -- rim then body, both from the unit rect mesh
     setColor(VirtualKeyboard.rimColor, 0.85)
     SE.graphics.draw(MESH.rect, r.x + r.w * 0.5, r.y + r.h * 0.5, 0, r.w + 4, r.h + 4)
     setColor(VirtualKeyboard.baseColor, 0.96)
@@ -1708,7 +1569,6 @@ local function drawMenu()
             SE.graphics.draw(MESH.rect, item.x + item.w * 0.5, item.y + item.h * 0.5, 0, item.w - 4, item.h - 4)
 
             local text = item.raw and item.label or VirtualKeyboard.L(item.label)
-            -- shrink until the label fits its cell (key names get long)
             local fs = math.floor(item.h * 0.5)
             while (fs > 8 and textWidth(text, fs) > item.w - 8) do fs = fs - 1 end
             setColor(VirtualKeyboard.textColor, 0.98)
@@ -1752,7 +1612,6 @@ local function drawDebugDisc(ctrl)
     setColor({ 0.30, 1.00, 0.45 }, 0.85)
     SE.graphics.draw(MESH.ring, cx, cy, 0, outer, outer)
 
-    -- the 8 dividing lines, drawn all the way out to the grab radius
     setColor({ 1.00, 0.72, 0.20 }, 0.70)
     local len = outer - inner
     for i = 0, 7 do
@@ -1810,14 +1669,9 @@ function VirtualKeyboard.Draw()
     if (VirtualKeyboard.debug) then drawDebugOverlay() end
     if (VirtualKeyboard.editMode) then drawEditHint() end
 
-    -- Restore the colour before returning. This overlay is the LAST thing drawn
-    -- in a frame and every control above paints with an alpha < 1, while LoEVE's
-    -- default love.run does NOT reset the graphics state between frames (it only
-    -- calls origin() + clear()). The colour left behind here therefore became the
-    -- ambient colour of the NEXT frame -- and STI paints the tilemap with that
-    -- ambient colour (Map.drawLayer -> lg.setColor(r, g, b, a * layer.opacity)),
-    -- so a leaked tint made every map tile render translucent (once into STI's
-    -- own map canvas, once again when that canvas is blitted back).
+    -- The overlay is the last thing drawn and love.run does not reset the
+    -- graphics state between frames, so a leftover alpha < 1 becomes the ambient
+    -- colour of the next frame -- STI then renders every map tile translucent.
     SE.graphics.setColor(1, 1, 1, 1)
 end
 

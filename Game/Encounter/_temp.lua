@@ -10,7 +10,7 @@ local encounter = {
             animation = require("Game.Animations.Poseur"),
 
             maxdamage = 400,
-            dmg_float = 2,  -- Some random stuff......
+            dmg_float = 2,
 
             show_hpbar = true,
             maxhp = 100,
@@ -51,7 +51,6 @@ local encounter = {
     }
 }
 
--- Assign internal _id to each statically-defined enemy
 for i = 1, #encounter.enemies
 do
     local e = encounter.enemies[i]
@@ -59,9 +58,7 @@ do
     encounter.enemy_id = encounter.enemy_id + 1
 end
 
--- The following methods are now provided by Battle.game_apis via metatable:
---   encounter:AddEnemy(data)  — adds a validated enemy with auto-assigned _id
---   encounter:AddItem(item)    — adds a validated item
---   encounter:forceAttack(id, value) — applies forced damage to an enemy by _id
+-- Battle.game_apis (via metatable) adds encounter:AddEnemy(data),
+-- encounter:AddItem(item) and encounter:forceAttack(id, value).
 
 return encounter

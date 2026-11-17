@@ -9,15 +9,12 @@ local function typeDetector(var, tar_types)
     return false
 end
 
--- Blaster assets always live under a "Blaster/" folder, but the two kinds
--- resolve in different roots: sprites under Resources/Sprites/, sounds under
--- Resources/Sounds/. Only the folder inside "Blaster/" is configurable - the
--- file names themselves are fixed (spr_gasterblaster_0..5.png and beam.png for
--- sprites, snd_intro.wav and snd_fire.wav for sounds).
+-- Only the folder inside "Blaster/" is configurable; file names are fixed
+-- (spr_gasterblaster_0..5.png / beam.png, snd_intro.wav / snd_fire.wav).
 local BLASTER_SPRITE_FOLDER = "Blaster/"
 local BLASTER_SOUND_FOLDER = "Blaster/"
 
--- Sounds used to sit flat in "Blaster/", so that layout stays valid.
+-- Legacy flat layout, still resolved as a fallback.
 local FLAT_BLASTER_SOUND_FOLDER = "Blaster"
 
 local DEFAULT_SPRITE_FOLDER = "Default"
@@ -27,10 +24,9 @@ local DEFAULT_SOUND_FOLDER = "Default"
 local SPRITE_ROOTS = { "Game/Resources/Sprites/", "Resources/Sprites/" }
 local SOUND_ROOTS = { "Game/Resources/Sounds/", "Resources/Sounds/" }
 
---- Test whether a file exists on the LÖVE filesystem.
---- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info
---- directly, and some builds expose neither, so every shape is tolerated and a
---- one-byte read is used as the last resort.
+--- Test whether a file exists on the LÖVE filesystem. LÖVE 11 returns a table
+--- from getInfo, LÖVE 12 returns the info directly, so only truthiness is
+--- trusted; a one-byte read is the last resort.
 ---@param path string
 ---@return boolean
 local function fileExists(path)
@@ -58,8 +54,7 @@ local function assetExists(roots, relative)
     return false
 end
 
---- Normalise a folder argument. Returns nil when the caller passed nothing, or
---- something unusable - nil means "just use the default folder".
+--- Normalise a folder argument. nil means "use the default folder".
 ---@param value any
 ---@param label string Argument name, used when warning about a bad value.
 ---@return string|nil
@@ -83,11 +78,9 @@ local function readFolderArg(value, label)
     return name
 end
 
---- Resolve the sprite folder for a blaster.
---- A requested folder is only honoured when its head sprite really exists;
---- otherwise the default is used and the miss is reported, because a folder
---- that silently does not resolve shows up as an invisible blaster with no
---- hint about which path was tried.
+--- Resolve the sprite folder for a blaster. A requested folder is only honoured
+--- when its head sprite exists; otherwise the default is used and the miss is
+--- reported, so a bad path never turns into an invisible blaster.
 ---@param gb_sprites string|nil Folder inside "Blaster/", e.g. "Default".
 ---@return string Folder name, used as "Blaster/" .. folder .. "/<file>.png".
 local function resolveSpriteFolder(gb_sprites)
@@ -103,10 +96,8 @@ local function resolveSpriteFolder(gb_sprites)
     return DEFAULT_SPRITE_FOLDER
 end
 
---- Resolve the sound folder for a blaster.
---- Sounds historically sat flat in "Blaster/", so a missing sub-folder falls
---- back to that layout before giving up: existing projects keep working, while
---- new ones can group their sounds per blaster.
+--- Resolve the sound folder for a blaster. A missing sub-folder falls back to
+--- the flat "Blaster/" layout before giving up.
 ---@param gb_sounds string|nil Folder inside "Blaster/", e.g. "Default".
 ---@return string Path prefix, used as prefix .. "/snd_intro.wav".
 local function resolveSoundFolder(gb_sounds)

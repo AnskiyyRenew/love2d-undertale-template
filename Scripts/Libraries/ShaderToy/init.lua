@@ -1,9 +1,5 @@
--- init.lua
--- ShaderToy main entry module.
--- Responsible for creating Shader / Project, and providing interfaces such as
--- use, unload, and update.
--- Conversion operations are handled by the convert module, and the conversion
--- rules are provided by the rules module.
+-- ShaderToy entry module: creates shaders / projects and exposes use, unload
+-- and update. Conversion lives in convert.lua, limits in rules.lua.
 
 local _p = (...):match("(.-)[^%.]+$")
 local path = _p .. "ShaderToy."
@@ -53,10 +49,9 @@ local shadertoy = {
 
 shadertoy.functions.__index = shadertoy.functions
 
--- ==================== Shader Creation ====================
+-- Shader creation
 
---- Generate a procedural noise texture with random RGB pixels.
---- Used to provide default data for shader channels that have no assigned texture.
+--- Generate a random RGB noise texture, used as the default for unset channels.
 ---@param self ShaderToyShader
 ---@param size? integer Texture size (width and height). Defaults to rules.DEFAULT_NOISE_SIZE.
 ---@return table The generated noise image.
@@ -79,8 +74,7 @@ function shadertoy.functions:generateNoiseTexture(size)
     return img
 end
 
---- Convert ShaderToy code into a LÖVE Shader instance.
---- The conversion is executed by the convert module, limited by the rules module.
+--- Convert ShaderToy GLSL into a LÖVE Shader wrapper (conversion via convert.lua).
 ---@param code string The original ShaderToy GLSL code.
 ---@param options table|number|nil Optional host-channel settings (see convert.lua).
 ---@return ShaderToyShader The created shader wrapper with conversion metadata.
@@ -92,13 +86,11 @@ function shadertoy.convert(code, options)
         code = converted.code,
         externs = converted.externs,
         runtimeFlags = converted.runtimeFlags,
-        -- textures / audio are NOT taken from the detection result:
-        -- the detection tables only hold flag names ("iChannel0" = true).
-        -- Real textures are assigned via setChannel / setAudioChannel,
-        -- and default noise textures are generated below.
+        -- Detection only reports flag names; real textures come from
+        -- setChannel / setAudioChannel, defaults are generated below.
         textures = {},
-        -- Channels listed here sample the sprite's main texture, so they never
-        -- own an external texture and must be skipped by the noise/send paths.
+        -- Channels sampling the host sprite texture own no external texture,
+        -- so the noise / send paths must skip them.
         hostChannels = converted.hostChannels or {},
         time = 0,
         frame = 0,
@@ -118,9 +110,9 @@ function shadertoy.convert(code, options)
     return shader
 end
 
--- ==================== Project Management ====================
+-- Project management
 
---- Create a new ShaderToy project, which manages multiple render passes.
+--- Create a project, which manages multiple render passes.
 ---@return ShaderToyProject The newly created project instance.
 function shadertoy.newProject()
     local proj = {
@@ -173,7 +165,7 @@ function shadertoy.project:draw()
         SE.graphics.setCanvas(writeCanvas)
         SE.graphics.clear()
 
-        -- Set up the textures of the preceding passes
+        -- Feed earlier passes into this pass's iChannel0..N
         for j, prev in ipairs(self.passes) do
             if j < i then
                 pass.shaderObj.shader:send("iChannel" .. (j - 1),
@@ -204,10 +196,9 @@ function shadertoy.project:unload()
     self.passes = {}
 end
 
--- ==================== Audio Handling ====================
+-- Audio handling
 
---- Assign an audio channel to a shader texture slot and start playback.
---- The audio is converted into an FFT / waveform texture for the shader.
+--- Bind an audio file to a channel, updated per frame as an FFT / waveform texture.
 ---@param self ShaderToyShader
 ---@param id integer The texture channel index (0-3).
 ---@param filepath string Path to the audio file.
@@ -233,7 +224,6 @@ function shadertoy.functions:setAudioChannel(id, filepath)
     self.textures[id] = self.audio.image
 end
 
--- Simple FFT implementation used for audio visualization.
 ---@param samples table Array of audio samples.
 ---@return table Magnitude spectrum of the samples.
 local function simpleFFT(samples)
@@ -253,10 +243,9 @@ local function simpleFFT(samples)
     return result
 end
 
--- ==================== Runtime Update ====================
+-- Runtime update
 
---- Update the shader uniforms, audio data and textures at runtime.
---- Call this every frame while the shader is in use.
+--- Push uniforms, audio data and textures. Call every frame while in use.
 ---@param self ShaderToyShader
 ---@param dt number Delta time since the last frame.
 function shadertoy.functions:update(dt)
@@ -323,7 +312,7 @@ function shadertoy.functions:update(dt)
     end
 end
 
--- ==================== Utility Functions ====================
+-- Utility functions
 
 --- Set a texture for a shader channel.
 ---@param self ShaderToyShader
@@ -338,22 +327,22 @@ function shadertoy.functions:setChannel(id, texture)
     self.textures[id] = texture
 end
 
---- Apply the shader (activate it for the current draw operations).
+--- Activate the shader for the current draw operations.
 ---@param self ShaderToyShader
 function shadertoy.functions:apply()
     SE.graphics.setShader(self.shader)
 end
 
---- Apply the shader (alias for apply).
+--- Alias of apply().
 shadertoy.functions.use = shadertoy.functions.apply
 
---- Clear the shader (deactivate it for the current draw operations).
+--- Deactivate the shader for the current draw operations.
 ---@param self ShaderToyShader
 function shadertoy.functions:clear()
     SE.graphics.setShader()
 end
 
---- Unload the shader, releasing its GPU resource.
+--- Release the GPU shader resource.
 ---@param self ShaderToyShader
 function shadertoy.functions:unload()
     if self.shader then
@@ -371,11 +360,6 @@ end
 ---@param savePath? string If provided, saves the code to this path.
 ---@return string? The selected code string (or nil if unavailable).
 function shadertoy.functions:printCode(mode, savePath)
-    -- mode:
-    -- nil / "final"
-    -- "original"   
-    -- "extern"     
-
     local target = ""
 
     if mode == "original" then

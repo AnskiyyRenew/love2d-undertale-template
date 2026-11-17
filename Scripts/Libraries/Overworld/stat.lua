@@ -1,14 +1,11 @@
--- It's not stat actually...
 local stat = {
     _created = false,
     _page = "idle",
     _menus = 2
 }
 DATA.player.getcell = true
--- Camera-relative positioning is delegated to the single shared GetRelativePos
--- defined in init.lua, so the stat menu and the overworld dialogs always read
--- the camera through the same code path (no duplicated math that could drift
--- out of sync by a frame).
+-- Camera-relative positioning goes through the single shared GetRelativePos
+-- in init.lua, so the stat menu and the overworld dialogs never drift apart.
 local function get_relative_pos(x, y)
     return GetRelativePos(x, y)
 end
@@ -61,25 +58,22 @@ heart.layer = heart.layer + 1
 heart.alpha = 0
 heart.color = {1, 0, 0}
 
--- Vars
 local in_menu = 1
 local in_item = 1
 local in_item_menu = 1
 local in_cell = 1
--- One-frame input swallow: set when entering item2 so the same confirm press
--- that opened the sub-menu can't instantly fire its confirm on the same frame.
--- Mirrors the input_lock pattern used in shop.lua.
+-- One-frame input swallow: set when entering item2 so the confirm press that
+-- opened the sub-menu can't fire its confirm on the same frame (like shop.lua).
 local input_lock = false
 
--- Left column geometry (canvas coords, y is the box centre). The column is a
--- small status box stacked on a taller button box; both share the same width.
--- DOWN runs 56..309, UP mirrors that across the midline and runs 171..424.
+-- Left column geometry (canvas coords, y is the box centre): a small status box
+-- stacked on a taller button box, both the same width. DOWN runs 56..309, UP
+-- mirrors that across the midline (171..424).
 local COL_X, COL_W = 100, 132
 local STATUS_Y, STATUS_H = 106, 100
 local BUTTONS_Y, BUTTONS_H = 240, 138
--- Baselines of the four status lines, as offsets from STATUS_Y. Keeping them
--- relative is what lets a mirrored box carry its text along instead of
--- flipping the lines themselves.
+-- Baselines of the four status lines, relative to STATUS_Y so a mirrored box
+-- carries its text along instead of flipping the lines.
 local STATUS_LINE = { -46, -4, 14, 31 }
 
 function stat.Update(dt)
@@ -87,12 +81,9 @@ function stat.Update(dt)
         if (Controller.GetState("menu") == 1 and not stat._created) then
             stat._created = true
             Char.controlling = false
-            -- Stop the player instantly. stat.Update runs BEFORE the physics
-            -- step inside map.Update, so zeroing the velocity here prevents the
-            -- body (and thus the camera) from sliding forward one frame while
-            -- the menu is being positioned. This removes the one-frame gap
-            -- between the camera the menu is anchored to and the camera that is
-            -- actually used to draw this frame.
+            -- stat.Update runs BEFORE the physics step in map.Update: zeroing
+            -- the velocity here stops the body (and camera) sliding one more
+            -- frame while the menu is being positioned.
             if (Char.collision.body) then
                 Char.collision.body:setLinearVelocity(0, 0)
             end
@@ -106,10 +97,8 @@ function stat.Update(dt)
             local _x, _y = get_relative_pos(65, 205)
             heart:MoveTo(_x, _y)
 
-            -- Mirror the whole left column when the player is low on screen.
-            -- The button box sits on the midline (240) and mirrors onto
-            -- itself, so only the status box actually moves down; the button
-            -- box, its order and the heart stay where they are.
+            -- Mirror the column when the player is low on screen. The button box
+            -- sits on the midline (240), so only the status box actually moves.
             local flipped = (Overworld.ResolveUIPosition() == "up")
             local buttons_y = flipped and Overworld.FlipY(BUTTONS_Y) or BUTTONS_Y
             local status_y = flipped and Overworld.FlipY(STATUS_Y) or STATUS_Y
@@ -142,7 +131,6 @@ function stat.Update(dt)
             t.fontsize = 16
             table.insert(elements, t)
 
-            -- Three menus.
             local _buttons = Localize.localizeText("Overworld.Menu.Buttons")
             local _x, _y = get_relative_pos(80, 190 - 3)
             local t = Typers.InstText.New(_buttons[1], {_x, _y}, "GUI")
@@ -354,10 +342,8 @@ function stat.Destroy()
     Char.controlling = true
     heart.alpha = 0
 
-    -- Clear BOTH layers: the top-level menu (elements) and whatever sub-page
-    -- was open (temp_elements). Previously only `elements` was cleared, so the
-    -- item list / USE-INFO-DROP row / cell list stayed on screen when a
-    -- third-level action popped a dialog — looked messy under the dialog box.
+    -- Clear BOTH layers: the top-level menu (elements) and any open sub-page
+    -- (temp_elements).
     for i = #temp_elements, 1, -1
     do
         local e = temp_elements[i]
@@ -373,7 +359,6 @@ function stat.Destroy()
         end
     end
 
-    -- Reset selection state so reopening the menu always starts clean.
     in_item = 1
     in_item_menu = 1
     in_cell = 1

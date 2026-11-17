@@ -1,20 +1,9 @@
 --[[
     GUI Label - text label (mixed Latin/CJK, wraps Typers.InstText)
 
-    Reuses Typers.InstText's bondfont mechanism: Latin determination_mono(27),
-    CJK simsun(13) scaled x2 (scale=2 ~= 26). InstText auto-splits Latin vs CJK
-    glyphs by byte length, so callers don't handle fonts. Font caching and Text
-    object reuse are handled inside InstText.
-
-    Usage:
-      local lbl = GUI.Label.New("Hello 世界", {320, 200})
-      lbl:SetAlign("center")
-      lbl:SetText("新文字")
-      lbl:SetColor(1, 1, 0)
-      lbl:Destroy()
-
-    Coordinate convention: top-left origin (x,y) (InstText origin); text flows
-    down-right. Align mode: "left" (default) / "center" / "right".
+    Reuses InstText's bondfont (Latin determination_mono 27, CJK simsun 13
+    scaled x2); InstText auto-splits glyphs by byte length, so callers never
+    handle fonts. Top-left origin; align "left" (default) / "center" / "right".
 ]]
 
 local Label = {}

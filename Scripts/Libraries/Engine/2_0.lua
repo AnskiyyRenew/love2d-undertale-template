@@ -1,35 +1,12 @@
 --[[
     Scripts/Libraries/Engine/2_0.lua
-    Backward-compatibility layer: run SE "12.0" / v2.0 projects on the current engine.
-
-    Load AFTER the current engine globals exist (Global, Sprites, Typers, Layers,
-    Keyboard, Masks, Tween, Audio, Scenes, Collisions, LuaEX, Camera):
-
-        require("Scripts.Libraries.Engine.2_0")     -- or ImportFile("Engine.2_0")
-
-    What this file provides (old name -> current implementation):
-      global        -> adapter over Global (colon methods + variable field access)
-      sprites       -> Sprites (+ CreateSpriteAtlas shim)
-      typers        -> Typers (+ CreateText / DrawText / SpawnBubble / instances / clear)
-      layers        -> Layers
-      keyboard      -> Keyboard
-      masks         -> Masks (+ reset / setTest / clear aliases)
-      tween         -> Tween
-      audio         -> Audio (+ ClearAll / NameExists, instance methods attached)
-      scenes        -> Scenes
-      collisions    -> Collisions
-      luaex         -> LuaEX (+ printTable shim)
-      windows       -> current Windows module
-      maths         -> small Mathematics shim (Clamp / Choose / Direction / ...)
-      localize      -> Localize (+ localizetext global)
-      _CAMERA_/cam  -> proxy over the current Camera instance (rotation <-> r,
-                       boundActive -> unBounds, old method names)
-
-    IMPORTANT COMPATIBILITY GAPS still to migrate (see bottom of file for details):
-      gui (GUIManager), Timeline, TimeManager(timer), ShaderToy folder API, old
-      Scripts/Shaders folder format, old Overworld/Battle gameplay modules, the old
-      typer tag vocabulary ([scale]/[voice]/[pattern]/[fontSize:i,s] / named colors),
-      old easing names, and the per-file save/ layout.
+    Backward-compatibility layer that runs SE "12.0" / v2.0 projects on the
+    current engine: fills the old global names (global, sprites, typers, layers,
+    keyboard, masks, tween, audio, scenes, collisions, luaex, windows, maths,
+    localize, _CAMERA_/cam) with adapters over the current modules.
+    Load after the current engine globals, i.e. require("Scripts.Libraries.Engine.2_0").
+    Gaps still to migrate: GUIManager, Timeline, timer, ShaderToy API, old shaders
+    and gameplay modules, old typer tag vocabulary and easing names.
 ]]
 
 local compat = {}
@@ -45,8 +22,7 @@ local function sset(name, value)
     end
 end
 
--- Resolve an engine module: prefer the already-loaded global, otherwise try
--- ImportFile (available once PathDefiner has run in main.lua).
+-- Resolve an engine module: prefer the loaded global, else try ImportFile.
 local function resolve(gname, import_path)
     local v = _G[gname]
     if (v ~= nil) then return v end
@@ -70,8 +46,8 @@ if (GlobalMod) then
 
     local global_compat = {}
 
-    -- Define the colon methods FIRST: once __newindex is installed below, plain
-    -- assignments would be routed into the variable store instead of the table.
+    -- Define the colon methods FIRST: with __newindex installed, a plain
+    -- assignment lands in the variable store instead of this table.
     function global_compat:SetVariable(name, value) return GlobalMod.SetVariable(name, value) end
     function global_compat:GetVariable(name) return GlobalMod.GetVariable(name) end
     function global_compat:EnsureVariable(name, value) return GlobalMod.EnsureVariable(name, value) end
@@ -120,8 +96,7 @@ local Masks = resolve("Masks", "Masks")
 if (Masks) then
     if (not Masks.setTest) then
         function Masks.setTest(value)
-            -- Old API toggled a manual stencil test; the current engine exposes
-            -- masks.Use(value) / masks.Clear(). Kept as a best-effort alias.
+            -- Best-effort alias: the current engine exposes Use()/Clear().
             if (value ~= nil and value ~= 0 and Masks.Use) then
                 pcall(Masks.Use, value)
             elseif (Masks.Clear) then
@@ -158,8 +133,8 @@ if (Audio) then
         end
     end
 
-    -- Attach old colon-methods to playback instances if the engine's instances
-    -- do not already expose them (old code calls ins:VolumeTransition(...)).
+    -- Attach colon-callable methods to playback instances if they lack them
+    -- (old code calls ins:VolumeTransition(...)).
     local function attach_inst_methods(inst)
         if (type(inst) ~= "table") then return inst end
         local map = {
@@ -384,7 +359,7 @@ local function legacy_wrap(typer)
 end
 
 if (Typers) then
-    -- old instances list name
+    -- alias for the old instances list name
     if (Typers.insts and not Typers.instances) then
         Typers.instances = Typers.insts
     end
@@ -394,7 +369,6 @@ if (Typers) then
         end
     end
 
-    -- typers.CreateText(sentences, position, layer, bubblesize, progressmode)
     if (EText and EText.New) then
         Typers.CreateText = function(sentences, position, layer, bubblesize, progressmode)
             position  = position or {320, 240}
@@ -411,7 +385,7 @@ if (Typers) then
         sset("CreateText", Typers.CreateText)
     end
 
-    -- typers.DrawText(text, position, layer)  -> current InstText (instant)
+    -- typers.DrawText -> current InstText (instant)
     if (InstText and InstText.New) then
         Typers.DrawText = function(text, position, layer)
             if (type(text) == "table") then text = text[1] end
@@ -426,8 +400,7 @@ if (Typers) then
         sset("CreateInstantText", Typers.DrawText)
     end
 
-    -- typers.SpawnBubble(x, y, w, h, layer): best-effort stub (the current EText
-    -- builds its own bubble lazily through :ShowBubble()).
+    -- Stub only: the current EText builds its own bubble via :ShowBubble().
     if (not Typers.SpawnBubble) then
         Typers.SpawnBubble = function(x, y, w, h, layer)
             return { x = x, y = y, w = w, h = h, layer = layer }

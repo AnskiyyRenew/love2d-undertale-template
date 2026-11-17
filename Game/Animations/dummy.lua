@@ -1,16 +1,7 @@
--- Dummy animation.
---
--- NOTE: this is NOT the animation of Game/Encounter/dummy.lua — that encounter
--- points at Game/Animations/Poseur.lua. Rename this file to whatever monster it
--- actually belongs to before wiring it up.
---
--- Contract and style rules live in Game/Animations/_temp.lua — read that first.
--- Short version: plain table, NO metatable; every function is declared with a
--- dot and takes the instance as its first argument; `New(pos)` returns a plain
--- instance that carries `_class` back to this module and gets these functions
--- bound onto it (Battle.BindAnimation), so callers write `anim.SetFace(3)`.
--- Everything inside this file calls the module by name (`Dummy.Foo(self, ...)`).
--- Sprites stay colon-style (`sprite:Set(...)`).
+-- Dummy animation. Not used by Game/Encounter/dummy.lua, which points at Poseur.lua.
+-- Contract: Game/Animations/_temp.lua. `require` caches the module, so `New(pos)`
+-- is the only way to get an instance; Battle.BindAnimation binds the functions
+-- for dot calls (`anim.Foo(...)`).
 
 local Dummy = {}
 
@@ -28,8 +19,6 @@ function Dummy.New(pos)
 
     Dummy.Init(self, pos)
 
-    -- The instance drives itself from here on (`anim.SetFace(3)`) — see
-    -- Battle.BindAnimation for the rule.
     Battle.BindAnimation(self, Dummy)
 
     return self
@@ -62,8 +51,7 @@ function Dummy.Update(self, dt)
         return
     end
 
-    -- Idle: reset to frame 0, then blink through the 2-frame sheet at a random
-    -- interval.
+    -- Idle: hold frame 0, then blink at a random interval (30–70 ticks).
     self.time = self.time + 1
     if (self.time == 10) then
         self.sprite:Set("Characters/Ruins/spr_migosp_0.png")
@@ -99,7 +87,6 @@ function Dummy.Destroy(self)
     self.sprite:Dust(true, true)
     self.sprite = nil
 
-    -- Destroy every extra object registered in `elements`.
     for i = #self.elements, 1, -1
     do
         local e = self.elements[i]

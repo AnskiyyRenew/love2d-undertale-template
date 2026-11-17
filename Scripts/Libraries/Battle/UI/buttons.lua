@@ -121,31 +121,29 @@ function buttons.ResetAllState()
 end
 
 function buttons.RemoveButton(id)
-    -- Phase 1: Rebuild logic_buttons — redirect rules that point to the deleted button,
-    --          and remove rules that start from the deleted button
+    -- Rebuild logic: redirect rules pointing at the deleted button, drop the
+    -- rules that start from it.
     local new_logic = {}
     for i = 1, #buttons.logic_buttons do
         local rule = buttons.logic_buttons[i]
         local source, target, trigger = rule[1], rule[2], rule[3]
 
         if source == id then
-            -- Rule starts from the deleted button → remove it entirely
+            -- Rule starts from the deleted button: drop it.
         elseif target == id then
-            -- Rule points to the deleted button → redirect to skip it
             local new_target
             if type(trigger) == "string" and (trigger == "left" or trigger == "prev") then
-                new_target = id - 1     -- "left"/reverse direction → go to previous index
+                new_target = id - 1     -- reverse direction -> previous index
             else
-                new_target = id + 1     -- "right"/forward direction → go to next index
+                new_target = id + 1     -- forward direction -> next index
             end
             table.insert(new_logic, {source, new_target, trigger})
         else
-            -- Rule is unrelated to the deleted button, keep as-is
             table.insert(new_logic, rule)
         end
     end
 
-    -- Phase 2: Decrement all source/target values that reference buttons after the deleted one
+    -- Decrement every index that sat after the deleted one.
     for i = 1, #new_logic do
         local rule = new_logic[i]
         if rule[1] > id then
@@ -156,8 +154,7 @@ function buttons.RemoveButton(id)
         end
     end
 
-    -- Phase 2b: Remove any rules referencing out-of-bounds indices
-    -- (can happen when all remaining buttons are removed one by one)
+    -- Drop rules left out of bounds after repeated removals.
     local new_count = #buttons.buttons - 1
     for i = #new_logic, 1, -1 do
         local rule = new_logic[i]
@@ -168,7 +165,6 @@ function buttons.RemoveButton(id)
 
     buttons.logic_buttons = new_logic
 
-    -- Phase 3: Remove button data from all indexed tables
     table.remove(buttons.buttons, id)
     table.remove(buttons.sprites, id)
     table.remove(buttons.rel_position, id)
@@ -180,7 +176,7 @@ function buttons.RemoveButton(id)
         table.remove(buttons.animations.selecting, id)
     end
 
-    -- Clamp button_selecting if the currently selected button was removed
+    -- Keep the cursor index inside the shrunken list.
     if buttons.button_selecting > #buttons.buttons then
         buttons.button_selecting = #buttons.buttons
     elseif buttons.button_selecting == id then
@@ -215,17 +211,11 @@ function buttons.SetSprites(sprs)
     buttons.ResetButtons()
 end
 
----Replace the per-button animation tables.
----
----Each state is a list indexed by button: `{ {frames, interval}, ... }`, where
----`frames` is the frame list handed to Sprite:SetAnimation and `interval` is in
----seconds. A button without an entry for a given state falls back to its static
----sprite in `buttons.sprites`.
----
----The new data is pushed onto the live sprites immediately, mirroring
----SetSprites(). Update() only re-applies the visual state when
----`last_applied_index` changes, so storing the table alone would leave the old
----static images on screen until the player moved the cursor.
+--- Replace the per-button animation tables. Each state is a list indexed by
+--- button: `{ {frames, interval}, ... }` (frames for Sprite:SetAnimation,
+--- interval in seconds); a missing entry falls back to the static sprite.
+--- Applied to the live sprites at once: Update() only re-applies the visual
+--- state when the selection index changes.
 ---@param anims table|nil `{ idle = {...}, selecting = {...} }`; nil clears them.
 function buttons.SetAnimations(anims)
     buttons.animations = (anims or {})

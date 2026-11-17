@@ -1,27 +1,19 @@
 -- GameConf -- loads the configuration script, Game area first.
 --
 --   conf_pure.lua        (root)    engine defaults, always executed
---   Game/conf_pure.lua   (Game)    game-specific overrides, executed after it
+--   Game/conf_pure.lua   (Game)    overrides, executed after it
 --
--- The root copy is ALWAYS run first so every variable has a sane default; the
--- Game copy then only needs to spell out what it wants to change. That is
--- deliberate: conf_pure.lua is not a module with a contract - it is a script
--- that happens to define FPS, Volume, Guard, ... . A Game copy that *replaced*
--- it would leave every variable it forgot undefined (no FPS -> 1/nil, no Guard
--- -> Guard.Update(nil) every frame) and the game would fall over at startup.
--- Overlaying keeps a partial Game copy harmless.
---
--- If the Game copy exists but throws, the configuration is rolled back to the
--- root state (snapshot / restore) and the error is reported loudly - so a
--- broken Game config degrades to "engine defaults", never to "half applied".
+-- The Game copy OVERLAYS the root one: conf_pure.lua is a script defining
+-- globals, so a replacing Game copy would leave every variable it forgot
+-- undefined. If it exists but throws, the config is rolled back to the root
+-- snapshot — a broken Game config degrades to engine defaults, never half-applied.
 
 local Conf = {}
 
 local ROOT_CONF = "conf_pure.lua"
 local GAME_CONF = "Game/conf_pure.lua"
 
---- Does the file exist? Same probe style as the other Game-first resolvers:
---- never infer existence from a failed load.
+--- Does the file exist? Never inferred from a failed load.
 ---@param path string
 ---@return boolean
 local function fileExists(path)

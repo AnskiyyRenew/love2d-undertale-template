@@ -1,22 +1,15 @@
 --[[
+计时器模块：以帧或以秒为单位触发回调。主循环需每帧调用 timers.Update(dt)。
 
-计时器模块：以帧或以秒为单位触发回调。
-
-需要在主循环里每帧调用一次 timers.Update(dt) 来推进所有实例。
-
-每个计时器有两个彼此独立的开关：
-  running —— 暂停开关（pause / unpause / togglePause）。暂停期间不累计也不触发，但实例仍然存活。
-  active  —— 生存标记。置为 false 后，实例会在当帧末尾从列表里移除并被丢弃
-             （手动 stop、或触发次数达到目标而自然结束，都会置它）。
-
+running 是暂停开关（暂停期间不累计、不触发，实例仍存活）；active 是生存
+标记，置 false 后当帧末尾从列表移除（stop 或自然完成都会置它）。
 ]]
 
 local timers = {
     insts = {}
 }
 
--- 构造一个计时器实例：updateFunc 是每帧推进逻辑，completeCheck 返回 true 表示已经完成。
--- 下面这些实例方法都返回 self，可以链式调用（例如 t:pause():restart()）。
+-- 实例方法均返回 self，可链式调用（如 t:pause():restart()）。
 local function createTimer(updateFunc, completeCheck)
     local timer = {
         time = 0,
@@ -25,19 +18,16 @@ local function createTimer(updateFunc, completeCheck)
         running = true,
         active = true,
 
-        -- 暂停：停止推进，已累计的 time / count 保持不动
         pause = function(self)
             self.running = false
             return self
         end,
 
-        -- 恢复：从暂停处继续，不重置计数
         unpause = function(self)
             self.running = true
             return self
         end,
 
-        -- 在暂停与运行之间切换
         togglePause = function(self)
             self.running = not self.running
             return self
@@ -47,13 +37,11 @@ local function createTimer(updateFunc, completeCheck)
             return not self.running
         end,
 
-        -- 停止并丢弃：置 active = false，当帧末尾被移出列表
         stop = function(self)
             self.active = false
             return self
         end,
 
-        -- 重启：清零进度并重新激活
         restart = function(self)
             self.time = 0
             self.count = 0
@@ -70,12 +58,10 @@ local function createTimer(updateFunc, completeCheck)
     return timer
 end
 
--- 说明：runFrame / runSecond 的第 4 个参数 immediate 为 true 时，
--- 创建计时器的那一刻先调用一次 func（并计入 count），随后才进入正常时序。
--- 例：runFrame(func, 60, 3, true) → 立即触发 1 次，第 60、120 帧各 1 次，共 3 次。
+-- immediate 为 true 时，创建当刻先调用一次 func（计入 count），再进入正常时序。
+-- 例：runFrame(func, 60, 3, true) → 立即 1 次，第 60、120 帧各 1 次，共 3 次。
 
--- 按帧计时：每 interval 帧触发一次 func，累计触发 count 次后自动结束。
--- 默认 60 帧一次、总共 1 次。
+-- 按帧计时：每 interval 帧触发一次，累计 count 次后自动结束（默认 60 帧 / 1 次）。
 function timers.runFrame(func, interval, count, immediate)
     local timer = createTimer(
         function(self, dt)
@@ -103,8 +89,8 @@ function timers.runFrame(func, interval, count, immediate)
     return timer
 end
 
--- 按秒计时：每 interval 秒触发一次 func，累计触发 count 次后自动结束。
--- 默认 1 秒一次、总共 1 次。走 dt 累计，因此受帧率波动影响比 runFrame 小。
+-- 按秒计时：每 interval 秒触发一次，累计 count 次后自动结束（默认 1 秒 / 1 次）。
+-- 走 dt 累计，受帧率波动影响比 runFrame 小。
 function timers.runSecond(func, interval, count, immediate)
     local timer = createTimer(
         function(self, dt)
@@ -132,8 +118,8 @@ function timers.runSecond(func, interval, count, immediate)
     return timer
 end
 
--- 按帧的「持续段」计时器：先空等 delay 帧，随后在一段长 during 帧的区间里每帧调用 func，
--- 区间结束时调用一次 afterfunc（可省略）并自动停止。
+-- 按帧的「持续段」计时器：先空等 delay 帧，随后在 during 帧内每帧调用 func，
+-- 结束时调用一次 afterfunc（可省略）并自动停止。
 function timers.duringFrame(func, delay, during, afterfunc)
     local timer = createTimer(
         function(self, dt)
@@ -176,7 +162,7 @@ function timers.duringFrame(func, delay, during, afterfunc)
     return timer
 end
 
--- 按秒的「持续段」计时器：语义同 duringFrame，只是 delay / during 以秒为单位、按 dt 累计。
+-- 按秒的「持续段」计时器：语义同 duringFrame，delay / during 以秒为单位并按 dt 累计。
 function timers.duringSecond(func, delay, during, afterfunc)
     local timer = createTimer(
         function(self, dt)

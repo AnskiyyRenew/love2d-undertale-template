@@ -1,6 +1,5 @@
--- Battle Game APIs
--- These methods are designed to be attached to encounter tables via metatable (__index).
--- When called as encounter:AddItem(...) or encounter:AddEnemy(...), `self` refers to the encounter table.
+-- Battle Game APIs, attached to encounter tables via metatable (__index), so
+-- `self` is the encounter table.
 
 local battle_methods = {}
 
@@ -90,12 +89,10 @@ function battle_methods.AddItem(self, item)
 end
 
 --- Add a validated enemy to the encounter's enemy list.
----Automatically assigns a unique `_id` based on `self.enemy_id`.
----Falls back to sensible defaults for any missing fields.
+---Assigns a unique `_id` and fills defaults for missing fields.
 function battle_methods.AddEnemy(self, enemy_data)
     local e = normalize_enemy(enemy_data)
 
-    -- Assign a unique internal id
     if (not self.enemy_id or type(self.enemy_id) ~= "number") then
         self.enemy_id = 1
     end
@@ -113,20 +110,9 @@ end
 
 --- Give enemy #`index` its own animation instance, and hand that instance back.
 ---
---- `enemy.animation` starts life as the animation *module* (what the encounter
---- `require`d); this call swaps that field for a fresh instance built by
---- `New(pos)` and returns it. The instance carries its own bound methods, so a
---- scene drives it with plain dot calls:
----
----     local sans = Game:InitAnimation(1, {320, 140})
----     sans.SetFace(3)
----     sans.cpos[1] = 100
----
---- Calling this twice is harmless: the second call changes nothing and answers
---- with the instance already in place, so it doubles as a way to fetch the
---- handle. An instance that was never registered here is invisible to the
---- engine — nothing would drive it.
----
+--- `enemy.animation` starts as the animation *module*; this call swaps it for a
+--- fresh `New(pos)` instance carrying bound methods, so a scene drives it with
+--- plain dot calls. Calling this twice is harmless and returns the same handle.
 ---@param index integer Position in `self.enemies` (1-based).
 ---@return table|nil anim The instance now stored at `enemy.animation`.
 function battle_methods.InitAnimation(self, index, ...)
@@ -136,22 +122,18 @@ function battle_methods.InitAnimation(self, index, ...)
         return
     end
 
-    -- `enemy.animation` is either the animation *module* (what `require` gave
-    -- the encounter) or already an independent instance. `_class` is the marker
-    -- — see Battle.AnimModule / Battle.IsAnimInstance for the whole rule.
+    -- The field holds either the animation module or an already-built instance
+    -- (`_class` is the marker, see Battle.IsAnimInstance).
     local module = enemy.animation
 
     if (Battle.IsAnimInstance(module)) then
-        -- Already built → nothing to do, but still answer with the handle so a
-        -- second call is a valid way to fetch it. Re-binding is a no-op.
+        -- Already built: re-binding is a no-op, but the handle is still returned.
         Battle.BindAnimation(module)
         return module
     end
 
-    -- The contract is `New(pos)` → a fresh, independent instance per enemy
-    -- (see Game/Animations/_temp.lua). A module without New() is reported
-    -- rather than guessed at: the old `module.Init(...)` fallback pushed `pos`
-    -- into the `self` slot, so it never did anything useful.
+    -- Contract: `New(pos)` returns an independent instance (see
+    -- Game/Animations/_temp.lua). A module without New() is reported instead.
     if (type(module) ~= "table" or not module.New) then
         print("[Game - Animation] WARNING: Enemy #" .. tostring(index)
             .. " animation has no New(pos); call Game:InitAnimation from the scene.")
@@ -160,7 +142,6 @@ function battle_methods.InitAnimation(self, index, ...)
 
     local created_instance = false
     local ok, err = pcall(function (...)
-        -- Factory module → produce a fresh, independent instance per enemy.
         enemy.animation = module.New(...)
         created_instance = true
     end, ...)
@@ -170,22 +151,18 @@ function battle_methods.InitAnimation(self, index, ...)
         return
     end
 
-    -- A `New()` that answers with something other than a table is a broken
-    -- module: report nothing, hand back nothing, leave `enemy.animation` as it
-    -- ended up (it is `nil` in that case, so Battle.Update skips the enemy).
+    -- A New() that answers with a non-table leaves enemy.animation nil, and
+    -- Battle.Update then skips the enemy.
     local anim = enemy.animation
     if (not created_instance or type(anim) ~= "table") then
         return
     end
 
-    -- Expose the owning enemy table to the animation instance, so monster code
-    -- can read enemy data (e.g. `self.enemy.canspare`, `self.enemy.killable`).
-    -- Battle.Update also refreshes a few shortcut fields on it every frame.
+    -- The instance can read its owner (e.g. `self.enemy.canspare`);
+    -- Battle.Update also refreshes shortcut fields on it every frame.
     anim.enemy = enemy
 
-    -- Finally, hang the module's functions on the instance: from here on the
-    -- instance drives itself (`anim.SetFace(3)`, `anim.Update(dt)`). See
-    -- Battle.BindAnimation for the rule.
+    -- Hang the module's functions on the instance (see Battle.BindAnimation).
     Battle.BindAnimation(anim, module)
 
     return anim

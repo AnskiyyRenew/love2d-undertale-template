@@ -1,68 +1,22 @@
---[[
-    DiscordRPC.lua
-    ============================================================================
-    Discord Rich Presence for LÖVE / Soul Engine, powered by the battle-tested
-
-        Resources/Libs/DiscordRPC/
-            discord-rpc-x64.dll      (Windows 64-bit)
-            discord-rpc-x86.dll      (Windows 32-bit)
-            libdiscord-rpc.so        (Linux)
-            libdiscord-rpc.dylib     (macOS)
-
-    Why not the Discord Game SDK (discord_game_sdk.dll)?
-    The Game SDK proved unstable / unusable through a direct LuaJIT FFI binding:
-    `DiscordCreate` succeeds, but `get_activity_manager()` etc. return NULL no
-    matter what (any flags/version/app-id), so calling any activity method
-    dereferences a NULL pointer and hard-crashes the game. The `discord-rpc`
-    library (the "old" API: Discord_Initialize / Discord_UpdatePresence) is far
-    simpler, has no vtables / manager getters, and is the proven path in LÖVE.
-
-    Naming convention: functions are camelCase, variables are snake_case.
-
-    Quick start (main.lua):
-        Discord = ImportFile("DiscordRPC")
-        Discord.application_id = "1234567890123456789"  -- YOUR app id, as a STRING
-
-        -- love.load():
-        Discord.init()
-
-        -- love.update(dt):   (required every frame)
-        Discord.update(dt)
-
-        -- show presence:
-        Discord.setActivity({
-            details     = "Fighting Sans",
-            state       = "Route: Genocide",
-            large_image = "sans",
-            large_text  = "It's a bad time.",
-            start       = Discord.timestamp(),   -- elapsed timer
-        })
-
-        -- love.quit():
-        Discord.shutdown()
-    ============================================================================
-]]
+-- Discord Rich Presence over the discord-rpc C library, via LuaJIT FFI.
+-- Needs Resources/Libs/DiscordRPC/discord-rpc-<arch>.dll (.so / .dylib).
+-- main.lua: set discord.application_id (string), Discord.init() in love.load,
+-- Discord.update(dt) every frame, Discord.setActivity{}, Discord.shutdown() on quit.
 
 local discord = {}
 
 discord.VERSION = "2.1.0"
 
--- <-- Set your Discord application ID here.
--- IMPORTANT: use a STRING. Discord app ids are 19-digit numbers larger than
--- 2^53, so a Lua number literal would lose precision (Lua numbers are doubles)
--- and Discord would reject the connection.
+-- Must be a STRING: 19-digit ids exceed 2^53, so a Lua number literal would
+-- lose precision and Discord would reject the connection.
 discord.application_id = nil
 
 discord.available = false
 discord.last_error = nil
 
--- ============================================================================
--- Constants
--- ============================================================================
 discord.JoinReply = { No = 0, Yes = 1, Ignore = 2 }
 
--- Returns the current unix timestamp, optionally shifted by `seconds`
--- (convenience for the activity "start" / "finish" fields).
+-- Current unix timestamp, optionally shifted by `seconds` (activity start / finish).
 function discord.timestamp(seconds)
     return os.time() + (tonumber(seconds) or 0)
 end
@@ -134,32 +88,23 @@ if (ffi_ok) then
     local function buildDllCandidates()
         local candidates = {}
 
-        -- Resolve the real source directory (where the game's files live on
-        -- the actual filesystem). IMPORTANT: love.filesystem.getSourceBaseDirectory()
-        -- returns the PARENT of the source folder -- e.g. "D:/games" when the
-        -- source is "D:/games/MyGame". So to point ffi.load at the real folder
-        -- we must append love.filesystem.getSource(). ffi.load does NOT use
-        -- LÖVE's virtual filesystem; it goes through the OS loader (LoadLibrary
-        -- / dlopen), which only understands real OS paths or paths relative to
-        -- the process CWD. A bare relative candidate like
-        -- "Resources/Libs/DiscordRPC/discord-rpc-x64.dll" only resolves when the
-        -- process was launched FROM the source folder, so it is unreliable.
+        -- ffi.load uses the OS loader, not LÖVE's VFS, so paths must be real;
+        -- getSourceBaseDirectory() is the PARENT of the source folder, hence the
+        -- getSource() append.
         local source_dir = nil
         local ok_s, s = pcall(function() return SE.filesystem.getSource() end)
         local ok_b, b = pcall(function() return SE.filesystem.getSourceBaseDirectory() end)
         if (ok_s and type(s) == "string" and s ~= "") then
             s = s:gsub("\\", "/"):gsub("/+$", "")
-            -- getSource() may be a bare folder name ("MyGame") or a full path.
-            -- Drive letter or leading slash => absolute; use as-is. Otherwise
-            -- combine with the base directory.
+            -- getSource() may be a bare folder name or a full path: a drive
+            -- letter or leading slash means absolute, otherwise prepend the base.
             if (s:match("^%a:") or s:match("^/")) then
                 source_dir = s
             elseif (ok_b and type(b) == "string" and b ~= "") then
                 source_dir = b:gsub("\\", "/"):gsub("/+$", "") .. "/" .. s
             end
         elseif (ok_b and type(b) == "string" and b ~= "") then
-            -- No getSource(); fall back to base (the parent). Least reliable,
-            -- but better than nothing.
+            -- No getSource(): fall back to the base directory.
             source_dir = b:gsub("\\", "/"):gsub("/+$", "")
         end
 
@@ -182,12 +127,12 @@ if (ffi_ok) then
         end
 
         local dirs = {}
-        -- Most reliable: absolute path into the real source folder.
+        -- Absolute paths into the real source folder are the only reliable ones.
         if (source_dir) then
             dirs[#dirs + 1] = source_dir .. "/Resources/Libs/DiscordRPC/"
             dirs[#dirs + 1] = source_dir .. "/Resources/Libs/"
         end
-        -- Relative fallback (works only if CWD == source folder).
+        -- Relative fallbacks: only resolve when CWD == source folder.
         dirs[#dirs + 1] = "Resources/Libs/DiscordRPC/"
         dirs[#dirs + 1] = "Resources/Libs/"
         dirs[#dirs + 1] = ""
@@ -200,16 +145,12 @@ if (ffi_ok) then
         return candidates, source_dir
     end
 
-    -- Loads the native discord-rpc DLL into memory.
     local function loadDiscordRpc()
         if (discord._lib and discord._lib_loaded) then
             return true
         end
         local candidates, source_dir = buildDllCandidates()
-        -- Per-candidate error log: the previous code only kept the LAST error,
-        -- which made it impossible to tell why the first (correct-relative-path)
-        -- candidate failed vs. the wrong-base candidates. Collect them all so a
-        -- failure report shows exactly which path was tried and what happened.
+        -- Keep every candidate's error so the report names the failing path.
         local errors = {}
         for _, path in ipairs(candidates) do
             local ok_load, lib = pcall(ffi.load, path)
@@ -240,7 +181,7 @@ if (ffi_ok) then
     }
     discord._events = events
 
-    -- Safely reads a C string, returning nil for NULL pointers.
+    -- Safely reads a C string, nil for NULL pointers.
     local function cstr(p)
         if (p == nil or p == ffi.NULL) then
             return nil
@@ -260,11 +201,8 @@ if (ffi_ok) then
         }
     end
 
-    -- Callback proxies (registered with the C library once, at init).
-    -- These are invoked from C (via Discord_RunCallbacks), so a Lua error raised
-    -- inside them cannot be caught by an ordinary pcall in the caller; it would
-    -- surface as "unprotected error in call to Lua API". Wrap every user callback
-    -- in pcall so a bad handler can never take down the whole game.
+    -- Called from C, so a Lua error here escapes the caller's pcall and shows up
+    -- as "unprotected error in call to Lua API": wrap every user callback.
     local function safeCallback(cb, ...)
         if (not cb) then return end
         local ok, err = pcall(cb, ...)
@@ -303,9 +241,8 @@ if (ffi_ok) then
         return h
     end
 
-    -- Fills a DiscordRichPresence from a friendly Lua table. Accepts both the
-    -- Game-SDK style names (state/details/large_image/...) and the discord-rpc
-    -- style names (largeImageKey/startTimestamp/...) for convenience.
+    -- Accepts Game-SDK style names (state / details / large_image / start) and
+    -- discord-rpc style names (largeImageKey / startTimestamp) alike.
     local function presenceFromTable(t)
         local p = ffi.new("DiscordRichPresence")
         p.state = t.state or nil
@@ -332,7 +269,6 @@ if (ffi_ok) then
         return p
     end
 
-    ------------------------------------------------------------------ public
     ---Initializes Discord. Pass your app id (string!), or set discord.application_id.
     ---@param client_id? string|number
     ---@param options? table  { auto_register = boolean, steam_id = string }
@@ -372,20 +308,15 @@ if (ffi_ok) then
         return true
     end
 
-    ---Pumps the SDK. Call every frame from love.update(dt) - required for
-    ---presence to sync and for event callbacks to fire.
+    ---Pumps the SDK. Required every frame: presence syncs and callbacks fire there.
     function discord.update(dt)
         if (discord.available and discord._lib) then
             discord._lib.Discord_RunCallbacks()
         end
     end
-    -- CRITICAL for LuaJIT: `discord.update` calls Discord_RunCallbacks, which
-    -- re-enters Lua through the FFI callback trampolines above. Calling into a C
-    -- function that re-enters Lua from JIT-compiled code makes LuaJIT raise
-    -- "unprotected error in call to Lua API" once Discord connects (~2s) and the
-    -- ready event fires. Disable JIT for this function so it always runs in the
-    -- interpreter. NOTE: `jit` is a LuaJIT builtin that must be loaded explicitly;
-    -- the previous `local jit = nil` shadowed the global and silently broke this.
+    -- jit.off: Discord_RunCallbacks re-enters Lua from JIT-ed code, which raises
+    -- "unprotected error in call to Lua API" once the ready event fires. `jit`
+    -- must be required explicitly, it is not a global.
     local ok_jit, jit = pcall(require, "jit")
     if (ok_jit and jit and jit.off) then
         jit.off(discord.update)
@@ -451,7 +382,6 @@ if (ffi_ok) then
     end
 
     ---Registers a callback fired once Discord accepts the connection.
-    ---Useful for diagnostics (e.g. check whether your App ID is valid).
     ---@param callback function  function(user_table|nil)
     function discord.onReady(callback)
         events.ready = callback
@@ -466,8 +396,7 @@ if (ffi_ok) then
     end
 
     ---Registers a callback fired when Discord reports an error.
-    ---This is the key diagnostic: an invalid/mismatched App ID usually shows up
-    ---here as an error message.
+    ---An invalid or mismatched App ID normally shows up here.
     ---@param callback function  function(errorCode, message)
     function discord.onError(callback)
         events.errored = callback

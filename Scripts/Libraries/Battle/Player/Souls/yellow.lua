@@ -4,7 +4,6 @@ local action = {
     is_moving = false
 }
 
--- Default vars.
 local speed = 2
 local enable_bigshot = true
 local bigshot_cd = 60
@@ -18,10 +17,8 @@ local cool_down = 5
 local cd_timer = 5
 local bullets = {}
 
--- Bigshot effects currently on screen: the orbiting charge particles and the
--- "fully charged" shadow heart. Keeping them in one registry is what makes the
--- whole charge wipeable in one call - on a soul switch the file is re-executed,
--- so anything not named here would be orphaned on screen forever.
+-- Bigshot effects on screen: orbiting charge particles and the charged shadow
+-- heart. Keeping them in one registry lets a soul switch wipe them all.
 local bs_parts = {}
 local bs_shadow = nil
 
@@ -41,8 +38,7 @@ local function clear_bigshot()
     end
 end
 
--- Init: the contract lives in _temp.lua. Binding, tint and state reset belong
--- to the soul, so the engine never pokes these fields from outside.
+-- Init: the soul contract lives in _temp.lua.
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.
@@ -58,9 +54,7 @@ function action.Init(sprite, can_move, args)
     end
     control_mode = 1
 
-    -- A new run starts from nothing: drop the effects the previous run left
-    -- behind and re-arm the charge. The file is re-executed on every switch, so
-    -- without this the old particles would never be found again.
+    -- Drop the previous run's effects and re-arm the charge.
     clear_bigshot()
     bigshot_timer = 0
     bs_begin = false
@@ -69,8 +63,8 @@ function action.Init(sprite, can_move, args)
     return action
 end
 
----Wipes the bigshot effects (particles + charged shadow) from the screen,
----without touching the charge counters. Useful when a wave wants them gone.
+---Wipes the bigshot effects (particles + charged shadow) without touching the
+---charge counters.
 function action.ClearBigshot()
     clear_bigshot()
 end
@@ -130,7 +124,6 @@ function action.Update(dt)
             if (left > 0) then sprite.x = sprite.x - speed end
             if (right > 0) then sprite.x = sprite.x + speed end
 
-            -- Fire.
             if (fire == 1 and cd_timer <= 0) then
                 Audio.PlaySound("snd_shoot.wav")
                 cd_timer = cool_down
@@ -168,7 +161,6 @@ function action.Update(dt)
             if (enable_bigshot) then
                 if (Controller.GetState("confirm") > 1) then
                     bigshot_timer = bigshot_timer + 1
-                    -- Part
                     if (bigshot_timer >= bigshot_cd / 3 and not bs_begin) then
                         bs_begin = true
 
@@ -185,11 +177,9 @@ function action.Update(dt)
                             )
                             part:Scale(0.1, 0.1)
                             part.Step = function (self)
-                                -- Released: fade out, then leave. The button is
-                                -- read here, on the sprite itself, so an effect
-                                -- can never be stranded: the soul stops updating
-                                -- the moment Player.canMove goes false, but this
-                                -- Step keeps running either way.
+                                -- The button is read on the sprite itself: this
+                                -- Step keeps running after the soul stops
+                                -- updating, so nothing is stranded on screen.
                                 if (self._dying) then
                                     self.alpha = self.alpha - 0.06
                                     if (self.alpha <= 0) then
@@ -208,19 +198,16 @@ function action.Update(dt)
                                 self._offset = self._offset + 3
                                 self._radius = math.max(0, self._radius - 1)
 
-                                -- Fade in and grow while it spirals in, then hold
-                                -- at full size on the heart.
+                                -- Fade in while it spirals towards the heart.
                                 local grow = (30 - self._radius) / 30
                                 self.alpha = math.min(1, self.alpha + 0.02)
-                                --self:Scale(0.1 + grow, 0.1 + grow)
                                 self:MoveTo(
                                     sprite.x + self._radius * math.cos(math.rad(self._offset)),
                                     sprite.y + self._radius * math.sin(math.rad(self._offset))
                                 )
 
-                                -- `<= 0` covers both the release frame (-1) and
-                                -- every frame after it (0), so a single missed
-                                -- frame no longer keeps the effect alive forever.
+                                -- `<= 0` covers the release frame (-1) and every
+                                -- frame after it (0).
                                 if (Controller.GetState("confirm") <= 0) then
                                     self._dying = true
                                 end
@@ -232,7 +219,6 @@ function action.Update(dt)
                     if (bigshot_timer >= bigshot_cd and not bs_ready) then
                         bs_ready = true
 
-                        -- Shadow
                         local heart = Sprites.CreateSprite(sprite.path, sprite.layer - 0.01)
                         heart.rotation = sprite.rotation
                         heart.color = {1, 1, 0}
@@ -241,8 +227,8 @@ function action.Update(dt)
                         heart:MoveTo(sprite:GetPosition())
                         heart._time = 0
                         heart.Step = function (self)
-                            -- Ride along with the heart, so the "charged" marker
-                            -- stays on the player instead of at the cast spot.
+                            -- Rides along with the heart, so the marker stays on
+                            -- the player instead of at the cast spot.
                             self._time = self._time + 1
                             if (bs_shadow == self) then
                                 self:MoveTo(sprite:GetPosition())
@@ -267,12 +253,8 @@ function action.Update(dt)
                     end
                 end
 
-                -- Any release ends the charge, however far it got. The old code
-                -- only reset when the bar was already full, so letting go early
-                -- left `bigshot_timer` running and `bs_begin` stuck true: the
-                -- next hold spawned no particles at all and jumped straight to a
-                -- full charge. The effects are not destroyed here - each one
-                -- fades itself out (see the Steps above).
+                -- Any release ends the charge, however far it got. The effects
+                -- fade themselves out in their own Step.
                 if (Controller.GetState("confirm") == -1) then
                     bigshot_timer = 0
                     bs_begin = false

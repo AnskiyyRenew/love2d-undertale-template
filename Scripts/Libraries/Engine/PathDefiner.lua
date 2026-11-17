@@ -53,10 +53,9 @@ local function normalize_path(path)
     return path:gsub("[/\\]", ".")
 end
 
----Import file from the specified path. Supports Lua scripts, shaders, and dynamic libraries. 
----@param path string The path to the file to import. Should be relative to the project root and use dot notation for Lua scripts.
----@param type? string The type of the file. Can be "default", "shader",
----@return any The loaded module, shader, or dynamic library.
+---Import file from the specified path: Lua scripts, shaders, or dynamic libraries.
+---@param path string Dot-notation path relative to the project root.
+---@param type? string "default"/"lua" -> Scripts.Libraries.*, "shader" -> Scripts.Shaders.*, "dll" -> Resources.Libs.*
 ---@return any The loaded module, shader, or dynamic library.
 function ImportFile(path, type)
     if (not path) then
@@ -161,18 +160,11 @@ function ClearModuleTree(module_name)
     end
 end
 
----Remove every loaded module that lives in the Game area (Game/...) from
----package.loaded, so the next require re-executes the file from disk.
----
----This is a SECOND root, not part of "Scripts.Libraries": clearing only the
----engine tree leaves game content cached, and with it every module-level
----variable (a re-entered battle would then inherit the previous run's state).
----
----Safe to call when nothing from the Game area is loaded - it touches no other
----module. Prefer the narrow `sub_root` form from subsystem teardown (e.g.
----`ClearGameTree("Souls")`) so unrelated content keeps its cache entry.
----@param sub_root string|nil Optional sub-tree inside the Game area, e.g.
----  "Souls" -> Game.Souls.* (plus the folder node itself). Nil clears all of Game.
+---Remove every loaded Game-area module from package.loaded, so the next require
+---re-executes the file from disk (a SECOND root, separate from Scripts.Libraries).
+---Prefer the narrow `sub_root` form (e.g. `ClearGameTree("Souls")`) so unrelated
+---content keeps its cache entry.
+---@param sub_root string|nil Sub-tree inside the Game area; nil clears all of Game.
 function ClearGameTree(sub_root)
     if (sub_root) and (sub_root ~= "") then
         ClearModuleTree("Game." .. sub_root)

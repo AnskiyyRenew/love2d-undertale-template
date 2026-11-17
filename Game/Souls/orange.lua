@@ -4,13 +4,11 @@ local action = {
     is_moving = false
 }
 
--- Default vars.
 local speed = 2
 local time = 0
 local dir = "idle"
 
--- Init: the contract lives in _temp.lua. The trail timer and facing are
--- per-run, so they are reset here instead of leaking from the last battle.
+-- Contract: _temp.lua. The trail timer and facing are per-run, reset here.
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.

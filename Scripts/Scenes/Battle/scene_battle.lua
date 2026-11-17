@@ -1,19 +1,15 @@
 local scene = {}
 
--- Import battle module
 Battle = ImportFile("Battle")
 Battle.SetEndRoom("scene_end")
 Game = Battle.SetGame("Poseur")
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 
--- Give each enemy its own independent animation instance. The animation
--- module is a factory, so every call to InitAnimation creates a fresh
--- instance with its own sprite — enemy #1 and enemy #2 no longer share one.
+-- InitAnimation is a factory: each enemy gets its own sprite instance.
 Game:InitAnimation(1, {320, 140})
 Game:InitAnimation(2, {120, 140})
 local enemies = Game.enemies
 
--- Handlers
 local function HandleActions(enemy, action)
     if (enemy.id == "Poseur") then
         if (action.id == "Check") then
@@ -49,7 +45,7 @@ local function OnHit(bullet)
     Player.Hurt(3, 60, true)
 end
 
--- Don't touch these.
+-- Overrides the battle module reads by name; do not rename.
 Battle.HandleActions = HandleActions
 Battle.HandleItems = HandleItems
 Battle.EnteringState = EnteringState
@@ -59,7 +55,6 @@ Battle.OnHit = OnHit
 
 
 
--- Scene backgrounds
 local shader = ImportFile("Gradiant", "shader")
 shader:send("topLeftColor", {1, 0, 0, 0.5})
 shader:send("bottomLeftColor", {1, 0, 1, 0.5})
@@ -68,8 +63,6 @@ shader:send("bottomRightColor", {0, 1, 1, 0.5})
 shader:send("angle", 20)
 local background = Sprites.CreateSprite("px.png", "Background")
 background:Scale(640, 480)
---background.color = {0, 0, 0}
---background:SetShaders({shader})
 
 function scene.update(dt)
     Battle.Update(dt)

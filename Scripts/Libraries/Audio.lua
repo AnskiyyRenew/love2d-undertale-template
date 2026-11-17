@@ -2,11 +2,8 @@ local audio = {
     _path_sound = "Resources/Sounds/",
     _path_music = "Resources/Music/",
 
-    -- Per-game override roots. The engine first looks for a resource inside the
-    -- Game area (Game/...) and only falls back to the main (root) one
-    -- when the Game copy does not exist. Keeping the two lists in the same order
-    -- as _path_sound / _path_music means a caller can request either "foo.wav"
-    -- (relative, gets the prefix) or "Resources/Sounds/foo.wav" (already rooted).
+    -- Per-game override roots, checked before the root ones. The order matches
+    -- _path_sound / _path_music so both bare names and rooted paths resolve.
     _game_path_sound = "Game/Resources/Sounds/",
     _game_path_music = "Game/Resources/Music/",
 
@@ -15,8 +12,8 @@ local audio = {
 }
 
 --- Test whether a file exists on the LÖVE filesystem.
---- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
---- and older/odd builds may expose neither, so every shape is tolerated.
+--- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly;
+--- some builds expose neither, so all shapes are tolerated.
 ---@param path string
 ---@return boolean
 local function fileExists(path)
@@ -27,7 +24,6 @@ local function fileExists(path)
     end)
     if (ok and info) then return true end
 
-    -- Fallback probe: only a real, non-empty readable file counts.
     local readable, data = pcall(function()
         return love.filesystem.read(path, 1)
     end)
@@ -35,9 +31,7 @@ local function fileExists(path)
 end
 
 --- Resolve a sound/music name to a real path, preferring the Game copy.
---- Names that are already "rooted" (leading "/", or already carrying a leading
---- prefix such as "Resources/Sounds/" or "Game/.../") keep working as
---- before, so callers like the Typers ("/Voices/foo.wav") are unaffected.
+--- Already-rooted names (leading "/", "Resources/Sounds/...") keep working.
 ---@param kind "sound"|"music"
 ---@param name string
 ---@return string The path to load, or the root path when nothing was found.
@@ -50,12 +44,8 @@ function audio.ResolvePath(kind, name)
 
     name = name:gsub("\\", "/")
 
-    -- Leading slash: an absolute path from the love filesystem root. The Game
-    -- twin and the sounds/music root are still probed, because callers such as
-    -- the Typers write "/Voices/foo.wav" meaning "under Resources/Sounds/"
-    -- rather than "a Voices/ folder at the project root". Absolute paths that
-    -- really do live at the root keep working - nothing is replaced, the extra
-    -- candidates are only consulted when the original file does not exist.
+    -- Leading "/" is a love-fs absolute path; the Game twin and the root prefix
+    -- are still probed (the Typers write "/Voices/foo.wav" meaning "under Resources/Sounds/").
     if (name:sub(1, 1) == "/") then
         local relative = name:gsub("^/+", "")
         if (relative == "") then return name end
@@ -71,14 +61,11 @@ function audio.ResolvePath(kind, name)
         return name
     end
 
-    -- Already an explicit Game path: leave it alone, otherwise it would be
-    -- prefixed a second time ("Game/Resources/Sounds/Game/Resources/Sounds/..")
-    -- and the lookup would silently miss.
+    -- Already an explicit Game path: leave it, or it would be prefixed twice.
     if (name:sub(1, #game_prefix) == game_prefix) then
         return name
     end
 
-    -- Already rooted: do not prepend anything, just try the Game twin once.
     if (name:sub(1, #root_prefix) == root_prefix) then
         local game_twin = game_prefix .. name:sub(#root_prefix + 1)
         if (fileExists(game_twin)) then return game_twin end
@@ -412,8 +399,7 @@ end
 function audio.PlaySound(sound, volume, loop)
     local inst = {}
     local resolved_path = audio.ResolvePath("sound", sound)
-    -- Reuse a preloaded template Source when one exists (SE.Preload warm-up):
-    -- cloning shares the decoded buffer, so this skips the per-call decode.
+    -- Cloning a preloaded template shares the decoded buffer, skipping the decode.
     local source
     local template = audio.cache[resolved_path] or audio.cache[sound]
     if (template) then
@@ -429,7 +415,7 @@ function audio.PlaySound(sound, volume, loop)
     inst.source = source
     inst.name = resolved_path
 
-    -- mark whether this instance is looping so Update can clean non-looping finished sources
+    -- Update releases non-looping sources once they stop, hence this flag.
     inst.loop = loop or false
     inst.paused = false
     inst.stopped = false
@@ -447,8 +433,7 @@ end
 function audio.PlayMusic(music, volume, loop)
     local inst = {}
     local resolved_path = audio.ResolvePath("music", music)
-    -- Reuse a preloaded template Source when one exists (SE.Preload warm-up):
-    -- cloning shares the stream handle, so this skips the per-call decoder setup.
+    -- Cloning a preloaded template shares the stream handle, skipping decoder setup.
     local source
     local template = audio.cache[resolved_path] or audio.cache[music]
     if (template) then
@@ -464,7 +449,7 @@ function audio.PlayMusic(music, volume, loop)
     inst.source = source
     inst.name = resolved_path
 
-    -- mark whether this instance is looping so Update can clean non-looping finished sources
+    -- Update releases non-looping sources once they stop, hence this flag.
     inst.loop = loop ~= false
     inst.paused = false
     inst.stopped = false
@@ -476,8 +461,7 @@ function audio.PlayMusic(music, volume, loop)
 end
 
 --- Presence check for a currently playing music track.
---- Uses the same resolution as PlayMusic so "which file got loaded" and
---- "is that file playing" can never disagree (Game copy or root fallback).
+--- Resolves like PlayMusic so the load and the check always agree.
 ---@param path string
 ---@return boolean
 function audio.FindMusic(path)
@@ -538,7 +522,6 @@ function audio.Update(dt)
             end
 
             if not a.paused then
-                -- if this source is not looping and not playing anymore, release and remove it
                 local ok_isPlaying = pcall(function() return a.source:isPlaying() end)
                 local isPlaying = false
                 if ok_isPlaying then
@@ -554,16 +537,9 @@ function audio.Update(dt)
     end
 end
 
---- Preload a sound/music file into the audio cache as a template Source.
---- PlaySound/PlayMusic clone from this template instead of re-decoding the
---- file every call. "sound" (static) decodes the whole file into memory once;
---- "music" (stream) keeps it on disk and just opens the handle, so the first
---- PlayMusic still has to stream but no longer pays the decoder setup cost.
---- Re-entering with the same path is a no-op (the existing template is kept).
----
---- The template is keyed by both the raw caller path and by its resolved
---- form, so PlaySound / PlayMusic always find the cache regardless of how the
---- caller wrote the name (bare "foo.wav", "Resources/Sounds/foo.wav", ...).
+--- Preload a sound/music file into the audio cache as a template Source that
+--- PlaySound/PlayMusic clone from. "sound" (static) decodes once into memory,
+--- "music" (stream) keeps it on disk. Re-entering the same path is a no-op.
 ---@param full_path string Full love-fs audio path.
 ---@param kind string "sound" (static) or "music" (stream).
 ---@return boolean loaded
@@ -580,8 +556,7 @@ function audio.PreloadFile(full_path, kind)
         return false
     end
 
-    -- Key by the raw path AND by every resolved form ResolvePath would
-    -- produce for this name, so PlaySound / PlayMusic find it either way.
+    -- Key by the raw path and by the resolved form so lookups hit either way.
     audio.cache[full_path] = source
     local resolved = audio.ResolvePath(kind, full_path)
     if (resolved and resolved ~= full_path) then

@@ -1,36 +1,13 @@
 --[[
     GUI TextInput - editable single-line text field
 
-    A window-style box (two stacked rects: thin border + black fill) with the
-    text rendered via Typers.InstText (same Latin/CJK font split as Label) and
-    a blinking cursor at the end of the text. Focus enables love.textinput so
-    the OS sends character events; the scene routes textinput / keypressed to
-    the focused field. Click inside to focus, click outside (or Escape) to blur.
+    Window-style box + InstText-rendered text + blinking cursor. Focus enables
+    love.textinput (OS character events) and key repeat (backspace hold); the
+    scene routes textinput / keypressed / update / clear to the field.
 
-    Layout: x,y is the top-left of the box; w,h is the outer size (including the
-    border). Text is drawn left-aligned with a 6px left pad, vertically centred
-    against the 27px Latin font height. The cursor is a 2px white bar.
-
-    Usage:
-      local ti = GUI.TextInput.New{
-          x = 200, y = 100, w = 240, h = 32,
-          placeholder = "Name", maxLen = 16,
-          onSubmit = function(self) print(self:GetText()) end,
-      }
-      -- wire the scene callbacks:
-      --   scene.mousepressed  -> (focus if click inside, else blur)
-      --   scene.textinput(t)  -> ti:HandleTextInput(t)
-      --   scene.keypressed(k) -> ti:HandleKeyPressed(k)
-      --   scene.update(dt)    -> ti:Update(dt)   (blink)
-      --   scene.clear         -> ti:Destroy()
-
-    maxLen counts UTF-8 characters (not bytes), so a CJK glyph counts as 1.
-    Backspace removes one UTF-8 codepoint (not one byte).
-
-    Note: love.keyboard.setTextInput is enabled on Focus and disabled on Blur;
-    this is what makes love.textinput fire at all. Key repeat is also toggled
-    on focus so holding Backspace repeats (the rest of the engine uses edge
-    detection, so enabling repeat does not cause double-fires elsewhere).
+    Layout: x,y = top-left of the box (w,h includes the border); text is
+    left-aligned with a 6px pad. maxLen counts UTF-8 characters, not bytes;
+    Backspace removes one codepoint.
 ]]
 
 local primitives = require((...):match("(.-)[^%.]+$") .. "primitives")
@@ -103,14 +80,12 @@ function TextInput.New(opts)
     local textLayer   = self.layer + 1
     local cursorLayer = self.layer + 2
 
-    -- text label (left-aligned, vertically centred-ish against FONT_H)
     local textY = self.y + (self.h - FONT_H) / 2 + 2
     self._label = Label.New(self.placeholder, {self.x + TEXT_PAD, textY}, textLayer)
     self._label:SetAlign("left")
     if (self.placeholder ~= "") then
         self._label:SetColor(PLACEHOLDER_COLOR[1], PLACEHOLDER_COLOR[2], PLACEHOLDER_COLOR[3])
     end
-    -- box draw entry (border + black fill) -- lowest, so the text draws on top
     self._boxEntry = Layers.add_external(function()
         if (not self._destroyed) then
             local borderColor = self.focused and FOCUS_COLOR or BORDER_COLOR
@@ -118,7 +93,6 @@ function TextInput.New(opts)
                 self.thickness, borderColor, {0, 0, 0})
         end
     end, boxLayer)
-    -- cursor draw entry (above the text)
     self._cursorEntry = Layers.add_external(function()
         if (not self._destroyed and self.focused and self._cursorVisible) then
             self:_drawCursor()
@@ -146,7 +120,6 @@ function TextInput:_drawCursor()
     primitives.drawRect(cx + 1, cy, CURSOR_W, ch, {1, 1, 1})
 end
 
--- Refresh the displayed text (or placeholder when empty).
 function TextInput:_refresh()
     if (self.text == "") then
         self._label:SetText(self.placeholder)
@@ -216,7 +189,6 @@ function TextInput:HandleTextInput(text)
     text = text:gsub("[\r\n]", "")
     if (text == "") then return end
     local new = self.text .. text
-    -- truncate if over maxLen (character count)
     if (self.maxLen > 0 and charCount(new) > self.maxLen) then
         local i, count = 1, 0
         while (i <= #new and count < self.maxLen) do

@@ -103,7 +103,6 @@ function page.Show(chest)
     tip:SetAlign("center")
     table.insert(elements, tip)
 
-    -- inventory typers
     for i = 1, 8
     do
         local _item = DATA.player.items[i]
@@ -196,7 +195,6 @@ function page.Update()
     heart.y = _y
 
     if (Controller.GetState("confirm") == 1) then
-        -- Swapper
         if (in_section == 1) then
             if (left_max <= 0 or right_max >= 10) then return end
             table.insert(CHEST[current_chest], DATA.player.items[in_channel])

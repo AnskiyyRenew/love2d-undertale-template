@@ -9,9 +9,9 @@ local encounter = {
             _color = {1, 1, 0.5},
             name = "",
             maxdamage = 10,
-            dmg_float = 2,  -- Some random stuff......I hate them
+            dmg_float = 2,
 
-            show_hpbar = false, -- Sans... stop hiding your hp bar.
+            show_hpbar = false,
             maxhp = 100,
             hp = 100,
             gold = 1,
@@ -39,7 +39,6 @@ local encounter = {
     }
 }
 
--- Assign internal _id to each statically-defined enemy
 for i = 1, #encounter.enemies
 do
     local e = encounter.enemies[i]
@@ -47,9 +46,7 @@ do
     encounter.enemy_id = encounter.enemy_id + 1
 end
 
--- The following methods are now provided by Battle.game_apis via metatable:
---   encounter:AddEnemy(data)  — adds a validated enemy with auto-assigned _id
---   encounter:AddItem(item)    — adds a validated item
---   encounter:forceAttack(id, value) — applies forced damage to an enemy by _id
+-- Battle.game_apis (via metatable) adds encounter:AddEnemy(data),
+-- encounter:AddItem(item) and encounter:forceAttack(id, value).
 
 return encounter

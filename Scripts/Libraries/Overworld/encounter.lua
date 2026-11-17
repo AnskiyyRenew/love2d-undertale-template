@@ -33,7 +33,6 @@ end
 function step.Update()
     if (not _run) then return end
     if (step.time >= time_target) then
-        -- encounter
         Overworld.Encounter()
         step.time = 0
     end

@@ -1,30 +1,9 @@
 --[[
-    GUI Slider - a horizontal value slider (track + knob)
+    GUI Slider - horizontal value slider (track + knob)
 
-    Pure component: it does not read input. The owning scene drives value
-    changes via :Move(dir) / :SetValue(v) / :DragTo(x) / :Wheel(dir);
-    :SetFocused toggles the knob highlight. Drawn through Layers.add_external,
-    like the rest of the GUI.
-
-    Layout: the knob is a knobSize x knobSize square; the track is a thin bar
-    vertically centred with the knob. Knob x is mapped from value over [min,max].
-
-    Mouse support:
-      :ContainsPoint(x,y)  hit-test (track + knob, with 4px slack)
-      :DragTo(cx, cy)      set value from a canvas x (clamped, stepped)
-      :Wheel(dir)          move by +/- step (same as :Move)
-
-    Usage:
-      local s = GUI.Slider.New{ x=200, y=300, w=240, min=0, max=100, value=50, step=1 }
-      s:SetFocused(true)
-      -- in scene.update, when focused and up/down pressed:
-      s:Move(1)    -- +step
-      s:Move(-1)   -- -step
-      -- or with mouse:
-      if (s:ContainsPoint(mx, my)) then s:SetFocused(true) end
-      if (dragging) then s:DragTo(mx, my) end
-      if (wheel ~= 0) then s:Wheel(wheel) end
-      local v = s:GetValue()
+    Pure component: the scene drives it via :Move(dir) / :SetValue(v) /
+    :DragTo(x) / :Wheel(dir); :SetFocused toggles the knob highlight.
+    The knob is a knobSize square; the track is a thin bar centred with it.
 ]]
 
 local primitives = require((...):match("(.-)[^%.]+$") .. "primitives")
@@ -55,10 +34,8 @@ function Slider.New(opts)
     self.focused = (opts.focused == true)
     self.showLabel = (opts.showLabel ~= false)
     self._destroyed = false
-    -- snap initial value into range and onto the step grid
     self.value = clamp(opts.value or self.min, self.min, self.max)
     self.value = self:_snap(self.value)
-    -- register draw
     self._entry = Layers.add_external(function()
         if (not self._destroyed) then self:_draw() end
     end, self.layer)
@@ -77,10 +54,8 @@ function Slider:_snap(v)
 end
 
 function Slider:_draw()
-    -- track vertically centred with the knob
     local trackY = self.y + (self.knobSize - self.trackH) / 2
     primitives.drawRect(self.x, trackY, self.w, self.trackH, self.trackColor)
-    -- knob position from value
     local span = (self.max - self.min)
     local t = (span == 0) and 0 or (self.value - self.min) / span
     local knobX = self.x + t * (self.w - self.knobSize)
@@ -88,7 +63,6 @@ function Slider:_draw()
     primitives.drawRect(knobX, self.y, self.knobSize, self.knobSize, knobColor)
 end
 
--- refresh the numeric readout label
 function Slider:_syncLabel()
     if (self._label) then
         self._label:SetText(tostring(self.value))

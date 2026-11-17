@@ -67,19 +67,12 @@ local db = {
     {id = "temyarmor", name = "temy armor"},
 }
 
--- ===========================================================================
--- Third-level menu action interface
--- ===========================================================================
--- Items: each id maps to { use=fn, info=fn, drop=fn }, fn signature function(id).
---   - The function body usually calls Overworld.dialogNew(...);
---   - A few special items may instead use show_sprite(path) to draw a sprite
---     directly; the player presses [X] to clear it and regain control;
---   - Missing id or action falls through to the default (see DoItemAction).
--- Cell: each id maps to a single fn, signature function(id), default Overworld.dialogNew.
--- Routing keys off id only, never name (the inventory stores id strings).
--- ===========================================================================
+-- Third-level menu action interface. Items: each id maps to
+-- { use=fn, info=fn, drop=fn } with signature fn(id); a few items use
+-- show_sprite(path) instead. Cell: each id maps to one fn(id).
+-- Missing id or action falls through to DoItemAction's default.
+-- Routing keys off id only, never name.
 
--- Remove one item with the given id from the inventory (first match only).
 local function drop_item(id)
     for i = #DATA.player.items, 1, -1 do
         if (DATA.player.items[i] == id) then
@@ -89,9 +82,8 @@ local function drop_item(id)
     end
 end
 
--- Full-screen sprite with cancel-to-clear: seize control, draw the sprite;
--- when the player presses [X] the sprite is destroyed and control is restored.
--- Reuses the sprite's own Step callback to listen for cancel, no engine change.
+-- Full-screen sprite: takes control, and [X] destroys it and gives control back
+-- (listens via the sprite's own Step callback).
 local function show_sprite(path)
     Char.controlling = false
     local spr = Sprites.CreateSprite(path, "GUI")
@@ -104,7 +96,6 @@ local function show_sprite(path)
     return spr
 end
 
--- Item action table (keyed by id). Each value is { use=fn, info=fn, drop=fn }.
 db._actions = {
     Spider = {
         use  = function(id) Overworld.dialogNew({"* You ate the Spider...", "* I CAN'T UNDERSTAND."}) end,
@@ -114,17 +105,10 @@ db._actions = {
             Overworld.dialogNew("* You dropped the Spider...\n* But nothing happened.")
         end,
     },
-    -- Flyer / special item example (sprite class, via show_sprite):
-    -- PunchCard = {
-    --     use  = function(id) Overworld.dialogNew("* You can't use that.") end,
-    --     info = function(id) show_sprite("poseur.png") end,
-    --     drop = function(id) drop_item(id); Overworld.dialogNew("* You dropped the Punch Card.") end,
-    -- },
 }
 
 -- Cell action table (keyed by id). Each value is fn(id).
 db._cell_actions = {
-    -- Toriel_1 = function(id) Overworld.dialogNew("* Ring ring... Mom didn't pick up.") end,
 }
 
 function db.FindItemByID(id)
@@ -138,15 +122,13 @@ function db.FindItemByID(id)
     end
 end
 
--- Legacy interface (kept for compatibility): fetch the registered fn by id + action.
--- Note: _actions is now a table keyed by id, so it is no longer scanned as an array.
+-- Legacy accessor: db._actions[id][action].
 function db.GetActionByID(id, action)
     local entry = db._actions[id]
     return entry and entry[action]
 end
 
--- Third-level menu router: execute an item action. action ∈ {"use", "info", "drop"}.
--- Missing id / action falls through to the default (Overworld.dialogNew).
+-- Third-level menu router: action ∈ {"use", "info", "drop"}, default dialog.
 function db.DoItemAction(id, action)
     if (not id) then return end
     local entry = db._actions[id]
@@ -155,8 +137,7 @@ function db.DoItemAction(id, action)
         fn(id)
         return
     end
-    -- Default fallback: look the name up by id and assemble a generic line,
-    -- so bulk-adding items doesn't require per-id registration.
+    -- Default: build a generic line from the item name.
     local name = (db.FindItemByID(id) or {}).name or id
     if (action == "use") then
         Overworld.dialogNew("* You used the " .. name .. ".")
@@ -168,7 +149,6 @@ function db.DoItemAction(id, action)
     end
 end
 
--- Third-level menu router: execute a cell action. Default Overworld.dialogNew.
 function db.DoCellAction(id)
     if (not id) then return end
     local fn = db._cell_actions[id]
@@ -180,8 +160,7 @@ function db.DoCellAction(id)
     Overworld.dialogNew("* You called " .. name .. ".\n* But nobody answered.")
 end
 
--- Look up a cell's display name by id (cell names live only in DATA.player.cells,
--- not in the item table).
+-- Cell names live only in DATA.player.cells, not in the item table.
 function db.FindCellNameByID(id)
     for _, c in ipairs(DATA.player.cells) do
         if (c.id == id) then

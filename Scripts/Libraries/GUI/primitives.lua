@@ -1,25 +1,15 @@
 --[[
     GUI Primitives - low-level draw primitives (UNDERTALE style)
 
-    All coordinates use top-left (x, y) + size (w, h) semantics, with pixel
-    snapping (math.floor(v + 0.5)) applied internally, matching the engine's
-    Sprites.snapCoord to avoid rotation/scale aliasing. Colours are 0-1
-    {r,g,b} or {r,g,b,a}; every draw resets to white afterwards so colour
-    never leaks into other layers on the same frame (trap #7: always restore
-    colour at frame end).
+    Top-left (x, y) + size (w, h); pixel-snapped (floor(v + 0.5), matching
+    Sprites.snapCoord). Colours are 0-1 {r,g,b} / {r,g,b,a}; every draw resets
+    to white afterwards so colour never leaks into other layers.
 
-    Provides:
-      drawRect(x,y,w,h,color,alpha)                 single solid rectangle
-      drawWindow(x,y,w,h,t,outer,inner,...)         two stacked rects = window (thick border + fill)
-      drawCenteredWindow(cx,cy,w,h,...)             centre-point variant (battle-box semantics)
-      drawBorder(x,y,w,h,t,color,alpha)             hollow border (4 edges, transparent interior)
-      drawCenteredBorder(cx,cy,w,h,...)             centre-point hollow border
-      snap(v) / applyColor / resetColor / mainColor helpers
-
-    Font convention (see init.lua header):
-      Latin  determination_mono.ttf  size 27 / 13
-      CJK    simsun.ttc              size 13 (size 27 needs scale=2)
-    This file only draws rectangles; fonts are handled in Label/Button via Typers.InstText.
+    Provides: drawRect, drawWindow (two stacked rects: thick border + fill),
+    drawCenteredWindow (battle-box centre semantics), drawBorder /
+    drawCenteredBorder (hollow 4-edge border), snap / applyColor / resetColor /
+    mainColor. Fonts live in Label/Button via InstText; this file only draws
+    rectangles.
 ]]
 
 local primitives = {}
@@ -81,10 +71,8 @@ function primitives.drawWindow(x, y, w, h, thickness, outer, inner, outerAlpha, 
     outer = outer or mainColor()
     inner = inner or {0, 0, 0}
     local t = thickness
-    -- outer (thick border)
     applyColor(outer, outerAlpha)
     SE.graphics.rectangle("fill", snap(x - t), snap(y - t), snap(w + t * 2), snap(h + t * 2))
-    -- inner (covers the centre, leaves the border)
     applyColor(inner, innerAlpha)
     SE.graphics.rectangle("fill", snap(x), snap(y), snap(w), snap(h))
     resetColor()
@@ -102,13 +90,9 @@ function primitives.drawBorder(x, y, w, h, thickness, color, alpha)
     color = color or mainColor()
     local t = thickness
     applyColor(color, alpha)
-    -- top
     SE.graphics.rectangle("fill", snap(x), snap(y), snap(w), snap(t))
-    -- bottom
     SE.graphics.rectangle("fill", snap(x), snap(y + h - t), snap(w), snap(t))
-    -- left
     SE.graphics.rectangle("fill", snap(x), snap(y), snap(t), snap(h))
-    -- right
     SE.graphics.rectangle("fill", snap(x + w - t), snap(y), snap(t), snap(h))
     resetColor()
 end

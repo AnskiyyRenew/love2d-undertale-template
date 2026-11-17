@@ -1,22 +1,13 @@
 ---@diagnostic disable: undefined-field
 
--- ---------------------------------------------------------------------------
--- Game-first module resolution
---
--- Encounter scripts, waves and attack patterns are all per-game content, so the
--- Game area (Game/...) wins and the engine directory is the fallback:
---
---   encounters      Game.Encounter.<file>   (Game-only; no root twin)
+-- Game-first module resolution. The Game area wins, the engine directory is the
+-- fallback:
+--   encounters      Game.Encounter.<file>    (Game-only, no engine twin)
 --   waves           Game.Waves.<name>      -> Scripts.Waves.<name>
---   attack patterns Game.Attacks.<name>    -> Scripts.Libraries.Battle.PlayerAttacks.<name>
---   souls           Game.Souls.<name>      -> Scripts.Libraries.Battle.Player.Souls.<name>
---                                                (resolved in Battle/Player/init.lua)
---
--- Existence is probed on the FILESYSTEM first rather than inferred from a failed
--- require. `pcall(require, ...)` cannot tell "the module is not there" apart from
--- "the module is there but its top-level code threw", and treating the second as
--- the first would silently cut the fallback chain short instead of surfacing a
--- genuine error in a module that really was found.
+--   attack patterns Game.Attacks.<name>    -> Scripts...Battle.PlayerAttacks.<name>
+--   souls           Game.Souls.<name>      -> Scripts...Battle.Player.Souls.<name>
+-- Files are probed on disk before require: pcall(require) cannot tell a missing
+-- module from one whose top-level code threw.
 local BATTLE_MODULE_ROOTS = {
     waves = {"Game.Waves.", "Scripts.Waves."},
     attacks = {"Game.Attacks.", "Scripts.Libraries.Battle.PlayerAttacks."}
@@ -30,8 +21,8 @@ local function battleModulePathOf(module_name)
 end
 
 --- Test whether a module's file actually exists on disk.
---- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
---- so the result is only trusted as a positive when it is truthy.
+--- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info
+--- directly, so a result is only trusted as a positive when it is truthy.
 ---@param module_name string
 ---@return boolean
 local function battleModuleExists(module_name)
@@ -42,19 +33,14 @@ local function battleModuleExists(module_name)
     end)
     if (ok and info) then return true end
 
-    -- Fallback probe: a real, readable file counts as existing.
     local readable, content = pcall(love.filesystem.read, file_path, 1)
     return (readable and content ~= nil)
 end
 
 --- Require the first module that exists among `roots`, Game area first.
 ---
---- Returns the module name that was found (nil when no root has the file) plus
---- the loaded value, so callers can distinguish three outcomes:
----   * loaded            -> module_name is set and loaded is the table
----   * found but crashed -> module_name is set, loaded is nil, error_message set
----   * not found         -> module_name is nil (caller decides on a default)
---- A missing Game copy never prevents the root copy from being tried.
+--- Game area first. `module_name` is returned whenever the file exists, even
+--- when loading it threw; `error_message` then carries the error.
 ---@param roots string[] Module prefixes to try, in order.
 ---@param name string Module name suffix (e.g. the wave name).
 ---@return string|nil module_name
@@ -62,8 +48,7 @@ end
 ---@return any error_message
 ---@return string|nil error_module
 local function requireGameFirst(roots, name)
-    -- Bare `return nil` yields exactly ONE value in Lua, which would make the
-    -- caller's 4-value unpack collapse. Return the full shape on every path.
+    -- Every path returns the full 4-value shape: a bare `return nil` collapses to one.
     if (not name) or (name == "") then return nil, nil, nil, nil end
 
     local found_module = nil
@@ -80,9 +65,6 @@ local function requireGameFirst(roots, name)
 
             local ok, loaded = pcall(require, module_name)
             if (ok and loaded) then
-                -- A Game-area copy that exists but throws must never be silent,
-                -- even when a lower root successfully supplies the module: the
-                -- override is broken and the author needs to know.
                 if (first_error) then
                     print("[Battle] WARNING: '" .. tostring(first_error_module) ..
                         "' exists but failed to load; using " .. module_name .. " instead.")
@@ -112,8 +94,7 @@ local function requireGameFirst(roots, name)
     return nil, nil, nil, nil
 end
 
----Clear a wave module from the require cache under BOTH roots, so a wave that
----moved between the Game area and the engine directory never stays stale.
+---Clear a wave module from the require cache under both roots.
 ---@param wave_name string|nil Defaults to battle.wave when nil.
 local function clearWaveModule(wave_name)
     local name = wave_name
@@ -128,10 +109,9 @@ local function clearWaveModule(wave_name)
     end
 end
 
----Load an attack pattern module, Game area first (Game/Attacks/) then engine
----(Scripts/Libraries.Battle.PlayerAttacks/).
----NOTE: declared before `local battle = {}` because the default pattern is
----resolved while that table is being built (Lua `local`s are not hoisted).
+---Load an attack pattern module, Game area first.
+---Declared before `local battle` because the default pattern is resolved while
+---that table is being built.
 ---@param name string e.g. "stick"
 ---@return table|nil attack Nil when no root has it or every candidate threw.
 ---@return string|nil module_name The module that was found (nil when none).
@@ -155,10 +135,6 @@ local function loadAttackPattern(name)
     return nil, module_name
 end
 
----Public wrapper so other Battle modules (e.g. UI states) can drop the wave
----module without hard-coding which root it came from.
----NOTE: defined further down, right after the `battle` table exists - this file
----assigns a field on a local table, so it cannot run before `local battle = {}`.
 
 Layers.new_layer("BOTTOM", -1000)
 Layers.new_layer("Background", -10)
@@ -176,8 +152,6 @@ Layers.new_layer("TopAll", 60)
 Layers.new_layer("TOP", 1000)
 
 local path = (...):match("(.-)[^%.]+$")
--- The default attack pattern is resolved through the same Game-first chain, so
--- a game can ship its own Game/Attacks/stick.lua.
 local default_attack, default_attack_module = loadAttackPattern("stick")
 if (not default_attack) then
     error("[Battle - PlayerAttack] the default attack pattern 'stick' could not be loaded.", 0)
@@ -196,8 +170,7 @@ local battle = {
     dialog_texts = nil,
 
     attack = default_attack,
-    -- Resolved module names (not bare pattern names) so battle.Clear() can drop
-    -- them from the require cache, whichever root they came from.
+    -- Resolved module names, so battle.Clear() can drop them from either root.
     attack_paths = {default_attack_module},
     wave = "wave",
     _wave = {},
@@ -212,17 +185,14 @@ local battle = {
     _end = false,
     _end_time = 0,
 
-    -- Overworld save-data bridge (see the block below SetEndRoom). True by
-    -- default; set it to false before Battle.SetGame() for a scripted fight
-    -- that sets its own Player.hp and must not touch DATA.
+    -- Set false before SetGame() for a scripted fight that owns Player.hp.
     auto_overworld_sync = true,
     _data_synced = false
 }
 
 ---Public wrapper so other Battle modules (e.g. UI states) can drop the wave
----module without hard-coding which root it came from. Defined here (not in the
----helpers block above) because it assigns a field on the local `battle` table.
----@param wave_name string|nil Defaults to battle.wave when nil.
+---module without hard-coding which root it came from. Defined after the `battle`
+---table because it assigns a field on that table.
 function battle.ClearWaveModule(wave_name)
     clearWaveModule(wave_name)
 end
@@ -274,12 +244,8 @@ end
 function battle.DefenseEnding() end
 function battle.HandleActions(enemy, action) end
 function battle.HandleItems(item) end
--- Default: fall back to the enemy's turn, matching the behaviour before the
--- HandleSpare hook was introduced. A scene that wants custom partial-spare
--- logic (e.g. only some enemies leave, narration before the next wave)
--- overrides this on its own battle table. Without an override the old
--- "go straight to DEFENDING" path is kept so destroy_elements() clearing
--- state.typers can never strand the MERCYMENU updater on an empty list.
+-- Override on the battle table for custom spare handling; the default hands the
+-- turn back to the enemy.
 function battle.HandleSpare() battle.ChangeState("DEFENDING") end
 function battle.HandleFlee() end
 function battle.FleeUpdate(dt) end
@@ -321,9 +287,7 @@ local function defaultEnteringState(old, new)
         battle.mainarena:Resize(565, 130)
         battle.mainarena:RotateTo(0)
         battle.mainarena.is_active = false
-        -- Defer the narration text until the arena finishes restoring to full
-        -- size (handled in battle.UpdateRestore), so the box visibly scales
-        -- back before the text reappears.
+        -- Narration reappears once the arena finishes restoring (battle.UpdateRestore).
         battle.restoring_arena = true
     end
 
@@ -335,9 +299,7 @@ end
 battle.EnteringState = defaultEnteringState
 battle.defaultEnteringState = defaultEnteringState
 
--- Unified state transition: the only way to change the battle state.
--- Whenever the state actually changes, EnteringState is run exactly once,
--- so callers never need to trigger it manually.
+-- Single entry point for state changes: EnteringState runs once per real change.
 function battle.ChangeState(new_state)
     if (battle.state == new_state) then
         return
@@ -351,39 +313,20 @@ function battle.SetEndRoom(room)
     battle.room_end = room
 end
 
--- ---------------------------------------------------------------------------
--- Overworld save-data bridge
---
--- `Game/Logics` (the global `DATA`) is the overworld's live save data; an
--- encounter module only defines *template* player stats. Without a bridge a
--- battle starts on the template's HP and its EXP / GOLD never reach the
--- overworld - the player's stats look frozen at whatever Game/Logics says.
---
--- This used to live in Scripts/Scenes/Battle/scene_battle_ow.lua only, so any
--- game that wired its overworld to a different battle scene silently lost every
--- stat change. It now runs for every battle while overworld data is loaded.
---
--- It is idempotent: a scene that still does its own hand-off (the old
--- scene_battle_ow pattern) simply sees Battle.EXP / GOLD already consumed, so
--- nothing is ever counted twice.
--- ---------------------------------------------------------------------------
+-- Overworld save-data bridge. `DATA` (Game/Logics) holds the live overworld
+-- stats, while an encounter module only defines template values. Runs for every
+-- battle while overworld data is loaded, and is idempotent: EXP / GOLD are
+-- consumed on write-back, so nothing is ever counted twice.
 
----Is this battle linked to an overworld save?
----
----False for battle-only games: `DATA` comes from `require("Game.Logics")`,
----which only the Overworld library performs, so it stays nil there and both
----directions are skipped without any configuration.
----@return boolean
+---Is this battle linked to an overworld save? False for battle-only games,
+---where `DATA` is never assigned.
 function battle.HasOverworldData()
     if (battle.auto_overworld_sync == false) then return false end
     return (type(DATA) == "table" and type(DATA.player) == "table")
 end
 
----Start the battle with the stats the overworld is carrying.
----
----Runs at the end of SetGame(), so it overrides the encounter module's
----template values instead of being overridden by them.
----@return boolean synced
+---Start the battle with the stats the overworld is carrying. Runs at the end of
+---SetGame(), so it overrides the encounter module's template values.
 function battle.SyncFromOverworld()
     if (not battle.HasOverworldData()) then return false end
 
@@ -398,12 +341,8 @@ function battle.SyncFromOverworld()
     return true
 end
 
----Write this battle's results back into the overworld save data.
----
----Carries the HP the battle ended on, adds the earned EXP / GOLD and applies
----any level-ups from `DATA.lv_data`. The earnings are consumed (zeroed) so a
----second write-back can never double-count them.
----@return boolean synced
+---Write this battle's results back into the overworld save data: HP, EXP, GOLD
+---and any level-ups from `DATA.lv_data`.
 function battle.SyncToOverworld()
     if (not battle.HasOverworldData()) then return false end
     if (battle._data_synced) then return false end
@@ -414,7 +353,6 @@ function battle.SyncToOverworld()
     p.gold = (p.gold or 0) + (battle.GOLD or 0)
     p.hp   = math.max(0, math.min(p.maxhp or Player.maxhp, Player.hp))
 
-    -- Level up while the total EXP has reached the next threshold.
     local lv_data = DATA.lv_data
     if (lv_data) then
         local lv = p.lv or 1
@@ -439,14 +377,10 @@ function battle.SyncToOverworld()
     return true
 end
 
----Plays the victory message. The base lines come from "Battle.WinTexts1"
----(EXP / GOLD); `extra_texts` are appended after them. When the typewriter
----finishes, `on_complete` runs and then the battle fades out (`_end = true`).
----
----Scenes usually override `Battle.Win` (keeping this as `Battle.defaultWin`) to
----react on victory, e.g. to append "* Your LOVE increased!" only on a level-up.
----@param extra_texts table|nil Extra text lines appended to the win message.
----@param on_complete function|nil Called once the win message has finished.
+---Play the victory message. The base lines come from "Battle.WinTexts1"
+---(EXP / GOLD), with `extra_texts` appended after them. Scenes override
+---`Battle.Win` to react on victory; this implementation stays available as
+---`Battle.defaultWin`.
 function battle.Win(extra_texts, on_complete)
     battle.ChangeState("WIN")
     local texts = Localize.localizeText("Battle.WinTexts1", {Battle.EXP, Battle.GOLD})
@@ -466,14 +400,8 @@ end
 -- Base implementation, kept so a scene can override Battle.Win and still call it.
 battle.defaultWin = battle.Win
 
----Load an encounter script from the Game area.
----
----Encounters live under Game/Encounter/ (there is no engine-side twin -
----Scripts/Encounter/ does not exist). The file is probed before requiring so a
----missing encounter reports "not found" instead of being confused with an
----encounter that exists but throws.
----@param file string Encounter name, e.g. "Poseur" (no extension).
----@return table|nil The loaded encounter table, or nil on failure.
+---Load an encounter script from Game/Encounter/ (there is no engine-side twin),
+---then apply its template stats on top of any overworld save data.
 function battle.SetGame(file)
     battle.gameName = "Game.Encounter." .. file
 
@@ -512,9 +440,7 @@ function battle.SetGame(file)
         end
         UI.barUpdate()
 
-        -- Attach game_apis methods to the encounter table via metatable.
-        -- This allows encounter:AddItem(...), encounter:AddEnemy(...),
-        -- and encounter:forceAttack(...) to work seamlessly on any loaded game.
+        -- Attach game_apis so encounter:AddItem / AddEnemy / forceAttack work.
         if (type(game_) == "table") then
             setmetatable(game_, {__index = game_apis})
         end
@@ -548,11 +474,8 @@ function battle.SetAttackPattern(pattern)
     battle.attack = default_attack
 end
 
----Load a wave script, Game area first (Game/Waves/) then engine
----(Scripts/Waves/). A wave that is missing or broken falls back to the default
----"wave" script and warns, so a battle always has *something* to run.
----@param wave_name string
----@return table The wave table that was selected.
+---Load a wave script, Game area first. A missing or broken wave falls back to the
+---default "wave" script so a battle always has something to run.
 function battle.LoadWave(wave_name)
     local name = (wave_name and wave_name ~= "") and wave_name or "wave"
     local roots = BATTLE_MODULE_ROOTS.waves
@@ -565,8 +488,6 @@ function battle.LoadWave(wave_name)
     end
 
     if (module_name) then
-        -- Found, but its top-level code threw: report the real error instead of
-        -- silently degrading, then still fall back so the battle can continue.
         print("[Battle - Wave] Error in '" .. tostring(error_module) .. "': " .. tostring(error_message))
     else
         print("[Battle - Wave] WARNING: wave '" .. name .. "' not found. Searched, in order:")
@@ -575,8 +496,7 @@ function battle.LoadWave(wave_name)
         end
     end
 
-    -- Fall back to the default wave. It lives in the engine directory, but go
-    -- through the resolver so a Game-side "wave" override still wins.
+    -- Fall back through the resolver so a Game-side "wave" override still wins.
     local fallback_module, fallback, fallback_error = requireGameFirst(roots, "wave")
     battle.waveModule = fallback_module or battle.waveModule
 
@@ -596,28 +516,13 @@ function battle.Defending()
 
     local _wave = battle.LoadWave(Battle.wave)
 
-    -- Defensive reset: the wave is the shared "Battle.Waves" table, which may
-    -- still hold _end = true from a previous run if cleanup was skipped.
+    -- The wave table is shared: a previous run may have left _end = true behind.
     _wave._end = false
     Battle._wave = _wave
 end
 
--- ---------------------------------------------------------------------------
--- Debug: jump straight to a wave, and end the current turn early
---
--- Testing turn 9 normally means playing turns 1-8 first. Both helpers below
--- re-use the transitions the normal flow uses instead of poking at
--- Battle._wave, so nothing is left half torn down:
---
---   leaving DEFENDING  -> ACTIONSELECT   wave objects destroyed, arena restored,
---                                        wave module dropped from the cache
---   entering DEFENDING -> Defending()    LoadWave + mainarena setup
---
--- Jumping from ATTACKING or a menu simply goes through ACTIONSELECT first; the
--- UI rebuilds itself from Battle.state, so a single transition is enough. The
--- one thing not undone is a FIGHT attack still in flight (the attack pattern's
--- own typer); the next ATTACKING restarts it anyway.
--- ---------------------------------------------------------------------------
+-- Debug helpers: jump straight to a wave, and end the current turn early. Both
+-- go through the normal transitions, so nothing is left half torn down.
 
 ---End the running enemy turn right now, as if its wave had called EndWave().
 ---Development builds only.
@@ -630,8 +535,7 @@ function battle.DebugEndWave()
     if (battle._wave.EndWave) then
         battle._wave.EndWave()
     end
-    -- The UI state normally clears ENDED when it notices the flag; a jump skips
-    -- that frame, and a stale ENDED = true would end the NEXT wave immediately.
+    -- A stale ENDED = true would end the NEXT wave immediately.
     battle._wave.ENDED = false
 
     battle.ChangeState("ACTIONSELECT")
@@ -655,8 +559,7 @@ function battle.DebugJumpWave(wave_name)
         return false, "battle is already over"
     end
 
-    -- Tear the current turn down the normal way (bullets spawned by it must be
-    -- destroyed, not just forgotten).
+    -- Tear the current turn down the normal way so its bullets get destroyed.
     if (battle.state == "DEFENDING" and type(battle._wave) == "table") then
         if (battle._wave.EndWave) then
             battle._wave.EndWave()
@@ -667,13 +570,11 @@ function battle.DebugJumpWave(wave_name)
         battle.ChangeState("ACTIONSELECT")
     end
 
-    -- Drop the cached module so the file's top-level code runs again: jumping to
-    -- the wave that is already loaded must not replay a stale closure/state.
+    -- Drop the cached module so the file's top-level code runs again.
     clearWaveModule(wave_name)
 
     battle.wave = wave_name
-    -- Otherwise UpdateRestore would reveal the narration text in the middle of
-    -- the wave we just started.
+    -- Otherwise UpdateRestore would reveal the narration in the middle of the wave.
     battle.restoring_arena = false
     battle.narration_text:SetText("")
 
@@ -684,29 +585,13 @@ function battle.DebugJumpWave(wave_name)
     return true, nil
 end
 
--- ---------------------------------------------------------------------------
--- Animation dispatch
---
--- An enemy animation is a plain table with NO metatable, split in two:
---   * the MODULE  — what `require` returns; holds the functions, no state.
---   * an INSTANCE — what `New(pos)` returns; holds the state, plus `_class`
---                   pointing back at its module.
---
--- `_class` is a plain field on the instance (not `__index` sugar), so it is
--- greppable and assertable, and `AnimModule` / `IsAnimInstance` keep working
--- for callers that want the module table itself.
---
--- `New` hands the instance to `BindAnimation` below, which hangs a thin closure
--- over every module function. From then on the instance drives itself with a
--- plain dot call — `anim.SetFace(3)`, `anim.Update(dt)`, `anim.Spare()` — and
--- that is the form every engine call site uses. Still no metatable: the
--- functions stay on the module (one copy each), only the binding is per-instance.
--- ---------------------------------------------------------------------------
+-- Animation dispatch. An animation is a plain table split in two: the MODULE
+-- (what require returns, holds the functions) and an INSTANCE (what New(pos)
+-- returns, holds the state plus `_class` pointing back at the module).
+-- BindAnimation hangs dot-callable closures on the instance; no metatable.
 
---- The function table that drives `anim`, or nil when there is nothing to call.
---- A normal instance answers with `anim._class`. A bare module (an enemy whose
---- scene never called `Game:InitAnimation`) answers with itself, which keeps the
---- no-op guards inside those modules working instead of crashing the battle.
+---The function table that drives `anim`: `anim._class`, the module itself for a
+---bare module (a scene that never called `Game:InitAnimation`), or nil.
 ---@param anim any
 ---@return table|nil
 function battle.AnimModule(anim)
@@ -716,27 +601,20 @@ function battle.AnimModule(anim)
     return anim._class or anim
 end
 
---- True when `t` is an independent instance produced by `New(pos)`, rather than
---- the module `require` handed back. `_class` is the marker: an instance carries
---- it, a module does not.
+---True for an instance produced by `New(pos)` (`_class` is the marker), false
+---for a module.
 ---@param t any
 ---@return boolean
 function battle.IsAnimInstance(t)
     return type(t) == "table" and t._class ~= nil
 end
 
---- Hang the module's functions on `instance` as bound, dot-callable methods, so
---- callers write `anim.SetFace(3)` instead of `cls.SetFace(anim, 3)`.
----
---- Each method is a thin closure that supplies the instance as its first
---- argument — the functions themselves stay on the module, so there is still one
---- copy of each and no metatable anywhere. `New` is skipped (it is a factory,
---- not a method), a field of the same name already on the instance is never
---- overwritten, and calling this twice is a no-op.
----
---- A colon call (`anim:Update(dt)`) would smuggle the instance in as a *second*
---- argument, so it raises a clear error where it is written instead of failing
---- deep inside the animation. There is exactly one call form.
+---Hang the module's functions on `instance` as bound, dot-callable methods, so
+---callers write `anim.SetFace(3)` instead of `cls.SetFace(anim, 3)`.
+---The methods stay on the module (one copy each); each bound closure only
+---supplies the instance as its first argument. `New` is skipped, an existing
+---field is never overwritten, and calling this twice is a no-op. Colon calls
+---raise, so there is exactly one call form.
 ---@param instance table The object `New(pos)` just returned.
 ---@param module table|nil Its module; defaults to `instance._class`.
 ---@return table instance The same table, so calls can be chained.
@@ -768,22 +646,9 @@ function battle.BindAnimation(instance, module)
     return instance
 end
 
--- ---------------------------------------------------------------------------
--- Hitbox viewer (development builds only)
---
--- One key (F7) toggles an overlay showing the collision shapes that are really
--- tested each frame: every sprite flagged `isBullet` plus the player soul(s).
--- A sprite with perfect-pixel collision on (sprite:SetPPCollision(true)) is
--- drawn as its individual rectangles, one without it as the single shape it
--- actually collides with -- an ellipse for a sprite set to "ellipse"
--- (sprite:SetHitboxShape("ellipse")), otherwise the box. The plain box is always
--- outlined faintly underneath, so the difference between "box" and "true shape"
--- is visible at a glance.
---
--- It is drawn through the layer system on the TOP layer, so it follows the
--- camera and covers the gameplay. Nothing here is even reachable in a release
--- build (_RELEASED), which is what the user asked for.
--- ---------------------------------------------------------------------------
+-- Hitbox viewer (development builds only): F7 toggles an overlay showing the
+-- shapes really tested each frame — every `isBullet` sprite plus the player
+-- soul(s). Drawn on the TOP layer; unreachable in a release build.
 local HITBOX_KEY = "f7"
 
 battle.debug_hitboxes = false
@@ -806,9 +671,8 @@ local function drawHitboxShape(shape)
         shape.x - hw * cos_a - hh * sin_a, shape.y - hw * sin_a + hh * cos_a)
 end
 
---- Draw one (possibly rotated) ellipse as a closed outline. LÖVE has no rotated
---- ellipse of its own, so the points come from here and go out as a polygon --
---- which also keeps the overlay to one draw call per shape.
+---Draw one (possibly rotated) ellipse as a closed outline. LÖVE has no rotated
+---ellipse, so the points go out as a polygon.
 ---@param shape table {x, y, w, h, angle}
 ---@param segments integer|nil Corner count of the approximation; 24 by default.
 local function drawEllipseShape(shape, segments)
@@ -864,8 +728,7 @@ end
 --- of everything) and restores every graphics state it touches, because the
 --- layer pass keeps drawing after it.
 local function drawHitboxOverlay()
-    -- The entry stays registered while hidden (cheaper than re-hooking), so the
-    -- off state has to bail out here as well as in ToggleHitboxes.
+    -- The entry stays registered while hidden (cheaper than re-hooking).
     if (not battle.debug_hitboxes) then
         battle.hitbox_sprites = 0
         battle.hitbox_shapes = 0
@@ -908,9 +771,8 @@ local function drawHitboxOverlay()
     battle.hitbox_shapes = shape_count
 end
 
---- Whether the overlay is still hooked into the layer system. A scene clear
---- empties the layer lists without flagging the old entry, so membership is
---- checked by identity rather than by `_active`.
+---Whether the overlay is still hooked into the layer system. A scene clear
+---empties the layer lists without flagging the old entry.
 ---@return boolean
 local function hitboxOverlayRegistered()
     return (hitbox_overlay ~= nil) and (Layers.find_by_id(hitbox_overlay._id) == hitbox_overlay)
@@ -946,9 +808,8 @@ function battle.ToggleHitboxes(show)
 end
 
 function battle.Update(dt)
-    -- Hitbox viewer (development builds only): F7 toggles it, and it is
-    -- re-hooked every frame while on, because a scene clear wipes the layer
-    -- system's external draws.
+    -- F7 toggles the viewer; re-hooked every frame while on, because a scene
+    -- clear wipes the layer system's external draws.
     if (not _RELEASED) then
         if (Keyboard.GetState(HITBOX_KEY) == 1) then
             battle.ToggleHitboxes()
@@ -972,8 +833,7 @@ function battle.Update(dt)
     do
         local anim = v.animation
         if (anim) then
-            -- Expose the enemy table plus the fields monsters commonly need, so
-            -- animation code can read them straight off `self`.
+            -- Fields monsters commonly read straight off `self`.
             anim.enemy    = v
             anim.canspare = v.canspare
             anim.killable = v.killable
@@ -982,10 +842,6 @@ function battle.Update(dt)
             -- Convenience signal: HP has reached 0 and the enemy is killable.
             anim.dead     = (v.hp ~= nil and v.hp <= 0 and v.killable == true)
 
-            -- The instance drives itself (`anim.Update(dt)`) — see
-            -- BindAnimation() above. A bare module, i.e. a scene that never
-            -- called Game:InitAnimation, has nothing bound and is skipped; its
-            -- Update would only have run its no-op guard anyway.
             if (type(anim) == "table" and anim._bound and anim.Update) then
                 anim.Update(dt)
             end
@@ -997,19 +853,9 @@ function battle.Update(dt)
     end
 end
 
--- Called while returning from DEFENDING to ACTIONSELECT. Defers the narration
--- text until the arena has scaled back to full size (565x130) on its OWN — we no
--- longer snap it with confirm.
---
--- During the restore, state.Update() routes every confirm/cancel through this
--- function instead of the logic_list, so pressing Z (confirm) is intercepted
--- and effectively ignored: it can not open FIGHT/ACT/ITEM/MERCY until the box
--- finishes restoring. Left/right still work, because buttons.Update() handles
--- them independently and only checks Battle.state == "ACTIONSELECT".
---
--- The arena reaches its target through its own per-frame tween (see
--- Arenas.Update), so all this function does is wait for that to land and then
--- drop the flag + show the narration text.
+-- Called on the way back from DEFENDING to ACTIONSELECT. Waits for the arena to
+-- finish restoring on its own, then reveals the narration. While the flag is
+-- set, state.Update() routes confirm/cancel here, so the menu cannot open early.
 function battle.UpdateRestore(dt)
     if (not battle.restoring_arena) then
         return
@@ -1023,8 +869,7 @@ function battle.UpdateRestore(dt)
 end
 
 function battle.Clear()
-    -- Overworld save-data bridge: hand HP / EXP / GOLD (and any level-ups)
-    -- back to DATA before the modules themselves are dropped.
+    -- Hand HP / EXP / GOLD (and any level-ups) back to DATA before dropping modules.
     battle.SyncToOverworld()
 
     -- Clear the game module tree so it re-queries Localize on next load
@@ -1032,9 +877,7 @@ function battle.Clear()
         ClearModuleTree(battle.gameName)
     end
 
-    -- Clear all loaded attack pattern modules. attack_paths holds resolved
-    -- module names, so both roots (Game.Attacks.* and
-    -- Scripts.Libraries.Battle.PlayerAttacks.*) are covered; the tree clear
+    -- attack_paths holds resolved names, so both roots are covered; the tree clear
     -- below catches any that were never registered.
     for i = #battle.attack_paths, 1, -1
     do
@@ -1042,10 +885,8 @@ function battle.Clear()
     end
     ClearGameTree("Attacks")
 
-    -- Game-area battle content lives under its own root, so clearing only
-    -- "Scripts.Libraries.Battle" would leave these cached: re-entering a battle
-    -- would then hand the new encounter last run's encounter / monster
-    -- animation / soul module, state included.
+    -- Game-area content: without this, re-entering a battle would hand back last
+    -- run's modules, state included.
     ClearGameTree("Encounter")
     ClearGameTree("Animations")
     ClearGameTree("Waves")
@@ -1057,13 +898,11 @@ function battle.Clear()
         Battle._wave._paths = {}
     end
     Battle._wave = {}
-    -- Clear the wave wrapper (under both roots) and reset the shared
-    -- "Battle.Waves" state so a future wave doesn't inherit a stale _end = true.
+    -- Clear the wave wrapper under both roots and reset the shared wave state.
     clearWaveModule(Battle.wave)
     battle.restoring_arena = false
 
-    -- Clear the entire Battle library tree (UI, buttons, Player, Arenas,
-    -- game_apis, Waves, PlayerAttacks, Souls, etc.) in a single pass.
+    -- Clear the whole Battle library tree (UI, buttons, Player, Arenas, ...).
     ClearModuleTree("Scripts.Libraries.Attacks")
     ClearModuleTree("Scripts.Libraries.Battle")
 end

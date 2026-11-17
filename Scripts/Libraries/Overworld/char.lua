@@ -2,7 +2,6 @@ local path = (...):match("(.-)[^%.]+$")
 local world = require(path .. "world")
 
 local char = {
-    -- Sprite frames for each walking direction.
     sprites = {
         up = {
             "Overworld/Frisk/spr_f_maincharau_0.png",
@@ -34,13 +33,12 @@ local char = {
     animationFrame = 1,
     animationTime = 0,
     isMoving = false,
-    -- Whether the player can move (input is read only while this is true).
+    -- Input is only read while this is true.
     controlling = true,
     -- Whether the Frisk Dance easter egg is enabled.
     friskdance = (Global and Global.GetVariable and Global.GetVariable("EnableFriskDance")) or false,
-    -- Whether the player is currently performing the Frisk Dance.
     frisk_dancing = false,
-    -- Timer for the Frisk Dance direction flip (UP <-> DOWN, every 1/30s).
+    -- Frisk Dance direction flip timer (UP <-> DOWN every 1/30s).
     friskDanceTime = 0,
     mainstate = "",
     collision = {
@@ -48,22 +46,18 @@ local char = {
         shape = nil,
         fixture = nil,
     },
-    -- Spawn position (world coordinates, i.e. already *2 from the Tiled map).
+    -- Spawn position in world coordinates (already *2 from the Tiled map).
     x = 0,
     y = 0,
 }
 
--- Movement state kept between frames.
 local first_direction = ""
 local d_pressing = false
 local char_prevX, char_prevY = 0, 0
--- Last physics-body position; used to detect whether the player is pressed
--- against a wall (the body did not move since the previous frame).
+-- Last physics-body position, used to detect a player pressed against a wall.
 local body_lastX, body_lastY = nil, nil
--- Tolerance (world units) when deciding whether the body "moved" between two
--- frames. A resting contact can still jitter by a fraction of a unit, while a
--- walking player covers ~3.3 units per frame, so anything above this is real
--- movement.
+-- Tolerance (world units) when deciding whether the body moved between frames:
+-- a resting contact jitters slightly, a walking player covers ~3.3 units.
 local DANCE_STILL_EPS = 0.5
 
 ---Replace the whole sprite table.
@@ -85,30 +79,23 @@ function char.SetPosition(x, y, direction)
     end
 end
 
----Create the player's sprite and physics body. Call this after the map is
----loaded so the physics world exists and the spawn position is known.
+--- Create the player's sprite and physics body. Call after the map is loaded.
 function char.Init()
-    -- Make sure the physics world exists.
     world.Init()
 
-    -- Clean up any previous instance.
     char.Destroy()
 
-    -- Create the player sprite.
     char.currentSprite = Sprites.CreateSprite(char.sprites[char.direction][1], "Player")
     char.currentSprite:Scale(2, 2)
     char.currentSprite:MoveTo(char.x, char.y)
     print(char.currentSprite:GetPosition())
 
-    -- Player collision setup.
     char.collision.body = SE.physics.newBody(world.physics_world, char.x, char.y, "dynamic")
     char.collision.shape = SE.physics.newRectangleShape(char.collision.body, 38, 20)
     char.collision.shape:setDensity(1)
     char.collision.shape:setRestitution(0)
-    -- Low friction so the player slides smoothly along sloped / diagonal walls
-    -- (movement is velocity-driven, so lowering it does not affect normal
-    -- walking or stopping). The effective contact friction between the player
-    -- and the walls is sqrt(player_friction * wall_friction).
+    -- Low friction so the player slides along sloped / diagonal walls. Box2D
+    -- mixes contact friction as sqrt(player * wall), so both must stay low.
     char.collision.shape:setFriction(0.01)
     char.collision.shape:setUserData({type = "oworld.char"})
     char.collision.fixture = char.collision.shape
@@ -118,7 +105,7 @@ function char.Init()
     body_lastX, body_lastY = nil, nil
 end
 
----Remove the player's physics body and sprite.
+--- Remove the player's physics body and sprite.
 function char.Destroy()
     if (char.collision.body and not char.collision.body:isDestroyed()) then
         char.collision.body:destroy()
@@ -133,28 +120,26 @@ function char.Destroy()
     end
 end
 
----Update the player: read input, move the physics body, make the sprite
----follow the fixture and advance the walk animation. Called every frame.
+--- Update the player: read input, move the body, follow the fixture and advance
+--- the walk animation. Called every frame.
 ---@param dt number
 function char.Update(dt)
     if (not char.currentSprite or not char.collision.body) then return end
 
     local velbodyx, velbodyy = 0, 0
 
-    -- Detect whether the physics body stayed in place since last frame
-    -- (i.e. the player is pressing against a wall).
+    -- Detect whether the body stayed in place since last frame (wall contact).
     local bx, by = char.collision.body:getX(), char.collision.body:getY()
     local prevX, prevY = body_lastX, body_lastY
     body_lastX, body_lastY = bx, by
     local moved_x = (prevX == nil) or (math.abs(bx - prevX) > DANCE_STILL_EPS)
-    -- Vertical stillness: the body is glued to the wall / ground and is not
-    -- slipping up or down. This is what keeps the Frisk Dance alive.
+    -- Vertical stillness is what keeps the Frisk Dance alive.
     local moved_y = (prevY == nil) or (math.abs(by - prevY) > DANCE_STILL_EPS)
     local blocked = (not moved_x and not moved_y)
 
     if (char.controlling) then
-        -- The first pressed direction is remembered until it is released,
-        -- so reversing direction requires turning first.
+        -- The first pressed direction is remembered until released, so reversing
+        -- requires turning first.
         if (Controller.GetState(first_direction) <= 0) then
             first_direction = ""
         end
@@ -196,14 +181,10 @@ function char.Update(dt)
         local down_held = Controller.GetState("down") > 0
         local was_dancing = char.frisk_dancing
         if (char.friskdance and up_held and down_held) then
-            -- Start condition: standing completely still AND pushing up
-            -- against a wall. Once started, the body must KEEP standing still
-            -- on the Y axis -- the moment it slips (walked away from the
-            -- wall, pushed through, fell, ...) the dance is cancelled, while
-            -- sliding left/right along the wall is still allowed.
-            -- Note that `velbodyy < 0` can only be required to *start* the
-            -- dance: while dancing the facing flips to "down" every other
-            -- flip, which makes the raw input velocity positive again.
+            -- Start: standing still while pushing up into a wall. Once started,
+            -- the body must stay still on Y; sliding left/right is allowed.
+            -- `velbodyy < 0` can only be required to start: while dancing the
+            -- facing flips to "down" every other flip.
             char.frisk_dancing = (not moved_y) and (was_dancing or (blocked and velbodyy < 0))
         else
             char.frisk_dancing = false
@@ -215,10 +196,7 @@ function char.Update(dt)
         end
 
         if (char.frisk_dancing) then
-            -- Keep pushing up so the player stays glued to the wall (the
-            -- collision stops the movement, which is exactly what the
-            -- "moved_y == false" check above looks for), while still letting
-            -- the player walk left/right during the Frisk Dance.
+            -- Keep pushing up so the collision holds the body still on Y.
             velbodyy = -2
             Step.UpdateTime()
         end
@@ -229,7 +207,6 @@ function char.Update(dt)
         char.frisk_dancing = false
     end
 
-    -- Make the sprite follow the fixture.
     char.currentSprite:MoveTo(
         char.collision.body:getX(),
         char.collision.body:getY() - 20
@@ -237,10 +214,8 @@ function char.Update(dt)
     char.collision.body:setLinearVelocity(velbodyx * 100, velbodyy * 100)
 
     if (char.frisk_dancing) then
-        -- Frisk Dance: advance the walk frame (never resetting to 0) and flip
-        -- between the UP and DOWN sprite groups every 1/30s, while the frame
-        -- counter keeps advancing (it never resets back to 0). The body stays
-        -- glued to the wall (its velocity was zeroed above).
+        -- Advance the walk frame and flip UP/DOWN every 1/30s; the body stays
+        -- glued to the wall.
         char.animationTime = char.animationTime + dt
         if (char.animationTime >= 0.18) then
             char.animationFrame = char.animationFrame % #char.sprites[char.direction] + 1
@@ -253,7 +228,6 @@ function char.Update(dt)
         end
         char.isMoving = true
     elseif (velbodyx ~= 0 or velbodyy ~= 0) then
-        -- Walk animation.
         char.animationTime = char.animationTime + dt
         if char.animationTime >= 0.18 then
             char.animationFrame = char.animationFrame % #char.sprites[char.direction] + 1

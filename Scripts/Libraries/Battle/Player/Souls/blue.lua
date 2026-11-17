@@ -2,13 +2,11 @@ local action = {
     sprite = nil,
     can_move = true,
     is_moving = false,
-    -- Ask the engine to catch this soul on the one-way platforms. The field is
-    -- opt in, so without it the soul would fall straight through
-    -- Player.BluePlatform surfaces (see Player.UpdatePlatforms).
+    -- Opt in: without this the soul falls through Player.BluePlatform surfaces
+    -- (see Player.UpdatePlatforms).
     use_platforms = true
 }
 
--- Default vars.
 local speed = 2
 local gravity = 0.15
 local max_jump = 5
@@ -24,9 +22,8 @@ local dir = "down"
 local man_dir = "down"
 local speed_limit = 10
 
----Derives the gravity direction from a rotation angle. The soul always falls
----towards the side it is "standing" on (the sprite's local down).
----0deg = down, 90deg = left, 180deg = up, 270deg = right.
+---Derives the gravity direction from a rotation angle: the soul always falls
+---towards its local down. 0deg = down, 90 = left, 180 = up, 270 = right.
 ---@param angle number
 ---@return string
 local function auto_direction(angle)
@@ -51,9 +48,8 @@ local function set_direction(direction)
     end
 end
 
--- Init: the contract lives in _temp.lua. A soul switch must not carry the
--- previous run's gravity direction, jump or slam state over, so Init resets the
--- soul and lines the sprite up with the fresh direction ("down" = rotation 0).
+-- Init: the soul contract lives in _temp.lua. Init resets the soul and lines the
+-- sprite up with a fresh direction ("down" = rotation 0).
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.
@@ -323,10 +319,8 @@ function action.Update(dt)
                 end
             end
 
-            -- Head bonk: if the soul's head touches the top of the arena while
-            -- jumping, give it the float/glide speed exactly once, then drop out
-            -- of the jump state so gravity takes over. Clearing `jumping` is what
-            -- stops it lingering on the ceiling while the key stays held.
+            -- Head bonk: give the float/glide speed once, then leave the jump
+            -- state so the soul does not linger on the ceiling while held.
             if (jumping and Arenas.PlayerOnCeiling(sprite)) then
                 current_speed = -float
                 jumping = false

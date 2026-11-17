@@ -1,6 +1,5 @@
--- Visual check for the ShaderToy host-channel rewrite.
--- px.png is a white 1x1 texture: when iChannel0 reads the host texture,
--- src.r is 1 everywhere and the screen renders solid red.
+-- Test scene for hostChannel. px.png is a white 1x1 texture, so src.r is 1
+-- everywhere and the screen must render solid red.
 local scene = {}
 
 local shadertoy = ImportFile("ShaderToy")

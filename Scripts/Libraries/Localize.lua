@@ -2,10 +2,8 @@ local localize = {}
 local dkjson = ImportFile("Utils.dkjson")
 localize.currentLanguage = nil
 
--- Localization lookup layers, highest priority first. A translation file placed
--- in the Game area (Game/Localization/) is merged ON TOP OF the engine default
--- (Localization/): keys missing from a higher layer fall back to a lower one,
--- so the Game copy only needs the entries it actually changes.
+-- Lookup layers, highest priority first. Game/Localization/ is merged ON TOP OF
+-- Localization/, so a Game file only needs the keys it changes.
 local ROOT_LOCALIZATION = "Localization/"
 local GAME_LOCALIZATION = "Game/Localization/"
 local LAYER_PATHS = { GAME_LOCALIZATION, ROOT_LOCALIZATION }
@@ -24,8 +22,8 @@ local function readFileOrNil(path)
     return content
 end
 
---- True for tables that should be merged key-by-key instead of overwritten
---- (anything holding at least one non-numeric key). Arrays are replaced whole.
+--- True for tables merged key-by-key instead of overwritten: anything holding
+--- at least one non-numeric key. Arrays are replaced whole.
 local function isMergeableMap(value)
     if (type(value) ~= "table") then return false end
     for k in pairs(value) do
@@ -48,7 +46,7 @@ end
 
 --- Load every existing layer of a language and merge them, Game side winning.
 ---@param language string Language code, e.g. "en" or "zh_CN".
----@return table|nil file The merged translation table (a layer the Game copy overlaid on the engine one).
+---@return table|nil file The merged translation table.
 ---@return string|nil primary Path of the highest priority layer that was used.
 ---@return table|nil sources Every layer path that contributed, highest priority first.
 local function loadLanguage(language)
@@ -59,7 +57,7 @@ local function loadLanguage(language)
     local file_name = languageFileName(language)
     local layers = {}
 
-    -- Collected highest priority first, so index 1 wins the `primary` slot.
+    -- Highest priority first, so index 1 wins the `primary` slot.
     for i = 1, #LAYER_PATHS do
         local path = LAYER_PATHS[i] .. file_name
         local content = readFileOrNil(path)
@@ -78,7 +76,6 @@ local function loadLanguage(language)
         return nil, nil, nil
     end
 
-    -- Start from the lowest priority layer and let the higher ones overwrite it.
     local merged = layers[#layers].table
     for i = #layers - 1, 1, -1 do
         mergeInto(merged, layers[i].table)
@@ -94,7 +91,6 @@ end
 
 
 --- Path of the highest priority existing layer, hinting where a language comes from.
---- Exposed mainly for debugging / tooling.
 ---@param language string
 ---@return string
 function localize.GetLanguagePath(language)
@@ -152,7 +148,6 @@ end
 function localize.localizeText(elements, formats)
     local file = localize.file
     if not file then
-        -- Load default
         if applyLanguage("en") then
             file = localize.file
         else
@@ -162,7 +157,6 @@ function localize.localizeText(elements, formats)
     end
     if (not file) then return end
 
-    -- Build the dot-separated key from elements
     local key
     if type(elements) == "string" then
         key = elements
@@ -184,7 +178,7 @@ function localize.localizeText(elements, formats)
         return nil
     end
 
-    -- Direct lookup using the flat dot-notation key
+    -- Keys are flat dot-notation strings ("menu.start"), not nested lookups
     local current = file[key]
 
     if current == nil then
@@ -192,8 +186,7 @@ function localize.localizeText(elements, formats)
         return nil
     end
 
-    -- Apply real string.format substitutions to a single string
-    -- (supports %s, %d, %f, %x, ...)
+    -- string.format substitution (%s, %d, %f, %x, ...); failures keep the raw text
     local function applyFormats(text)
         if formats == nil then
             return text
@@ -215,7 +208,7 @@ function localize.localizeText(elements, formats)
         return applyFormats(current)
 
     elseif type(current) == "table" then
-        -- Apply format substitutions to every string element (e.g. GameoverText array)
+        -- Format every string element (e.g. GameoverText array)
         if formats ~= nil then
             local result = {}
             for i = 1, #current do

@@ -10,7 +10,7 @@ world.interactions = {
 }
 
 -- Check whether one side of a contact is the player ("oworld.char") and the
--- other side is the given object type (warp / chest / sign / save / trigger).
+-- other side is the given object type.
 local function isPlayerCollision(dataA, dataB, objectType)
     return (dataA and dataA.type == "oworld.char" and dataB and dataB.type == objectType) or
            (dataB and dataB.type == "oworld.char" and dataA and dataA.type == objectType)
@@ -20,16 +20,13 @@ end
 local function handleInteraction(dataA, dataB, objectType)
     world.interactions.can_interact = true
     world.interactions.current_object = objectType
-    -- Keep a reference to the collided object so callers can read its properties
-    -- (e.g. getInteractResult(obj_type, value, "rr")).
     local obj = dataA.object or dataB.object
     world.interactions.current_obj = obj
     if (dataA.type == objectType) then world.interactions.current_id = dataA.id end
     if (dataB.type == objectType) then world.interactions.current_id = dataB.id end
 
-    -- Track the object in the multi-touch list so getTouchResult can see all of
-    -- them at once. Deduplicate: the same object may fire beginContact more
-    -- than once, so only add it if it isn't already in the list.
+    -- Track the object for getTouchResult (deduplicated: beginContact can fire
+    -- more than once for the same object).
     local found = false
     for i = 1, #world.interactions.touching do
         if (world.interactions.touching[i].object == obj) then
@@ -51,9 +48,8 @@ local function handleInteraction(dataA, dataB, objectType)
     end
 end
 
--- When the oworld.char stops colliding with an object, remove it from the
--- touched list. If the player still touches other objects, keep the first one
--- as the "current" interaction so getInteractResult keeps working.
+-- Remove the object from the touched list; if others remain, keep the first
+-- as the "current" interaction.
 local function clearInteraction(dataA, dataB, objectType)
     local obj = dataA.object or dataB.object
     for i = #world.interactions.touching, 1, -1 do
@@ -78,7 +74,6 @@ local function clearInteraction(dataA, dataB, objectType)
     end
 end
 
--- beginContact: the player started touching an object.
 local function beginContact(a, b)
     if (not a or not b) then return end
     local fixtureA, fixtureB = a, b
@@ -94,7 +89,6 @@ local function beginContact(a, b)
     end
 end
 
--- endContact: the player stopped touching an object.
 local function endContact(a, b)
     if (not a or not b) then return end
     local dataA = a:getUserData() or {}

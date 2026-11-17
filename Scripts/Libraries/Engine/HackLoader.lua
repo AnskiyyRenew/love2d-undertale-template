@@ -1,50 +1,19 @@
 -- HackLoader -- game-side "hack" injection for engine internals.
 --
 -- Engine libraries under Scripts.Libraries are NOT part of the Game override
--- mechanism (only scenes / waves / souls / maps / resources are). Some things -
--- the battle UI, battle flow, sprite behaviour - can therefore only be changed
--- by editing the engine, which a game author must not do.
+-- mechanism, so Game/Hacks/*.lua is the supported way in. Files run once at
+-- startup (numeric prefix order, "_" files skipped), each returning
+-- {name, apply(Hack)} or a plain function.
 --
--- This module gives the Game area a supported way in:
---
---   Game/Hacks/*.lua     run once at startup, after every engine library has
---                        been loaded but before the first scene is switched to.
---
--- Three primitives, enough for both "tweak one function" and "replace a whole
--- subsystem":
---
---   Hack.Replace(engine_module, game_module)
---       Whole-module replacement, applied through package.preload so it also
---       wins for modules that are loaded LAZILY later on (Battle, UI, ...).
---       If the engine module is already loaded the fields are hot-swapped in
---       place (and a warning is printed) instead of pretending it worked.
---
---   Hack.After(module_name, fn)
---       Run `fn(module)` as soon as `module_name` is loaded - now if it already
---       is, otherwise the moment it gets required. This is the only way to
---       touch lazily loaded globals such as Battle / UI.
---
---   Hack.Wrap(owner, key, wrapper) / Hack.Set(owner, key, value)
---       Function-level surgery. `wrapper` receives the ORIGINAL function as its
---       first argument. Both record the previous value so Hack.Unapply() can
---       put everything back.
---
--- Load order / isolation:
---   * Files are sorted by their numeric filename prefix (010_x.lua before
---     020_y.lua); files starting with "_" are plain modules, never entry points.
---   * One broken hack is reported loudly and skipped - it never prevents the
---     rest from loading, and never blocks the game from starting.
---   * Wrapping the same owner.key twice prints a WARNING: later hacks wrap
---     around earlier ones, so order decides who sees the call first.
---   * Hack.Unapply() undoes every patch and installed loader, so F5 (which
---     clears Scripts.Libraries) can replay the hacks on the fresh modules
---     instead of stacking wrappers on top of wrappers.
+--   Hack.Replace(engine_module, game_module)       whole-module replacement
+--   Hack.After(module_name, fn)                    fn(module) as soon as loaded
+--   Hack.Wrap / Set / Patch(owner, key, value)     function-level surgery
+--   Hack.Unapply()                                 undo everything (F5 reload)
 
 local Hack = {}
 
--- Registry kept in a GLOBAL: F5 calls ClearModuleTree("Scripts.Libraries"),
--- which drops this very module from package.loaded. A module-local table would
--- be silently replaced by an empty one and Unapply() would lose every original.
+-- Registry kept in a GLOBAL: F5 drops this module from package.loaded, so a
+-- module-local table would be replaced and Unapply() would lose every original.
 local state = _HACK_STATE
 if (not state) then
     state = {
@@ -65,9 +34,6 @@ local function err(message)
     print("[Hack] ERROR: " .. tostring(message))
 end
 
--- ---------------------------------------------------------------------------
--- module loading helpers
--- ---------------------------------------------------------------------------
 
 --- Load a module the way require() would, ignoring package.preload (so our own
 --- loader can never recurse into itself).
@@ -111,14 +77,9 @@ local function fireAfter(module_name, mod)
     end
 end
 
---- Install a package.preload loader that (a) honours Hack.Replace, and
---- (b) fires the after-hooks. Kept installed so a later reload (F5) is
---- patched again instead of slipping through un-hacked.
----
---- The "already installed" mark is the ENTRY TABLE itself, not `previous`:
---- `previous` is nil for most modules and nil/false cannot be told apart from
---- "not installed", which made a second call capture our own loader as the
---- previous one and chain wrappers together.
+--- Install a package.preload loader that honours Hack.Replace and fires the
+--- after-hooks. The "installed" mark is the ENTRY TABLE itself: `previous` is
+--- nil for most modules and cannot be told apart from "not installed".
 ---@param module_name string
 local function ensureLoader(module_name)
     if (state.loaders[module_name]) then return end
@@ -173,14 +134,9 @@ local function patchFields(owner, patch, label)
     end
 end
 
--- ---------------------------------------------------------------------------
--- public API
--- ---------------------------------------------------------------------------
 
---- Replace an engine module with a module from the Game area.
---- Works for modules that are not loaded yet (the normal case - Battle and UI
---- are required lazily by battle scenes). If the target is already loaded the
---- fields are hot-swapped instead, with a warning.
+--- Replace an engine module with a Game-area module. Not-yet-loaded modules go
+--- through package.preload; already-loaded ones are hot-swapped with a warning.
 ---@param engine_module string e.g. "Scripts.Libraries.Battle.UI"
 ---@param game_module string e.g. "Game.Hacks.MyBattleUI"
 function Hack.Replace(engine_module, game_module)
@@ -291,9 +247,6 @@ function Hack.Patch(owner, patch, label)
     patchFields(owner, patch, label)
 end
 
--- ---------------------------------------------------------------------------
--- loading / unloading
--- ---------------------------------------------------------------------------
 
 local HACK_DIR = "Game/Hacks"
 
@@ -310,11 +263,8 @@ local function fileExists(path)
     return (readable and content ~= nil)
 end
 
---- Declarative overrides: Game/Overrides.lua returns a plain mapping of
----   engine module name -> Game module name
---- so "swap this whole subsystem" needs no Lua logic at all. It rides on the
---- very same preload machinery as Hack.Replace - this is only a friendlier
---- front door, not a second mechanism.
+--- Declarative overrides: Game/Overrides.lua maps engine module name -> Game
+--- module name, applied through the same preload machinery as Hack.Replace.
 local OVERRIDES_FILE = "Game/Overrides.lua"
 local OVERRIDES_MODULE = "Game.Overrides"
 
@@ -381,8 +331,7 @@ end
 --- Load and run every hack in Game/Hacks/, plus the declarative
 --- Game/Overrides.lua mapping. Safe to call again after Unapply().
 function Hack.Load()
-    -- Declarative overrides first: they are the "swap this whole module" case,
-    -- and a hack that replaces the same module then wins (with a warning).
+    -- Overrides first: a hack replacing the same module then wins (with a warning).
     loadOverrides()
 
     local files = listHackFiles()
@@ -433,14 +382,11 @@ function Hack.Unapply()
     end
 
     for module_name, entry in pairs(state.loaders) do
-        -- entry.previous is nil when nothing was registered before us, which
-        -- removes our loader entirely.
+        -- entry.previous is nil when nothing was registered before us.
         package.preload[module_name] = entry.previous
     end
 
-    -- Drop the hack modules from the require cache too, so a reload actually
-    -- picks up edits made to Game/Hacks/*.lua and Game/Overrides.lua instead of
-    -- re-running the code that was loaded at startup.
+    -- Drop the hack modules from the require cache so a reload picks up edits.
     package.loaded[OVERRIDES_MODULE] = nil
     for module_name in pairs(state.applied) do
         package.loaded[module_name] = nil

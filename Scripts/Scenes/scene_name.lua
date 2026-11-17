@@ -60,7 +60,6 @@ Layers.add_external(function ()
 end)
 
 function scene.update(dt)
-    -- Shake
     for i = 1, #shakers
     do
         shakers[i] = {
@@ -69,7 +68,6 @@ function scene.update(dt)
         }
     end
 
-    -- Logic
     local left  = (Controller.GetState("left") == 1)
     local right = (Controller.GetState("right") == 1)
     local up    = (Controller.GetState("up") == 1)

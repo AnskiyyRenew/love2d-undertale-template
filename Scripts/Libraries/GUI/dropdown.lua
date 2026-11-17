@@ -1,44 +1,14 @@
 --[[
     GUI Dropdown - UNDERTALE-style dropdown menu
 
-    A trigger button showing the currently-selected item; clicking it expands
-    a vertical list of options. The menu opens either above ("up") or below
-    ("down") the trigger. A single width `w` sizes the menu (option rows);
-    `buttonW` (optional, defaults to `w`) sizes the trigger button separately.
+    A trigger button showing the selected item; clicking it expands a vertical
+    option list above ("up") or below ("down") it. Pure component: the scene
+    polls :SetHover(mx,my) each frame and routes clicks via :HandleClick(mx,my),
+    which returns true when the click landed on the dropdown. Selection state
+    matches the rest of the GUI (selected = "> " + yellow, hovered = yellow).
 
-    Pure component: it does not read input. The scene polls hover each frame
-    via :SetHover(mx,my) and routes clicks via :HandleClick(mx,my), which
-    returns true when the click landed on the dropdown (so the scene can skip
-    letting other components handle it). Clicking an option selects it and
-    collapses the menu; clicking outside collapses the menu (and returns false
-    so the scene is free to forward that same click elsewhere).
-
-    Selection state follows the rest of the GUI library:
-      selected option  -> prefix "> " + yellow (like Button:SetSelected)
-      hovered option   -> yellow, no prefix (like Button:SetHovered)
-      normal           -> white, no prefix
-    The trigger button border turns yellow while hovered or expanded.
-
-    Layering: backgrounds (trigger box + menu box) sit on `layer`; all text
-    sits on `layer + 1`. Same-layer sorting is by _id (registration order),
-    so a same-layer Label + background box would let the black interior cover
-    the text -- the split avoids that (same fix as TextInput).
-
-    Usage:
-      local dd = GUI.Dropdown.New{
-          x = 200, y = 200, w = 180,
-          buttonW = 180,          -- optional; defaults to w
-          buttonH = 24, itemH = 24,
-          items = {"Red", "Green", "Blue"},
-          selected = 1,
-          expand = "down",        -- "up" | "down"
-          layer = 1001,
-          onSelect = function(self, idx, text) print(idx, text) end,
-      }
-      -- in scene.update (after GUI.Input.Update()):
-      local mx, my = GUI.Input.GetCanvasMouse()
-      dd:SetHover(mx, my)
-      if (GUI.Input.IsPressed(1)) then dd:HandleClick(mx, my) end
+    Layering: backgrounds sit on `layer`, all text on `layer + 1` (same-layer
+    sorting is by registration order, so a same-layer box would cover the text).
 ]]
 
 local primitives = require((...):match("(.-)[^%.]+$") .. "primitives")
@@ -75,7 +45,6 @@ function Dropdown.New(opts)
     self._triggerHovered = false
     self._optionHovered = nil
     self._destroyed = false
-    -- clamp selected into range
     self.selected = opts.selected or 1
     if (#self.items > 0) then
         if (self.selected < 1) then self.selected = 1 end
@@ -226,14 +195,10 @@ function Dropdown:SetHover(mx, my)
 end
 
 --- Handle a mouse click. Returns true if the click landed on the dropdown
---- (trigger or an option); false if it landed outside (the menu is still
---- collapsed in that case, so the scene is free to forward the click to other
---- components).
----   collapsed + click trigger  -> expand (true)
----   expanded  + click option   -> select + collapse (true)
----   expanded  + click trigger   -> collapse (true)
----   expanded  + click outside  -> collapse (false)
----   collapsed + click outside  -> no-op (false)
+--- (trigger or an option); false when it landed outside, in which case the menu
+--- is collapsed but the scene is free to forward the click to other components.
+---   collapsed + trigger -> expand; expanded + option -> select + collapse;
+---   expanded + trigger / outside -> collapse (outside returns false).
 function Dropdown:HandleClick(mx, my)
     if (self.expanded) then
         local optIdx = self:_optionAt(mx, my)
@@ -290,7 +255,6 @@ end
 --- current selection by index, clamped into the new range.
 function Dropdown:SetItems(items)
     self.items = items or {}
-    -- rebuild option labels
     for _, lbl in ipairs(self._optLabels) do lbl:Destroy() end
     self._optLabels = {}
     if (#self.items > 0) then

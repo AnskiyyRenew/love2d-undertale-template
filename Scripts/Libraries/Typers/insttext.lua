@@ -1,27 +1,10 @@
 --[[
-
-
-How to use:
-
-local text = Typers.InstText.New("Hello there\nWorld of mine", {320, 60}, 0)
-text:SetAlign("center")
-
-Draws the full text instantly (no typing animation).
-Automatically splits English/CJK characters and renders them
-with the appropriate font, scale, and positioning.
-
-Methods:
-  :SetText(new_text)   -- Dynamically change the displayed text
-  :SetAlign(mode)      -- Set alignment: "left" (default), "center", "right"
-  :UseBondFont(config) -- Swap bondfont config and rebuild
-  :SetStencils(masks)  -- Clip the text to the mask areas (same as a sprite)
-  :SetShaders(shaders) -- Run the text through a shader chain (same as a sprite)
-
-
+InstText: draws the whole text instantly, no typing animation. Splits ASCII and
+CJK characters and renders each with its bondfont entry. Entry points:
+typers.New, typers.ClearCache; instances expose SetText / SetAlign / Rebuild.
 ]]
--- Shared mask / shader helpers (see render.lua). Resolved through the engine
--- module path rather than relative to this file, so a Game-area copy of a
--- typer (whole-file override) still finds it.
+-- Shared mask / shader helpers. Resolved through the engine module path so a
+-- Game-area whole-file copy of a typer still finds it.
 local render = require("Scripts.Libraries.Typers.render")
 
 local typers = {
@@ -62,11 +45,8 @@ local function getTextCacheKey(font, char)
     return font_key .. "_" .. char
 end
 
---- Decrement a text object's reference count. Text objects are shared across
---- all InstText instances (same font + char), so only release and evict from
---- the cache once no instance references it anymore. This prevents the
---- "Cannot use object after it has been released" error when one instance
---- rebuilds while another still draws the same object.
+--- Text objects are shared by every instance with the same font + char, so only
+--- release and evict the cache entry once the last reference is gone.
 local function releaseTextObject(font, char)
     local key = getTextCacheKey(font, char)
     local cache_entry = text_cache[key]
@@ -119,7 +99,7 @@ end
 function typers.New(text, position, layer, size)
     local typer = {}
 
-    -- Metatable to intercept `.layer` writes and automatically mark Layers as dirty
+    -- Metatable to intercept `.layer` writes and mark Layers dirty.
     setmetatable(typer, {
         __index = function(t, k)
             if k == "layer" then
@@ -133,9 +113,8 @@ function typers.New(text, position, layer, size)
                 Layers.mark_dirty()
             elseif k == "font" then
                 rawset(t, k, v)
-                -- Setting font directly applies it to both the English and
-                -- non-English bondfont entries, with empty funcs so the whole
-                -- text renders with this single font.
+                -- A directly-set font applies to both bondfont entries with
+                -- empty funcs, so the whole text uses this single font.
                 if (t.bondfont) then
                     t.bondfont.engfont.font = v
                     t.bondfont.non_engfont.font = v
@@ -146,8 +125,7 @@ function typers.New(text, position, layer, size)
                 if (t.Rebuild) then t:Rebuild() end
             elseif k == "fontsize" then
                 rawset(t, k, v)
-                -- Setting fontsize directly applies it to both bondfont sizes,
-                -- with empty funcs as well.
+                -- Same for the size: both bondfont entries are resized.
                 if (t.bondfont) then
                     t.bondfont.engfont.size = v
                     t.bondfont.non_engfont.size = v
@@ -171,7 +149,7 @@ function typers.New(text, position, layer, size)
     typer._layer_value = (layer or 0)
     typer.size = (size or {640, 0})
 
-    -- Bondfont config (default, matching ntext/stext)
+    -- Bondfont config, matching ntext / stext.
     typer.bondfont = {
         engfont = {font = "determination_mono.ttf", size = 27},
         non_engfont = {font = "simsun.ttc", size = 13},
@@ -189,15 +167,12 @@ function typers.New(text, position, layer, size)
     typer.outline = nil
     typer.align = "left"
     typer.effect = {}
-    -- Word-aware automatic line breaking (same semantics as EText/NText):
-    -- off by default, enabled by setting `typer.auto_wrap = true` together with
-    -- a box width in `typer.size[1]`. Off means every existing caller keeps
-    -- laying text out on a single line.
+    -- Word-aware wrapping: off by default, enabled by setting
+    -- `typer.auto_wrap = true` together with a box width in `typer.size[1]`.
     typer.auto_wrap = false
 
-    -- Helper: rebuild letter data from typer.text
     local function rebuildLetters()
-        -- Release old text objects (evicts from cache to prevent reuse-after-free)
+        -- Release old text objects (evicts the cache, preventing reuse-after-free).
         if (typer.letters) then
             for _, letter in ipairs(typer.letters) do
                 if (letter.font and letter.char) then
@@ -215,7 +190,7 @@ function typers.New(text, position, layer, size)
         local line_start = 1
         local i = 1
 
-        -- Close the line currently being built and move the pen down one row.
+        -- Close the line being built and move the pen down one row.
         local function endLine()
             local line_width = offset_x
             for j = line_start, #typer.letters do
@@ -232,9 +207,8 @@ function typers.New(text, position, layer, size)
             return (typer.size and typer.size[1]) or 640
         end
 
-        -- Width of the word starting at `from`, stopping at the next break
-        -- opportunity (space / newline / tab). Lets a whole word be pushed to
-        -- the next line instead of being cut in half.
+        -- Width of the word starting at `from`, up to the next break
+        -- opportunity, so a word moves whole to the next line.
         local function wordWidth(from)
             local total = 0
             local j = from
@@ -265,7 +239,6 @@ function typers.New(text, position, layer, size)
             local max_width = wrapWidth()
 
             if (char == "\n") then
-                -- End current line: compute its total width
                 endLine()
                 i = i + 1
             elseif (max_width > 0 and char == " " and offset_x > 0
@@ -274,7 +247,6 @@ function typers.New(text, position, layer, size)
                 endLine()
                 i = i + 1
             elseif (len == 1) then
-                -- English character
                 if (typer.bondfont) then
                     typer.bondfont.engfunc()
                 end
@@ -302,7 +274,6 @@ function typers.New(text, position, layer, size)
                 offset_x = offset_x + w
                 i = i + 1
             else
-                -- Non-English character (CJK, etc.)
                 if (typer.bondfont) then
                     typer.bondfont.non_engfunc()
                 end
@@ -333,7 +304,7 @@ function typers.New(text, position, layer, size)
                 i = i + len
             end
         end
-        -- Final line: set line_width for remaining letters
+        -- Final line: fill in line_width for the remaining letters.
         if (line_start <= #typer.letters) then
             local line_width = offset_x
             for j = line_start, #typer.letters do
@@ -349,7 +320,6 @@ function typers.New(text, position, layer, size)
 
     rebuildLetters()
 
-    -- Compute alignment offset for a line given its total width
     local function alignOffset(line_width)
         if (typer.align == "center") then
             return -line_width / 2
@@ -359,7 +329,6 @@ function typers.New(text, position, layer, size)
         return 0
     end
 
-    -- Register the instant draw function
     render.install(typer)
 
     typer.draw_func = function()
@@ -388,8 +357,8 @@ function typers.New(text, position, layer, size)
                     local t = ol[5] or 1
                     local s = letter.scale or 1
                     SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
-                    -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
-                    -- square t-pixel offsets). setLineWidth has no effect on draw.
+                    -- 8-directional outline: 8 shifted copies at t-pixel offsets.
+                    -- setLineWidth has no effect on draw.
                     SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
@@ -422,16 +391,14 @@ function typers.New(text, position, layer, size)
         end
         typer.text = tostring(new_text or "")
         rebuildLetters()
-        --typer.letters = {}
     end
 
     function typer:Rebuild()
         rebuildLetters()
     end
 
-    --- Pixel width of the widest line, ignoring `typer.x`. Every letter already
-    --- stores the total width of its own line in `line_width` - the same value
-    --- alignment is computed from - so the largest of those is the answer.
+    --- Pixel width of the widest line, ignoring `typer.x`. Each letter stores
+    --- the total width of its own line in `line_width`.
     function typer:GetWidth()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
@@ -444,9 +411,8 @@ function typers.New(text, position, layer, size)
         return widest
     end
 
-    --- Pixel height of every line, ignoring `typer.y`. Spans from the top of
-    --- the highest glyph to the bottom of the lowest one, so both the line
-    --- gaps added by `\n` / auto-wrap and each glyph's own `scale` count.
+    --- Pixel height of every line, ignoring `typer.y`. Includes the `\n` /
+    --- auto-wrap line gaps and each glyph's own `scale`.
     function typer:GetHeight()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
@@ -474,12 +440,8 @@ function typers.New(text, position, layer, size)
     end
 
     function typer:Destroy()
-        -- Idempotent destroy: guard against being called a second time on the
-        -- same instance (e.g. an Update loop that still holds a stale reference
-        -- to an already-destroyed typer). Re-running the release below would
-        -- decrement refs again, and since a newer InstText may have re-created
-        -- the same font+char cache entry, it could release an object that is
-        -- still being drawn -> "Cannot use object after it has been released".
+        -- Idempotent: a stale second Destroy must not decrement refs again and
+        -- release a cache entry that a newer instance is still drawing.
         if (typer._destroyed) then return end
         typer._destroyed = true
 

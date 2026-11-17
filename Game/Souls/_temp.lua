@@ -1,50 +1,33 @@
---  PLAYER SOUL — TEMPLATE AND CONTRACT
---  ============================================================================
---  A soul is a plain module table whose `Update(dt)` decides how the player
---  moves. It is loaded Game-first: `Game/Souls/<id>.lua`, and the engine copy
---  in `Scripts/Libraries/Battle/Player/Souls/<id>.lua` is only the fallback.
+-- Player soul template and contract.
+-- A soul is a plain module table whose `Update(dt)` moves the player. Loaded
+-- Game-first from `Game/Souls/<id>.lua`; the engine copy is only the fallback.
 --
---  HOW TO USE THIS FILE
---    1. Copy it to `Game/Souls/<your_soul>.lua` (the local name `action` is
---       only a convention — keep it, it is what every engine soul uses).
---    2. Replace the "-- TODO" parts.
---    3. Switch to it from a wave: `Player.SetSoul("your_soul")`.
+-- Using it: copy to `Game/Souls/<your_soul>.lua`, keep the local name `action`,
+-- fill the `-- TODO` parts, then `Player.SetSoul("your_soul")` from a wave.
 --
---  THE CALLBACKS
---    * Init(sprite, can_move, args) → called by `Player.SetSoul` /
---      `Player.NewSoul` right after this file is (re)loaded, once per switch.
---      THIS IS WHERE A SOUL SETS ITSELF UP: bind the sprite, choose its own
---      tint, reset its own state, read `args`. The engine binds nothing by
---      itself, so whatever a run needs at the start belongs here.
---    * Update(dt) → called by Battle every frame while this soul is the active
---      one and `Player.canMove` is true.
+-- Callbacks:
+--   Init(sprite, can_move, args) — called once per switch by `Player.SetSoul` /
+--     `Player.NewSoul` right after the file is (re)loaded. The soul sets itself
+--     up here (bind sprite, tint, reset state, read `args`); the engine binds
+--     nothing by itself.
+--   Update(dt) — every frame while this soul is active and can move.
 --
---  THE FIELDS
---    * action.sprite   the player sprite this soul drives.
---    * action.can_move mirrors Player.canMove; false = do not move.
---    * action.is_moving yours, for "am I walking" checks.
---    * action.use_platforms  OPTIONAL, default absent. Set it to true to be
---      caught by the one-way platforms created with `Player.BluePlatform`;
---      a soul that leaves it out passes straight through them.
+-- Fields: `sprite` (the player sprite), `can_move` (mirrors Player.canMove),
+-- `is_moving` (yours), `use_platforms` (optional; true = caught by
+-- `Player.BluePlatform` surfaces, absent = pass through them).
 --
---  IMPORTANT
---    * `Player.action` IS this module table — the engine never copies it. The
---      file is re-executed on every switch, so nothing leaks between souls, but
---      module-level values do live for as long as the battle does: reset them in
---      `Init` instead of assuming a fresh process.
---    * Read input through `Controller.GetState("left")` and friends, never
---      `Keyboard` — that is what keeps gamepads working.
---    * `args` is whatever the wave passed as `Player.SetSoul(id, args)`.
--- ============================================================================
+-- IMPORTANT: `Player.action` IS this module table and the file is re-executed on
+-- every switch, so module-level values live as long as the battle — reset them
+-- in `Init`. Read input via `Controller.GetState(...)`, never `Keyboard`, so
+-- gamepads keep working. `args` is what the wave passed to `Player.SetSoul`.
 
 local action = {
     sprite = nil,
     can_move = true,
     is_moving = false,
-    -- use_platforms = true,   -- uncomment to stand on Player.BluePlatform surfaces
+    -- use_platforms = true, -- stand on Player.BluePlatform surfaces
 }
 
--- Default vars.
 local speed = 2
 
 ---Called once per soul switch: bind the sprite and start from a clean state.

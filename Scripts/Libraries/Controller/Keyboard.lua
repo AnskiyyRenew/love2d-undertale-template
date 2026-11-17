@@ -82,8 +82,7 @@ table.insert(Keyboard.keys, {id = "kp+", state = 0, pressed = false, pressaux = 
 table.insert(Keyboard.keys, {id = "kp.", state = 0, pressed = false, pressaux = false})
 table.insert(Keyboard.keys, {id = "kp=", state = 0, pressed = false, pressaux = false})
 
----Use this function to bind a name to a set of keys.
----This allows you to check the state of a set of keys with a single name.
+--- Bind a name to a set of keys, so one name covers the whole group.
 ---@param name string
 ---@param ... string
 function Keyboard.Bind(name, ...)
@@ -208,6 +207,8 @@ function Keyboard.GetTouches()
     return out
 end
 
+--- Shrink the touch map so it cannot grow without bound: a released touch is
+--- dropped once it has been through state 0 for a frame.
 local function updateTouchStates()
     for id, t in pairs(Keyboard.touches) do
         if t.pressed and t.pressed == t.pressaux then
@@ -223,10 +224,7 @@ local function updateTouchStates()
             t.pressaux = t.pressed
         end
 
-        -- optional: cleanup old released touches after they've been -1 then 0 for a frame
-        -- keep them around for a short time if you want; here we remove them when state == 0 and pressaux == false
         if t.state == 0 and not t.pressed and (not t.keep) then
-            -- remove to avoid unbounded growth (if you want to keep reading previous touches, delete this line)
             Keyboard.touches[id] = nil
         end
     end
@@ -234,8 +232,7 @@ end
 
 
 
---- Simulate a key being pressed (works exactly like a real press:
---- returns 1 the next frame, then 2 while held). Call from touch / events.
+--- Simulate a key press: 1 next frame, then 2 while held.
 ---@param key string
 function Keyboard.SimulatePress(key)
     local simKey = Keyboard.simulatedKeys[key]
@@ -317,22 +314,19 @@ function Keyboard.GetState(key)
     return 0
 end
 
----Use this function to get the mouse's position in the game world.
----It doesn't matter if the game is scaled or not, it will always return the position in the game world.
+--- Mouse position in game world space, whatever the game scale is.
 ---@return number, number
 function Keyboard.GetMousePosition()
     local ScreenScale = ScreenScale
     local x, y = SE.mouse.getPosition()
     x = x - DrawX
 
-    -- Transform the position with CAMERA
     x = x / ScreenScale + Camera.x - 320
     y = y / ScreenScale + Camera.y - 240
     return x, y
 end
 
----This function returns any letter that is currently pressed.
----If the functionKeys are pressed, it won't return any letter.
+--- Letter currently pressed (shift applied), or "" when only function keys are.
 ---@return string
 function Keyboard.ReturnLetter()
     local letter = ""
@@ -380,9 +374,7 @@ function Keyboard.ReturnLetter()
     return letter
 end
 
----This function simulates a key press for a certain duration.
----It will automatically release the key after the duration.
----Returns a progress table that can be used to track the key press.
+--- Simulate a key press for `duration` frames, then release it.
 ---@param key string
 ---@param duration number
 ---@return table
@@ -464,10 +456,8 @@ function Keyboard.Update()
         progress.timer = progress.timer + 1
     end
 
-    -- Finalize simulated key states (same edge logic as the real keys above).
-    -- This makes simulated input feel identical to real input:
-    --   1 = just pressed, 2 = held, -1 = just released, 0 = released
-    -- It runs after the AutoPress loop so AutoPress presses register on the same frame.
+    -- Finalize simulated key states with the same edge logic as real keys. Runs
+    -- after the AutoPress loop so an AutoPress press registers on the same frame.
     local staleKeys = {}
     for key, simKey in pairs(Keyboard.simulatedKeys) do
         if (simKey.pressed ~= nil) then
@@ -484,9 +474,8 @@ function Keyboard.Update()
                 simKey.pressaux = simKey.pressed
             end
 
-            -- A fully-released simulated key is dropped so it no longer shadows
-            -- real input for the same key name (e.g. after using the virtual
-            -- keyboard's "z", a real Z press works again).
+            -- A fully-released simulated key is dropped so it stops shadowing
+            -- real input for the same key name.
             if (not simKey.pressed and simKey.state == 0) then
                 table.insert(staleKeys, key)
             end

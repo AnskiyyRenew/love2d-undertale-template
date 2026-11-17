@@ -1,5 +1,4 @@
--- Documentation: https://gamejolt.com/game-api/doc
--- Naming convention: functions are camelCase, variables are snake_case.
+-- GameJolt Game API v1.2 client. https://gamejolt.com/game-api/doc
 
 local gamejolt = {}
 
@@ -20,19 +19,16 @@ gamejolt._session_auto = {
 -- Flipped to true only once the API has accepted a pair of credentials.
 gamejolt._verified = false
 
--- Returns true for strings holding at least one non-whitespace character.
 local function nonEmpty(value)
     return type(value) == "string" and value:match("%S") ~= nil
 end
 
--- Strips surrounding whitespace. Tokens pasted out of a browser often carry it and
--- the API rejects them verbatim.
+-- Tokens pasted out of a browser carry whitespace and the API rejects them verbatim.
 local function trim(value)
     return value:match("^%s*(.-)%s*$")
 end
 
--- Percent-encodes a query value. Unencoded spaces, "&" or "=" both corrupt the URL
--- and change what the server hashes, so every signed request comes back rejected.
+-- Unencoded spaces, "&" or "=" corrupt the URL and change what the server hashes.
 local function urlencode(value)
     local text = tostring(value)
     return (text:gsub("\n", "\r\n"):gsub("([^%w%-%._~])", function(char)
@@ -46,7 +42,6 @@ local function userParams()
            "&user_token=" .. urlencode(gamejolt.user_token)
 end
 
--- Guards against building a URL out of a nil app_id or private key.
 local function requireConfig()
     if (gamejolt.app_id == nil or gamejolt.private_key == nil or gamejolt.base_url == nil) then
         return false, "GameJolt: call gamejolt.init(app_id, private_key) first"
@@ -54,7 +49,7 @@ local function requireConfig()
     return true
 end
 
--- Guards user-scoped endpoints; without it they raise while concatenating nil.
+-- Without this, user-scoped endpoints raise while concatenating nil.
 local function requireLogin()
     if (not gamejolt.isLoggedIn()) then
         return false, "GameJolt: not authenticated, call gamejolt.authUser(username, user_token) first"
@@ -62,15 +57,13 @@ local function requireLogin()
     return true
 end
 
--- Generates a signature for the GameJolt API request by hashing the input with MD5.
 local function generateSignature(request_path)
     local input = gamejolt.base_url .. request_path .. gamejolt.private_key
     return md5.sumhexa(input)
 end
 
--- Sends an HTTPS request to the GameJolt API and returns the response or error message.
--- On failure returns false, message, kind, where kind is "transport" (unreachable, bad
--- HTTP status, unparseable body) or "api" (the server explicitly refused).
+-- Returns payload, or false, message, kind: "transport" (unreachable, bad HTTP
+-- status, unparseable body) or "api" (the server explicitly refused).
 local function apiRequest(path)
     if (not https or type(https.request) ~= "function") then
         local platform = (SE and SE.system and SE.system.getOS and SE.system.getOS()) or "Unknown"
@@ -80,8 +73,7 @@ local function apiRequest(path)
 
     local url = gamejolt.base_url .. path .. "&signature=" .. generateSignature(path)
 
-    -- lua-https (https.dll) API: returns code, body, headers. DNS and TLS failures raise
-    -- instead of returning a code in some builds, hence the pcall.
+    -- lua-https: returns code, body, headers; DNS / TLS failures may raise.
     local raised, code, body = pcall(https.request, url)
     if (not raised) then
         return false, "HTTPS request failed: "..tostring(code), "transport"
@@ -99,14 +91,12 @@ local function apiRequest(path)
         return false, "JSON decode error: "..tostring(err).."\nResponse: "..tostring(body), "transport"
     end
 
-    -- A body that parses but carries no response envelope is not a valid success.
     local payload = data.response
     if (type(payload) ~= "table") then
         return false, "Malformed response: missing response envelope", "transport"
     end
 
-    -- GameJolt reports success as the string "true"/"false", but tolerate a bare boolean
-    -- so neither shape slips past the check.
+    -- GameJolt reports success as the string "true"/"false", not a boolean.
     if (payload.success == false or payload.success == "false") then
         return false, payload.message or "API error", "api"
     end
@@ -129,8 +119,7 @@ local function sessionAutoTick(dt)
     local result, err, kind = gamejolt.sessionPing(state.status)
     if (result == nil or result == false) then
         state.last_error = err
-        -- A server-side refusal means the credentials stopped working. Stop beating a dead
-        -- session instead of retrying every interval for the rest of the run.
+        -- A refusal means the credentials stopped working: stop the heartbeat.
         if (kind == "api") then
             state.enabled = false
             gamejolt._verified = false
@@ -164,8 +153,8 @@ function gamejolt.isAvailable()
     return false, "GameJolt API native HTTPS module is unavailable on "..tostring(platform)..": "..tostring(https_error or "missing native https module")
 end
 
----Discards the stored credentials locally. This does not talk to GameJolt, so call
----sessionClose() first when a session is still open there.
+---Discards the stored credentials locally; call sessionClose() first if a
+---session is still open on GameJolt.
 function gamejolt.logout()
     gamejolt.username = nil
     gamejolt.user_token = nil
@@ -183,9 +172,7 @@ function gamejolt.isLoggedIn()
        and gamejolt._verified == true
 end
 
---------------------------------------------USERS--------------------------------------------
 ---Fetches user data from the GameJolt API using either user ID or username.
--- Syntax: /users/?game_id=xxxxx&user_id=12345
 ---@param user_id number|string|nil
 ---@param username string|nil
 ---@return table|false, string|nil, string|nil
@@ -200,10 +187,8 @@ function gamejolt.fetchUser(user_id, username)
     return apiRequest(path)
 end
 
----Authenticates a user with their username and token against the GameJolt API.
--- The credentials are stored only after the API accepts them, so isLoggedIn() cannot
--- report a login the server rejected. A failed attempt also clears the previous login.
--- Syntax: /users/auth/?game_id=xxxxx&username=test&user_token=test
+---Authenticates a user against the API. Credentials are stored only after the
+---server accepts them, and a failed attempt clears the previous login.
 ---@param username string
 ---@param user_token string
 ---@return boolean, string|nil
@@ -234,9 +219,7 @@ function gamejolt.authUser(username, user_token)
     return true
 end
 
-------------------------------------------------ACHIEVEMENTS (TROPHIES)---------------------------------------------
----Fetches achievements (trophies) from the GameJolt API. If achieved_only is true, only achieved trophies are returned.
--- Syntax: /trophies/?game_id=xxxxx&username=test&user_token=test&achieved=true
+---Fetches achievements (trophies). With achieved_only only achieved ones are returned.
 ---@param achieved_only boolean|nil
 ---@return table|false, string|nil, string|nil
 function gamejolt.fetchAchievements(achieved_only)
@@ -251,8 +234,7 @@ function gamejolt.fetchAchievements(achieved_only)
     return apiRequest(path)
 end
 
----Unlocks an achievement (trophy) in the GameJolt API using the trophy ID.
--- Syntax: /trophies/add-achieved/?game_id=xxxxx&username=myusername&user_token=mytoken&trophy_id=1047
+---Unlocks a trophy by its trophy ID.
 ---@param trophy_id number|string
 ---@return boolean|false, string|nil, string|nil
 function gamejolt.unlockAchievement(trophy_id)
@@ -272,9 +254,7 @@ function gamejolt.unlockAchievement(trophy_id)
     return false, message
 end
 
----------------------------------------------SESSIONS--------------------------------------------
----Opens a session for the authenticated user in the GameJolt API.
--- Syntax: /sessions/open/?game_id=xxxxx&username=myusername&user_token=mytoken
+---Opens a session for the authenticated user.
 ---@return table|false, string|nil, string|nil
 function gamejolt.sessionOpen()
     local ok, err = requireConfig()
@@ -286,8 +266,7 @@ function gamejolt.sessionOpen()
     return apiRequest(path)
 end
 
----Automatically opens a session and periodically pings GameJolt to keep it alive.
--- Only needs to be called once; the library will handle subsequent heartbeats for you.
+---Opens a session and pings it every `interval` seconds. Call once.
 ---@param interval number|nil
 ---@param status string|nil
 ---@return boolean|false, string|nil, string|nil
@@ -308,15 +287,13 @@ function gamejolt.sessionUpdate(interval, status)
     return true
 end
 
----Manually ticks the session auto-ping mechanism.
----Call this from your own love.update(dt) to keep the GameJolt session alive.
+---Ticks the session heartbeat. Call from love.update(dt).
 ---@param dt number
 function gamejolt.update(dt)
     sessionAutoTick(dt)
 end
 
 ---Pings the current session to keep it active or update its status.
--- Syntax: /sessions/ping/?game_id=xxxxx&username=myusername&user_token=mytoken&status=active
 ---@param status string|nil
 ---@return table|false, string|nil, string|nil
 function gamejolt.sessionPing(status)
@@ -330,10 +307,8 @@ function gamejolt.sessionPing(status)
     return apiRequest(path)
 end
 
----Closes the current session for the authenticated user in the GameJolt API.
--- Stops the heartbeat but keeps the credentials, so the player stays logged in.
--- Use logout() to drop them.
--- Syntax: /sessions/close/?game_id=xxxxx&username=myusername&user_token=mytoken
+---Closes the session. Stops the heartbeat but keeps the credentials; use
+---logout() to drop them.
 ---@return table|false, string|nil, string|nil
 function gamejolt.sessionClose()
     gamejolt._session_auto.enabled = false
@@ -348,8 +323,7 @@ function gamejolt.sessionClose()
     return apiRequest(path)
 end
 
----------------------------------------------DATA STORE--------------------------------------------
----Resolves the credential fragment for a data-store call, validating the login first.
+---Credential fragment for a data-store call; validates the login when user_data is set.
 ---@param user_data boolean|nil
 ---@return string|nil, string|nil
 local function userDataParams(user_data)
@@ -362,8 +336,7 @@ local function userDataParams(user_data)
     return userParams()
 end
 
----Stores data in the GameJolt Data Store under the specified key.
--- Syntax: /data-store/set/?game_id=xxxxx&key=test&data=test&username=myusername&user_token=mytoken
+---Stores data in the Data Store under `key`.
 ---@param key string
 ---@param data string
 ---@param user_data boolean|nil
@@ -381,8 +354,7 @@ function gamejolt.dataStore(key, data, user_data)
     return apiRequest(path)
 end
 
----Fetches data from the GameJolt Data Store using the specified key.
--- Syntax: /data-store/?game_id=xxxxx&key=test&username=myusername&user_token=mytoken
+---Fetches the value stored under `key`.
 ---@param key string
 ---@param user_data boolean|nil
 ---@return table|false, string|nil, string|nil
@@ -399,8 +371,7 @@ function gamejolt.dataFetch(key, user_data)
     return apiRequest(path)
 end
 
----Fetches all data from the GameJolt Data Store for the authenticated user.
--- Syntax: /data-store/?game_id=xxxxx&username=myusername&user_token=mytoken
+---Fetches all Data Store entries for the authenticated user.
 ---@param user_data boolean|nil
 ---@return table|false, string|nil, string|nil
 function gamejolt.dataFetchAll(user_data)
@@ -415,8 +386,7 @@ function gamejolt.dataFetchAll(user_data)
     return apiRequest(path)
 end
 
----Deletes data from the GameJolt Data Store using the specified key.
--- Syntax: /data-store/delete/?game_id=xxxxx&key=test&username=myusername&user_token=mytoken
+---Deletes the entry stored under `key`.
 ---@param key string
 ---@param user_data boolean|nil
 ---@return table|false, string|nil, string|nil
@@ -433,8 +403,7 @@ function gamejolt.dataDelete(key, user_data)
     return apiRequest(path)
 end
 
----Fetches the keys from the GameJolt Data Store for the authenticated user.
--- Syntax: /data-store/get-keys/?game_id=xxxxx&username=myusername&user_token=mytoken
+---Fetches the Data Store keys of the authenticated user.
 ---@param user_data boolean|nil
 ---@return table|false, string|nil, string|nil
 function gamejolt.dataGetKeys(user_data)
@@ -449,9 +418,7 @@ function gamejolt.dataGetKeys(user_data)
     return apiRequest(path)
 end
 
-------------------------------------------SCORES--------------------------------------------
----Fetches scores from the GameJolt API using the specified table ID.
--- Syntax: /scores/?game_id=xxxxx&table_id=12345
+---Fetches scores for a table, without user credentials.
 ---@param table_id number|string|nil
 ---@return table|false, string|nil, string|nil
 function gamejolt.fetchScoresLocal(table_id)
@@ -463,8 +430,7 @@ function gamejolt.fetchScoresLocal(table_id)
     return apiRequest(path)
 end
 
----Fetches scores from the GameJolt API using the specified table ID and user data.
--- Syntax: /scores/?game_id=xxxxx&table_id=12345&username=myusername&user_token=mytoken
+---Fetches scores for a table, scoped to the logged-in user.
 ---@param table_id number|string|nil
 ---@return table|false, string|nil, string|nil
 function gamejolt.fetchScoresGlobal(table_id)
@@ -478,11 +444,8 @@ function gamejolt.fetchScoresGlobal(table_id)
     return apiRequest(path)
 end
 
----Submits a score to the GameJolt API using the specified table ID and score value.
--- Credentials are appended whenever someone is logged in, which files the score under that
--- account. With nobody logged in the score is submitted as a guest, and passing as_guest
--- forces that even while authenticated.
--- Syntax: /scores/add/?game_id=xxxxx&score=12345&table_id=12345
+---Submits a score. Credentials are appended while logged in, so the score is
+---filed under that account; otherwise it is a guest score (as_guest forces that).
 ---@param score number|string
 ---@param table_id number|string|nil
 ---@param sort string|nil

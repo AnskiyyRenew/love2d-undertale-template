@@ -1,31 +1,14 @@
 --[[
     GUI Button - UNDERTALE-style button
 
-    Selection state: prefix (default "> ") + yellow colour; when not selected a
-    space pad of equal width is used so the text never shifts left/right when
-    toggling selection. Colour/prefix are all customisable.
+    Selection state: prefix (default "> ") + yellow; when not selected a
+    same-width space pad keeps the text from shifting (determination_mono is
+    monospaced). Hover sets yellow WITHOUT the prefix, so keyboard selection
+    and mouse hover stay visually distinct.
 
-    Mouse support: an optional hit area (w x h) plus a hover state. Hover sets
-    the yellow colour (without the prefix, so keyboard-selected and mouse-hover
-    look distinct); click is detected by the scene via :ContainsPoint.
-
-    The button does NOT read input itself -- selection, hover, and triggering
-    are driven externally (the scene's input handling) via SetSelected /
-    SetHovered / Trigger. This lets a button work with keyboard, gamepad, or
-    mouse input alike.
-
-    Usage:
-      local btn = GUI.Button.New{
-          x = 200, y = 150, text = "FIGHT",
-          w = 200, h = 30,            -- hit area (mouse); defaults 180x24
-          onSelect = function() ... end,
-      }
-      btn:SetSelected(true)
-      btn:SetHovered(true)
-      if (confirm pressed) then btn:Trigger() end
-
-    Monospace alignment: determination_mono is monospaced, so prefix "> " (2
-    chars) and pad "  " (2 chars) are the same width; text doesn't jitter on toggle.
+    Pure component: selection / hover / triggering are driven by the scene via
+    SetSelected / SetHovered / Trigger / ContainsPoint, so it works with
+    keyboard, gamepad, and mouse alike.
 ]]
 
 local Label = require((...):match("(.-)[^%.]+$") .. "label")
@@ -67,13 +50,11 @@ function Button:_displayText()
     return self.pad .. self.text
 end
 
--- Apply selected / hovered / normal colour.
 function Button:_applyStyle()
     local c = (self.selected or self.hovered) and self.colorSelected or self.colorNormal
     self._label:SetColor(c[1], c[2], c[3])
 end
 
--- Rebuild text and colour
 function Button:_refresh()
     self._label:SetText(self:_displayText())
     self:_applyStyle()

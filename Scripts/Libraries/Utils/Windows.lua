@@ -1,35 +1,12 @@
 -- Windows.lua (cross-platform)
--- Native window / OS helper library for LOVE 12 (SDL3 based).
---
--- Everything that can be routed through SDL3 works on Windows, macOS and Linux and is
--- loaded through the LuaJIT FFI on every platform. The Win32 code paths are kept as
--- Windows-native fast paths only (message pump, layered-window transparency, GDI window
--- capture, CreateWindowEx fallback) and are skipped elsewhere.
---
--- Provides: getHandle, processMessages, setTransparency, setBackgroundTransparent,
---           saveScreenshot, showDialog, CreateWindow + the SDL child-window helpers
---           (render / present canvas / keyboard+mouse callbacks / close detection).
---
--- Platform support per function:
---   CreateWindow / CreateWindowSDL   Windows / macOS / Linux   (Android & iOS: unsupported)
---   CreateWindowWin32                Windows only
---   DestroyWindow / DestroyWindowSDL all
---   getHandle                        all (HWND / NSWindow* / XID / wl_surface* / jobject)
---   processMessages                  Windows only (SDL/LÖVE pumps its own queue elsewhere)
---   setTransparency                  all (SDL_SetWindowOpacity; Win32 layered on Windows)
---   setBackgroundTransparent         all (colour key only on Windows, alpha elsewhere)
---   saveScreenshot                   Windows (GDI) / macOS (screencapture) / Linux (grim, ...)
---   showDialog                       all
---
--- The module keeps its historical name because Scripts/Libraries/Engine/2_0.lua exposes it
--- as the global `SE.windows` and Scripts/Libraries/Engine/DevTool.lua requires it by path.
+-- Native window / OS helpers for LÖVE 12 (SDL3), loaded through LuaJIT FFI.
+-- SDL3 paths work on Windows, macOS and Linux; the Win32 paths are Windows-only
+-- fast paths. Exposed as SE.windows; every helper degrades to nil/false when the
+-- native library is unavailable.
 
 ---@class WindowsLib
 ---Cross-platform native window utility library for LÖVE 12 (SDL3 + optional Win32 fast paths).
 local window = {}
-
-
--- 1. Platform detection & FFI bootstrap
 
 
 ---Host OS name as reported by the engine ("Windows" / "OS X" / "Linux" / "Android" / "iOS").
@@ -90,9 +67,6 @@ function window.hasFFI()
 end
 
 
--- 2. Win32 shared libraries (Windows only)
-
-
 local user32, gdi32, kernel32
 if is_windows and ffi then
     local function loadLib(name)
@@ -108,11 +82,7 @@ if is_windows and ffi then
 end
 
 
--- 3. C declarations
-
-
--- SDL3 is bundled with LOVE 12 on every platform, so it is declared unconditionally.
--- (On Win32 the extra structs below are declared separately.)
+-- SDL3 ships with LOVE 12 on every platform, so it is declared unconditionally.
 if ffi then
     ffi.cdef[[
         typedef struct SDL_Window SDL_Window;
@@ -419,13 +389,8 @@ if ffi and is_windows then
 end
 
 
--- 4. SDL3 shared library (every platform)
-
-
----Candidate SDL3 library names/paths, tried in order.
----Windows: SDL3.dll ships next to love.exe. Linux/macOS: the soname/dylib name, including
----the usual Homebrew prefixes. A statically linked LOVE is covered by the "current process"
----fallback in loadSDL() below.
+---Candidate SDL3 library names/paths, tried in order. A statically linked LOVE
+---is covered by the "current process" fallback in LoadSDL() below.
 local SDL_CANDIDATES = {
     "SDL3",
     "SDL3.dll",
@@ -453,9 +418,8 @@ local function tryLoadSDL(path)
     return nil
 end
 
----Load SDL3, auto-detecting the library on the current platform.
----Called once at require time; call it again (e.g. with an explicit path) if SDL was not
----found automatically, then reload whatever feature needs it.
+---Load SDL3, auto-detecting the library on the current platform. Called once at
+---require time; call again with an explicit path if detection failed.
 ---@param path? string Explicit library path/name; auto-detect when omitted
 ---@return boolean ok
 ---@return string|nil errMsg
@@ -478,8 +442,7 @@ function window.LoadSDL(path)
         end
     end
 
-    -- Last resort: some builds link SDL3 straight into the executable, so its symbols are
-    -- only reachable through the current process (dlopen(NULL) / GetModuleHandle(NULL)).
+    -- Last resort: statically linked SDL3 is only reachable through the current process.
     local ok, lib = pcall(ffi.load)
     if ok and lib then
         sdl, sdl_name = lib, "<current process>"
@@ -516,18 +479,15 @@ function window.SDLVersion()
 end
 
 
--- 5. Module state
-
-
 -- Module-level persistent objects (critical: keep them alive to avoid GC)
 local wndProcRef = nil        -- WNDPROC callback (Win32 path), kept alive
 window.windowClassRegistered = false
 window._created = {}          -- hwnd -> { unicode=bool, className, title, titleW, titleLenW }
 window._sdlWindows = {}       -- SDL_Window* -> { renderer, title, color, canvasTex, ... }
 window._sdlClosePending = {}  -- SDL_Window* -> true (child window requested close, pending destroy)
-window._sdlKeyCallbacks = {}   -- SDL_Window* -> fun(key, scancode, isDown, isRepeat) (fires only when that window has focus)
-window._sdlMouseCallbacks = {} -- SDL_Window* -> { motion=fun(x,y,xrel,yrel), button=fun(button,x,y,down,clicks), wheel=fun(x,y) }
-window._sdlHover = nil         -- the managed child window the mouse is hovering over (key-forwarding fallback)
+window._sdlKeyCallbacks = {}   -- SDL_Window* -> fun(key, scancode, isDown, isRepeat)
+window._sdlMouseCallbacks = {} -- SDL_Window* -> { motion=fun(...), button=fun(...), wheel=fun(...) }
+window._sdlHover = nil         -- managed child window under the mouse (key-forwarding fallback)
 local sdlEventWatchRef = nil  -- event-watch callback, kept alive to avoid GC
 
 ---Whether a handle belongs to a window created by this module's SDL path.
@@ -548,13 +508,9 @@ local function ptrOK(p)
 end
 
 
--- 6. Screen / colour helpers
-
-
 ---Get the LÖVE window handle.
----Windows: tries several class names and process enumeration and returns the HWND.
----macOS / Linux: returns the engine hook value when available, otherwise derives the
----native handle of the main LÖVE window from SDL3 (NSWindow* / XID / wl_surface*).
+---Windows: probes known class names, then the current process's windows.
+---Other platforms: engine hook value, else the main window's SDL native handle.
 ---@return userdata|nil handle Platform native handle, or nil if not found
 function window.getHandle()
     if is_windows and user32 and kernel32 and ffi then
@@ -598,10 +554,9 @@ function window.getHandle()
 end
 
 ---Process the Win32 message queue (call regularly on the main thread).
----Windows only: the Win32 fallback windows created by CreateWindowWin32 need an explicit
----pump. On macOS/Linux (and for pure SDL windows) SDL3 drives its own queue, so this is a
----no-op there.
----@param hwnd? userdata If provided, only processes messages for this window (recommended to avoid interfering with the LÖVE main window); nil processes all messages for the current thread.
+---Windows only: Win32 fallback windows need an explicit pump; SDL windows are
+---driven by SDL3, so this is a no-op elsewhere.
+---@param hwnd? userdata If given, only this window's messages; nil processes all for the thread.
 function window.processMessages(hwnd)
     if not (is_windows and user32) then return end
     local msg = ffi.new("MSG")
@@ -617,7 +572,7 @@ function window.processMessages(hwnd)
     end
 end
 
----Convert a UTF-8 Lua string to UTF-16 (wchar_t*), fully supporting non-ASCII characters such as Chinese; returns buf, len (number of code units).
+---Convert a UTF-8 Lua string to UTF-16 (wchar_t*), including non-ASCII characters.
 ---@param str string UTF-8 string
 ---@return userdata buf wchar_t buffer (NUL-terminated)
 ---@return integer len Number of UTF-16 code units
@@ -657,9 +612,8 @@ local function utf8_to_wchar_utf16(str)
     return buf, #out
 end
 
--- Default window procedure (Win32): white background + title text; cleans up records on WM_DESTROY.
--- Wrapped in pcall: a Lua error thrown inside an ffi callback crashes the process directly
--- (0xC000041D); here we catch and log it, then return 0 so the system continues.
+-- Default window procedure (Win32): white background + title text; cleans up on WM_DESTROY.
+-- A Lua error inside an ffi callback crashes the process (0xC000041D), so it is caught here.
 local function nativeWndProc(hwnd, msg, wParam, lParam)
     local ok, res = pcall(function()
         if msg == ffi.C.WM_DESTROY then
@@ -703,9 +657,6 @@ local function nativeWndProc(hwnd, msg, wParam, lParam)
 end
 
 
--- 7. Window creation
-
-
 ---@class CreateWindowOptions
 ---Options for creating a native window.
 ---@field title? string Window title (default: class name or "SDL Window")
@@ -714,16 +665,14 @@ end
 ---@field width? integer Window width (default: 480)
 ---@field height? integer Window height (default: 320)
 ---@field className? string Win32 window class name (ASCII recommended, CreateWindowWin32 only)
----@field style? integer Win32 window style DWORD (default WS_OVERLAPPEDWINDOW, CreateWindowWin32 only)
+---@field style? integer Win32 style DWORD (default WS_OVERLAPPEDWINDOW, Win32 only)
 ---@field unicode? boolean Use the Unicode (W) Win32 API (CreateWindowWin32 only, default true)
 ---@field resizable? boolean Make the window resizable (SDL only)
 ---@field borderless? boolean Create a borderless window (SDL only)
 ---@field color? integer[] Initial fill color {r,g,b} (SDL only)
 
 ---Create a native window (recommended entry point).
----Prefers SDL3 (bundled with LÖVE 12 on every platform, SDL handles the event/message loop
----internally, most stable); falls back to the Win32 CreateWindowEx implementation on Windows
----when SDL is unavailable. macOS/Linux have no non-SDL fallback.
+---Prefers SDL3; falls back to Win32 CreateWindowEx on Windows when SDL is missing.
 ---@param opts? CreateWindowOptions Options (see CreateWindowSDL / CreateWindowWin32)
 ---@return userdata|nil handle The native window handle (SDL_Window* or HWND), or nil on failure
 ---@return string|nil errMsg Error message when creation fails
@@ -737,8 +686,7 @@ function window.CreateWindow(opts)
     return nil, "SDL3 unavailable and " .. tostring(os_name) .. " has no native window fallback."
 end
 
----Create a native window (low-level Win32 implementation, independent of the LÖVE main window).
----Windows only; prefer CreateWindow / CreateWindowSDL.
+---Create a native window (low-level Win32 implementation; prefer CreateWindow).
 ---@param opts? CreateWindowOptions
 ---@return userdata|nil hwnd The Win32 window handle, or nil on failure
 ---@return string|nil errMsg Error message when creation fails
@@ -759,7 +707,7 @@ function window.CreateWindowWin32(opts)
     local style     = opts.style or ffi.C.WS_OVERLAPPEDWINDOW
     local unicode   = (opts.unicode ~= false)
 
-    -- Current process instance handle (must use GetModuleHandle(NULL), otherwise class registration fails)
+    -- Must use GetModuleHandle(NULL), otherwise class registration fails
     local hInstance = kernel32.GetModuleHandleA(nil)
     if hInstance == nil then
         return nil, "GetModuleHandleA(NULL) failed, lastError=" .. tostring(kernel32.GetLastError())
@@ -874,13 +822,13 @@ local SDL_INIT_VIDEO          = 0x00000020
 local SDL_WINDOW_BORDERLESS   = 0x00000010
 local SDL_WINDOW_RESIZABLE    = 0x00000020
 local SDL_WINDOWPOS_CENTERED  = 0x2FFF0000
-local SDL_PIXELFORMAT_RGBA32       = 0x16762004 -- little-endian = ABGR8888, memory byte order R,G,B,A (matches LÖVE rgba8)
+local SDL_PIXELFORMAT_RGBA32       = 0x16762004 -- ABGR8888 in memory: R,G,B,A (matches LÖVE rgba8)
 local SDL_TEXTUREACCESS_STREAMING  = 1
 
 -- SDL event-watch callback: detects a close request for a child window (X button).
--- Only marks it as pending; does NOT destroy the window inside the SDL event context to avoid re-entrancy issues.
--- Close-request grace period (seconds): LÖVE 12 sends a spurious close-request shortly after
--- a foreign window is created; ignore close requests within this window of creation time.
+-- Only marks it pending; destroying it inside the SDL event context would re-enter.
+-- LÖVE 12 also sends a spurious close-request shortly after a foreign window is
+-- created, so requests within SDL_CLOSE_GRACE seconds are ignored.
 local SDL_CLOSE_GRACE = 2.0
 
 local function sdlEventWatch(userdata, event)
@@ -889,12 +837,12 @@ local function sdlEventWatch(userdata, event)
         local u = ffi.cast("uint32_t*", event)
         local etype = u[0]
         if etype == ffi.C.SDL_EVENT_WINDOW_CLOSE_REQUESTED then
-            -- SDL_WindowEvent layout (uint32 indices): [0]=type [4]=windowID(off16) [5]=data1 [6]=data2
+            -- SDL_WindowEvent layout (uint32): [0]=type [4]=windowID [5]=data1 [6]=data2
             local wid = u[4]
             for win, info in pairs(window._sdlWindows) do
                 if sdl.SDL_GetWindowID(win) == wid then
-                    -- Skip the spurious early close-request so the child does not self-close;
-                    -- an explicit SDLSimulateClose() sets forceClose to bypass the grace period.
+                    -- Skip the spurious early close-request; SDLSimulateClose sets
+                    -- forceClose to bypass the grace period.
                     if info.forceClose or (os.clock() - (info.createdAt or 0) >= SDL_CLOSE_GRACE) then
                         window._sdlClosePending[win] = true
                     end
@@ -918,8 +866,8 @@ local function sdlEventWatch(userdata, event)
             local scancode = kev.scancode
             local down = kev.down ~= 0
             local repeat_ = kev.repeat_ ~= 0
-            -- Forward keys when: ① the child window has keyboard focus, OR
-            -- ② the mouse is hovering this child window (fallback if OS focus was never granted).
+            -- Forward keys when the child has focus, or when the mouse hovers it
+            -- (fallback if the OS never granted focus).
             local hoverWin = window._sdlHover
             for win, cb in pairs(window._sdlKeyCallbacks) do
                 if sdl.SDL_GetWindowID(win) == wid or (hoverWin ~= nil and win == hoverWin) then
@@ -937,7 +885,7 @@ local function sdlEventWatch(userdata, event)
                     break
                 end
             end
-            -- Clear hover when the cursor leaves the managed windows (e.g. back over the main window)
+            -- Clear hover when the cursor leaves the managed windows.
             if not hovered then
                 window._sdlHover = nil
             end
@@ -978,8 +926,7 @@ local function ensureSdlEventWatch()
     end
 end
 
----Create a native window using SDL3 (recommended: LÖVE 12 bundles SDL3 on every platform,
----SDL handles the event/message loop internally). Works on Windows, macOS and Linux.
+---Create a native window using SDL3 (recommended; SDL drives its own event loop).
 ---@param opts? CreateWindowOptions
 ---@return userdata|nil win The SDL_Window* handle, or nil on failure
 ---@return string|nil errMsg Error message when creation fails
@@ -989,8 +936,7 @@ function window.CreateWindowSDL(opts)
         return nil, "SDL3 not found (requires LÖVE 12)."
     end
     if is_mobile then
-        -- SDL can create a "window" on Android/iOS but there is no window manager to host a
-        -- second top-level window, and no second GL context to render into.
+        -- No window manager for a second top-level window, and no second GL context.
         return nil, "native child windows are not supported on " .. tostring(os_name) .. "."
     end
 
@@ -1001,7 +947,7 @@ function window.CreateWindowSDL(opts)
     local w = opts.width or 480
     local h = opts.height or 320
 
-    -- SDL3 windows are shown by default; flags start at 0 and can add resizable/borderless
+    -- SDL3 shows windows by default; flags start at 0.
     local flags = 0
     if opts.resizable then flags = bor(flags, SDL_WINDOW_RESIZABLE) end
     if opts.borderless then flags = bor(flags, SDL_WINDOW_BORDERLESS) end
@@ -1011,14 +957,11 @@ function window.CreateWindowSDL(opts)
         return nil, "SDL_CreateWindow failed"
     end
 
-    -- In SDL3, SDL_CreateWindow no longer takes x/y; the position is set separately.
-    -- SDL_WINDOWPOS_CENTERED is the SDL sentinel and resolves per platform (macOS/Linux too).
+    -- SDL3 sets x/y separately; SDL_WINDOWPOS_CENTERED resolves per platform.
     local x = opts.x or SDL_WINDOWPOS_CENTERED
     local y = opts.y or SDL_WINDOWPOS_CENTERED
     sdl.SDL_SetWindowPosition(win, x, y)
-    -- Note: SDL_RaiseWindow is intentionally NOT called here; in this LÖVE 12 build
-    -- raising the child window triggered a spurious close-request. Set the position
-    -- away from the main window instead (or call SDL_RaiseWindow manually if needed).
+    -- SDL_RaiseWindow is deliberately not called: it triggered a spurious close-request.
 
     -- Create a renderer (SDL3: passing NULL for the name uses the default renderer)
     local renderer = sdl.SDL_CreateRenderer(win, nil)
@@ -1051,14 +994,13 @@ function window.SDLRender(win, color)
     return true
 end
 
----Draw the contents of a LÖVE Canvas into the SDL native window (the core method for drawing content in the second window).
----Pipeline: LÖVE Canvas -> ImageData(RGBA8) -> SDL texture (SDL_UpdateTexture) -> SDL_RenderTexture.
----Usage: draw content with love.graphics onto a canvas, then call this function.
+---Draw the contents of a LÖVE Canvas into the SDL native window.
+---Canvas -> ImageData(RGBA8) -> SDL texture -> SDL_RenderTexture.
 ---@param win userdata The SDL_Window* handle
----@param canvas userdata A readable LÖVE Canvas. The SDL texture is reused and only rebuilt when the size changes.
+---@param canvas userdata A readable LÖVE Canvas; the SDL texture is rebuilt on size change.
 ---@return boolean ok true on success
----@note Every-frame calls incur a GPU->CPU readback cost; suitable for UI/preview. Reduce frequency for very large frames.
----@note LÖVE 12 canvases are NOT readable by default: create the canvas with { readable = true } (see DevTool).
+---@note Every-frame calls cost a GPU->CPU readback; reduce the rate for large frames.
+---@note LÖVE 12 canvases are not readable by default: create with { readable = true }.
 function window.SDLPresentCanvas(win, canvas)
     local info = window._sdlWindows and window._sdlWindows[win]
     if not info or not info.renderer then return false end
@@ -1080,7 +1022,7 @@ function window.SDLPresentCanvas(win, canvas)
         end
     end
 
-    -- LÖVE 12 uses love.graphics.readbackTexture (Canvas:newImageData is deprecated); LÖVE 11 uses newImageData
+    -- LÖVE 12: readbackTexture (Canvas:newImageData is deprecated); LÖVE 11: newImageData
     local ok, imgdata = pcall(function()
         if love.graphics.readbackTexture then
             return love.graphics.readbackTexture(canvas)
@@ -1153,9 +1095,7 @@ function window.getMainWindowSDL()
     return nil
 end
 
--- Native handle properties, in the preferred order per platform. SDL3 exposes the OS-level
--- window object through window properties; the exact key differs per video backend, so every
--- known key is probed (the platform-native one first) and the first hit wins.
+-- Native handle property keys, one per SDL video backend.
 local NATIVE_HANDLE_KEYS = {
     win32   = "SDL.window.win32.hwnd",
     cocoa   = "SDL.window.cocoa.window",
@@ -1176,11 +1116,10 @@ else
 end
 
 ---Get the OS-level window handle behind an SDL window.
----Windows -> HWND, macOS -> NSWindow*, Linux/X11 -> XID (a number), Wayland -> wl_surface*,
----Android -> ANativeWindow*. Note that on X11/Wayland this is the SDL *client* window: the
----handle belongs to the current process and must not be sent to another process.
+---HWND / NSWindow* / XID / wl_surface* / ANativeWindow*, depending on the backend.
+---On X11/Wayland the handle belongs to this process and must not be shared.
 ---@param win userdata The SDL_Window* handle
----@param backend? string Force a specific backend ("win32" / "cocoa" / "x11" / "wayland" / "android")
+---@param backend? string Force a backend ("win32" / "cocoa" / "x11" / "wayland" / "android")
 ---@return userdata|integer|nil handle The native handle, or nil if the backend exposes none
 ---@return string|nil kind Which backend the handle came from
 function window.SDLGetNativeHandle(win, backend)
@@ -1191,8 +1130,7 @@ function window.SDLGetNativeHandle(win, backend)
     for _, kind in ipairs(NATIVE_HANDLE_ORDER) do
         if backend == nil or backend == kind then
             local key = NATIVE_HANDLE_KEYS[kind]
-            -- X11 stores a number, the others a pointer; try both so a backend change does
-            -- not silently break the lookup.
+            -- X11 stores a number, the others a pointer: try both.
             local num = sdl.SDL_GetNumberProperty(props, key, 0)
             if num ~= nil and tonumber(num) ~= nil and tonumber(num) ~= 0 then
                 return tonumber(num), kind
@@ -1206,15 +1144,11 @@ function window.SDLGetNativeHandle(win, backend)
     return nil
 end
 
----Simulate a real close request for a child window (equivalent to clicking the X button).
----Windows: sends WM_CLOSE to the native HWND, so it goes through the exact same path as a real
----X click (SDL converts WM_CLOSE to SDL_EVENT_WINDOW_CLOSE_REQUESTED, which the event watch
----detects). Other platforms have no portable "send WM_CLOSE", and this LÖVE build is known to
----be fragile about synthetic events injected into a foreign window's queue, so the default
----marks the window close-pending directly — which is exactly what the polling caller observes.
----Pass method = "event" to force the synthetic SDL event route instead.
+---Simulate a real close request for a child window (equivalent to clicking the X).
+---Windows goes through WM_CLOSE; elsewhere the window is marked close-pending, since
+---synthetic SDL events are fragile. Pass method = "event" to force the event route.
 ---@param win userdata The SDL_Window* handle
----@param method? string "auto" (default) / "native" (WM_CLOSE, Windows only) / "event" (synthetic SDL event) / "flag" (mark pending directly)
+---@param method? string "auto" / "native" (WM_CLOSE, Windows) / "event" (SDL event) / "flag"
 ---@return boolean ok true when a close was requested
 ---@return string|nil used Which route was taken ("native" / "event" / "flag"), nil on failure
 function window.SDLSimulateClose(win, method)
@@ -1236,9 +1170,7 @@ function window.SDLSimulateClose(win, method)
     end
 
     if method == "event" then
-        -- Build the {type, reserved, timestamp, windowID, data1, data2} head of an SDL_Event.
-        -- The buffer is over-sized (SDL's SDL_Event size varies between builds) and zero-filled,
-        -- so SDL never reads uninitialised memory.
+        -- Over-sized, zero-filled buffer: SDL_Event's size varies between builds.
         local ok = pcall(function()
             local buf = ffi.new("uint8_t[256]")
             local ev = ffi.cast("SDL_WindowEvent*", buf)
@@ -1258,10 +1190,9 @@ function window.SDLSimulateClose(win, method)
 end
 
 ---Register a keyboard callback for a specific SDL child window.
----The callback fires only for keys pressed while THAT window has keyboard focus
----(this is per-window, NOT global; LÖVE's love.keypressed only sees the main window).
+---Fires only while THAT window has keyboard focus (per-window, not global); nil removes.
 ---@param win userdata The SDL_Window* handle
----@param callback? fun(key: integer, scancode: integer, isDown: boolean, isRepeat: boolean) Callback for key events; pass nil to remove.
+---@param callback? fun(key: integer, scancode: integer, isDown: boolean, isRepeat: boolean)
 ---@return boolean ok true if registered (or removed)
 function window.SDLSetKeyCallback(win, callback)
     if not sdl or not win then return false end
@@ -1275,9 +1206,8 @@ function window.SDLSetKeyCallback(win, callback)
 end
 
 ---Register mouse / wheel callbacks for a specific SDL child window.
----Callbacks only fire while that window is hovered / focused (like keys, this is
----per-window, NOT global). Coordinates are in the window's client (pixel) space,
----which maps 1:1 to the LÖVE canvas passed to SDLPresentCanvas when sizes match.
+---Per-window like keys; coordinates are client pixels and map 1:1 to the canvas
+---passed to SDLPresentCanvas when their sizes match.
 ---@param win userdata The SDL_Window* handle
 ---@param callbacks? table|nil Callbacks table { motion, button, wheel } or nil to remove:
 ---  motion: fun(x:number, y:number, xrel:number, yrel:number)
@@ -1295,9 +1225,8 @@ function window.SDLSetMouseCallback(win, callbacks)
     return true
 end
 
----Whether the child window has requested to close (X clicked). The DevTool polls
----this in its update; when true it should destroy the window (no auto-destroy here,
----to avoid re-entrancy inside the SDL event context).
+---Whether the child window has requested to close (X clicked). No auto-destroy here:
+---the caller polls this and destroys the window outside the SDL event context.
 ---@param win userdata The SDL_Window* handle
 ---@return boolean pending true if a close request is pending
 function window.SDLIsClosePending(win)
@@ -1323,10 +1252,8 @@ function window.SDLIsWindowFocused(win)
     return (info and info.focused) or false
 end
 
----Request OS keyboard focus for a child window (called when the user clicks inside it).
----SDL3's entry point for this is SDL_RaiseWindow ("raise ... and gain the input focus",
----emits SDL_EVENT_WINDOW_FOCUS_GAINED on success). The two older names below do not exist
----in current SDL3 builds and are only kept as harmless fallbacks.
+---Request OS keyboard focus for a child window.
+---SDL3's entry point is SDL_RaiseWindow; the two older names are harmless fallbacks.
 ---@param win userdata The SDL_Window* handle
 ---@return boolean ok true if the call was made
 function window.SDLSetKeyboardFocus(win)
@@ -1350,8 +1277,7 @@ function window.SDLFocusCallName()
     return window._lastFocusCall
 end
 
----Which managed child window the mouse is currently hovering over (used to decide
----whether main-window key presses should be forwarded to that child as a fallback).
+---Which managed child window the mouse is hovering over (key-forwarding fallback).
 ---@return userdata|nil win The hovered SDL_Window* handle, or nil
 function window.SDLHoveredWin()
     if not sdl then return nil end
@@ -1368,17 +1294,12 @@ function window.SDLKeyName(key)
     return ffi.string(p)
 end
 
--- (No synthetic key-event helper: pushing synthetic key events via SDL_PushEvent can crash
---  this LÖVE 12 / SDL3 build when LÖVE processes events for a foreign window. Real key
---  presses in the focused child window work fine through window.SDLSetKeyCallback.)
-
-
--- 8. Transparency
+-- No synthetic key-event helper: SDL_PushEvent of key events can crash this build.
+-- Real presses in the focused child arrive through window.SDLSetKeyCallback.
 
 
 ---Set the opacity of a window through SDL (Windows / macOS / Linux).
----Wayland has no compositor-independent way to do this: the call fails there and the
----function reports false.
+---Wayland has no compositor-independent opacity: the call fails and reports false.
 ---@param win userdata The SDL_Window* handle
 ---@param alpha integer Alpha 0-255 (0 = fully transparent, 255 = opaque)
 ---@return boolean ok true on success
@@ -1397,8 +1318,7 @@ function window.setWindowOpacity(win, alpha)
 end
 
 ---Set window transparency (alpha 0-255).
----Accepts either a window created by this module (SDL path on every platform, via
----SDL_SetWindowOpacity) or a Win32 HWND (layered-window API, Windows only).
+---Accepts this module's SDL windows (SDL_SetWindowOpacity) or a Win32 HWND (layered).
 ---@param handle userdata The window handle (SDL_Window* from this module, or an HWND on Windows)
 ---@param alpha integer Alpha value 0-255
 ---@return boolean ok true on success
@@ -1437,8 +1357,7 @@ end
 ---@param colorKey? integer Color key (RGB) or nil for alpha-based transparency
 ---@param alpha? integer Alpha value 0-255
 ---@return boolean ok true on success
----@note The colour key is a Win32 layered-window feature; on macOS/Linux the call degrades to
----      plain alpha (the colour key is ignored and warned about once).
+---@note The colour key is Win32-only; elsewhere the call degrades to alpha.
 function window.setBackgroundTransparent(handle, colorKey, alpha)
     if not handle then return false end
 
@@ -1463,9 +1382,6 @@ function window.setBackgroundTransparent(handle, colorKey, alpha)
     end
     return window.setTransparency(handle, alpha or 0)
 end
-
-
--- 9. Screenshot
 
 
 local function pack_u16_le(n)
@@ -1603,9 +1519,7 @@ local UNIX_GRABBERS = is_macos and {
 }
 
 ---Unix implementation: shell out to a screen grabber.
----There is no portable "grab this window's pixels even when occluded" call (macOS has
----`screencapture -l<windowid>` but the SDL handle is not a window ID), so `throughWindow`
----is ignored here and a screen-region grab is performed instead.
+---`throughWindow` is ignored: no portable "grab even when occluded" call exists.
 local function saveScreenshotUnix(x, y, w, h, path)
     local tried = {}
     for _, grabber in ipairs(UNIX_GRABBERS) do
@@ -1632,8 +1546,8 @@ end
 ---@param y integer Y coordinate (screen coordinates)
 ---@param w integer Width
 ---@param h integer Height
----@param path string Output file path (BMP on Windows, whatever the system tool writes elsewhere — usually PNG)
----@param throughWindow? boolean Windows: true = capture the window (works even if occluded), false = capture the screen region. Other platforms: always a screen-region grab (no portable equivalent).
+---@param path string Output path (BMP on Windows, whatever the system tool writes elsewhere)
+---@param throughWindow? boolean Windows: capture the window even when occluded; ignored elsewhere.
 ---@return boolean ok true on success
 ---@return string|nil errMsg Error message on failure
 function window.saveScreenshot(x, y, w, h, path, throughWindow)
@@ -1649,9 +1563,6 @@ function window.saveScreenshot(x, y, w, h, path, throughWindow)
     end
     return false, "Unsupported platform for screenshots: " .. tostring(os_name)
 end
-
-
--- 10. Dialogs & platform queries
 
 
 ---Show a dialog (cross-platform, uses LÖVE's showMessageBox).

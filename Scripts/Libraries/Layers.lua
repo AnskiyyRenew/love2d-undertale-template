@@ -20,9 +20,8 @@ local function find_layer_obj(name)
     return nil
 end
 
---- Safely convert a value to a numeric layer, resolving string layer names.
---- If the value is a string, it looks up the layer by name via `find_layer_obj`.
---- If not found, it prints a warning and returns 0.
+--- Resolve a numeric layer, looking string names up via `find_layer_obj`.
+--- Unknown names warn and fall back to 0.
 ---@param v any The layer value (number or string).
 ---@return number The numeric layer value.
 local function to_numeric_layer(v)
@@ -39,7 +38,7 @@ local function to_numeric_layer(v)
     return tonumber(v) or 0
 end
 
---- Perform a stable sort on a table by `layer` (numeric), then by `_id`.
+--- Sort in place by `layer`, then by `_id` so the order stays stable.
 ---@param t table The table to sort in-place.
 local function stable_sort(t)
     table.sort(t, function(a, b)
@@ -163,10 +162,9 @@ local function wrap_layer(layer_obj)
             return layer_obj.objects
         end,
 
-        --- Change the numeric layer value for this layer and all its objects.
-        --- If `new_layer` is a string, it will be resolved via `find_layer_obj`.
-        --- If the named layer is not found, a warning is printed and the value defaults to 0.
-        ---@param new_layer number|string The new layer value (number) or layer name (string) to switch to.
+--- Change the numeric layer value for this layer and all its objects.
+--- String names are resolved via `find_layer_obj`; unknown names warn and use 0.
+---@param new_layer number|string The new layer value (number) or layer name (string) to switch to.
         set_layer = function(self, new_layer)
             if type(new_layer) == "string" then
                 local target = find_layer_obj(new_layer)
@@ -274,15 +272,13 @@ function layers.set_layer_active(name, active)
     return true
 end
 
---- Add an object to the layer system. If `obj.layer` is a string, it is resolved
---- to a numeric layer value via `find_layer_obj`. If the named layer is not found,
---- a warning is printed and the value defaults to 0.
+--- Add an object to the layer system, resolving string layer names to numbers.
+--- Unknown names warn and fall back to 0.
 ---@param obj table The object to add.
 ---@return table The added object.
 function layers.add(obj)
     obj.layer = obj.layer or 0
 
-    -- Resolve string layer names to their numeric values, so sorting works correctly
     if type(obj.layer) == "string" then
         local layer_obj = find_layer_obj(obj.layer)
         if layer_obj then
@@ -392,8 +388,7 @@ function layers.sort()
     sort()
 end
 
---- Mark the layer system as dirty, forcing a rebuild of the draw list
---- and re-sort on the next draw call.
+--- Force a rebuild of the draw list and a re-sort on the next draw call.
 function layers.mark_dirty()
     mark_dirty()
 end

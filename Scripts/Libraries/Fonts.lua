@@ -1,17 +1,6 @@
--- Fonts library.
---
--- Fonts behave like the other resources: every lookup goes through the Game
--- area first, and only falls back to the engine directory when the Game copy
--- does not exist.
---
---     Fonts/           engine default   Resources/Fonts/
---     Game/Fonts/      game override    Game/Resources/Fonts/
---
--- Callers may pass either a bare filename ("determination_mono.ttf"), a name
--- already rooted at the engine directory ("Resources/Fonts/foo.ttf" - what the
--- Typers build internally), or a full explicit Game path. All three shapes
--- resolve to the same place, and the extra Game candidates are only consulted
--- when the original file is missing, so nothing that used to load breaks.
+-- Fonts library: every lookup goes through the Game area first, then falls
+-- back to the engine directory. Callers may pass a bare filename, an already
+-- rooted "Resources/Fonts/..." path, or an explicit Game path.
 local fonts = {
     _path  = "Resources/Fonts/",
 
@@ -20,8 +9,8 @@ local fonts = {
 }
 
 --- Test whether a file exists on the LÖVE filesystem.
---- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
---- and older/odd builds may expose neither, so every shape is tolerated.
+--- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly;
+--- some builds expose neither, so all shapes are tolerated.
 ---@param path string
 ---@return boolean
 local function fileExists(path)
@@ -32,7 +21,6 @@ local function fileExists(path)
     end)
     if (ok and info) then return true end
 
-    -- Fallback probe: only a real, non-empty readable file counts.
     local readable, data = pcall(function()
         return love.filesystem.read(path, 1)
     end)
@@ -48,16 +36,13 @@ function fonts.ResolvePath(name)
 
     name = name:gsub("\\", "/")
 
-    -- Already an explicit Game path: leave it alone, otherwise it would be
-    -- prefixed a second time ("Game/Resources/Fonts/Game/Resources/Fonts/..")
-    -- and the lookup would silently miss.
+    -- Already an explicit Game path: leave it, or it would be prefixed twice.
     if (name:sub(1, #fonts._gpath) == fonts._gpath) then
         return name
     end
 
-    -- Leading slash: an absolute path from the love filesystem root. Mirror
-    -- the engine prefix first, the same way the Typers write "/Voices/foo.wav"
-    -- meaning "under Resources/Sounds/".
+    -- Leading "/" is a love-fs absolute path; the Game twin and the engine root
+    -- are still probed before falling back to the original.
     if (name:sub(1, 1) == "/") then
         local relative = name:gsub("^/+", "")
         if (relative == "") then return name end
@@ -73,7 +58,6 @@ function fonts.ResolvePath(name)
         return name
     end
 
-    -- Already rooted: do not prepend anything, just try the Game twin once.
     if (name:sub(1, #fonts._path) == fonts._path) then
         local game_twin = fonts._gpath .. name:sub(#fonts._path + 1)
         if (fileExists(game_twin)) then return game_twin end
@@ -87,9 +71,8 @@ function fonts.ResolvePath(name)
 end
 
 --- Create a font, resolving the path Game-first.
---- Mirrors `love.graphics.newFont`, so every extra argument (size, hinting,
---- dpiscale) is forwarded untouched, and a call with no path at all (the
---- "default font" form) still works.
+--- Extra arguments (size, hinting, dpiscale) are forwarded untouched; a nil
+--- path uses the default font.
 ---@param path? string Font name, already-rooted path, or nil for the default font.
 ---@return Font
 function fonts.New(path, ...)

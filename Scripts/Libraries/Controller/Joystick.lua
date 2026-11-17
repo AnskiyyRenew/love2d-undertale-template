@@ -1,26 +1,15 @@
 --[[
-    Joystick.lua - Gamepad / Joystick controller
-
-    Uses the SAME feedback convention as Keyboard.lua:
-        state 0  = released
-        state 1  = just pressed (this frame)
-        state 2  = held
-        state -1 = just released (this frame)
-
-    Supports:
-      * Auto-detection of connected gamepads (LÖVE standard gamepad mapping
-        when available, raw numbered fallback otherwise).
-      * Analog sticks & triggers as axis values AND as dead-zone buttons.
-      * Binds (grouping several buttons/axes under one name).
-      * Simulation so you can test on desktop without hardware
-        (pair with the "ControllerSimulation" variable in PureConf.lua).
---]]
+    Joystick.lua - gamepad controller (auto-detect, gamepad mapping with raw
+    fallback, analog sticks/triggers, binds, simulation).
+    Same state convention as Keyboard: 0 released, 1 just pressed, 2 held,
+    -1 just released. Entry: Update / GetState / GetAxis / Bind.
+]]
 
 local Joystick = {
     joysticks = {},          -- array of connected LÖVE joystick objects
     enabled = true,          -- master switch (AllowPlayerInput)
-    deadzone = 0.15,         -- analog deadzone (0..1); 0.10 sensitive | 0.15 default | 0.20 tolerant
-    axisThreshold = 0.5,     -- value a trigger must exceed to count as a button press
+    deadzone = 0.15,         -- analog deadzone (0..1)
+    axisThreshold = 0.5,     -- value a trigger must exceed to count as pressed
 
     -- logical button name -> { pressed, pressaux, state }
     buttons = {},
@@ -60,9 +49,8 @@ local axisButtonMaps = {
     { axis = "triggerright", trigger = "triggerright" },
 }
 
---- Apply the dead-zone to a raw axis value, then re-scale the usable range
---- (deadzone..1) back to 0..1 so movement starts smoothly from 0 instead of
---- jumping when the stick crosses the threshold. Returns 0 inside the dead-zone.
+--- Apply the dead-zone to a raw axis value and re-scale (deadzone..1) to 0..1,
+--- so movement starts smoothly at 0. Returns 0 inside the dead-zone.
 ---@param v number
 ---@return number
 local function applyDeadzone(v)
@@ -168,7 +156,6 @@ function Joystick.IsConnected()
 end
 
 --- Set the analog dead-zone (0..1), clamped to [0, 0.95].
---- Recommended: 0.10 (sensitive) .. 0.20 (tolerant); 0.15 is a good default.
 ---@param v number
 function Joystick.SetDeadzone(v)
     if (v == nil) then return end
@@ -182,7 +169,6 @@ function Joystick.SetAxisThreshold(v)
 end
 
 --- Bind a name to a set of gamepad buttons / virtual buttons / binds.
----Allows checking a whole group with a single name (same as Keyboard.Bind).
 ---@param name string
 ---@param ... string
 function Joystick.Bind(name, ...)
@@ -270,14 +256,12 @@ function Joystick.Update()
         end
     end
 
-    -- Reset raw button states each frame; polling below re-marks what is down.
-    -- Anything not re-polled (e.g. a pad was unplugged) releases cleanly.
+    -- Reset raw button and axis states each frame; polling below re-marks what
+    -- is down, so an unplugged pad releases cleanly.
     for name, b in pairs(Joystick.buttons) do
         b.pressed = false
     end
 
-    -- Reset axis values each frame so unplugged pads don't leave virtual
-    -- stick/trigger buttons stuck held.
     for name in pairs(Joystick.axes) do
         Joystick.axes[name] = 0
     end
@@ -286,7 +270,7 @@ function Joystick.Update()
         pollJoystick(joy)
     end
 
-    -- Simulated axes override the real ones BEFORE we derive virtual buttons,
+    -- Simulated axes must be applied BEFORE the virtual buttons are derived,
     -- so SimulateAxis() also drives the virtual stick/trigger buttons.
     for name, v in pairs(Joystick.simulatedAxes) do
         Joystick.axes[name] = v
@@ -305,9 +289,7 @@ function Joystick.Update()
     end
 end
 
---- Return the state of a gamepad button / virtual button / bind.
----Same convention as Keyboard.GetState: 0 = released, 1 = just pressed,
----2 = held, -1 = just released.
+--- Return the state of a button / virtual button / bind (0/1/2/-1).
 ---@param name string
 ---@return integer
 function Joystick.GetState(name)
@@ -355,9 +337,8 @@ function Joystick.IsDown(name)
     return Joystick.GetState(name) >= 1
 end
 
---- Return the analog value of an axis (-1..1) with the dead-zone applied and
---- the usable range re-scaled to 0..1 (0 inside the dead-zone). Works for
---- sticks & triggers. Simulated axes go through the same filtering.
+--- Analog axis value (-1..1) with the dead-zone applied and re-scaled. Works for
+--- sticks & triggers; simulated axes go through the same filtering.
 ---@param name string
 ---@return number
 function Joystick.GetAxis(name)

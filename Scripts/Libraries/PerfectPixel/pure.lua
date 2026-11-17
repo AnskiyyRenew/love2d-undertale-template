@@ -1,9 +1,9 @@
--- Pure Lua implementation of the rectangle decomposition library
+-- Pure Lua fallback for the rectangle decomposition library.
 local re = {}
 
 local function globalExpandRect(grid)
     local m, n = #grid, #grid[1]
-    -- Build the prefix-sum array (rows 0..m, columns 0..n)
+    -- prefix sums, 0-based on both axes
     local prefix = {}
     for i = 0, m do
         prefix[i] = {}
@@ -12,7 +12,6 @@ local function globalExpandRect(grid)
         end
     end
 
-    -- Fill
     for i = 1, m do
         for j = 1, n do
             local score = (grid[i][j] == 2) and 1 or 0
@@ -22,16 +21,13 @@ local function globalExpandRect(grid)
 
     local max_score = 0
     local best_rect = nil
-    local height = {}  -- Height array (1-based column index)
+    local height = {}  -- filled rows above the current row, per column
 
-    -- Initialise
     for j = 1, n do
         height[j] = 0
     end
 
-    -- Walk every row
     for i = 1, m do
-        -- Update the height array
         for j = 1, n do
             if grid[i][j] ~= 0 then
                 height[j] = height[j] + 1
@@ -40,44 +36,40 @@ local function globalExpandRect(grid)
             end
         end
 
-        local stack = {}  -- Monotonic stack (holds column indices)
+        local stack = {}  -- monotonic stack of column indices
 
-        -- Walk every column of the current row
         for j = 1, n do
-            -- Keep the stack monotonically increasing
+            -- keep the stack monotonically increasing
             while #stack > 0 and height[j] < height[stack[#stack]] do
-                local k = table.remove(stack)  -- Pop the top of the stack
+                local k = table.remove(stack)
                 local left = (#stack > 0) and stack[#stack] or 0
                 local rect_height = height[k]
-                local x1 = i - rect_height + 1  -- Start row (1-based)
-                local x2 = i                     -- End row (1-based)
-                local y1 = left + 1              -- Start column (1-based)
-                local y2 = j - 1                 -- End column (1-based)
+                local x1 = i - rect_height + 1  -- all row/column bounds below are 1-based
+                local x2 = i
+                local y1 = left + 1
+                local y2 = j - 1
 
-                -- Make sure the rectangle is valid
                 if y1 <= y2 then
-                    -- Score the rectangle
                     local score_here = prefix[x2][y2]
                         - prefix[x1-1][y2]
                         - prefix[x2][y1-1]
                         + prefix[x1-1][y1-1]
 
-                    -- Update the best score
                     if score_here > max_score then
                         max_score = score_here
                         best_rect = {
-                            x1 - 1,     -- Start row (0-based)
-                            y1 - 1,     -- Start column (0-based)
-                            x2 - x1 + 1,-- Height (number of rows)
-                            y2 - y1 + 1 -- Width (number of columns)
+                            x1 - 1,     -- 0-based row
+                            y1 - 1,     -- 0-based column
+                            x2 - x1 + 1,-- rows
+                            y2 - y1 + 1 -- columns
                         }
                     end
                 end
             end
-            table.insert(stack, j)  -- Push the current column
+            table.insert(stack, j)
         end
 
-        -- Drain whatever is left on the stack
+        -- drain the remaining stack
         while #stack > 0 do
             local k = table.remove(stack)
             local left = (#stack > 0) and stack[#stack] or 0
@@ -85,7 +77,7 @@ local function globalExpandRect(grid)
             local x1 = i - rect_height + 1
             local x2 = i
             local y1 = left + 1
-            local y2 = n  -- Clamp the boundary to the last column
+            local y2 = n
 
             if y1 <= y2 then
                 local score_here = prefix[x2][y2]
@@ -96,10 +88,10 @@ local function globalExpandRect(grid)
                 if score_here > max_score then
                     max_score = score_here
                     best_rect = {
-                        x1 - 1,     -- Start row (0-based)
-                        y1 - 1,     -- Start column (0-based)
-                        x2 - x1 + 1,-- Height (number of rows)
-                        y2 - y1 + 1 -- Width (number of columns)
+                        x1 - 1,     -- 0-based row
+                        y1 - 1,     -- 0-based column
+                        x2 - x1 + 1,-- rows
+                        y2 - y1 + 1 -- columns
                     }
                 end
             end
@@ -158,52 +150,5 @@ function re.rectangulate(imageData)
         end
     end
 end
-
---[[
-
-local function print_grid(grid)
-    for y = 1, #grid[1] do
-        for x = 1, #grid do
-            io.write(grid[x][y])
-            io.write(" ")
-        end
-        io.write("\n")
-    end
-end
-
-local function test_grid(grid)
-    local new_grid = {}
-    for i = 1, #grid do
-        new_grid[i] = {}
-        for j = 1, #grid[i] do
-            new_grid[i][j] = grid[i][j] == 1 and 2 or 0
-        end
-    end
-    print_grid(new_grid)
-    local score, rect = globalExpandRect(new_grid)
-    if rect == nil then
-        print("score="..score..", rect=无解")
-        return
-    end
-    print("score="..score..", rect={"..table.concat(rect, ", ").."}")
-end
-
-local grid = {
-    {0, 0, 0, 0, 0, 0, 0},
-    {0, 1, 0, 1, 0, 1, 0},
-    {0, 0, 1, 1, 1, 0, 0},
-    {0, 1, 1, 1, 1, 1, 0},
-    {0, 1, 0, 1, 0, 1, 0},
-    {0, 1, 1, 1, 1, 1, 0},
-    {0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0},
-}
-
-test_grid(grid)
-
---]]
 
 return re

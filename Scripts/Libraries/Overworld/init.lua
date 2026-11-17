@@ -7,12 +7,8 @@ Layers.new_layer("GUI", 80)
 Layers.new_layer("TOP", 100)
 Layers.new_layer("DEBUG", 200)
 
--- ---------------------------------------------------------------------------
--- Game-first resource resolution
---
--- Game/ is the per-game content root. Game data (Logics, maps, waves)
--- lives there and the engine tree is only a fallback / default.
--- ---------------------------------------------------------------------------
+-- Game-first resource resolution: Game/ is the per-game content root, the
+-- engine tree is only a fallback / default.
 
 --- Describe a module name as a project-relative file path, for filesystem probes.
 ---@param module_name string e.g. "Game.Logics.items"
@@ -22,8 +18,7 @@ local function owModulePathOf(module_name)
 end
 
 --- Test whether a file exists on disk.
---- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
---- so the result is only trusted as a positive when it is truthy.
+--- LÖVE 11 returns a table from getInfo, LÖVE 12 returns the info directly.
 ---@param file_path string
 ---@return boolean
 local function owFileExists(file_path)
@@ -34,15 +29,13 @@ local function owFileExists(file_path)
     end)
     if (ok and info) then return true end
 
-    -- Fallback probe: a real, readable file counts as existing.
     local readable, content = pcall(love.filesystem.read, file_path, 1)
     return (readable and content ~= nil)
 end
 
 --- Require the first module that exists among `roots`, Game area first.
---- Existence is probed on the filesystem rather than inferred from a failed
---- require, so a module that exists but throws is reported as a real error
---- instead of silently looking like a missing fallback candidate.
+--- Existence is probed on disk, so a module that exists but throws is reported
+--- as a real error rather than taken for a missing candidate.
 ---@param roots string[] Module prefixes to try, in order.
 ---@param name string Module name suffix.
 ---@return any loaded
@@ -56,8 +49,8 @@ local function owRequireGameFirst(roots, name)
         if (owFileExists(owModulePathOf(module_name))) then
             local ok, loaded = pcall(require, module_name)
             if (ok and loaded) then
-                -- A Game-area copy that exists but throws must never be silent,
-                -- even when a lower root successfully supplies the module.
+                -- A Game-area copy that exists but throws is never silent, even
+                -- when a lower root supplies the module.
                 if (first_error) then
                     print("[Overworld] WARNING: '" .. tostring(first_error_module) ..
                         "' exists but failed to load; using " .. module_name .. " instead.")
@@ -74,8 +67,7 @@ local function owRequireGameFirst(roots, name)
                 first_error_module = module_name
             end
 
-            -- Found, but its top-level code threw: surface it rather than
-            -- pretending the module was absent.
+            -- Found, but its top-level code threw: surface it.
             print("[Overworld] Error loading '" .. module_name .. "': " .. tostring(loaded))
         end
     end
@@ -86,9 +78,8 @@ DATA = DATA or require("Game.Logics")
 FLAG = DATA.flags
 CHEST = DATA.chests
 
--- Items live next to the logics. Prefer the Game copy, then the engine default.
--- Note: require is passed the resolved module name, and the Game copy wins even
--- when a stale `DATA` was carried over from a previous scene.
+-- Items live next to the logics: the Game copy wins over the engine default,
+-- even when a stale `DATA` was carried over from a previous scene.
 ITEMS = ITEMS or owRequireGameFirst({
     "Game.Logics.",
     "Scripts.Logics."
@@ -111,8 +102,7 @@ local overworld = {
     stat = require(path .. "Overworld.stat"),
     inst = {},
     interacts = {},
-    -- "auto" derives the side from the player's screen position every time an
-    -- overlay opens; "up" / "down" pin it.
+    -- "auto" derives the side from the player's screen position; "up" / "down" pin it.
     ui_prefer = "auto",
     -- Canvas Y below which overlays flip up (2/3 of the 480px canvas).
     ui_threshold = 320,
@@ -130,20 +120,15 @@ local overworld = {
     _leaving = false,
 
     debug = false,
-    -- Whether the overworld camera auto-follows the player every frame.
-    -- When false, the camera is NOT moved automatically; drive it manually
-    -- via Camera:setPosition(x, y) or Camera.x / Camera.y (e.g. scripted
-    -- cutscenes or fixed views). Exposed as Overworld.follow_player.
+    -- Whether the camera auto-follows the player every frame. When false, move
+    -- it manually via Camera:setPosition / Camera.x / Camera.y.
     follow_player = true,
 }
 
--- One-frame lock: set when a dialog's typewriter finishes so that the same
--- "confirm" press which closed the dialog cannot instantly re-trigger the
--- interaction (which would otherwise cause an infinite dialog loop).
+-- One-frame lock so the confirm press that closed a dialog cannot immediately
+-- re-trigger the interaction. `dialog_lock_pending` keeps it for the rest of the
+-- frame in which _onComplete ran.
 local dialog_just_closed = false
--- Tracks whether the lock was set in the current frame (by _onComplete) so that
--- overworld.Update keeps it for the rest of this frame and only clears it at
--- the start of the next frame.
 local dialog_lock_pending = false
 function overworld.JustOnDialog()
     dialog_just_closed = true
@@ -155,8 +140,7 @@ Overworld = overworld
 Map = overworld.map
 World = overworld.map.world
 Char = overworld.map.char
--- Drive the Frisk Dance ("Dance of Genocide") toggle through the dedicated
--- overworld._friskdance variable (read from the "EnableFriskDance" flag).
+-- Frisk Dance toggle for Char, read from the "EnableFriskDance" flag.
 Char.friskdance = overworld._friskdance
 Stat = overworld.stat
 Save = overworld._pages.save
@@ -173,9 +157,8 @@ function GetRelativePos(x, y)
     return rx - 320 + x, ry - 240 + y
 end
 
----Canvas-space Y of the player sprite (0-480), or nil before the map is ready.
----Mirrors the camera clamping used by GetRelativePos so overlays and the
----side-detection below always agree on where the camera actually is.
+--- Canvas-space Y of the player sprite (0-480), or nil before the map is ready.
+--- Uses the same camera clamping as GetRelativePos.
 function overworld.GetPlayerScreenY()
     local spr = Char and Char.currentSprite
     if (not spr) then return nil end
@@ -188,10 +171,9 @@ function overworld.FlipY(y)
     return 480 - y
 end
 
----Which side the overlay UI (dialogs, the stat menu) opens on.
----Set `ui_prefer` to "up" / "down" to force it; the default "auto" opens the
----UI above the player once the player drops below `ui_threshold` (canvas Y,
----320 = the bottom third), so the box never sits on top of the sprite.
+--- Which side the overlay UI (dialogs, the stat menu) opens on.
+--- `ui_prefer` pins "up" / "down"; the default "auto" opens above the player
+--- once it drops below `ui_threshold`.
 function overworld.ResolveUIPosition()
     local pref = overworld.ui_prefer
     if (pref == "up" or pref == "down") then
@@ -231,32 +213,11 @@ function SpawnBlock(x, y, width, height, thickness)
     return block
 end
 
--- Automatically restrict the camera to the loaded map's ACTUAL tile coverage.
---
--- Why not just map.width * tilewidth? Because the tiles are not guaranteed to
--- start at pixel (0,0):
---   * A tile layer carries its own draw origin. STI bakes that into
---     layer.x / layer.y (layer.x = layer.x + layer.offsetx + map.offsetx),
---     so a layer can be offset from the map origin.
---   * Infinite ("chunk") maps place every chunk at an ABSOLUTE tile position,
---     which may be NEGATIVE (e.g. chunk.x = -16). STI draws those chunks at
---     (0,0) with the negative offset already inside the tile coordinates.
--- So we walk every visible tile layer and union the actual pixel rectangle of
--- its non-empty tiles (their real x/y, including layer/chunk offsets).
---
--- Coordinate notes (matching map.lua's drawing / physics):
---   * STI map units are Tiled pixels (1 tile = tilewidth x tileheight px).
---   * The map is drawn at 2x scale / every object is *2, so the OVERWORLD
---     (camera/world) unit is 2 Tiled pixels; a 20x20 tile spans 40x40 units.
---   * Camera.x/y is the WORLD POINT shown at the screen CENTER, and
---     Camera:Update clamps that center inside [min..max] (Camera:setBounds).
---   * The center may not come within half a viewport of a covered edge:
---         min_x = covered_left  + view_w/2
---         max_x = covered_right - view_w/2
---     When the covered area is smaller than the viewport it is centered/locked.
---
--- Exposed as overworld.AutoCameraBounds() so scenes can re-run / override it
--- (e.g. adding a custom margin after the call).
+-- Restrict the camera to the map's ACTUAL tile coverage. map.width * tilewidth
+-- is wrong: tile layers carry their own offset and infinite chunks may sit at
+-- negative tile coordinates. Tiled pixels are drawn at 2x (one overworld unit =
+-- 2 Tiled px), and Camera.x/y is the world point at the screen centre, clamped
+-- to the covered rect minus half a viewport.
 function overworld.AutoCameraBounds()
     local m = overworld.map._map
     if (not m) then return end
@@ -322,7 +283,6 @@ function overworld.AutoCameraBounds()
 
     if (not min_px_x) then return end
 
-    -- Convert the covered pixel rectangle into overworld units (*2).
     local sx_l = min_px_x * 2
     local sx_r = max_px_x * 2
     local sy_t = min_px_y * 2
@@ -355,16 +315,9 @@ function overworld.AutoCameraBounds()
     Camera:setBounds(min_x, min_y, max_x, max_y)
 end
 
----Resolve a map path, Game area first.
----
----A scene asks for a map with a project-relative path such as
----"Maps/main_scene/main_0.lua". A Game-side copy at
----"Game/Maps/main_scene/main_0.lua" takes priority when it exists, so a
----game can override any built-in map without touching the scene script.
----
----NOTE: STI resolves a map's tile images relative to the map file, so a Game-side
----override must ship its own ../images/ tree next to it (or reference images by
----an absolute path). Only the .lua/.tmx file itself is redirected here.
+--- Resolve a map path, Game area first: a copy at "Game/<path>" wins.
+--- STI resolves tile images relative to the map file, so a Game-side override
+--- must ship its own ../images/ tree. Only the map file itself is redirected.
 ---@param lua_file string Path as given by the scene.
 ---@return string The path that should be handed to STI.
 function overworld.ResolveMapPath(lua_file)
@@ -386,9 +339,8 @@ end
 
 function overworld.Init(lua_file)
     overworld.map.Init(lua_file)
-    -- Restrict the camera to the map's tile bounds right after the map loads,
-    -- so scenes no longer need a manual Camera:setBounds (a later explicit
-    -- call still overrides this).
+    -- Camera bounds from the map's tiles right after load; a later explicit
+    -- Camera:setBounds still overrides this.
     overworld.AutoCameraBounds()
 end
 
@@ -427,27 +379,17 @@ function overworld.SetMusic(mpath)
     end
 end
 
----If you wanna get the results when the overworld.char interacts with some objects, use this function.
----If the id argument is nil, then this will return every objects' result.
----If extra_key is nil, the object is matched by its "id" property. If extra_key
----is a property name (string), the object is matched by that property's value
----instead (e.g. getInteractResult("trigger", 1, "rr") matches the trigger whose
----rr == 1) and the property value is returned.
----
----There is NO facing requirement: touching the object is enough, from any
----direction. The interaction data comes from the physics beginContact callback
----(world.interactions), so simply colliding with the object arms it.
----NOTE: a legacy 4th argument (the old `require_facing` flag) is ignored; it is
----accepted for backwards compatibility with existing scene scripts only.
+--- Interaction results for the object the player is touching. `id` nil matches
+--- every object of `obj_type`; `extra_key` nil/number matches by id, a string
+--- matches by that property's value. Touching is enough - there is NO facing
+--- requirement. A legacy 4th `require_facing` argument is ignored.
 ---@param obj_type string
 ---@param id number | string | nil
 ---@param extra_key string | number | nil
 ---@return boolean | any
 function overworld.getInteractResult(obj_type, id, extra_key)
     -- If a dialog just finished this frame, swallow EVERY interaction result for
-    -- the rest of the frame so the same confirm press that completed the
-    -- typewriter can't re-trigger any of them (this applies to every call made
-    -- this frame, not just the first one).
+    -- the rest of the frame so the closing confirm cannot re-trigger them.
     if (dialog_just_closed) then
         return false
     end
@@ -456,27 +398,19 @@ function overworld.getInteractResult(obj_type, id, extra_key)
     local interactions = overworld.map.world.interactions
     if (not interactions) then return false end
     if (not interactions.current_object) then return false end
-    -- NOTE: no CSTATE / dialog state machine exists yet, so the reference's
-    -- "Controlling" guard is intentionally omitted. Add it back once a dialog
-    -- state is introduced.
+    -- No dialog state machine exists yet, so there is no dialog-state guard here.
 
     local final_type = interactions.current_object
     if (final_type ~= obj_type) then return false end
 
-    -- No facing check here: the object is armed by the physics contact alone,
-    -- so any direction the player touches it from counts.
-
-    -- id not given: only require the object type to match.
     if (id == nil) then
         return true
     end
 
-    -- No extra_key (or a numeric extra_key): match by the object's id.
     if (not extra_key or type(extra_key) == "number") then
         return (interactions.current_id == id)
     end
 
-    -- extra_key is a property name: match the collided object's property value.
     local obj = interactions.current_obj
     if (not obj or not obj.properties) then return false end
     local value = obj.properties[extra_key]
@@ -486,11 +420,8 @@ function overworld.getInteractResult(obj_type, id, extra_key)
     return false
 end
 
----Like getInteractResult, but checks EVERY object the player is currently
----touching at once (not just the last collision). This avoids the problem where
----overlapping triggers overwrite each other. Returns true if any touched object
----of obj_type matches: by id (extra_key nil / number) or by a property value
----(extra_key = property name, e.g. getTouchResult("trigger", 1, "rr")).
+--- Like getInteractResult, but checks EVERY object being touched at once, so
+--- overlapping triggers do not overwrite each other.
 ---@param obj_type string
 ---@param id number | string | nil
 ---@param extra_key string | number | nil
@@ -502,12 +433,10 @@ function overworld.getTouchResult(obj_type, id, extra_key)
     local touching = interactions.touching or {}
     for _, t in ipairs(touching) do
         if (t.type == obj_type) then
-            -- id not given: any touched object of this type matches.
             if (id == nil) then
                 return true
             end
 
-            -- Match by id, or by a property value when extra_key is a name.
             if (not extra_key or type(extra_key) == "number") then
                 if (t.id == id) then
                     return true
@@ -523,19 +452,15 @@ function overworld.getTouchResult(obj_type, id, extra_key)
     return false
 end
 
----Find a placed object on the current map and return its runtime object table
----(which contains x, y, id, properties, etc.). This searches the GLOBAL object
----registry, so the object does NOT need to be touched or interacted with — as
----long as it was placed/spawned on the map it is included. Parameters work the
----same as getInteractResult / getTouchResult: extra_key nil/number matches by
----id, extra_key string matches by the object property of that name (e.g.
----FindObject("trigger", 1, "rr")). Returns nil if no matching object is found.
+--- Find a placed object on the current map and return its runtime table.
+--- Searches the global object registry, so the object only has to be placed;
+--- matching works like getInteractResult.
 ---@param obj_type string
 ---@param id number | string | nil
 ---@param extra_key string | number | nil
 ---@return table | nil
 function overworld.FindObject(obj_type, id, extra_key)
-    -- Search the global registry: every object placed/spawned on the current map.
+    -- Every object placed/spawned on the current map.
     local objects = overworld.map.objects
     if (not objects) then return nil end
 
@@ -543,12 +468,10 @@ function overworld.FindObject(obj_type, id, extra_key)
     if (not list) then return nil end
 
     for _, obj in ipairs(list) do
-        -- id not given: return the first object of this type.
         if (id == nil) then
             return obj
         end
 
-        -- Match by id, or by a property value when extra_key is a name.
         if (not extra_key or type(extra_key) == "number") then
             if (obj.id == id) then
                 return obj
@@ -565,10 +488,8 @@ end
 function overworld.dialogNew(texts, position)
     if (not Char.controlling) then return end
     Char.controlling = false
-    -- Stop the player immediately so the camera stays put for this frame. If
-    -- this is called before map.Update (e.g. from a sprite Step), zeroing the
-    -- velocity before the physics step prevents the one-frame slide that would
-    -- otherwise make GetRelativePos anchor the dialog one frame behind.
+    -- Stop the player immediately so the camera stays put. This can run before
+    -- map.Update, so zeroing the velocity prevents a one-frame slide.
     if (Char.collision.body) then
         Char.collision.body:setLinearVelocity(0, 0)
     end
@@ -590,8 +511,7 @@ function overworld.dialogNew(texts, position)
     _text._onComplete = function ()
         Char.controlling = true
         dialog.block:Destroy()
-        -- Lock every interaction for the rest of this frame so the confirm
-        -- press that closed the dialog can't re-trigger any of them.
+        -- Lock every interaction for the rest of this frame.
         dialog_just_closed = true
         dialog_lock_pending = true
     end
@@ -627,7 +547,6 @@ function overworld.SaveInteract(texts, location, position, direction)
         Save.Show()
     end
 
-    -- Save
     DATA.room = Scenes.name_current
     DATA.room_name = (location or "Unknown place")
     DATA.position = position
@@ -661,25 +580,18 @@ function overworld.Encounter(type)
 end
 
 function overworld.Update(dt)
-    -- Time
     DATA.time = DATA.time + dt
 
-    -- Release the one-frame dialog lock at the start of a NEW frame. If the
-    -- lock was just set this frame (dialog_lock_pending is true, because
-    -- _onComplete ran before this update), keep it active for the rest of the
-    -- frame so every getInteractResult call this frame stays blocked.
+    -- Release the one-frame dialog lock at the start of a NEW frame; if it was
+    -- set this frame by _onComplete, keep it for the rest of this frame.
     if (not dialog_lock_pending) then
         dialog_just_closed = false
     end
     dialog_lock_pending = false
 
-    -- stat runs BEFORE map on purpose: it opens the menu and zeroes the
-    -- player's velocity before the physics step inside map.Update, so the body
-    -- (and camera) does not slide forward one frame while the menu is being
-    -- positioned. map.Update then moves the player and makes the camera follow;
-    -- GetRelativePos (used by dialogs, which are created after this update)
-    -- reads the freshly-followed camera, keeping stat and dialogs on the same
-    -- frame.
+    -- stat before map on purpose: it zeroes the player's velocity before the
+    -- physics step, and dialogs built after this update read the camera that
+    -- map.Update just followed.
     overworld.stat.Update(dt)
     overworld.map.Update(dt)
 
@@ -687,7 +599,6 @@ function overworld.Update(dt)
     Chest.Update()
     Step.Update()
 
-    -- encounter
     if (overworld._enc._init) then
         if (overworld._enc._type == "default") then
             if (overworld._enc.time == 0) then
@@ -755,11 +666,8 @@ blacktop.color = {0, 0, 0}
 blacktop:MoveTo(DATA.position[1], DATA.position[2])
 blacktop._decay = true
 blacktop.Step = function (self)
-    -- The player (Char.currentSprite) may not exist yet during the very first
-    -- frames after a scene switch / hot-reload, or may already have been
-    -- destroyed by the previous session's cleanup. Guard the follow (mirrors
-    -- char.Update / map.Update) so the fade sprite never crashes the global
-    -- sprite update.
+    -- Char.currentSprite may not exist yet on the first frames after a scene
+    -- switch, or may already be gone; guard the follow.
     if (Char.currentSprite) then
         self:MoveTo(Char.currentSprite.x, Char.currentSprite.y)
     end
@@ -793,8 +701,7 @@ function overworld.Clear()
     Map.Destroy()
     Camera:unBounds()
 
-    -- Clear the entire Overworld library tree (char, map, world, stat, init,
-    -- encounter, shop, ...) so it re-executes fresh on next load.
+    -- Clear the whole Overworld library tree so it re-executes on next load.
     ClearModuleTree("Scripts.Libraries.Overworld")
 
     Camera:reset()

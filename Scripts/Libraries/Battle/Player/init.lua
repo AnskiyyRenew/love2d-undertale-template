@@ -1,6 +1,6 @@
 local path = (...):match("(.-)[^%.]+$")
 
----Creates a shallow copy of a soul module table so each new soul gets its own instance.
+---Shallow copy of a soul module table, so each new soul gets its own instance.
 ---@param soul table The original soul module to copy
 ---@return table A new table with the same fields as the original
 local function copy_soul(soul)
@@ -11,18 +11,12 @@ local function copy_soul(soul)
     return new
 end
 
--- Soul resolution (Game area first, engine second):
---   Game.Souls.<name>                            -> Game/Souls/<name>.lua
---   Scripts.Libraries.Battle.Player.Souls.<name> -> (engine fallback)
+-- Soul resolution, Game area first:
+--   Game.Souls.<name> -> Game/Souls/<name>.lua
+--   Scripts.Libraries.Battle.Player.Souls.<name> -> engine fallback
 --
--- `Scripts.Libraries.*` is normally exempt from the Game override mechanism, but
--- souls are per-game content, so they get an explicit Game root here.
---
--- Existence is probed on the FILESYSTEM first rather than inferred from a failed
--- require. `pcall(require, ...)` cannot tell "the module is not there" apart from
--- "the module is there but its top-level code threw", and treating the second as
--- the first would silently cut the fallback chain short instead of surfacing a
--- genuine error in a module that really was found.
+-- Existence is probed on the filesystem, not inferred from a failed require:
+-- pcall cannot tell "not there" from "there but threw".
 local SOUL_ROOTS = {"Game.Souls.", path .. "Player.Souls."}
 
 --- Describe a module name as a project-relative file path, for filesystem probes.
@@ -33,8 +27,7 @@ local function soulModulePathOf(module_name)
 end
 
 --- Test whether a module's file actually exists on disk.
---- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
---- so the result is only trusted as a positive when it is truthy.
+--- LÖVE 11 returns a table from getInfo, LÖVE 12 the info directly.
 ---@param module_name string
 ---@return boolean
 local function soulModuleExists(module_name)
@@ -45,27 +38,20 @@ local function soulModuleExists(module_name)
     end)
     if (ok and info) then return true end
 
-    -- Fallback probe: a real, readable file counts as existing.
     local readable, content = pcall(love.filesystem.read, file_path, 1)
     return (readable and content ~= nil)
 end
 
 -- The soul resolved by the last requireSoul() call.
 --
--- Player.action IS the soul module table (SetSoul does not copy it), so anything
--- a soul writes on itself stays in package.loaded and would be handed out again
--- to the next battle that uses the same soul - the same "stale state on a second
--- entry" problem scenes had. Dropping the old module before loading a new one is
--- what SceneManager does in doSwitch()/unloadSceneModule().
+-- Player.action IS the soul module table, so state a soul writes on itself
+-- survives in package.loaded and would leak into the next battle. The old
+-- module is dropped before a new one loads, like SceneManager does.
 ---@type string|nil
 local current_soul_id = nil
 
---- Drop a soul module from package.loaded so the next require re-executes the
---- file from disk instead of handing back the cached table.
----
---- Cleared under BOTH roots, same as SceneManager.unloadSceneModule(): clearing
---- only one root would leave a stale copy alive whenever the file lives in the
---- other one (a soul can move between Game/Souls and the engine directory).
+--- Drop a soul module from package.loaded so the next require re-executes it.
+--- Both roots are cleared: the file may live in either one.
 ---@param id string|nil Soul name; nil and "" are no-ops.
 local function unloadSoulModule(id)
     if (not id) or (id == "") then return end
@@ -76,15 +62,9 @@ end
 
 --- Require a soul module, Game area first.
 ---
---- A missing Game copy never prevents the engine copy from being tried, and a
---- Game copy that exists but throws is always reported - even when the engine
---- copy then loads fine, because the override is broken and the author needs to
---- know. Errors keep their original message (level 0 adds no location prefix).
----
---- Every call hands back a FRESHLY EXECUTED module: the soul that was in use
---- before this one is dropped from package.loaded, and so is the one about to be
---- loaded. Without the second one, switching A -> B -> A would be clean but any
---- module cached by some other path would still be served stale.
+--- A broken Game copy is always reported, even when the engine copy then loads:
+--- the override is broken and the author needs to know. Both the previous and
+--- the incoming module are unloaded first, so every call gets a fresh table.
 ---@param id string Soul name (e.g. "red", "orange", "blue").
 ---@return table The soul module.
 local function requireSoul(id)
@@ -92,8 +72,7 @@ local function requireSoul(id)
         error("[Player] Invalid soul name.", 0)
     end
 
-    -- Unload the previous soul, then the one we are about to load. Mirrors
-    -- SceneManager: unloadSceneModule(previous) + unloadSceneModule(next).
+    -- Unload the previous soul, then the one about to load.
     unloadSoulModule(current_soul_id)
     unloadSoulModule(id)
     current_soul_id = id
@@ -129,8 +108,7 @@ local function requireSoul(id)
     end
 
     if (found_module) then
-        -- Every candidate was found, but none of them loaded: re-raise the real
-        -- error instead of pretending the soul does not exist.
+        -- Every candidate exists but none loaded: re-raise the real error.
         error(first_error, 0)
     end
 
@@ -138,16 +116,9 @@ local function requireSoul(id)
         SOUL_ROOTS[1] .. ", " .. SOUL_ROOTS[2] .. ").", 0)
 end
 
----Hand a freshly loaded soul module its sprite and let the soul initialise
----itself.
----
----The soul owns its own setup - binding the sprite, picking its own tint,
----resetting its own state, consuming `args`. The contract is written down once,
----in Souls/_temp.lua; this file pokes no soul fields of its own.
----
----A soul written before `Init` existed still runs: the two fields the engine
----itself reads back (`sprite` / `can_move`) are bound here instead, loudly, so a
----game is never left with a soul that drives nothing.
+---Hand a freshly loaded soul module its sprite and let it initialise itself.
+---The contract lives in Souls/_temp.lua; a soul without Init() still runs, with
+---`sprite` / `can_move` bound here instead.
 ---@param module table The soul module that was just required.
 ---@param sprite table The sprite this soul drives.
 ---@param can_move boolean Mirrors Player.canMove at switch time.
@@ -238,9 +209,8 @@ function Player.AddParticle()
     end
 end
 
----Creates a new soul with its own sprite and independent update logic.
----Each new soul loads the same soul module as a separate instance,
----so it behaves like the main soul but has its own state and sprite.
+---Creates a new soul with its own sprite and independent state, driven by the
+---same soul module as the main soul.
 ---@param id string|number The soul identifier (e.g. "red", "orange", or 1 for red)
 ---@param args table|nil Forwarded to the soul's Init.
 ---@param use_sound boolean|nil Whether to play the ding sound
@@ -255,14 +225,13 @@ function Player.NewSoul(id, args, use_sound)
         _id = "red"
     end
 
-    -- Create a new sprite for this soul
     local sprite = Sprites.CreateSprite(Player._spr_default, "Player")
     sprite:MoveTo(999, 999)
     sprite.color = {1, 0, 0}
     sprite._hitbox = {4, 4}
 
-    -- Load the soul module, let it set itself up on that fresh sprite, then keep
-    -- a private copy so this entry in Player.souls owns its own fields.
+    -- The soul sets itself up on the fresh sprite; the copy keeps its fields
+    -- private to this entry in Player.souls.
     local module = initSoul(requireSoul(_id), sprite, Player.canMove, args)
     local soul = copy_soul(module)
 
@@ -285,9 +254,8 @@ function Player.SetHitBox(width, height, soul)
 end
 
 ---Pick the collision shape of a soul sprite: "ellipse" or "rect" (the default).
----A round soul tested as an ellipse stops catching the four empty corners of
----its box without paying for perfect-pixel collision. Synonyms work too
----("circle" / "oval", "rectangle" / "box").
+---A round soul tested as an ellipse ignores the four empty corners of its box.
+---Synonyms work too ("circle" / "oval", "rectangle" / "box").
 ---@param shape string|nil "ellipse" or "rect"; nil means "rect".
 ---@param soul table|nil The soul object from Player.NewSoul; nil = main soul.
 ---@return boolean ok False when `shape` is not a known shape name.
@@ -297,11 +265,8 @@ function Player.SetHitboxShape(shape, soul)
     return spr:SetHitboxShape(shape)
 end
 
----Switch the player soul sprite(s) to perfect-pixel collision, so the bullet
----test follows the heart's real pixels instead of the `_hitbox` box (see
----Sprites.SetPPCollision). Applies to the main soul and every extra soul sprite.
----Turn this on only if you want the art's true shape: for the 16x16 heart that
----is a wider hit area than the default 4x4 test box.
+---Switch the soul sprite(s) to perfect-pixel collision (see Sprites.SetPPCollision).
+---For the 16x16 heart this is a wider hit area than the default 4x4 test box.
 ---@param enabled boolean
 ---@return boolean ok Whether a usable tiling was found.
 ---@return integer count How many collision rectangles it produced.
@@ -354,27 +319,15 @@ function Player.AddKR(kramount)
     end
 end
 
----Creates a one-way platform.
----The platform only catches a soul that opted in with `use_platforms = true`
----(see Player.UpdatePlatforms), and only when its foot crosses the platform's top
----face from above (a classic one-way platform), so the player can still jump up
----through it from below and is never yanked up while standing underneath it.
+---Creates a one-way platform. Only a soul that opted in with
+---`use_platforms = true` is caught (see Player.UpdatePlatforms), and only when
+---its foot crosses the top face from above.
 ---@param x number|nil X position (default 320).
 ---@param y number|nil Y position (default 320).
 ---@param width number|nil Visual width in pixels (default 50).
----@param args table|nil Optional settings:
----  rotation       (number)        platform angle, default 0
----  mode           (string)        "none" or "move", default "none". Does NOT gate
----                                 movement any more; it only decides whether a
----                                 sideways drift carries the player along with it.
----  speed          ({x = n, y = n}) per-frame movement, applied whenever it is set
----  color          ({r, g, b})     tint, default {1, 0.3, 1}
----  surface_offset (number)        extra offset from the top edge, default 0
----  surface_tolerance (number)     half-thickness of the catch band, default 2
----  layer          (number|string) sprite layer, default "BelowBullets"
----  active         (boolean)       whether it can catch the player, default true
----  line_color     ({r, g, b})     white highlight line tint, default {1, 1, 1}
----  line_alpha     (number)        highlight line alpha, default 1
+---@param args table|nil rotation / mode ("move" also carries the player along) /
+---  speed {x, y} / color / surface_offset / surface_tolerance (catch band
+---  half-thickness) / layer / active / line_color / line_alpha.
 ---@return table The platform instance.
 function Player.BluePlatform(x, y, width, args)
     local args = (args or {})
@@ -510,16 +463,11 @@ function Player.ClearPlatforms()
     Player.platform_ground = false
 end
 
----One-way platform collision, for any soul that wants it.
----This test itself is soul-agnostic (it only looks at the sprite and its
----vertical speed), so a soul opts in either by setting `use_platforms = true` -
----Player.UpdatePlatforms then calls this for the active soul every frame - or by
----calling it directly from its own Update.
----The player's foot is probed along the sprite's own local "down" (its gravity
----direction) both before and after this frame's movement. A platform catches the
----player only when that foot crosses the platform's top face from above, so the
----player passes through from below and is never snapped up when already under it.
----When caught, the foot is snapped exactly onto the surface.
+---One-way platform collision, soul-agnostic: a soul opts in with
+---`use_platforms = true` (Player.UpdatePlatforms then calls this every frame),
+---or calls it directly from its own Update.
+---The foot is probed along the sprite's local "down" before and after this
+---frame's movement, and is caught only when it crosses the top face from above.
 ---@param sprite table  The player sprite.
 ---@param vertical number The soul's vertical speed (positive = falling).
 ---@return boolean grounded Whether a platform caught the player this frame.
@@ -531,9 +479,8 @@ function Player.BluePlatformCollide(sprite, vertical)
     local speed = sprite.speed or {x = 0, y = 0}
     local frame_dx, frame_dy = (speed.x or 0), (speed.y or 0)
 
-    -- The foot sits half the player's height below its centre, along the
-    -- sprite's local "down". Scales with yscale so a crouched soul (yscale < 1)
-    -- still lands correctly instead of floating above the platform.
+    -- The foot sits half the player's height below its centre along the local
+    -- "down"; it scales with yscale so a crouched soul still lands correctly.
     local half_h = math.max(2, ((sprite.height or 16) * (sprite.yscale or 1)) / 2)
     local psin = math.sin(math.rad(sprite.rotation or 0))
     local pcos = math.cos(math.rad(sprite.rotation or 0))
@@ -565,18 +512,16 @@ function Player.BluePlatformCollide(sprite, vertical)
                 local clx = cdx * cos + cdy * sin
                 local cly = cdy * cos - cdx * sin
 
-                -- Half-extent of the (possibly rotated) player square on the platform's x axis.
+                -- Half-extent of the (possibly rotated) player square on the
+                -- platform's x axis.
                 local rel = math.rad((sprite.rotation or 0) - (img.rotation or 0))
                 local ext_x = half_h * (math.abs(math.cos(rel)) + math.abs(math.sin(rel)))
 
                 local overlaps = (clx + ext_x - 4 > -pw / 2) and (clx - ext_x + 4 < pw / 2)
 
-                -- Treat the surface as a thin band instead of an exact line. The
-                -- foot is snapped with sin/cos, so on an angled platform it can end
-                -- a floating-point hair *below* the surface; with an exact
-                -- `ply <= surface` test that state never re-triggers and the player
-                -- slowly sinks / slides through. The band keeps resting stable while
-                -- still catching fast falls (Slam) via the previous-frame foot.
+                -- The surface is a band, not an exact line: the foot is snapped
+                -- with sin/cos, so on an angled platform it can sit a hair below
+                -- the surface and an exact test would never re-trigger.
                 local tol = (platform.surface_tolerance or 2)
                 local crossed = (ply <= surface + tol) and (cly >= surface - tol)
 
@@ -600,30 +545,12 @@ function Player.BluePlatformCollide(sprite, vertical)
     return false
 end
 
--- The soul field that opts a soul into the blue one-way platforms.
---
--- Platforms were written for the blue soul and only the blue soul was caught by
--- them, decided here from `Player.soul == "blue"`. That put the soul list in the
--- engine: any other soul that wanted the same platforms had to be wired in
--- again, here. The field moves that decision into the soul file, where it
--- belongs:
---
---     local action = {
---         sprite = nil,
---         use_platforms = true   -- caught by Player.BluePlatform surfaces
---     }
---
--- OPT IN, never opt out: the field is absent from every existing soul, so
--- nothing changes for them - they pass straight through the platforms exactly
--- as before. Only a soul that explicitly sets it to `true` is caught.
+-- Soul field that opts a soul into the blue one-way platforms. Opt in only:
+-- a soul that leaves it out passes straight through.
 local PLATFORM_FIELD = "use_platforms"
 
 ---Does the ACTIVE soul want to be caught by the one-way platforms?
----
----A soul that declares `use_platforms` decides for itself; a soul that says
----nothing keeps the historical behaviour, where only the engine's own blue soul
----was caught. That fallback also protects a `Game/Souls/blue.lua` written
----before this field existed: it stays on the platforms without being edited.
+---Absent field falls back to the blue soul, so an untouched blue.lua still works.
 ---@return boolean
 local function soulUsesPlatforms()
     local action = Player.action
@@ -636,13 +563,9 @@ local function soulUsesPlatforms()
 end
 
 ---Updates every blue platform (movement + player collision).
----
----Collision belongs to the souls that ask for it: a soul is caught only when it
----sets `action.use_platforms = true` (see soulUsesPlatforms). Every other soul
----ignores platforms and simply passes through. An extra soul created with
----`Player.NewSoul` is never driven from here - it can call
----`Player.BluePlatformCollide(soul.sprite, soul.GetSpeed())` from its own
----Update if it wants the same treatment.
+---Only a soul that sets `action.use_platforms = true` is caught. Extra souls from
+---Player.NewSoul are not driven here; they can call BluePlatformCollide from
+---their own Update.
 ---@param dt number|nil
 function Player.UpdatePlatforms(dt)
     local platforms = Player.platforms
@@ -677,7 +600,7 @@ function Player.UpdatePlatforms(dt)
     end
     Player.platform_ground = grounded
 
-    -- Remember where the platforms ended up, for next frame's carry / crossing test.
+    -- Remember where the platforms ended up, for the carry / crossing test.
     for _, platform in ipairs(platforms) do
         local img = platform.image
         if (img) then
@@ -713,13 +636,11 @@ function Player.Update(dt)
                 local coll_p = Sprites.GetHitbox(Player.sprite)
 
                 -- Both shapes carry their own kind (`shape`), so a bullet set to
-                -- "ellipse" (bullet:SetHitboxShape("ellipse")) is tested as an
-                -- ellipse here instead of as the rectangle around it.
+                -- "ellipse" is tested as an ellipse, not as its rectangle.
                 if (Collisions.ShapeWithShape(coll_b, coll_p)) then
-                    -- Broad phase hit. When either side asked for perfect-pixel
-                    -- collision (sprite:SetPPCollision(true)) the real answer
-                    -- comes from the rectangulated shapes; nil means neither
-                    -- side opted in, so the box result stands.
+                    -- Broad phase hit. When either side opted into perfect-pixel
+                    -- collision the rectangulated shapes decide; nil means
+                    -- neither did, so the box result stands.
                     local pp = Sprites.PPCollide(b, Player.sprite)
                     if (pp == nil or pp == true) then
                         Battle.OnHit(b)
@@ -733,7 +654,6 @@ function Player.Update(dt)
     if (Battle.state ~= "DEFENDING") then return end
     if (not Player.canMove) then return end
     Player.action.Update(dt)
-    --print(true)
 
     for i = #Player.souls, 1, -1 do
         local soul = Player.souls[i]

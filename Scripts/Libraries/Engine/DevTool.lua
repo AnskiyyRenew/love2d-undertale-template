@@ -1,45 +1,19 @@
 --[[
     Scripts/Libraries/Engine/DevTool.lua
-    Developer tool V2 - standalone SDL child window (Tree variable browser + Console REPL)
-
-    Depends on:
-      Windows.lua (Scripts/Libraries/Utils/Windows.lua); requires LÖVE 12 (ships with SDL3).
-
-    Usage (main.lua):
-      DevTool = ImportFile("Engine.DevTool")        -- requiring it only registers the hooks
-      -- in love.update:  DevTool.Update(dt)
-      -- in love.draw:    DevTool.Draw()
-      -- F8 opens/closes the window (dev builds only; call DevTool.Toggle() to do the same)
-      -- The window stays closed until F8 is pressed once.
-
-    [Tree] variable browser
-      - Top-level roots: Player / Battle / Overworld / Scenes.current / Global(config) / _G(all)
-      - Click a number/string leaf -> inline edit writes back to real engine memory
-      - Click a boolean leaf -> toggles it; click a table node (or its arrow) -> expand/collapse
-      - R rebuilds the selected node's children (refresh dynamic containers)
-      - Quick edit bar on top: path = value read/write, e.g. Player.hp -> 999
-    [Console] REPL
-      - Sandbox evaluation (loadstring + setfenv) reading/writing engine globals
-      - Supports expressions (Enter shows the result) and statements (e.g. Player.hp = 999)
-      - Available variables: Player Battle Overworld Scenes Global _G
-
-    Keyboard input notes:
-      - The child window has no love.textinput, and SDL child-window keyboard events are
-        unreliable in this LÖVE build (KF=YES still produced no input). Therefore keys are
-        forwarded from the main window's love.keypressed and mapped from LÖVE key names.
-      - Clicking the tool window requests OS keyboard focus (see KF:YES/NO top-right);
-        if focus is never granted, keys are still forwarded while the mouse hovers the tool.
+    Developer tool: standalone SDL child window with a variable tree browser and
+    a console REPL. Requires Utils/Windows.lua (LÖVE 12 / SDL3).
+    Entry: DevTool.Update(dt) / DevTool.Draw() from main.lua; F8 or
+    DevTool.Toggle() opens the window.
 ]]
 
--- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua;
--- main.lua also skips importing this module in release builds).
+-- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua).
 if (_RELEASED) then
     return {}
 end
 
 local DevTool = {}
 
--- Windows native window library dependency (SDL3 child window + mouse/key events)
+-- Windows native window library dependency (SDL3 child window + mouse events)
 local window
 do
     local ok, mod = pcall(require, "Scripts.Libraries.Utils.Windows")
@@ -54,9 +28,6 @@ if not window then
     end
 end
 
--- ============================================================
--- Window / layout / theme parameters
--- ============================================================
 local TOOL_W, TOOL_H   = 1280, 760
 local PRESENT_INTERVAL = 1 / 30      -- readback throttle for the child-window present (30fps)
 local ROW_H            = 20
@@ -73,7 +44,7 @@ local MAX_CHILDREN     = 300
 local MAX_DEPTH        = 26
 local MAX_ROWS         = 40000
 
--- Console region (only relevant while the Tree mode hides the quick bar)
+-- Console region (only used while Tree mode hides the quick bar)
 local CONSOLE_TOP      = HEADER_H + 4
 local CONSOLE_INPUT_H  = 24
 
@@ -103,9 +74,6 @@ local rootDefs = {
     { name = "_G (all globals)",  get = function() return _G end },
 }
 
--- ============================================================
--- State
--- ============================================================
 DevTool.enabled     = false   -- start closed; the first F8 press opens the window
 DevTool.win         = nil
 DevTool.canvas      = nil
@@ -143,9 +111,6 @@ DevTool.console     = {
     focus   = true,
 }
 
--- ============================================================
--- Basic helpers
--- ============================================================
 local function addr(v)
     local ok, s = pcall(tostring, v)
     return (ok and s) or "?"
@@ -225,16 +190,13 @@ local function fitText(font, s, maxW)
     return s:sub(1, maxc - 1) .. "~"
 end
 
--- ============================================================
--- Tree building (lazy expansion + cycle detection)
--- ============================================================
 local function buildChildren(node)
     node.children = {}
     node.built = true
     local t = nodeValue(node)
     if type(t) ~= "table" then return end
 
-    -- Ancestor set: addresses of every table from the root down to this node, for cycle detection
+    -- Ancestor addresses (root -> this node) for cycle detection
     local anc = {}
     if node.ancestors then
         for k in pairs(node.ancestors) do anc[k] = true end
@@ -357,9 +319,6 @@ local function nodePath(node)
     return table.concat(parts, ".")
 end
 
--- ============================================================
--- Quick path parsing / writing
--- ============================================================
 local function splitPath(p)
     local segs = {}
     local i, n = 1, #p
@@ -457,9 +416,6 @@ local function quickSet()
     end
 end
 
--- ============================================================
--- Input helpers (key names -> characters)
--- ============================================================
 local SHIFT_MAP = {
     ["1"] = "!", ["2"] = "@", ["3"] = "#", ["4"] = "$", ["5"] = "%",
     ["6"] = "^", ["7"] = "&", ["8"] = "*", ["9"] = "(", ["0"] = ")",
@@ -493,9 +449,6 @@ local function applyEditor()
     DevTool.editor = nil
 end
 
--- ============================================================
--- Console (REPL): sandbox evaluation
--- ============================================================
 local function consoleAddLine(text, color)
     local c = DevTool.console
     c.lines[#c.lines + 1] = { text = tostring(text), color = color }
@@ -545,12 +498,8 @@ local function consoleRun()
     end
 end
 
--- ============================================================
--- Character mapping (LÖVE key names coming from main.lua love.keypressed)
--- Note: SDL child-window keyboard events are unreliable in this LÖVE build
--- (KF=YES still yielded no input), so keys are forwarded from the main window
--- by main.lua and mapped from LÖVE key names here.
--- ============================================================
+-- SDL child-window key events are unreliable in this LÖVE build, so main.lua
+-- forwards its love.keypressed keys and they are mapped from LÖVE key names here.
 local ASCII_BY_NAME = {
     ["space"] = " ", ["grave"] = "`", ["minus"] = "-", ["equals"] = "=",
     ["left bracket"] = "[", ["right bracket"] = "]", ["backslash"] = "\\",
@@ -562,9 +511,7 @@ local function loveKeyChar(name, shift)
     if not name then return nil end
     if #name == 1 then
         -- LÖVE key constants name the UNSHIFTED physical key ("-", not "minus"),
-        -- so punctuation needs the same shifted-symbol table as digits.
-        -- Previously punctuation fell through to `return name` and ignored Shift,
-        -- making SHIFT_MAP["-"]="_" (and every other shifted symbol) unreachable.
+        -- so punctuation uses the same shifted-symbol table as digits.
         if name:match("%a") then
             return shift and string.upper(name) or name
         end
@@ -615,8 +562,8 @@ local function backspaceSink()
     end
 end
 
----Whether main-window keys should be forwarded to the tool
----(the child window has focus, or the mouse is hovering over it).
+--- Whether main-window keys should be forwarded to the tool (child window has
+--- focus, or the mouse hovers over it).
 function DevTool.WantsKeys()
     if not DevTool.enabled or not DevTool.win or not window then return false end
     local focused = false
@@ -720,9 +667,6 @@ function DevTool._onWheel(x, y)
     end
 end
 
--- ============================================================
--- Click / wheel consumption (called from love.update)
--- ============================================================
 local function hitRow(c)
     local v = DevTool.view
     if not v then return nil end
@@ -861,9 +805,6 @@ local function consumeInput()
     DevTool._clicks = {}
 end
 
--- ============================================================
--- Window lifecycle
--- ============================================================
 local function loadFonts()
     local ok1, f1 = pcall(Fonts.New, "determination_mono.ttf", 15)
     DevTool.font = (ok1 and f1) or SE.graphics.newFont(15)
@@ -943,9 +884,6 @@ function DevTool.Toggle()
     DevTool.enabled = not DevTool.enabled
 end
 
--- ============================================================
--- Drawing
--- ============================================================
 local function drawHeader(g)
     g.setColor(COL.panel)
     g.rectangle("fill", 0, 0, TOOL_W, HEADER_H)
@@ -1213,9 +1151,6 @@ local function drawInner()
     pcall(window.SDLPresentCanvas, DevTool.win, DevTool.canvas)
 end
 
--- ============================================================
--- Main entry points (called from main.lua)
--- ============================================================
 function DevTool.Update(dt)
     if DevTool._failed then return end
     local ok, err = pcall(function()

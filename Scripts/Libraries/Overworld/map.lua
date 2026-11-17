@@ -25,9 +25,7 @@ local map = {
     debug_objects = {},
 }
 local debug_attris = {
-    -- color, angle
-    -- angle is a RELATIVE base angle (degrees); the final display rotation
-    -- also adds the object's own `rotation` from the map.
+    -- color, relative base angle in degrees; the object's own `rotation` is added.
     marks = {{0.5, 1, 1}, 45},
     triggers = {{0.3, 1, 0.3}, 0},
     walls = {{1, 0.3, 0.3}, 0},
@@ -40,9 +38,6 @@ local debug_attris = {
 local obj_sprites = {}
 local sti = ImportFile("STI")
 
----------------------------------------------------
--- Object layer handlers: place runtime objects + physics bodies.
----------------------------------------------------
 local layerHandlers = {}
 
 function layerHandlers.triggers(layer)
@@ -63,7 +58,7 @@ function layerHandlers.triggers(layer)
         shape:setDensity(1)
         shape:setSensor(true)
 
-        -- Runtime object entry; referenced from the fixture userData so the
+        -- Runtime object referenced from the fixture userData, so the
         -- interaction system can read its properties (e.g. an "rr" key).
         local entry = {
             x = obj.x * 2,
@@ -166,9 +161,8 @@ end
 function layerHandlers.walls(layer)
     local objects = map.objects.walls
     local scale = 2
-    -- Wall friction. Box2D mixes the two contact frictions with sqrt(f1 * f2),
-    -- so walls only slide smoothly when BOTH this value and the player's own
-    -- friction (char.lua) are low. Tune this single spot to adjust wall grip.
+    -- Wall friction. Box2D mixes contact friction as sqrt(f1 * f2), so this and
+    -- the player's own friction (char.lua) must both stay low.
     local wall_friction = 0.01
 
     local function rotatePoint(px, py, angle)
@@ -195,10 +189,8 @@ function layerHandlers.walls(layer)
                 table.insert(verts, (p.y - first.y) * scale)
             end
 
-            -- LÖVE 12.0: attach the polygon directly to the body (the same as the
-            -- rectangle/circle branches below). The body-less variant is deprecated
-            -- and yields a detached shape, on which setDensity/setUserData throw
-            -- "Shape must be active in the physics World to use this method."
+            -- LÖVE 12 requires the polygon to be attached to a body: a detached
+            -- shape throws on setDensity / setUserData.
             local shape = SE.physics.newPolygonShape(body, verts)
             shape:setDensity(1)
             shape:setFriction(wall_friction)
@@ -356,7 +348,7 @@ end
 local function scan_layers(_map)
     for _, layer in ipairs(_map.layers) do
         if (layer.type == "objectgroup") then
-            -- Keep the raw Tiled objects for the debug drawer.
+            -- Raw Tiled objects, kept for the debug drawer.
             local debug_list = map.debug_objects[layer.name]
             if (not debug_list) then
                 debug_list = {}
@@ -366,7 +358,6 @@ local function scan_layers(_map)
                 table.insert(debug_list, obj)
             end
 
-            -- Place the runtime objects / physics bodies.
             local handler = layerHandlers[layer.name]
             if (handler) then
                 handler(layer)
@@ -375,12 +366,10 @@ local function scan_layers(_map)
     end
 end
 
----------------------------------------------------
-
 local function draw_object_debug(obj, color, base_angle)
     local x, y = obj.x or 0, obj.y or 0
     local w, h = obj.width or 0, obj.height or 0
-    -- relative base angle + the object's own rotation (e.g. a 90deg / 60deg wall)
+    -- relative base angle + the object's own rotation (e.g. a 90deg wall)
     local angle = (base_angle or 0) + (obj.rotation or 0)
 
     SE.graphics.push()
@@ -388,13 +377,11 @@ local function draw_object_debug(obj, color, base_angle)
     SE.graphics.rotate(math.rad(angle))
 
     if (obj.shape == "point" or (w <= 0 and h <= 0)) then
-        -- Point marker: cross at the object position
         local s = 4
         SE.graphics.setColor(color[1], color[2], color[3])
         SE.graphics.line(-s, 0, s, 0)
         SE.graphics.line(0, -s, 0, s)
     else
-        -- Rectangle: translucent fill + colored outline
         SE.graphics.setColor(color[1], color[2], color[3], 0.25)
         SE.graphics.rectangle("fill", 0, 0, w, h)
         SE.graphics.setColor(color[1], color[2], color[3], 1)
@@ -431,25 +418,20 @@ end
 
 local function debug_keyboards(dt)
     if (Keyboard.GetState("space") == 1) then
-        -- Convert window pixel position -> canvas coordinate (0-640, 0-480)
+        -- Window pixel position -> canvas coordinate (0-640, 0-480).
         local mx, my = SE.mouse.getPosition()
         local canvas_x = (mx - DrawX) / ScreenScale
         local canvas_y = (my - DrawY) / ScreenScale
 
-        -- Convert canvas coordinate -> map world coordinate, matching the map draw:
-        --   map._map:draw((320 - Camera.x) / 2, (240 - Camera.y) / 2, 2, 2)
-        --   screen = 2 * world + 320 - Camera.x
+        -- Canvas -> map world: screen = 2 * world + 320 - Camera.x.
         local wx = (canvas_x - 320 + Camera.x) / 2
         local wy = (canvas_y - 240 + Camera.y) / 2
 
-        -- Snap the camera so the world point under the mouse is the view center.
-        -- The view center (screen 320, 240) shows world (Camera.x / 2, Camera.y / 2).
+        -- Snap the camera so the world point under the mouse is the view centre.
         Camera.x = wx * 2
         Camera.y = wy * 2
     end
 end
-
----------------------------------------------------
 
 ---Destroy every physics body owned by the map objects.
 local function resetObjects(objects)
@@ -487,8 +469,7 @@ function map.Init(lua_file)
 
     map.current = lua_file
     -- Game area first: a copy at Game/<path> overrides the built-in map.
-    if (Overworld and Overworld.ResolveMapPath) then
-        map.current = Overworld.ResolveMapPath(lua_file)
+    if (Overworld and Overworld.ResolveMapPath) then        map.current = Overworld.ResolveMapPath(lua_file)
     end
     map._map = sti(map.current, {"box2d"})
     map._map.draw_objects = false

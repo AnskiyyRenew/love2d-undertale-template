@@ -6,8 +6,7 @@ local action = {
 
 local speed = 2
 
--- Init: the contract lives in _temp.lua. Binding, tint and state reset belong
--- to the soul, so the engine never pokes these fields from outside.
+-- Contract: _temp.lua. Binding, tint and state reset belong to the soul.
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.

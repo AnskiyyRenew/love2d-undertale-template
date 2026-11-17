@@ -1,22 +1,10 @@
 -- Poseur animation — the monster of the sample encounter.
---
--- Contract and style rules live in Game/Animations/_temp.lua — read that first.
--- Short version: plain table, NO metatable; every function is declared with a
--- dot and takes the instance as its first argument; `New(pos)` returns a plain
--- instance that carries `_class` back to this module and gets these functions
--- bound onto it (Battle.BindAnimation), so the engine, the attack patterns and
--- the mercy menu all write `anim.Foo(...)` on the instance.
--- Everything inside this file calls the module by name (`PoseurAnim.Foo(self, ...)`).
--- Sprites stay colon-style (`sprite:Set(...)`, `sprite:Dust(...)`).
---
--- This module is a FACTORY: `require` returns the module once (Lua caches it in
--- `package.loaded`), so `New(pos)` is the only way to get a usable instance.
--- Every enemy gets its OWN sprite and its own state, which means two enemies of
--- the same type no longer share one table.
+-- Contract: Game/Animations/_temp.lua. `require` caches the module, so `New(pos)`
+-- is the only way to get an instance; Battle.BindAnimation binds the functions
+-- for dot calls (`anim.Foo(...)`).
 
 local PoseurAnim = {}
 
--- Create a brand-new, independent Poseur animation instance.
 function PoseurAnim.New(pos)
     local self = {}
 
@@ -31,14 +19,11 @@ function PoseurAnim.New(pos)
 
     PoseurAnim.Init(self, pos)
 
-    -- The instance drives itself from here on (`anim.SetFace(3)`) — see
-    -- Battle.BindAnimation for the rule.
     Battle.BindAnimation(self, PoseurAnim)
 
     return self
 end
 
--- Create the sprites.
 function PoseurAnim.Init(self, pos)
     local _pos = (pos or {320, 140})
     local poseur = Sprites.CreateSprite("poseur.png", "UI")
@@ -70,7 +55,6 @@ function PoseurAnim.Update(self, dt)
         return
     end
 
-    -- Put your monster's animation code here.
     if (self.hurting) then
         local p = self.poseur
         p.x = self.cpos[1] + self.intensity
@@ -79,8 +63,6 @@ function PoseurAnim.Update(self, dt)
     end
 end
 
--- Destroy the anim.
--- You can also use `sprite:Dust` function here.
 function PoseurAnim.Destroy(self)
     if (not self.poseur) then
         return

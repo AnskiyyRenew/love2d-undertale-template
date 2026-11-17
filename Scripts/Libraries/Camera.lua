@@ -84,7 +84,6 @@ function camera:Update(dt)
     self.x = math.max(self.min_x or -math.huge, math.min(self.x, self.max_x or math.huge))
     self.y = math.max(self.min_y or -math.huge, math.min(self.y, self.max_y or math.huge))
 
-    -- shaker
     local _s = self.shaker
     if (_s._time > 0) then
         _s._time = _s._time - 1

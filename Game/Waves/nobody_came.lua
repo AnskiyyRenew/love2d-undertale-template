@@ -33,7 +33,6 @@ function wave.Update(dt)
 
     time = time + 1
     if (time == 680) then
-        -- EndWave()
     end
 end
 

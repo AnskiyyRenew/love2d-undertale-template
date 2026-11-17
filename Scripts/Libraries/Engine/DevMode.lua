@@ -1,38 +1,12 @@
 --[[
     Scripts/Libraries/Engine/DevMode.lua
-    In-game developer mode: unlock with a key sequence, then jump between waves.
-
-    Unlock (any scene, development builds only):
-        type  e -> n -> d  in order (1.5 s between keys, no modifiers held)
-        the console prints [DevMode] ... and the wave picker opens right away
-        when a battle is loaded. Typing the sequence again locks the mode.
-
-    Keys while the panel is open:
-        F10 / Esc                 close the panel (F10 reopens it)
-        Up / Down / PageUp / PageDown / Home / End / wheel   move the cursor
-        Left / Right              collapse / expand the selected folder
-        Enter / Space             jump to the highlighted wave (or toggle folder)
-        S                         end the current enemy turn immediately
-        I                         toggle invincible (Player.Hurt is skipped)
-
-    Why a tree: a wave's name IS its path. Game/Waves/bones/wave1.lua is the wave
-    `bones.wave1`, exactly the string an encounter puts in its `wave` field, so the
-    folder layout in the project is the navigation the tester already knows.
-
-    While the panel is open the current scene is paused (scene.pausing), so the
-    wave that was running can not hurt the player while browsing.
-
-    The overlay draws in CANVAS space (inside the 640x480 canvas, before it is
-    scaled to the window), which is why mouse input is converted with
-    GUI.Input.ScreenToCanvas and the drawing needs no screen-scale maths.
-
-    Every visible string comes from the DevMode.* keys of Localization/<lang>.json
-    (engine side; a game may override keys in Game/Localization/<lang>.json).
-    Lookups are lazy because main.lua imports this module before Localize.
+    In-game developer mode: type e-n-d to unlock, then jump between waves.
+    Entry: Update / Draw / HandleKey / Mouse*; the scene below is paused while
+    the panel is open. The overlay draws in 640x480 canvas space.
+    Every label is a DevMode.* key from Localization/<lang>.json.
 ]]
 
--- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua;
--- main.lua also skips importing this module in release builds).
+-- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua).
 if (_RELEASED) then
     return {}
 end
@@ -62,13 +36,8 @@ local devmode = {
     _notice_time = 0,
 }
 
--- ---------------------------------------------------------------------------
--- Localization
--- ---------------------------------------------------------------------------
--- main.lua imports DevMode before Localize, so the global is resolved at each
--- lookup instead of being captured here. Looking it up lazily also means an
--- F2 language reload is visible on the next draw. Keys live in the engine's
--- Localization/<lang>.json; Game/Localization/<lang>.json can override them.
+-- Localize is imported after this module, so the global is resolved per lookup;
+-- keys live in the engine's Localization/<lang>.json, Game may override them.
 ---@param key string A DevMode.* key from the language files.
 ---@param formats table|string|nil Passed through to Localize.localizeText.
 ---@return string text The translation, or the key when Localize is unavailable.
@@ -85,9 +54,6 @@ local function L(key, formats)
     return key
 end
 
--- ---------------------------------------------------------------------------
--- Layout (canvas space, 640x480)
--- ---------------------------------------------------------------------------
 local PANEL = { x = 24, y = 18, w = 592, h = 444 }
 local ROW_H = 22
 local TITLE_Y = PANEL.y + 8
@@ -114,11 +80,8 @@ local COL = {
     scrollbar = { 1, 1, 1, 0.35 },
 }
 
--- ---------------------------------------------------------------------------
--- Text: the panel mixes CJK labels with ASCII wave names, so a string is split
--- into ASCII / non-ASCII runs and each run is drawn with its own font (the same
--- pair the engine uses everywhere: determination_mono 13 + simsun 13).
--- ---------------------------------------------------------------------------
+-- The panel mixes CJK labels with ASCII wave names, so a string is split into
+-- ASCII / non-ASCII runs drawn with determination_mono 13 and simsun 13.
 local font_ascii, font_cjk
 
 local function ensureFonts()
@@ -189,12 +152,8 @@ local function drawTextRight(str, right, y, color)
     return drawText(str, right - textWidth(str), y, color)
 end
 
--- ---------------------------------------------------------------------------
--- Wave discovery
--- ---------------------------------------------------------------------------
--- Same order the engine resolves waves in (see BATTLE_MODULE_ROOTS in
--- Battle/init.lua): Game area first, engine directory as the fallback. A folder
--- is a namespace, so the module name of a row is prefix .. "." .. relative path.
+-- Same resolution order as the engine (Game area first, engine fallback). A
+-- folder is a namespace: the module name is prefix .. "." .. relative path.
 local WAVE_ROOTS = {
     { dir = "Game/Waves",    prefix = "Game.Waves",    labelKey = "DevMode.Root.Game" },
     { dir = "Scripts/Waves", prefix = "Scripts.Waves", labelKey = "DevMode.Root.Engine" },
@@ -291,21 +250,9 @@ function devmode.Rebuild()
     devmode._cursor = math.min(math.max(devmode._cursor, 1), math.max(1, #rows))
 end
 
--- ---------------------------------------------------------------------------
--- Battle access
--- ---------------------------------------------------------------------------
 --- True when a battle scene is the one currently running.
----
---- Two independent signals, because a game is free to name its battle scene
---- anything it likes: the engine's own scenes are `scene_battle*`, and a battle
---- that is actually being driven advances `Battle.TIME_F` every frame (tracked
---- in Update, and frozen while the panel is open so a paused battle still
---- counts as "in a battle").
----
---- Says nothing about whether this Battle can be driven from the panel. A
---- project that copied DevMode.lua over an older `Battle/init.lua` is in a
---- battle just fine; reporting that as "not in a battle" would point the reader
---- at the wrong file. `entryMissing` owns that check.
+--- Either the scene name contains "battle", or Battle.TIME_F advanced (tracked
+--- in Update, frozen while the panel is open so a paused battle still counts).
 ---@return boolean
 local function battleReady()
     if (type(Battle) ~= "table") then
@@ -324,10 +271,8 @@ local function battleReady()
 end
 
 --- Why the running battle cannot be driven from here, or nil when it can.
----
---- `Battle` outlives the scene, so a project may hold this DevMode next to a
---- `Battle` that predates the debug entry points. Callers report this reason
---- verbatim instead of blaming the battle state.
+--- `Battle` outlives the scene, so a stale Battle may lack the debug entries;
+--- callers report this reason verbatim.
 ---@param entry string "DebugJumpWave" or "DebugEndWave"
 ---@return string|nil
 local function entryMissing(entry)
@@ -347,17 +292,14 @@ local function currentWave()
     return Battle.wave
 end
 
--- ---------------------------------------------------------------------------
--- Actions
--- ---------------------------------------------------------------------------
 function devmode.Notify(text)
     devmode._notice = tostring(text)
     devmode._notice_time = 2.5
     print("[DevMode] " .. devmode._notice)
 end
 
---- Expand every folder on the way to the wave that is loaded right now and put
---- the cursor on it, so the panel opens where the tester left off.
+--- Expand every folder leading to the wave that is loaded right now, so the
+--- panel opens where the tester left off.
 local function revealCurrent()
     local wave = currentWave()
     if (not wave) then return end
@@ -482,9 +424,8 @@ local function toggleFolder(open)
     focusPath(row.path)
 end
 
---- Keep Player.Hurt wrapped while developer mode is on, so the invincible
---- switch can veto damage at the source instead of healing it back a frame
---- later (a lethal hit would already have killed the player by then).
+--- Keep Player.Hurt wrapped while developer mode is on, so invincible can veto
+--- damage at the source (a lethal hit would kill before a heal could undo it).
 local function ensureHurtHook()
     if (type(Player) ~= "table" or type(Player.Hurt) ~= "function") then return end
     if (Player._devmode_hurt) then return end
@@ -504,9 +445,6 @@ function devmode.ToggleInvincible()
     }))
 end
 
--- ---------------------------------------------------------------------------
--- Open / close / toggle
--- ---------------------------------------------------------------------------
 --- Open the panel. The running scene is paused underneath it.
 ---@return boolean opened
 function devmode.Open()
@@ -579,9 +517,6 @@ function devmode.Toggle()
     end
 end
 
--- ---------------------------------------------------------------------------
--- Key sequence
--- ---------------------------------------------------------------------------
 local SEQUENCE = "end"
 local SEQ_TIMEOUT = 1.5
 
@@ -673,9 +608,8 @@ function devmode.HandleKey(key, isrepeat)
             return true
         end
 
-        -- The unlock sequence also works inside the panel: typing e-n-d again
-        -- locks developer mode and closes everything, which is the only way back
-        -- out that does not require knowing about F10 first.
+        -- e-n-d also works inside the panel: it locks the mode and closes
+        -- everything, the only way out that does not need F10.
         if (#key == 1 and key:match("^%a$")) then
             trackSequence(key)
             if (not devmode.open) then return true end
@@ -686,7 +620,7 @@ function devmode.HandleKey(key, isrepeat)
         if (key == "s") then endWave(); return true end
         if (key == "i") then devmode.ToggleInvincible(); return true end
 
-        -- Everything else is swallowed: the battle below must not act on it.
+        -- Swallow everything else: the battle below must not act on it.
         return true
     end
 
@@ -703,9 +637,6 @@ function devmode.HandleKey(key, isrepeat)
     return false
 end
 
--- ---------------------------------------------------------------------------
--- Mouse
--- ---------------------------------------------------------------------------
 local function rowAt(cx, cy)
     if (cx < PANEL.x or cx > PANEL.x + PANEL.w) then return nil end
     if (cy < LIST_Y or cy > LIST_Y + LIST_H) then return nil end
@@ -757,18 +688,14 @@ function devmode.WheelMoved(_, y)
     return true
 end
 
--- ---------------------------------------------------------------------------
--- Update / Draw
--- ---------------------------------------------------------------------------
 function devmode.Update(dt)
     if (devmode.enabled) then
         ensureHurtHook()
     end
 
-    -- `Battle.TIME_F` only advances while a battle scene drives the battle, so
-    -- it tells "the global Battle table is from an old battle" apart from "a
-    -- battle is running". Skipped while the panel is open: the scene is paused
-    -- there on purpose, and jumping must stay available.
+    -- Battle.TIME_F only advances while a battle drives it, so it separates "old
+    -- Battle table" from "battle running". Skipped while the panel is open,
+    -- where the scene is paused on purpose.
     if (not devmode.open) then
         if (type(Battle) == "table" and type(Battle.TIME_F) == "number") then
             devmode._battle_fresh = (Battle.TIME_F ~= devmode._last_time_f)
@@ -794,8 +721,8 @@ function devmode.Update(dt)
         return
     end
 
-    -- Cursor position is read every frame: mousemoved is not guaranteed to fire
-    -- (and does not fire at all when the window is scaled by the OS).
+    -- Cursor position is read every frame: mousemoved may never fire (it does not
+    -- when the OS scales the window).
     local sx, sy = SE.mouse.getPosition()
     devmode._mouse.x, devmode._mouse.y = GUI.Input.ScreenToCanvas(sx, sy)
 
@@ -831,7 +758,6 @@ function devmode.Draw()
 
     -- Row list
     SE.graphics.setScissor(PANEL.x + 2, LIST_Y, PANEL.w - 4, LIST_H)
-
     for i = 1, VISIBLE_ROWS do
         local index = devmode._scroll + i - 1
         local row = rows[index]

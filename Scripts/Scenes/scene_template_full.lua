@@ -1,8 +1,6 @@
 local scene = {}
 
--- ============================================
--- 1. CORE LIFECYCLE CALLBACKS
--- ============================================
+-- 1. Core lifecycle callbacks
 
 --- Called once when the scene is first loaded.
 function scene.load()
@@ -27,9 +25,7 @@ function scene.quit()
 end
 
 
--- ============================================
--- 2. KEYBOARD CALLBACKS
--- ============================================
+-- 2. Keyboard callbacks
 
 --- Called when a key is pressed.
 --- @param key string The key name (e.g., "escape", "a").
@@ -37,7 +33,7 @@ end
 --- @param isrepeat boolean True if this is a repeated key event.
 function scene.keypressed(key, scancode, isrepeat)
     if key == "escape" then
-        SE.event.quit() -- Press ESC to quit the game
+        SE.event.quit()
     end
     print("SE.keypressed: Key '" .. key .. "' pressed")
 end
@@ -52,14 +48,11 @@ end
 --- Called when text input is received (e.g., from IME or character input).
 --- @param text string The input text.
 function scene.textinput(text)
-    -- Example: append input text to a string
     print("SE.textinput: Text input received: " .. text)
 end
 
 
--- ============================================
--- 3. MOUSE CALLBACKS
--- ============================================
+-- 3. Mouse callbacks
 
 --- Called when a mouse button is pressed.
 --- @param x number X coordinate of the mouse.
@@ -88,8 +81,6 @@ end
 --- @param dy number Change in Y since last frame.
 --- @param istouch boolean True if the event came from a touchscreen.
 function scene.mousemoved(x, y, dx, dy, istouch)
-    -- Mouse move events are frequent; avoid printing debug info here.
-    -- Use this to update mouse-related logic (e.g., hover states).
 end
 
 --- Called when the mouse wheel is scrolled.
@@ -100,9 +91,7 @@ function scene.wheelmoved(x, y)
 end
 
 
--- ============================================
--- 4. WINDOW & SYSTEM CALLBACKS
--- ============================================
+-- 4. Window & system callbacks
 
 --- Called when the window gains or loses focus.
 --- @param f boolean True if the window gained focus, false if it lost focus.
@@ -119,7 +108,6 @@ end
 --- @param h number New window height.
 function scene.resize(w, h)
     print(string.format("SE.resize: Window resized to %dx%d", w, h))
-    -- Use this to recalculate UI layout or camera viewport
 end
 
 --- Called when the window visibility changes (minimized/restored).
@@ -133,9 +121,7 @@ function scene.visible(v)
 end
 
 
--- ============================================
--- 5. DRAG & DROP CALLBACKS
--- ============================================
+-- 5. Drag & drop callbacks
 
 --- Called when one or more files are dragged and dropped onto the window.
 --- @param file SE.File The dropped file object.

@@ -29,8 +29,7 @@ local function load_save_data()
     local contents
 
     if SE and SE.filesystem and SE.filesystem.read then
-        -- SE.filesystem uses paths relative to the save directory,
-        -- so we must NOT pass the absolute OS path here.
+        -- SE.filesystem paths are relative to the save directory: never pass an OS path.
         contents = SE.filesystem.read(save_file_name)
     elseif io then
         local file = io.open(path, "r")
@@ -76,8 +75,7 @@ local function save_save_data()
     end
 
     if (SE and SE.filesystem and SE.filesystem.write) then
-        -- SE.filesystem uses paths relative to the save directory,
-        -- so we must NOT pass the absolute OS path here.
+        -- SE.filesystem paths are relative to the save directory: never pass an OS path.
         local ok = SE.filesystem.write(save_file_name, encoded)
         if ok then
             return true

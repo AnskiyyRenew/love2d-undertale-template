@@ -8,7 +8,7 @@ local masks = {}
 ---@param h number  rect/ellipse: bbox height; image: target height (0 = native image height)
 ---@param r number  Rotation in degrees
 ---@param value number  Stencil layer value
----@param image love.Image|table|nil  Optional. love.Image or sprite table (with .image). Used for "image" shape.
+---@param image love.Image|table|nil  love.Image or sprite table (with .image) for "image" shape.
 ---@return table
 function masks.New(shape, x, y, w, h, r, value, image)
     local self = {
@@ -29,8 +29,7 @@ function masks.New(shape, x, y, w, h, r, value, image)
     }
 
     ---Let a mask follow a sprite's position, scale, and rotation.
-    ---For image masks, the w/h track the sprite's scaled size so manual
-    ---scaleX/scaleY still take effect when set.
+    ---Image masks derive w/h from the scaled size; manual scaleX/scaleY still win.
     ---@param sprite table
     function self:Follow(sprite)
         self.x = sprite.x
@@ -65,10 +64,8 @@ function masks.Draw(tab)
                 elseif mask.shape == "ellipse" or mask.shape == "circle" then
                     SE.graphics.ellipse("fill", 0, 0, mask.w / 2, mask.h / 2)
                 elseif mask.shape == "image" or mask.shape == "img" then
-                    -- Mask shape follows the image's per-pixel alpha: only
-                    -- fragments that the sprite shader actually emits are
-                    -- incremented into the stencil buffer, so fully
-                    -- transparent pixels of the ImageData never become mask.
+                    -- Only fragments the sprite shader emits reach the stencil, so
+                    -- fully transparent pixels never become mask.
                     local img = mask.image
                     if img and type(img) == "table" and img.image then
                         img = img.image  -- tolerate sprite tables
@@ -111,34 +108,13 @@ function masks.Use(value)
 end
 
 ---Disable stencil test and zero the stencil buffer.
----
----Merely calling setStencilState() (no args) only switches the test OFF --
----the values already written into the buffer stay where they are. Because
----Masks.Draw uses "increment" and Masks.Use defaults to "greater" than 0,
----any pixel ever touched by a mask keeps passing the test forever, leaking
----across frames and across waves (a large mask in turn A still lets bullets
----render in its area during turn B even though turn B only set a small mask).
----
----To prevent that, Clear first overwrites the whole buffer with 0 using
----setStencilState("replace", "always", 0) + a full-canvas rectangle, then
----disables the test. The rectangle is drawn through push/origin so it covers
----the canvas regardless of any camera transform the caller has active, and
----setColorMask(false) keeps it from touching colour.
----
----Caveat: this zeroes the buffer for EVERYONE on this canvas, so a caller
----that relied on the buffer persisting across multiple Draw/Use/Clear cycles
----within the same frame would see later masks need to re-Draw themselves.
----The engine's sprite pipeline (Sprites.lua) calls Draw -> Use -> draw ->
----Clear once per sprite, so each sprite re-writes its own masks and is
----unaffected.
----
----Second caveat (the "black canvas" bug): push("all") saves the stencil
----state that was live when Clear was *entered* -- and Clear runs right
----after Masks.Use(), so that saved state is "keep, greater, 0" (test ON).
----pop() therefore resurrects a stencil test against the buffer we just
----zeroed, which rejects every draw for the rest of the frame and turns the
----whole canvas black. The setStencilState() AFTER pop re-disables the test
----so Clear's contract ("leave the stencil disabled") actually holds.
+---setStencilState() with no args only switches the test OFF: values already in
+---the buffer stay there, and Draw/Use would then leak a mask across frames.
+---So the buffer is zeroed first ("replace"/0 + a full-canvas rect, colour masked
+---off), and only then the test is disabled.
+---push("all")/pop() restores the caller's stencil state ("keep, greater", test
+---ON), so the test must be disabled again after pop() or every later draw is
+---rejected and the canvas goes black.
 function masks.Clear()
     local ok, err = pcall(function()
         SE.graphics.push("all")
@@ -152,9 +128,7 @@ function masks.Clear()
         SE.graphics.setColorMask(true)
         SE.graphics.setStencilState()
         SE.graphics.pop()
-        -- pop("all") restores the stencil state saved at push time, which is
-        -- Masks.Use's "keep, greater, 0" (ON) since Clear is called after Use.
-        -- Re-disable the test here so it doesn't leak past Clear.
+        -- pop("all") restored the caller's "keep, greater" state (test ON).
         SE.graphics.setStencilState()
     end)
 

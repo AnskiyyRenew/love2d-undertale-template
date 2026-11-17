@@ -1,24 +1,13 @@
 -- Secrets.lua
--- Native secret store: pulls secrets out of a compiled shared library so they
--- never appear as plain text inside the .love archive.
+-- Secret store backed by a compiled shared library, so secrets never appear as
+-- plain text inside the .love archive.
 --
--- Loaded through LuaJIT FFI. IMPORTANT: ffi.load goes through the OS loader
--- (LoadLibrary / dlopen), NOT through LÖVE's virtual filesystem -- "Resources/
--- Libs/..." only means something to love.filesystem, so every candidate has to
--- be a real OS path. See DiscordRPC.lua:134 for the same trap, already solved
--- there; this module reuses that approach.
+-- ffi.load goes through the OS loader (LoadLibrary / dlopen), NOT LÖVE's virtual
+-- filesystem: every candidate must be a real OS path.
 --
--- Fallback contract (must never hard-fail):
---   native library -> Secrets.fallback table -> nil
--- A missing library is normal: a dev machine without a build, or the web
--- (love.js) target which has no native libraries at all. Callers must treat
--- nil as "feature unavailable" and degrade quietly.
---
--- Usage:
---   local Secrets = ImportFile("Utils.Secrets")
---   local pk = Secrets.gamejoltPK()          -- nil when unavailable
---   if Secrets.available() then ... end
---   print(Secrets.source())                  -- "native" / "fallback" / "none"
+-- Fallback order, which must never hard-fail: native library -> Secrets.fallback
+-- table -> nil. A missing library is normal (web target, dev machine without a
+-- build); callers treat nil as "feature unavailable" and degrade quietly.
 
 local Secrets = {}
 
@@ -31,11 +20,12 @@ end
 ---Must match PROBE_MAGIC in gen_source.py.
 local PROBE_MAGIC = 0x5EC0DE
 
----Slot indices. Mirrors SLOT_ORDER in gen_source.py -- append only.
+---Slot indices. Mirrors SLOT_ORDER in gen_source.py: append only, never reorder
+---(the slot number is the binary contract with the compiled library).
 Secrets.SLOT_GAMEJOLT_PK = 0
 
----Plain-text fallback values, keyed by slot. Filled from conf_pure.lua
----(GamejoltPK) at init; a project may also set these directly.
+---Plain-text fallback values, keyed by slot. Filled from conf_pure.lua at init;
+---projects may also set these directly.
 Secrets.fallback = {}
 
 ---@type any|nil Loaded FFI namespace, or nil.
@@ -46,9 +36,6 @@ Secrets._path = nil
 Secrets._error = nil
 ---@type boolean Set once the load has been attempted; do not retry every call.
 Secrets._tried = false
-
-
--- 1. Platform and file name
 
 
 local function os_name()
@@ -75,9 +62,6 @@ local function lib_names(platform)
 end
 
 
--- 2. Real OS paths (ffi.load does not see LÖVE's virtual filesystem)
-
-
 ---Resolves the directory the game actually lives in on disk.
 local function source_dir()
     local ok_s, s = pcall(function() return SE.filesystem.getSource() end)
@@ -101,10 +85,9 @@ local function candidates(platform, names)
     local dirs = {}
     local src = source_dir()
     if src then
-        -- Source checkout: the library sits next to the other engine libs.
+        -- Source checkout: the library sits next to the other engine libs. A fused
+        -- exe reports the exe itself as source, so its own folder is probed too.
         dirs[#dirs + 1] = src .. "/Resources/Libs/Secrets/"
-        -- Fused exe: getSource() points at the exe itself, so probe its folder
-        -- too (that is where the packager drops the dll).
         dirs[#dirs + 1] = src .. "/"
         dirs[#dirs + 1] = src .. "/Resources/Libs/"
     end
@@ -121,9 +104,6 @@ local function candidates(platform, names)
     end
     return out
 end
-
-
--- 3. Loading
 
 
 local function load_native()
@@ -167,11 +147,8 @@ local function load_native()
 end
 
 
--- 4. Fallback wiring
-
-
----Copies conf_pure.lua's plain-text values into the fallback table.
----Runs once at init so a dev machine without a compiled library still works.
+---Copies conf_pure.lua's plain-text values into the fallback table (once), so a
+---dev machine without a compiled library still works.
 local _wired = false
 local function wire_fallback()
     if _wired then return end
@@ -195,16 +172,13 @@ end
 
 
 ---Initialises the store. Safe to call more than once; also runs lazily on the
----first get(), so callers do not have to remember to call it.
+---first get(), so callers don't have to call it.
 ---@return boolean native True when the native library was loaded.
 function Secrets.init()
     wire_fallback()
     ensure()
     return Secrets._lib ~= nil
 end
-
-
--- 5. Public API
 
 
 ---True when secrets come from the compiled native library.

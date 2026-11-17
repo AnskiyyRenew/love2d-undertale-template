@@ -6,9 +6,6 @@ ow.InitEncounter("test_killed", 80, 40, 3)
 ow.SetBattleScene("Battle.scene_battle_ow", "Poseur")
 Camera:setBounds(320, 210, 1080, 210)
 
--- 180, 50
--- 240, 50
--- 300, 50
 for i = 1, 3
 do
     local sign = Sprites.CreateSprite("Scene/True Lab/spr_monitor_dark_0.png", "Map")
@@ -61,7 +58,6 @@ local trigger_7 = false
 
 function scene.update(dt)
     ow.Update(dt)
-    --print(Controller.GetMousePosition())
 
     if (ow.getInteractResult("trigger", 1)) then
         if (Controller.GetState("confirm") == 1) then

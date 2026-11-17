@@ -1,29 +1,17 @@
 --[[
-    Scripts/Scenes/TEST/scene_wingdings.lua
-    Visual check: three EText "typewriters" rendered side by side so you can confirm
-    how Wingdings.ttf actually looks:
-
-      1) baseline  : default bondfont (eng=determination_mono.ttf, non=simsun.ttc)
-      2) WingBond  : UseBondFont with engfont AND non_engfont = Wingdings.ttf
-      3) inline    : the original scene style "[font:Wingdings.ttf]..."
-
-    Run: in Engine/PureConf.lua uncomment
-      --Global.SetVariable("FirstRoom", "TEST.scene_wingdings")
-    then start the game (or press Z a few times to clear the typers).
-
-    Expected: if the bundled Wingdings.ttf maps ASCII letters to plain letter glyphs,
-    line 2 and 3 will look like normal English letters (nearly identical to line 1),
-    i.e. NOT the "symbol" wingding style.
+    Visual test of Wingdings.ttf in three forms: default bondfont,
+    UseBondFont with eng + non-eng = Wingdings, and an inline [font:...] tag.
+    Run: set Global "FirstRoom" to "TEST.scene_wingdings".
 ]]
 
 local scene = {}
 local SAMPLE = "GOT YOU BOTH.\nSTILL DARING TO WRITE\nNONSENSE ON THE BOARD."
 
--- 1) baseline: default dialogue bondfont
+-- 1) default bondfont
 local e1 = Typers.EText.New(SAMPLE, {60, 60}, "GUI")
 e1.voices = {}
 
--- 2) WingBond: both eng & non-eng use Wingdings.ttf
+-- 2) UseBondFont with eng + non-eng = Wingdings.ttf
 local e2 = Typers.EText.New(SAMPLE, {60, 210}, "GUI")
 e2.voices = {}
 e2:UseBondFont({
@@ -33,7 +21,7 @@ e2:UseBondFont({
     non_engfunc = function() end,
 })
 
--- 3) inline tag, mirroring the original scene usage
+-- 3) inline [font:...] tag
 local e3 = Typers.EText.New("[font:Wingdings.ttf]" .. SAMPLE, {60, 360}, "GUI")
 e3.voices = {}
 

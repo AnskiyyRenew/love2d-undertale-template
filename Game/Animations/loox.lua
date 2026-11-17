@@ -1,12 +1,7 @@
 -- Loox animation.
---
--- Contract and style rules live in Game/Animations/_temp.lua — read that first.
--- Short version: plain table, NO metatable; every function is declared with a
--- dot and takes the instance as its first argument; `New(pos)` returns a plain
--- instance that carries `_class` back to this module and gets these functions
--- bound onto it (Battle.BindAnimation), so callers write `anim.SetFace(3)`.
--- Everything inside this file calls the module by name (`Loox.Foo(self, ...)`).
--- Sprites stay colon-style (`sprite:Set(...)`).
+-- Contract: Game/Animations/_temp.lua. `require` caches the module, so `New(pos)`
+-- is the only way to get an instance; Battle.BindAnimation binds the functions
+-- for dot calls (`anim.Foo(...)`).
 
 local Loox = {}
 
@@ -23,8 +18,6 @@ function Loox.New(pos)
 
     Loox.Init(self, pos)
 
-    -- The instance drives itself from here on (`anim.SetFace(3)`) — see
-    -- Battle.BindAnimation for the rule.
     Battle.BindAnimation(self, Loox)
 
     return self
@@ -72,8 +65,6 @@ function Loox.Update(self, dt)
         return
     end
 
-    -- Put your monster's animation code here.
-
     -- Default hurt shake: knock the sprite sideways, decaying toward 0.
     if (self.hurting) then
         local p = self.sprite
@@ -98,7 +89,6 @@ function Loox.Destroy(self)
     self.sprite:Dust(true, true)
     self.sprite = nil
 
-    -- Destroy every extra object registered in `elements`.
     for i = #self.elements, 1, -1
     do
         local e = self.elements[i]

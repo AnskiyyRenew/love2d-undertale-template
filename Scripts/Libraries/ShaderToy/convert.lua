@@ -83,8 +83,8 @@ function convert.safeTexel(code)
     end)
 end
 
---- Normalize the optional host-channel setting.
---- A host channel reads the sprite's own main texture instead of an external image.
+--- Normalize the optional host-channel setting: a host channel reads the
+--- sprite's own main texture instead of an external image.
 ---@param options table|number|nil
 ---@param rules table
 ---@return table hostChannels Set of channel ids bound to the main texture
@@ -107,8 +107,7 @@ local function parseHostOptions(options, rules)
         if options.hostFlipY == false then flipY = false end
     end
 
-    -- Drop ids outside the declared channel range instead of rewriting a
-    -- channel name that can never map to a real extern.
+    -- Drop out-of-range ids: they can never map to a real extern.
     for id in pairs(set) do
         if id < 0 or id >= rules.CHANNEL_COUNT or id ~= math.floor(id) then
             set[id] = nil
@@ -119,10 +118,9 @@ local function parseHostOptions(options, rules)
 end
 
 --- Rewrite texture(iChannelN, uv) into a read of the sprite's main texture.
---- Only the sampler is swapped; the UV expression is preserved so offset and
---- distorted samples keep their original behaviour. ShaderToy's fragCoord has
---- y pointing up while LÖVE's texture_coords has y pointing down, so the UV's
---- y component is flipped unless hostFlipY is disabled.
+--- Only the sampler is swapped, the UV expression is kept. ShaderToy's
+--- fragCoord has y up, LÖVE's texture_coords has y down: the UV y is flipped
+--- unless hostFlipY is disabled.
 ---@param code string
 ---@param name string Channel name, for example "iChannel0"
 ---@param flipY boolean
@@ -138,9 +136,8 @@ function convert.redirectHostChannel(code, name, flipY)
         end
         out[#out + 1] = code:sub(from, callStart - 1)
 
-        -- Scan to the matching ')'. The first top-level argument after the
-        -- channel name is the UV expression; extra arguments (textureLod
-        -- style) are not part of GLSL ES 1.0 and are dropped.
+        -- Scan to the matching ')'; only the first argument (the UV) is kept,
+        -- extra arguments are dropped (not GLSL ES 1.0).
         local depth, p = 0, commaPos + 1
         local uvEnd, callEnd = nil, nil
         while p <= #code do
@@ -160,7 +157,7 @@ function convert.redirectHostChannel(code, name, flipY)
         end
 
         if not callEnd then
-            -- Unbalanced call: keep the original text rather than emit broken GLSL.
+            -- Unbalanced call: keep the text instead of emitting broken GLSL.
             out[#out + 1] = code:sub(callStart)
             break
         end
@@ -216,9 +213,8 @@ function convert.convert(shadercode, rules, options)
     local converted, hostChannels = convert.applyReplacementRules(shadercode, rules, options)
     result.hostChannels = hostChannels
 
-    -- A host channel no longer samples an extern sampler. Drop its declaration
-    -- when the original code has no other reference to that channel, so the
-    -- final GLSL does not carry an unused texture uniform.
+    -- A host channel samples the main texture, so drop its extern declaration
+    -- if the original code has no other reference to that channel.
     for id in pairs(hostChannels) do
         local name = "iChannel" .. id
         local stripped = shadercode:gsub("texture%s*%(%s*" .. name .. "%s*,", "")

@@ -54,7 +54,6 @@ local error_types = {
     OVER_LIMIT = 4      -- Over the limit
 }
 
--- Add Unicode normalization to precheck_json and check_object_safety
 local function normalize_unicode(str)
     return str:gsub("\\u([%da-fA-F][%da-fA-F][%da-fA-F][%da-fA-F])", function(u)
         return utf8.char(tonumber(u, 16)):lower()

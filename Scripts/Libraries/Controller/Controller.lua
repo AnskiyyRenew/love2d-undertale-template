@@ -1,34 +1,18 @@
 --[[
-    Controller.lua - Unified multi-device input accessor.
-
-    Provides two layers of integration so game code works no matter which
-    device the player uses:
-
-    1) Mirror bridge (Controller.Update)
-       The game's existing code reads input via Keyboard.GetState("left") /
-       "confirm" / "cancel" / "up" / "down" / "right" / "menu" / "shift".
-       This bridge copies the gamepad's logical states into Keyboard's
-       simulated keys every frame, so e.g. pushing the left stick (leftx < 0)
-       is EXACTLY equivalent to holding the "left" key, and "a" is exactly
-       equivalent to holding the "confirm" key. No existing call sites need
-       to change.
-
-    2) Unified query (Controller.GetState)
-       Merges Keyboard (which now includes the mirrored gamepad) and Joystick
-       into a single call, with bind-style priority:
-           1 = just pressed, 2 = held, -1 = just released, 0 = released
---]]
+    Controller.lua - unified multi-device input (Keyboard + Joystick).
+    Controller.Update mirrors the gamepad onto Keyboard's simulated keys;
+    Controller.GetState merges both devices (1/2/-1/0, bind-style priority).
+]]
 
 local Controller = {
     -- logical names mirrored from the gamepad onto Keyboard keys
     mirror = { "up", "down", "left", "right", "confirm", "cancel", "menu", "shift" },
     mirrorPressed = {},      -- name -> boolean (whether we currently mirror it)
     enableMirror = true,     -- set false to disable the mirror bridge
-    deadzone = 0.15,         -- analog deadzone (kept in sync with Joystick; filtering happens in Joystick.GetAxis)
+    deadzone = 0.15,         -- analog deadzone; filtering happens in Joystick.GetAxis
 }
 
---- Release any keyboard keys we previously mirrored (used when the gamepad
---- disconnects or input is disabled so nothing gets stuck held).
+--- Release every key this bridge mirrored (gamepad disconnect / input off).
 local function releaseMirrored()
     for name, wasPressed in pairs(Controller.mirrorPressed) do
         if (wasPressed and Keyboard and Keyboard.SimulateRelease) then
@@ -38,9 +22,8 @@ local function releaseMirrored()
     end
 end
 
---- Call every frame BEFORE Keyboard.Update() (main.lua -> love.update).
---- Mirrors the gamepad's logical states onto Keyboard keys so the game's
---- existing Keyboard.GetState() calls respond to the gamepad too.
+--- Call every frame BEFORE Keyboard.Update(), so the game's GetState() calls
+--- already see the gamepad.
 function Controller.Update()
     local mirroring = Controller.enableMirror
         and (Keyboard and Keyboard.allowInput ~= false)
@@ -110,14 +93,13 @@ function Controller.GetAxis(name)
     return 0
 end
 
---- Return a smooth -1..1 movement vector from the gamepad's left stick,
---- falling back to the digital arrow keys / dpad when the stick is centered.
+--- Return a smooth -1..1 movement vector from the left stick, falling back to
+--- the digital arrows when the stick is centered.
 ---@return number, number
 function Controller.GetVector()
     local x, y = 0, 0
     if (Joystick and Joystick.GetAxis) then
-        -- Joystick.GetAxis already applies the dead-zone + re-scaling: a
-        -- centered stick reads 0, anything past the dead-zone is a smooth 0..1.
+        -- GetAxis already applies the dead-zone and re-scales to 0..1.
         x = Joystick.GetAxis("leftx")
         y = Joystick.GetAxis("lefty")
     end
@@ -132,9 +114,8 @@ function Controller.GetVector()
     return x, y
 end
 
---- Set the analog dead-zone (default 0.15). Forwards to Joystick so filtering
---- is centralized (applied inside Joystick.GetAxis); keeps Controller.deadzone
---- in sync for anyone reading it directly.
+--- Set the analog dead-zone (default 0.15). Forwards to Joystick, where the
+--- filtering actually happens.
 ---@param v number
 function Controller.SetDeadzone(v)
     if (v ~= nil) then Controller.deadzone = v end
@@ -148,8 +129,7 @@ function Controller.SetMirrorEnabled(bool)
     if (not Controller.enableMirror) then releaseMirrored() end
 end
 
---- Return a list of devices that currently contribute a non-zero state
---- for the given name (useful for debugging / "which device did that").
+--- Devices that currently report a non-zero state for `name` (debug aid).
 ---@param name string
 ---@return table
 function Controller.GetSource(name)

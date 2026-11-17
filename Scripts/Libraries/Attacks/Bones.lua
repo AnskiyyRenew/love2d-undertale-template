@@ -43,9 +43,8 @@ local function _rotateZ(point, center, angle)
 end
 
 -- 3D → 2D projection helpers
---- Orthographic projection. When bulge > 0, applies a z-dependent scale:
----   z=0 → exact pixels,  z>0 → shrinks,  z<0 → expands
---- This creates an inflation / bulging effect.
+--- Orthographic projection; bulge > 0 adds a z-dependent scale (z=0 exact,
+--- z>0 shrinks, z<0 expands).
 local function _orthographic(point, bulge)
     if (bulge and bulge > 0) then
         local denom = bulge + point[3]
@@ -61,8 +60,6 @@ local function _perspective(point, d)
     return point[1] * factor, point[2] * factor
 end
 
--- Shared helpers ------------------------------------------------------------
-
 ---Normalizes a character name to the folder used under "Resources/Sprites/Attacks".
 ---@param whose string|nil
 ---@return string
@@ -74,7 +71,7 @@ local function _characterFolder(whose)
     return "Sans"
 end
 
----Sounds the original attacks reference that this project does not ship.
+---Sound fallbacks for the files this project does not ship.
 local _soundFallbacks = {
     ["snd_pierce.wav"] = {"snd_spearappear.wav", "snd_lazer.wav"}
 }
@@ -192,12 +189,8 @@ function bones.New2D(whose, length, position, angle, velocity)
     bone._body:MoveTo(999, 999)
     bone._tail:MoveTo(999, 999)
 
-    -- The three parts form ONE composite: they must NOT be pixel-snapped
-    -- individually. bones.Update snaps the bone's anchor once and places every
-    -- part at exact offsets from it; per-part rounding would let the caps
-    -- drift up to a full pixel away from the shaft as soon as the offsets are
-    -- fractional (odd length, non-90-degree rotation) -> crooked / detached
-    -- head and tail.
+    -- The three parts form ONE composite: never pixel-snap them individually,
+    -- or the caps drift off the shaft once offsets are fractional.
     bone._head.pixel_snap = false
     bone._body.pixel_snap = false
     bone._tail.pixel_snap = false
@@ -212,10 +205,8 @@ function bones.New2D(whose, length, position, angle, velocity)
     end
 
     --- Set the bone's anchor point (pivot), normalized 0~1 each.
-    --- ypivot runs along the bone: 0 = head end, 1 = tail end, 0.5 = center
-    --- (spans the whole bone: head + body + tail).
-    --- xpivot runs across the head/tail width to the sides: 0 = one edge,
-    --- 1 = the other edge (0~1 spans the full width: 10px for sans, 13px for papyrus).
+    --- ypivot runs along the bone (0 = head end, 1 = tail end);
+    --- xpivot runs across the width (10px for sans, 13px for papyrus).
     --- @param xp number|nil  x pivot (omit to keep the current value)
     --- @param yp number|nil  y pivot (omit to keep the current value)
     function bone:SetPivot(xp, yp)
@@ -230,16 +221,10 @@ function bones.New2D(whose, length, position, angle, velocity)
     end
 
 
-    -- Pivot-aware edge offset: the bone's anchor sits `offL` away from the
-    -- bone's centre along its length (toward the head = positive). At the
-    -- default pivot (0.5) this is 0 and the formulas below reduce to the
-    -- original centred placement. With any other pivot the anchor is shifted,
-    -- so the anchor is re-centred by the opposite amount to keep the bone
-    -- itself flush against the arena edge — only the anchor moves.
-    --
-    -- Note: these To* helpers assume a straight (0/90 deg) bone, so only
-    -- ypivot matters here; xpivot shifts across the bone's width and does not
-    -- affect the flush-edge placement.
+    -- Pivot-aware edge offset: the anchor sits `offL` from the bone's centre
+    -- along its length (toward the head = positive) and is re-centred so the
+    -- bone stays flush against the arena edge. These To* helpers assume a
+    -- straight (0/90 deg) bone, so only ypivot matters here.
     local function _pivotAlong(bone)
         return (bone.ypivot - 0.5) * bone.length
     end
@@ -329,13 +314,9 @@ function bones.New3D(points, percent, mode)
     }
     bone.concat = true
 
-    -- Metatable: assigning bone.x / bone.y / bone.z directly
-    -- repositions all 3D vertices (keeps synced with _center).
-    --
-    -- NOTE: x/y/z are NEVER stored directly in the bone table.
-    --   - Reading  (__index)    → reads from _center
-    --   - Writing (__newindex)  → shifts all points, updates _center, but does NOT store in table
-    -- This guarantees every assignment properly propagates to all vertices.
+    -- Metatable: bone.x / bone.y / bone.z map onto _center, and writing one
+    -- shifts every 3D vertex. x/y/z are never rawset into the table, so
+    -- __newindex fires on every assignment.
     local bone_mt = {}
     function bone_mt.__index(t, k)
         if (k == "x") then return t._center and t._center[1] end
@@ -354,7 +335,7 @@ function bones.New3D(points, percent, mode)
                 end
                 t._center[idx] = v
             end
-            -- Do NOT rawset — x/y/z stay out of the table so __newindex fires every time.
+            -- x/y/z stay out of the table, so __newindex fires every time.
         else
             rawset(t, k, v)
         end
@@ -368,7 +349,7 @@ function bones.New3D(points, percent, mode)
     end
     bone.percent = _percent
 
-    -- Perspective or Orthographic
+    -- Perspective ("p") or orthographic ("o", the default)
     local _mode = (mode or "orthographic")
     if (type(_mode) ~= "string") then
         _mode = "orthographic"
@@ -380,7 +361,6 @@ function bones.New3D(points, percent, mode)
         end
     end
 
-    -- Check points. (puns haha.)
     local _points = points
     local x, y, z = 0, 0, 0
     if (not points) then
@@ -397,15 +377,12 @@ function bones.New3D(points, percent, mode)
             print("[Attacks - Bones] The argument 'points' has an invalid position, inserting '0' for empty indexes.:")
             print("                  " .. unpack(p))
 
-            -- Please...don't put strings here, I don't want to check them.
             while (#p < 3)
             do
                 p[#p + 1] = 0
             end
         elseif (type(p) == "table" and #p == 3) then
-            -- Now I want to check them.
             if (type(p[1]) == "number" and type(p[2]) == "number" and type(p[3]) == "number") then
-                -- Yes I 'have' to check them
                 x = x + p[1]
                 y = y + p[2]
                 z = z + p[3]
@@ -423,13 +400,9 @@ function bones.New3D(points, percent, mode)
         y / #_points,
         z / #_points,
     }
-    -- Don't assign x/y/z to the table — __index / __newindex on the metatable
-    -- handle reads/writes transparently via _center.
     bone.bulge = 0  -- 0 = pure orthographic; >0 adds z-scale inflation effect
     bone.xscale = 1 -- 2D view scale (applied post-projection, does not affect 3D data)
     bone.yscale = 1
-
-    -- Funcs
 
     --- Move the bone's center to (x, y, z) directly.
     --- @param x number
@@ -516,8 +489,7 @@ function bones.New3D(points, percent, mode)
     end
 
     --- Scale the 2D view of all projected points around the bone's visual center.
-    --- This is a purely visual transform — it does NOT modify internal 3D point data,
-    --- so resetting to (1, 1) always restores the original appearance.
+    --- Visual only: the internal 3D point data is untouched.
     --- @param sx number  X scale factor (default 1)
     --- @param sy number  Y scale factor (default 1)
     function bone:Scale(sx, sy)
@@ -528,10 +500,6 @@ function bones.New3D(points, percent, mode)
     table.insert(bones._3D, bone)
     return bone
 end
-
-------------------------------------------------------------------
--- Walls
-------------------------------------------------------------------
 
 ---Tears a wall down: the warning bar first, then every bone, then unregisters
 ---it from whichever list holds it.
@@ -585,8 +553,7 @@ local function _wallSetStencils(wall, masks)
 end
 
 -- Method tables: _WALL (one sliding bone sprite per direction) and _WALLC
--- (20 bones per side). They share the same behaviour today but stay separate
--- so each variant can grow its own methods later.
+-- (20 bones per side) share these methods.
 local wall_methods = {
     SetStencils = _wallSetStencils,
     Destroy = _destroyWall
@@ -617,23 +584,8 @@ local function _animationTable(animation)
 end
 
 ---Runs one wall animation phase (extend or retract) on a target.
----
----Why this is not a bare Tween.CreateTween call: main.lua runs Tween.Update
----*before* the scene update that drives bones.Update, so a tween created from
----a wall's logic only starts writing on the NEXT frame and lives for
----`ticks + 2` frames in total (one extra pass re-writes the final value and
----then drops the animation). Two consequences the old wall.time arithmetic
----got wrong:
----   * tearing the wall down at `warntime + It + staytime + Ot` destroys the
----     sprite one frame before the retract tween writes its final value, so the
----     last frame of motion is never drawn and the wall pops out of existence
----     (up to ~26% of the travel with a fast-finishing easing);
----   * with staytime <= 1 the retract is started while the extend tween is
----     still writing its final value, so the wall freezes at full extension for
----     a couple of frames and then catches up in a single frame (visible snap).
----
----Both are handled here: `_wall_phase` silences a superseded tween, and
----`_wall_done` reports the exact frame the phase reached its target.
+---Tween.Update runs before bones.Update, so a tween created here first writes
+---on the next frame: the phase is done on the frame after `ticks`.
 ---@param target table   sprite (writes x / y) or 2D bone (writes length)
 ---@param phase string   "in" | "out"
 ---@param easing string
@@ -648,8 +600,7 @@ local function _wallTween(target, phase, easing, from, to, ticks, field)
 
     Tween.CreateTween(
         function (value)
-            -- A newer phase already took over: never drag the wall back to the
-            -- previous phase's value.
+            -- A newer phase already took over: never write this one's value.
             if (target._wall_phase ~= phase) then
                 return
             end
@@ -657,10 +608,9 @@ local function _wallTween(target, phase, easing, from, to, ticks, field)
             target._wall_writes = target._wall_writes + 1
             target[field] = value
 
-            -- Call number `ticks + 1` carries the final value; Tween then makes
-            -- one more call while dropping the animation. Report the finish on
-            -- that extra call so the final value gets at least one frame on
-            -- screen before the wall is torn down.
+            -- Call `ticks + 1` carries the final value; Tween makes one extra
+            -- call while dropping the animation, and that call reports the
+            -- finish so the last value gets a frame on screen.
             if (target._wall_writes > ticks + 1) then
                 target._wall_done = true
             end
@@ -670,8 +620,7 @@ local function _wallTween(target, phase, easing, from, to, ticks, field)
 end
 
 ---True once the *retract* phase has written its final value. The extend phase
----sets _wall_done as well, so the phase must be checked too — otherwise the
----wall would be torn down while it is just sitting there during staytime.
+---sets _wall_done too, so the phase must be checked as well.
 ---@param target table
 ---@return boolean
 local function _wallRetracted(target)
@@ -700,8 +649,8 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
     rotation  = (rotation or 0)
     animation = _animationTable(animation)
 
-    -- wall.time starts at 1, so a warntime of 0 would never fire the extend
-    -- tween at all. Clamp the schedule (the warning bar keeps using warntime).
+    -- wall.time starts at 1, so warntime 0 would never fire the extend tween;
+    -- clamp the schedule (the warning bar keeps using warntime).
     local intime = (warntime > 0) and warntime or 1
 
     local folder = _characterFolder(whose)
@@ -734,14 +683,11 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
         end
     end
 
-    -- No more angles calculation, just move the warning sprite directly.
-    -- 0, 90, 180, 270 degrees only.
+    -- The warning bar is moved directly; only 0/90/180/270 are supported.
     --
-    -- Both phases travel between two fixed positions, so the retract can start
-    -- from the exact extended position instead of from `self.y` (which is a
-    -- fraction short of it while the extend tween is on its last frames).
-    -- `over` is only a safety net: the normal teardown is driven by
-    -- _wallRetracted().
+    -- Both phases travel between two fixed positions, so the retract starts from
+    -- the exact extended position. `over` is a safety net only: the normal
+    -- teardown is driven by _wallRetracted().
     local over = intime + animation.It + staytime + animation.Ot + 4
 
     if (direction == "down") then
@@ -859,7 +805,6 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
             end
         end
 
-        -- Nothing left to drive once the warning bar and every bone are gone.
         if (#self.bones == 0 and not self.warning) then
             self:Destroy()
         end
@@ -892,8 +837,8 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
     rotation  = (rotation or 0)
     animation = _animationTable(animation)
 
-    -- wall.time starts at 1, so a warntime of 0 would never fire the grow
-    -- tween at all. Clamp the schedule (the warning bar keeps using warntime).
+    -- wall.time starts at 1, so warntime 0 would never fire the grow tween;
+    -- clamp the schedule (the warning bar keeps using warntime).
     local intime = (warntime > 0) and warntime or 1
 
     local cos, sin = math.cos(math.rad(rotation)), math.sin(math.rad(rotation))
@@ -912,11 +857,8 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
     wall.warning.alpha = 0.5
     wall.warning.rotation = rotation
 
-    -- Every bone of a complex wall shares the same grow/retract behaviour.
-    -- Same two off-by-ones as bones.Wall: the shrink used to start from
-    -- self.length (a fraction short of the full length while the grow tween was
-    -- still writing) and the bone used to be destroyed one frame before the
-    -- shrink reached 0, popping out of existence while still visibly long.
+    -- Every bone of a complex wall shares the same grow/retract behaviour, with
+    -- the same tween timing as bones.Wall.
     local full  = length * 2
     local over  = intime + animation.It + staytime + animation.Ot + 4
 
@@ -1059,7 +1001,6 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
             end
         end
 
-        -- Nothing left to drive once the warning bar and every bone are gone.
         if (#self.bones == 0 and not self.warning) then
             self:Destroy()
         end
@@ -1102,12 +1043,9 @@ function bones.Update(dt)
             local offS = (b.xpivot - 0.5) * width     -- to the side
 
             -- Pixel snapping, composite edition: align the bone's bounding-box
-            -- EDGES to the pixel grid and lay every part out from there. Neither
-            -- a per-part snap nor a centre snap can serve both art sets: papyrus
-            -- caps are 13 x 5 (odd) and sans caps are 10 x 6 (even), and a
-            -- centre is only on the grid for one of the two. Integer bounding
-            -- edges put the caps AND the 5 px / 6 px body on the grid for both,
-            -- and stay exact for odd lengths as well.
+            -- EDGES to the grid, then lay every part out from there. Neither a
+            -- per-part nor a centre snap works for both art sets (odd papyrus
+            -- caps, even sans caps); integer edges keep both on the grid.
             local total = b.length + (b._head.height or 0) + (b._tail.height or 0)
             local half_l = total * 0.5                       -- along the bone
             local half_w = (b.width or 10) * 0.5             -- across it
@@ -1140,7 +1078,6 @@ function bones.Update(dt)
             )
         end
 
-        -- Step
         if (b.Step) then
             b:Step()
         end
@@ -1162,16 +1099,9 @@ function bones.Update(dt)
                 end
             end
 
-            -- Uniform z‑zoom: scale all projected points around the bone's center
-            -- based on the center's z value. Reference distance = 500 (same as
-            -- the perspective projection default).
-            --   z=0 (at screen)    → factor=1 (normal)
-            --   z>0 (behind)       → factor<1 (shrinks)
-            --   z<0 (in front)     → factor>1 (enlarges)
-            --
-            -- Split formula avoids singularities:
-            --   z >= 0  → 500 / (500 + z)     hyperbolic decay
-            --   z <  0  → (500 - z) / 500      linear growth
+            -- Uniform z-zoom around the bone's center, reference distance 500:
+            -- z>0 shrinks, z<0 enlarges. The split formula avoids a singularity
+            -- at z = -500.
             if (isOrtho) then
                 local cz = b._center[3]
                 local factor
@@ -1187,9 +1117,8 @@ function bones.Update(dt)
                 end
             end
 
-            -- Apply 2D view scale (xscale/yscale) around the visual center of all projected points.
-            -- This is purely cosmetic — it does NOT touch the internal 3D point data,
-            -- so resetting to (1, 1) always restores the original appearance.
+            -- 2D view scale around the projected centre. Cosmetic: the internal
+            -- 3D point data is untouched, so (1, 1) restores the original look.
             local sx, sy = b.xscale or 1, b.yscale or 1
             if (sx ~= 1 or sy ~= 1) then
                 local pcx, pcy = 0, 0
@@ -1224,7 +1153,6 @@ function bones.Update(dt)
                     angle = math.deg(math.atan2(dx, -dy))
                 end
 
-                -- Apply to the 2D bone
                 link.x = mx
                 link.y = my
                 link.length = dist * link._3d_percent
@@ -1232,16 +1160,13 @@ function bones.Update(dt)
             end
         end
 
-        -- Step
         if (b.Step) then
             b:Step()
         end
     end
 
-    -- Walls: the warning bar plus the bone waves. Every wall keeps its own
-    -- timer and drives its own bones (wall.logic calls bone:logic()).
-    -- Updated last so newly tweened bone lengths are applied from the next
-    -- frame on, exactly like the original implementation.
+    -- Walls are updated last, so newly tweened bone lengths apply from the next
+    -- frame on.
     for _, list in ipairs({bones._WALL, bones._WALLC})
     do
         for i = #list, 1, -1

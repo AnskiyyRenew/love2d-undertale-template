@@ -6,9 +6,8 @@ scenes.module_current = ""
 scenes.pending_clear = false
 scenes._pending_switch = nil
 
--- Scene lookup roots, tried in order. A scene placed in the Game area
--- (Game/Scenes/) overrides the engine default (Scripts/Scenes/);
--- when no Game copy exists the root module is used exactly as before.
+-- Scene lookup roots, tried in order: a scene in Game/Scenes/ overrides the
+-- engine default in Scripts/Scenes/.
 scenes.MODULE_ROOTS = {
     "Game.Scenes.",
     "Scripts.Scenes."
@@ -19,18 +18,15 @@ local function normalize_path(path)
 end
 
 --- Turn a switchTo argument into a plain scene name.
---- Accepts "scene_x", "Scenes/scene_x" and "Scripts.Scenes.scene_x" alike, so
---- callers are free to pass either a name or a path.
+--- Accepts "scene_x", "Scenes/scene_x" and "Scripts.Scenes.scene_x" alike.
 ---@param path string
 ---@return string
 local function sceneNameOf(path)
     local name = normalize_path(path or "")
     name = name:gsub("^%.+", ""):gsub("%.+$", "")
     name = name:gsub("^[Ss]cripts%.", "")
-    -- "Game.Scenes.x" and "Scenes.x" both collapse to "x". Only the full
-    -- "Game.Scenes." prefix is stripped, so a scene living in a folder that
-    -- happens to be called "Game" (i.e. "Game.foo") is not mistaken for the
-    -- Game area itself.
+    -- Only the full "Game.Scenes." prefix is stripped, so a scene under a folder
+    -- literally named "Game" ("Game.foo") is not mistaken for the Game area.
     name = name:gsub("^[Gg]ame%.[Ss]cenes%.", "")
     name = name:gsub("^[Ss]cenes%.", "")
     return name
@@ -45,7 +41,7 @@ end
 
 --- Test whether a scene module's file actually exists on disk.
 --- LÖVE 11 returns a table from getInfo while LÖVE 12 returns the info directly,
---- so the result is only trusted as a positive when it is truthy.
+--- so the result is only trusted when truthy.
 ---@param module_name string
 ---@return boolean
 local function sceneModuleFileExists(module_name)
@@ -56,20 +52,15 @@ local function sceneModuleFileExists(module_name)
     end)
     if (ok and info) then return true end
 
-    -- Fallback probe: a real, readable file counts as existing.
     local readable, content = pcall(love.filesystem.read, file_path, 1)
     return (readable and content ~= nil)
 end
 
 --- Find the module name of a scene, preferring the Game area.
 ---
---- Two distinct failure modes are kept apart, because they need different
---- handling: a scene whose FILE is absent under a root must fall through to the
---- next root, while a scene whose file EXISTS but whose top-level code throws is
---- a real error in a scene that was actually found. Doing existence checks
---- first (instead of treating a failed require as "not found") is what stops a
---- Game-area miss or a Game-area crash from silently cutting the search short
---- before the root directory has been tried.
+--- A missing FILE falls through to the next root; a file that EXISTS but whose
+--- top-level code throws is a real error and must never be reported as "not
+--- found". Existence is checked before require for exactly that reason.
 ---@param name string Plain scene name (e.g. "scene_name").
 ---@return string|nil moduleName The module that was found, or nil when no root has it.
 ---@return any loaded The module value returned by require (only when found).
@@ -92,10 +83,7 @@ local function findSceneModule(name)
 
             local ok, loaded = pcall(require, module_name)
             if (ok and loaded) then
-                -- Warn whenever the Game-area lookup did not produce the scene
-                -- that ended up loading, so a missing override is never silent.
-                -- A Game copy that exists but throws is named as such: reporting
-                -- it as "not found" would blame the wrong cause.
+                -- A Game copy that exists but throws is named as such, never "not found".
                 if (first_error) then
                     print("[Scenes] WARNING: '" .. tostring(first_error_module) ..
                         "' exists but failed to load; using " .. module_name .. " instead.")
@@ -135,8 +123,8 @@ local function resolveSceneModule(name)
     return module_name, loaded
 end
 
---- Unload a scene module from the require cache. Both possible roots are
---- cleared so a scene that moved between Game and root never stays stale.
+--- Unload a scene module from the require cache, clearing both roots so a scene
+--- that moved between Game and root never stays stale.
 ---@param name string Plain scene name.
 local function unloadSceneModule(name)
     if (not name) or (name == "") then return end
@@ -198,13 +186,8 @@ local function doSwitch(sceneName, reset, ...)
 
         print("[Scenes] Scene loaded: " .. sceneName .. " (" .. module_name .. ")")
     elseif (module_name) then
-        -- The scene's file WAS found, but its top-level code threw (e.g. a
-        -- missing global such as DATA when entering a scene directly from
-        -- FirstRoom). This used to be swallowed, so the real error only surfaced
-        -- later at whatever callback first touched the (now nil) current scene -
-        -- for example a window resize - with a completely misleading location.
-        -- Always report the real error, and install a no-op stub so the engine
-        -- keeps running instead of crashing on an unrelated event.
+        -- The file was found but its top-level code threw: report the real error
+        -- and install a no-op stub so the engine keeps running.
         print("[Scenes] Failed to load scene '" .. sceneName .. "':")
         print("  [" .. tostring(error_module) .. "] " .. tostring(lookup_error))
         print("[Scenes] Continuing with a no-op stub scene in place of '" .. sceneName .. "'.")
@@ -218,9 +201,7 @@ local function doSwitch(sceneName, reset, ...)
             }
         end
     else
-        -- The scene was not found under any root: a genuine "cannot find it"
-        -- error. Nothing sensible can be installed in its place, and silently
-        -- keeping the previous scene would hide the mistake, so make noise.
+        -- Found under no root at all: a genuine error, so make noise.
         local tried = {}
         for _, root in ipairs(scenes.MODULE_ROOTS) do
             table.insert(tried, root .. sceneName .. "  (" .. modulePathOf(root .. sceneName) .. ")")
@@ -236,21 +217,17 @@ local function doSwitch(sceneName, reset, ...)
     end
 end
 
---- Switch to a different scene by name. This function will unload the current scene and load the new one.
+--- Switch to a different scene by name: unloads the current scene, loads the new one.
 ---@param sceneName string The name of the scene to switch to.
 ---@param ... any|nil (optional) Additional arguments to pass to the new scene's load function.
 function scenes.switchTo(sceneName, ...)
-    -- The switch is intentionally deferred to the start of the next frame (see
-    -- flushPendingSwitch). This offsets the scene change by one frame from the
-    -- input that triggered it (e.g. the confirm press that finished a dialogue),
-    -- so the new scene never receives that leftover keypress. It also makes
-    -- switchTo safe to call from any callback without recursion.
+    -- Deferred to the start of the next frame (see flushPendingSwitch), so the
+    -- new scene never receives the keypress that triggered the switch.
     scenes._pending_switch = {sceneName, {...}}
 end
 
 --- Resolve a scene argument to the module name that would be required for it,
---- preferring the Game area. Useful for hot-reload tooling that needs to clear
---- the require cache for the scene it is about to reload.
+--- preferring the Game area (used by hot-reload tooling).
 ---@param sceneName string Scene name or path.
 ---@return string|nil moduleName e.g. "Scripts.Scenes.scene_name".
 function scenes.ResolveModule(sceneName)
@@ -263,16 +240,14 @@ function scenes.UnloadModule(sceneName)
     unloadSceneModule(sceneNameOf(sceneName))
 end
 
---- Perform the switch that was requested in the previous frame. Called by main
---- at the start of each frame. Duplicate requests for the scene we are already
---- on are ignored.
+--- Perform the switch requested in the previous frame. Called by main at the
+--- start of each frame.
 function scenes.flushPendingSwitch()
     if (scenes._pending_switch) then
         local p = scenes._pending_switch
         scenes._pending_switch = nil
         doSwitch(p[1], unpack(p[2]))
         if (p[1] ~= scenes.name_current) then
-            --doSwitch(p[1], p[2], unpack(p[3]))
         end
     end
 end

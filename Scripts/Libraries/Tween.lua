@@ -1,27 +1,11 @@
 -- Tween.lua
--- Usage:
---   local anim = tween.CreateTween(setter, "quad", "out", 0, 100, 60)
---   tween.Update(dt)  -- Call every frame
---
--- Parameter description:
---   setter      : function(value), receives the interpolation result every frame
---   easingType  : easing curve name, e.g. "quad", "sine", "bounce", etc.
---   direction   : "in" | "out" | "inout" (linear does not need a direction, use "")
---   begin       : starting value
---   final       : target value
---   duration    : number of ticks the animation lasts
---   delay       : (optional) number of ticks to wait before starting, default 0
---   destroyAfter: (optional) after the delay, force destroy the animation after this many ticks, default = duration
+-- tween.CreateTween(setter, easingType, direction, begin, final, duration, delay, destroyAfter)
+-- tween.Update(dt) once per frame; durations are counted in ticks.
 
 local tween = {
     animations = {},
     customEasings = {},   -- custom easings registered via CreateCustomTween
 }
-
---------------------------------------------------------------------------------
--- Built-in easing function table
--- Each function receives progress (0~1) and returns eased progress (0~1)
---------------------------------------------------------------------------------
 
 local function bounceOutRaw(t)
     local n1, d1 = 7.5625, 2.75
@@ -156,19 +140,15 @@ local builtinEasings = {
     end,
 }
 
---------------------------------------------------------------------------------
--- Public API
---------------------------------------------------------------------------------
-
 ---Creates a tween animation
----@param variableSetter  function(value)  callback every frame, receives the current interpolated value
+---@param variableSetter  function(value)  called every frame with the interpolated value
 ---@param easingType      string           easing type, e.g. "quad", "bounce", "linear"
----@param direction       string           direction: "in", "out", "inout" (use "" or anything for linear)
+---@param direction       string           "in", "out", "inout" ("" for linear)
 ---@param begin           number           starting value
 ---@param final           number           target value
 ---@param duration        number           number of ticks the animation lasts
 ---@param delay           number?          number of ticks to wait before starting (default 0)
----@param destroyAfter    number?          force destroy the animation after this many ticks once it starts (default = duration)
+---@param destroyAfter    number?          ticks after start before destroy (default duration)
 function tween.CreateTween(variableSetter, easingType, direction, begin, final, duration, delay, destroyAfter)
     local animation = {
         variableSetter = variableSetter,
@@ -176,16 +156,16 @@ function tween.CreateTween(variableSetter, easingType, direction, begin, final, 
         begin          = begin,
         final          = final,
         duration       = duration,
-        delay          = delay or 0,         -- remaining delay ticks (decremented every frame)
-        destroyAfter   = destroyAfter or duration, -- destroy after this many ticks once the animation starts
-        time           = 0,                  -- number of ticks the animation has run (delay period is not counted)
+        delay          = delay or 0,         -- remaining delay ticks, decremented every frame
+        destroyAfter   = destroyAfter or duration, -- ticks after which the animation is destroyed
+        time           = 0,                  -- ticks run so far (the delay phase is not counted)
     }
     table.insert(tween.animations, animation)
     return animation
 end
 
 ---Registers a custom easing function
----@param name       string    easing name (easingType+direction must compose this name when calling)
+---@param name       string    easing name; must equal easingType..direction at call time
 ---@param easingFunc function  receives progress (0~1), returns eased progress (0~1)
 function tween.CreateCustomTween(name, easingFunc)
     assert(type(name) == "string",     "Custom tween name must be a string")
@@ -198,11 +178,11 @@ function tween.Update(dt)
     for i = #tween.animations, 1, -1 do
         local animation = tween.animations[i]
 
-        -- Delay phase: delay has not been exhausted yet, only decrement without counting time
+        -- Delay phase: only decrement, time is not counted yet
         if animation.delay > 0 then
             animation.delay = animation.delay - 1
 
-        -- Animation finished (time exceeds destroyAfter): write the final value and remove it
+        -- Finished: write the final value once, then remove
         elseif animation.time > animation.destroyAfter then
             local ok, err = pcall(animation.variableSetter, animation.final)
             if not ok then
@@ -210,7 +190,6 @@ function tween.Update(dt)
             end
             table.remove(tween.animations, i)
 
-        -- Normal playback phase
         else
             local progress = animation.time / animation.duration
             local easingFunc = builtinEasings[animation.easingName]
@@ -238,7 +217,7 @@ end
 ---Creates a Bezier easing curve and registers it in the custom easing table
 ---@param name   string    easing name
 ---@param points table    control point list, format: {{x=0,y=0}, {x=...,y=...}, ..., {x=1,y=1}}
----                        supports any number of control points, evaluated using the De Casteljau algorithm
+---                        any number of control points, via the De Casteljau algorithm
 function tween.CreateBezierEasing(name, points)
     assert(type(name) == "string", "Bezier easing name must be a string")
     assert(type(points) == "table" and #points >= 2, "Bezier easing needs at least 2 control points")

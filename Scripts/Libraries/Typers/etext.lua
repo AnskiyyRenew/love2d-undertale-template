@@ -1,74 +1,10 @@
 --[[
-
-
-How to use:
-
-local text = Typers.EText.New("[colorHEX:ff0000][effect:shake, 3]Just some simple text", {80, 60}, 0, {200, 100})
-
-
-EText uses inline tags wrapped in [ ] to style text directly, instead of a separate opts table.
-
-Available tags:
-
-  [wait:x]              Pause typing for x seconds (number only, no expressions).
-                        Uses its own timer, so a following [speed:] cannot
-                        swallow the pause. Fast-forward (cancel key / [skip])
-                        skips pauses entirely and types the rest instantly.
-  [speed:x]             Set typing interval to x (number only, no expressions).
-  [colorRGB:r, g, b]    Set text color using RGB values (0-255).
-  [colorHEX:xxxxxx]     Set text color using hex string (e.g. ff0000 for red).
-  [font:name]           Switch typing font to name (e.g. determination_mono.ttf).
-                        Setting a font directly disables the bondfont feature;
-                        bondfont stays off until it is re-set via UseBondFont.
-  [size:x]              Set the font size of all FOLLOWING text to x (number
-                        only, no expressions). Letters already typed keep the
-                        size they were created with, so text on screen never
-                        changes retroactively. Both bondfont entries (ASCII and
-                        non-ASCII) are resized, and unlike [font:] bondfont
-                        stays enabled so per-character scale/spacing still
-                        applies. Survives into later sentences, same as [font:].
-  [effect:name, int]    Set typing effect (e.g. shake, 3).
-  [outline:r,g,b,a,w]   Set outline color (r,g,b), alpha (a), and thickness (w).
-                        Drawn as 8 shifted copies (8-directional, square
-                        t-pixel offsets) behind each letter.
-    [voice:name]           Set the typing voice file under Resources/Sounds/Voices/.
-  [portrait:frames|interval|mode]
-                        Create a talking portrait. frames = comma-separated image
-                        paths, interval = seconds per frame (default 0.1), mode =
-                        "looponce" (default; plays once, returns to first frame).
-  [portrait:remove]     Remove/hide the portrait.
-  [skip]                Mark this sentence for auto-skip (no colon/value needed).
-  [next]                End the sentence the moment it finishes typing and move
-                        on to the next one without waiting for input. Works in
-                        every mode, including "manual": the sentence advances on
-                        its own, the confirm key is not needed (and not waited
-                        for). A bubble belongs to the sentence that showed it, so
-                        [next] clears it together with the text (same as
-                        [hidebubble]); the following sentence has to
-                        [showbubble:] again.
-  [func:name]           Call function `name()`. Lookup order:
-                        1) this typer's funcs registry (set via typer:SetFunc)
-                        2) _G[ name ] (global scope, for backward compat)
-                        So [func:] can call local/upvalue functions that were
-                        registered with :SetFunc, not just globals.
-  [func:name|a, b, c]   Call function `name(a, b, c)` with arguments separated by commas.
-                        Use `|` to separate function name from arguments.
-                        Numeric strings are auto-converted to numbers.
-  typer:SetFunc(name, fn)
-                        Register a function `fn` under string `name` in this
-                        typer's funcs table. Lets [func:name] reach closures
-                        and module-locals without polluting _G. A nil `fn`
-                        clears the entry. Chainable (returns typer).
-
-Tags can be chained consecutively: [font:x][colorHEX:ffff00][effect:shake, 2]
-
-The "^" character still works as a reset-to-default marker, same as NText.
-Every "* " at the start of a sentence is treated as a dialogue prefix (star prefix).
-
+EText: types sentences one character at a time, styling inline with [tag]
+sequences instead of an opts table. Entry points: typers.New, typers.Update,
+typers.ClearCache.
 ]]
--- Shared mask / shader helpers (see render.lua). Resolved through the engine
--- module path rather than relative to this file, so a Game-area copy of a
--- typer (whole-file override) still finds it.
+-- Shared mask / shader helpers. Resolved through the engine module path so a
+-- Game-area whole-file copy of a typer still finds it.
 local render = require("Scripts.Libraries.Typers.render")
 
 local typers = {
@@ -154,10 +90,6 @@ local function normalizeStarPrefix(sentence)
 
     return sentence
 end
-
--- ══════════════════════════════════════
--- Bubble helpers
--- ══════════════════════════════════════
 
 local function createBubble(x, y, w, h, layer)
     local bubble = {}
@@ -279,17 +211,14 @@ function typers.CreateBondFont(engfont, non_engfont, engfunc, non_engfunc)
     }
 end
 
--- Helper: process a single [tag] and apply it to the typer.
--- Returns true if the tag was recognized and applied.
+-- Apply one [tag]; returns true when the tag was recognized.
 local function applyTag(typer, tag_name, tag_value)
     tag_name = tag_name:lower()
     if (tag_name == "wait" and tag_value) then
         local val = tonumber(tag_value)
         if (val) then
-            -- Pauses ride on the dedicated waittime timer, NOT typer.interval:
-            -- a [speed:] tag parsed later in the same scan would otherwise
-            -- overwrite interval and the pause would evaporate. Ignored while
-            -- skipping so fast-forward stays fast.
+            -- Pauses use waittime, not interval, so a later [speed:] cannot
+            -- swallow them; ignored while skipping.
             if (not typer.skip.skipping) then
                 typer.waittime = val
                 typer.cantype = false
@@ -328,18 +257,13 @@ local function applyTag(typer, tag_name, tag_value)
         end
         return true
     elseif (tag_name == "font" and tag_value) then
-        -- Writing .font automatically disables bondfont (see metatable).
         typer.font = tag_value
-        -- An explicitly-set font must win over the eng/non-eng bondfont split,
-        -- so every following character (ASCII and non-ASCII) uses this font.
         typer.use_bondfont = false
         return true
     elseif (tag_name == "size" and tag_value) then
-        -- Font size of all following text. Letters already typed keep their own
-        -- font object, so this never resizes what is on screen already.
+        -- Only following text changes; letters already typed keep their font.
         typer:SetFontSize(tag_value)
-        -- NOTE: unlike [font:], this keeps bondfont enabled - only the size of
-        -- both bondfont entries changes, the per-character funcs still run.
+        -- Unlike [font:], keeps bondfont enabled; only both sizes change.
         return true
     elseif (tag_name == "effect" and tag_value) then
         local name, intensity = tag_value:match("([^,]+),%s*(.+)")
@@ -380,11 +304,6 @@ local function applyTag(typer, tag_name, tag_value)
         typer:HideBubble()
         return true
     elseif (tag_name == "portrait") then
-        -- Format:
-        --   [portrait:frame1.png, frame2.png, ...]                 default interval/mode
-        --   [portrait:frame1.png, frame2.png, ...|0.05]            custom interval
-        --   [portrait:frame1.png, frame2.png, ...|0.05|looponce]   custom interval + mode
-        --   [portrait:remove] / [portrait:hide]                    hide the portrait
         if (tag_value) then
             local lower = tag_value:lower()
             if (lower == "remove" or lower == "hide" or lower == "clear" or lower == "none") then
@@ -429,7 +348,6 @@ local function applyTag(typer, tag_name, tag_value)
         return true
         
     elseif (tag_name == "func" and tag_value) then
-        -- Format: [func:funcName] or [func:funcName|arg1, arg2, ...]
         local pipe_pos = tag_value:find("|", 1, true)
         local func_name, args_str
         if (pipe_pos) then
@@ -440,9 +358,7 @@ local function applyTag(typer, tag_name, tag_value)
             args_str = nil
         end
 
-        -- Lookup order: this typer's funcs registry first (so local/upvalue
-        -- functions registered via typer:SetFunc work), then _G as fallback
-        -- for backward compatibility with old global-function style.
+        -- Lookup: this typer's funcs registry first, then _G as fallback.
         local fn = nil
         if (typer.funcs and typer.funcs[func_name]) then
             fn = typer.funcs[func_name]
@@ -480,8 +396,7 @@ local function applyTag(typer, tag_name, tag_value)
     return false
 end
 
--- Helper: parse consecutive [tag...] sequences starting at position `start`.
--- Returns the new counter position after all tags are consumed.
+-- Parse consecutive [tag] sequences starting at `start`; returns the new counter.
 local function parseTagsAt(typer, sentence, sentence_len, start)
     local counter = start
     while (counter <= sentence_len) do
@@ -530,21 +445,18 @@ function typers.New(text, position, layer, size, mode)
                 Layers.mark_dirty()
             elseif k == "font" then
                 rawset(t, k, v)
-                -- Setting font directly applies it to both the English and
-                -- non-English bondfont entries, with empty funcs so the whole
-                -- text renders with this single font.
+                -- A directly-set font applies to both bondfont entries with
+                -- empty funcs, so the whole text uses this single font.
                 if (t.bondfont) then
                     t.bondfont.engfont.font = v
                     t.bondfont.non_engfont.font = v
                     t.bondfont.engfunc = function() end
                     t.bondfont.non_engfunc = function() end
                 end
-                -- A directly-set font wins over the eng/non-eng bondfont split.
                 t.use_bondfont = false
             elseif k == "fontsize" then
                 rawset(t, k, v)
-                -- Setting fontsize directly applies it to both bondfont sizes,
-                -- with empty funcs as well.
+                -- Same for the size: both bondfont entries are resized.
                 if (t.bondfont) then
                     t.bondfont.engfont.size = v
                     t.bondfont.non_engfont.size = v
@@ -573,9 +485,8 @@ function typers.New(text, position, layer, size, mode)
         active = false,
         offset_applied = false
     }
-    -- Create the portrait sprite eagerly (placeholder px.png) so `portrait.image`
-    -- is always valid and can be read/configured at any time. `active` tells
-    -- whether a real portrait is currently being shown.
+    -- Created eagerly (placeholder px.png) so `portrait.image` is always valid;
+    -- `active` tells whether a real portrait is currently shown.
     typer.portrait.image = Sprites.CreateSprite("px.png", typer.layer)
     if (typer.portrait.image and typer.portrait.image.animation) then
         typer.portrait.image:MoveTo(typer.x, typer.y + 55)
@@ -617,9 +528,8 @@ function typers.New(text, position, layer, size, mode)
     typer.has_star_prefix = false
     typer.auto_wrap = false
 
-    -- Per-typer function registry for [func:name]. Searched BEFORE _G so
-    -- local/upvalue/closure functions registered via :SetFunc can be called
-    -- from inside text without polluting the global namespace.
+    -- Per-typer [func:] registry, searched before _G so closures registered
+    -- with :SetFunc work without polluting globals.
     typer.funcs = {}
 
     typer.bondfont = {
@@ -638,8 +548,7 @@ function typers.New(text, position, layer, size, mode)
             typer.pos.relative[2] = 4
         end
     }
-    -- Whether the bondfont feature is currently enabled. Set to false when a
-    -- font is directly set (e.g. [font:...]); re-enabled by UseBondFont.
+    -- Bondfont toggle: a directly-set font turns it off, UseBondFont back on.
     typer.use_bondfont = true
 
     typer.mode = mode or "manual"
@@ -709,16 +618,13 @@ function typers.New(text, position, layer, size, mode)
     end
 
     --- Pixel width of the widest line typed out so far, ignoring `typer.x`.
-    --- Only letters that already exist are measured, so the value grows while
-    --- the text is still being typed.
+    --- Only letters that already exist are measured, so it grows while typing.
     function typer:GetWidth()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
 
-        -- A letter's `x` is relative to `typer.x` and its `width` excludes
-        -- `scale`, so scale it back in to get the drawn footprint. A letter
-        -- placed left of the previous one means a new line started (`\n` or
-        -- auto-wrap), which closes the line that was being measured.
+        -- `width` excludes `scale`, so scale it back in. A letter left of the
+        -- previous one means a new line started and closes the current line.
         local widest, line_right, prev_right, left = 0, 0, nil, nil
         for _, letter in ipairs(letters) do
             local x = letter.x or 0
@@ -739,9 +645,7 @@ function typers.New(text, position, layer, size, mode)
     end
 
     --- Pixel height of every line typed out so far, ignoring `typer.y`.
-    --- Spans from the top of the highest glyph to the bottom of the lowest
-    --- one, so both the line gaps added by `\n` / auto-wrap and each glyph's
-    --- own `scale` are included.
+    --- Includes the `\n` / auto-wrap line gaps and each glyph's own `scale`.
     function typer:GetHeight()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
@@ -763,20 +667,14 @@ function typers.New(text, position, layer, size, mode)
         return typer:GetWidth(), typer:GetHeight()
     end
 
-    ---Change the font size for everything typed from here on. Already-typed
-    ---letters keep the size they were created with, so only following text
-    ---changes - the same way [font:] only affects what comes after it.
+    --- Change the font size for everything typed from here on; already-typed
+    --- letters keep the size they were created with.
     ---
     ---@param size number|string font size in pixels; ignored when it is not a
     ---  positive number.
     ---
-    ---NOTE: this deliberately does more than `typer.fontsize = n`. A plain
-    ---write never reaches the bondfont entries, because __newindex only fires
-    ---for keys the table does not hold yet and New() already stored `fontsize`
-    ---(so the metatable branch is dead from then on). While bondfont is on,
-    ---each character is sized from bondfont.engfont.size / non_engfont.size,
-    ---so those two are what actually decide the result; the plain field is
-    ---what the [font:]-style path (bondfont off) reads. Both are kept in sync.
+    ---NOTE: a plain `typer.fontsize = n` never reaches the bondfont entries, so
+    ---both bondfont sizes are updated here as well.
     function typer:SetFontSize(size)
         local value = tonumber(size)
         if (not value) or (value <= 0) then return end
@@ -794,10 +692,8 @@ function typers.New(text, position, layer, size, mode)
         typer.use_bondfont = true
     end
 
-    ---Register a function under `name` in this typer's funcs registry.
-    ---[func:name] hits this table before _G, so closures / module-locals
-    ---can be called from text without polluting globals. Pass `nil` to clear.
-    ---Returns the typer for chaining: t:SetFunc("a", fa):SetFunc("b", fb).
+    ---Register a function under `name` for [func:name]; it wins over _G.
+    ---Pass `nil` to clear. Returns the typer, so calls can be chained.
     function typer:SetFunc(name, fn)
         if (type(name) ~= "string" or #name == 0) then return typer end
         if (fn == nil) then
@@ -859,9 +755,8 @@ function typers.New(text, position, layer, size, mode)
             typer.portrait.image = nil
         end
 
-        -- Remove this typer from the registries BEFORE firing _onComplete. If
-        -- the callback triggers a scene switch (which clears all typers), the
-        -- same typer won't be destroyed a second time and recurse into itself.
+        -- Deregister BEFORE firing _onComplete: the callback may switch scenes
+        -- and clear all typers, which would destroy this one a second time.
         Layers.remove(typer)
         for i = #typers.insts, 1, -1 do
             if (typers.insts[i] == typer) then
@@ -882,15 +777,12 @@ function typers.New(text, position, layer, size, mode)
     function typer:Update(dt)
         typer.time = typer.time + dt
 
-        -- Cancel key (manual mode only)
         if (typer.mode ~= "none" and Controller.GetState("cancel") == 1 and typer.skip.canskip and typer.sentence_index <= #typer.texts) then
             typer.skip.skipping = true
         end
 
-        -- Fast-forward (cancel key / [skip]) has to be instant: it clears any
-        -- pending pause and opens the interval gate on the very same frame, so
-        -- the rest of the sentence bursts out no matter what [wait:] or
-        -- [speed:] are currently set to.
+        -- Fast-forward must be instant: clear any pending pause and open the
+        -- interval gate on the same frame that skipping starts.
         if (typer.skip.skipping) then
             typer.waittime = 0
             if (typer.time < typer.interval) then
@@ -899,9 +791,7 @@ function typers.New(text, position, layer, size, mode)
         end
 
         if (typer.waittime > 0) then
-            -- Dedicated pause timer: counts down independently of the
-            -- per-character interval timer (typer.time / typer.interval), so a
-            -- [speed:] tag can never swallow a [wait:] and vice versa.
+            -- Dedicated pause timer, independent of typer.time / typer.interval.
             typer.waittime = typer.waittime - dt
             if (typer.waittime <= 0) then
                 typer.waittime = 0
@@ -928,16 +818,13 @@ function typers.New(text, position, layer, size, mode)
                     local temp_char = sentence:sub(counter, counter)
 
                     if (temp_char == "[") then
-                        -- Parse all consecutive [tag] sequences
                         counter = parseTagsAt(typer, sentence, sentence_len, counter)
-                        -- Update font after tags in case [font:] was used
                         current_font = getFont(typer.font, typer.fontsize)
 
                     elseif (temp_char == "^") then
                         counter = counter + 1
                         if (not typer.skip.skipping) then
-                            -- Same as [wait:]: pause via waittime, so a
-                            -- following [speed:] cannot swallow it.
+                            -- Same as [wait:]: waittime, so [speed:] cannot eat it.
                             typer.waittime = 0.3
                             typer.cantype = false
                         end
@@ -1073,16 +960,12 @@ function typers.New(text, position, layer, size, mode)
             if (typer.counter > #typer.texts[typer.sentence_index]) then
                 typer.skip.skipping = false
                 local should_advance = false
-                -- True when [next] is what advances us. The bubble was shown for
-                -- THIS sentence, so it has to go away with its text; a confirm
-                -- keypress (the other modes) must not do that, because the usual
-                -- "[showbubble:] once, several sentences" dialogue would lose its
-                -- bubble on the first confirm.
+                -- Whether [next] is what advances us: the bubble belongs to this
+                -- sentence, so only [next] hides it; a confirm keypress must not.
                 local advance_ends_sentence = false
 
-                -- [next] ends the sentence on its own, in EVERY mode: that is
-                -- the whole point of the tag, and in "none" mode it is the only
-                -- way to move on at all (no key is ever read there).
+                -- [next] advances on its own in every mode; in "none" mode it is
+                -- the only way to move on at all.
                 if (typer.pending_next) then
                     should_advance = true
                     advance_ends_sentence = true
@@ -1135,8 +1018,8 @@ function typers.New(text, position, layer, size, mode)
                     local t = ol[5] or 1
                     local s = letter.scale or 1
                     SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
-                    -- 8-directional outline: 8 shifted copies (cardinal + diagonal,
-                    -- square t-pixel offsets). setLineWidth has no effect on draw.
+                    -- 8-directional outline: 8 shifted copies at t-pixel offsets.
+                    -- setLineWidth has no effect on draw.
                     SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)

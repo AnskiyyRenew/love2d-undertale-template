@@ -1,20 +1,10 @@
 --[[
     GUI Window - UNDERTALE-style visual window
 
-    Two stacked rectangles (thick outer border + inner fill); purely visual,
-    no collision, no player constraint. Driven by Layers.add_external; layer
-    defaults to 1000 (above battle elements). Animation uses the same
-    smooth_value approach as Arenas (rate-limited approach toward a target).
-
-    Usage:
-      local w = GUI.Window.New{ x=200, y=100, w=240, h=120, thickness=5 }
-      w:ResizeWithSpeed(300, 150, 15, 15)   -- smooth resize (call w:Update(dt) in scene.update)
-      w:SetVisible(false)
-      w:SetCenter(320, 240)                 -- switch to centre-point semantics
-      w:Destroy()                           -- on scene end / cleanup
-
-    Coordinate convention: top-left (x,y) + size (w,h). :SetCenter switches to centre.
-    Note: Update must be driven by the caller (scene.update); omit for static menus.
+    Two stacked rectangles (thick outer border + inner fill); purely visual.
+    Animation rate-limits toward a target (same smooth_value as Arenas);
+    Update must be driven by the caller (scene.update) — omit for static menus.
+    Top-left coords; :SetCenter switches to centre-point semantics.
 ]]
 
 local primitives = require((...):match("(.-)[^%.]+$") .. "primitives")
@@ -52,11 +42,9 @@ function Window.New(opts)
     self.visible = (opts.visible ~= false)
     self._entry = nil
     self._destroyed = false
-    -- animation target / speeds
     self.target = { x = self.x, y = self.y, w = self.w, h = self.h, thickness = self.thickness }
     self.speeds = {}
     for k, v in pairs(DEFAULT_SPEEDS) do self.speeds[k] = v end
-    -- register draw with Layers
     self._entry = Layers.add_external(function()
         if (not self._destroyed and self.visible) then
             primitives.drawWindow(self.x, self.y, self.w, self.h,
