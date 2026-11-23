@@ -59,6 +59,7 @@ The docs live in a separate repository, published as a site, and aren't shipped 
 
 **Run the project**
 
+- One-click runtime: double-click `Packager\setup\install.bat` (Windows) or run `Packager/setup/install.sh` (Linux / macOS). It downloads LOVE 12.0 into `Packager/tools/love`, which stays inside the repo and can be deleted to uninstall. Afterwards start the game with `Packager\play.bat` / `Packager/play.sh`. On a machine that does not have the repository yet, start with `Packager\setup\bootstrap.bat` / `Packager/setup/bootstrap.sh` instead: it clones this repo and then installs LOVE. Or
 - Use your editor's LOVE2D run feature. [Visual Studio Code](https://code.visualstudio.com/) with LOVE/Lua extensions is the common setup. Or
 - drag the project folder onto `love.exe` (`lovec.exe` on Windows).
 
@@ -138,6 +139,7 @@ Libraries this template uses:
 
 **运行项目**
 
+- 一键装运行环境：Windows 双击 `Packager\setup\install.bat`，Linux / macOS 运行 `Packager/setup/install.sh`。脚本会把 LOVE 12.0 下载到 `Packager/tools/love`（仓库内，删目录即卸载），之后用 `Packager\play.bat` / `Packager/play.sh` 启动。如果机器上还没有这份仓库，先从 `Packager\setup\bootstrap.bat` / `Packager/setup/bootstrap.sh` 开始：它会克隆本仓库再装 LOVE。或
 - 用编辑器的 LOVE2D 运行功能，常见选择是 [Visual Studio Code](https://code.visualstudio.com/) 配合 LOVE/Lua 扩展。或
 - 把项目文件夹拖到 `love.exe` 上（Windows 上是 `lovec.exe`）。
 

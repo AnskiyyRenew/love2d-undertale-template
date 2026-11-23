@@ -25,7 +25,7 @@
     
     
       
-        <title>导出与发布 - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ 导出与发布 - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -94,7 +94,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../index.html" title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,13 +108,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              导出与发布
+              ❕️ 导出与发布
             
           </span>
         </div>
@@ -244,13 +244,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../index.html" title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1224,7 +1224,7 @@
   <span class="md-ellipsis">
     
   
-    计时器
+    ❕️ 计时器
   
 
     
@@ -1561,7 +1561,7 @@
   <span class="md-ellipsis">
     
   
-    回合脚本
+    ❕️ 回合脚本
   
 
     
@@ -2061,7 +2061,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy 转化库
+    ❕️ ShaderToy 转化库
   
 
     
@@ -2322,6 +2322,8 @@
       
         
       
+        
+      
     
     
     
@@ -2434,6 +2436,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../070_develop/015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 开发者模式（回合跳转）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../070_develop/020_devtool/index.html" class="md-nav__link">
         
   
@@ -2469,7 +2499,7 @@
   <span class="md-ellipsis">
     
   
-    引擎热键
+    ❕️ 引擎热键
   
 
     
@@ -3157,7 +3187,7 @@
 
 
 
-  <h1>导出与发布</h1>
+  <h1>❕️ 导出与发布</h1>
 
 <p>游戏可运行且内容完成后，下一步是将其打包为<strong>可分发、可直接打开的文件</strong>。</p>
 <p>这一步分两件事：先把配置改对（<code>conf.lua</code> 里的三个地方），再把项目交给打包工具。引擎自带打包工具，路径是项目根目录下的 <code>Packager/</code> 。</p>
@@ -3361,6 +3391,11 @@ run.bat<span class="w">            </span><span class="c1"># 或手动：python 
 <h2 id="windowsexe">Windows：exe<a class="headerlink" href="#windowsexe" title="Permanent link">&para;</a></h2>
 <p>需要本机装了 LÖVE（界面里要指向含 <code>love.exe</code> 的目录）。</p>
 <p>产物是一个<strong>文件夹</strong>，不是单个 exe —— <code>love.dll</code> 、<code>SDL2.dll</code> 等必须与 exe 位于同一目录，缺少其中任何一个都无法启动。</p>
+<div class="admonition note">
+<p class="admonition-title">项目自带的 <code>.dll</code> 也会一起复制</p>
+<p>这类库（<code>Resources/Libs/https.dll</code> 、<code>Resources/Libs/DiscordRPC/discord-rpc-x64.dll</code> 、<code>Scripts/Libraries/PerfectPixel/cpp.dll</code> 等）经 <code>ffi.load</code> / <code>require</code> 交给操作系统加载器读取，无法从 <code>.love</code> 压缩包内部加载；fused exe 在磁盘上也没有源码树可供原路径查找。</p>
+<p>打包脚本把它们<strong>平铺到 exe 同目录</strong>，并按原相对路径<strong>再镜像一份</strong>（兼容仍按 <code>Resources/Libs/...</code> 查找的加载器）。同名冲突时保留 LÖVE 运行时自带的版本，x86/x64 两份同名库保留 x64 版本。</p>
+</div>
 <p>发布时有两种送法：</p>
 <ul>
 <li><strong>整个文件夹</strong>压成 zip 发出去，玩家解压后双击里面的 exe。</li>

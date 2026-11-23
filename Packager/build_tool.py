@@ -118,6 +118,8 @@ STRINGS = {
         "msg_skipped_doc": "已跳过 Documentation 文件夹。",
         "msg_exe_created": "已生成 Windows 可执行文件: {path}",
         "msg_dll_copied": "已复制 DLL: {name}",
+        "msg_proj_dll_copied": "已复制项目 DLL 到 exe 同目录: {name}（来自 {src}）",
+        "msg_proj_dll_conflict": "跳过同名 DLL: {name}（已保留 {kept}，来源 {src}）",
         "msg_android_created": "已生成 Android 构建准备文件: {path}",
         "msg_android_hint": "提示: 用 Android Studio 打开该目录并构建 APK。",
         "msg_web_created": "已生成 love-js 导出准备文件: {path}",
@@ -221,6 +223,8 @@ STRINGS = {
         "msg_skipped_doc": "Skipped Documentation folder.",
         "msg_exe_created": "Created Windows executable: {path}",
         "msg_dll_copied": "Copied DLL: {name}",
+        "msg_proj_dll_copied": "Copied project DLL next to the exe: {name} (from {src})",
+        "msg_proj_dll_conflict": "Skipped DLL with duplicate name: {name} (kept {kept}, from {src})",
         "msg_android_created": "Created Android build preparation: {path}",
         "msg_android_hint": "Hint: open this folder in Android Studio and build the APK.",
         "msg_web_created": "Created love-js export preparation: {path}",
@@ -467,6 +471,57 @@ def iter_project_files(project_dir, exclude_dirs, exclude_exts, exclude_paths):
                 continue
             rel = os.path.relpath(fp, project_dir).replace(os.sep, "/")
             yield rel, fp
+
+
+def copy_project_dlls(project_dir, exe_dir, exclude_dirs, exclude_paths,
+                      reserved_names, emit):
+    """Copy every DLL shipped inside the project next to the fused exe.
+
+    ffi.load / require("https") go through the OS loader, which cannot read
+    from inside the .love archive; a fused exe also has no source tree on
+    disk for the "Resources/Libs/..." candidates. A bare DLL name is searched
+    for in the folder the exe was launched from, so a flat copy there is what
+    makes these libraries loadable after packaging. The original relative
+    path is mirrored as well, for loaders that keep probing a subpath.
+
+    reserved_names holds DLLs already copied from the LÖVE install (lower
+    case); they belong to love.exe and must never be overwritten. secrets.dll
+    is skipped here because copy_secret_dll owns it and reports a missing
+    build. Returns the number of DLLs copied.
+    """
+    items = []
+    for rel, fp in iter_project_files(project_dir, exclude_dirs, set(),
+                                      exclude_paths):
+        if rel.lower().endswith(".dll"):
+            items.append((rel, fp))
+    items.sort(key=lambda t: t[0].lower())
+
+    copied = 0
+    placed = {}          # flat basename (lower case) -> relative source path
+    for rel, fp in items:
+        name = os.path.basename(fp)
+        if name.lower() == SECRET_DLL.lower():
+            continue
+        key = name.lower()
+        if key in reserved_names or key in placed:
+            prev = placed.get(key, "<love.exe runtime>")
+            # LÖVE on Windows is 64-bit: prefer x64 over x86 for a shared name.
+            prefer_x64 = ("x64" in rel.lower() or "amd64" in rel.lower())
+            keep = prefer_x64 and ("x86" in prev.lower())
+            if not keep:
+                emit("msg_proj_dll_conflict", name=name, kept=prev, src=rel)
+                continue
+        shutil.copy2(fp, os.path.join(exe_dir, name))
+        placed[key] = rel
+        copied += 1
+        emit("msg_proj_dll_copied", name=name, src=rel)
+        mirror = os.path.join(exe_dir, *rel.split("/"))
+        flat = os.path.join(exe_dir, name)
+        if os.path.normcase(os.path.abspath(mirror)) != \
+                os.path.normcase(os.path.abspath(flat)):
+            os.makedirs(os.path.dirname(mirror), exist_ok=True)
+            shutil.copy2(fp, mirror)
+    return copied
 
 
 def create_zip(project_dir, zip_path, exclude_dirs, exclude_exts, exclude_paths):
@@ -1097,12 +1152,19 @@ class PackagerApp:
             with open(exe_path, "ab") as dst, open(love_path, "rb") as src:
                 shutil.copyfileobj(src, dst, 1024 * 1024)
             self._emit("msg_exe_created", path=exe_path)
+            reserved = set()
             for f in sorted(os.listdir(love_dir)):
                 if f.lower().endswith(".dll"):
                     shutil.copy2(os.path.join(love_dir, f), os.path.join(exe_dir, f))
+                    reserved.add(f.lower())
                     self._emit("msg_dll_copied", name=f)
+            # Game-owned native libs (https.dll, discord-rpc-*.dll, cpp.dll, ...)
+            # live inside the .love, but the OS loader cannot read the archive.
+            # Flatten them beside the exe so bare-name ffi.load / require work.
+            copy_project_dlls(project_dir, exe_dir, exclude_dirs,
+                              exclude_paths + [exe_dir], reserved, self._emit)
             # The secret store is not in love_dir (it lives under
-            # Resources/Libs/Secrets), so the loop above cannot pick it up.
+            # Resources/Libs/Secrets), so the loops above cannot pick it up.
             # A fused exe has no source tree, so it has to sit beside the exe.
             copy_secret_dll(project_dir, exe_dir, self._emit)
 

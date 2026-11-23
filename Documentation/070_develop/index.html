@@ -27,7 +27,7 @@
     
     
       
-        <title>Developer Tools - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ Developer Tools - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href=".." title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Developer Tools
+              ❕️ Developer Tools
             
           </span>
         </div>
@@ -246,13 +246,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href=".." title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1226,7 +1226,7 @@
   <span class="md-ellipsis">
     
   
-    Timer
+    ❕️ Timer
   
 
     
@@ -1563,7 +1563,7 @@
   <span class="md-ellipsis">
     
   
-    Turn Script
+    ❕️ Turn Script
   
 
     
@@ -2063,7 +2063,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy Conversion Library
+    ❕️ ShaderToy Conversion Library
   
 
     
@@ -2326,6 +2326,8 @@
       
         
       
+        
+      
     
     
     
@@ -2438,6 +2440,34 @@
   
   
     <li class="md-nav__item">
+      <a href="015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Developer Mode (Wave Jump)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="020_devtool/index.html" class="md-nav__link">
         
   
@@ -2473,7 +2503,7 @@
   <span class="md-ellipsis">
     
   
-    Engine Hotkeys
+    ❕️ Engine Hotkeys
   
 
     
@@ -2982,7 +3012,7 @@
 
 
 
-  <h1>Developer Tools</h1>
+  <h1>❕️ Developer Tools</h1>
 
 <hr />
 <p>The engine ships with some <strong>development-only debugging and assistive tools</strong> that let you inspect and modify the game's running state in real time, and visually generate assets — greatly improving debugging efficiency. The vast majority of these tools only take effect in development builds; they're automatically excluded when packaging for release and never enter the shipped game.</p>
@@ -3001,6 +3031,10 @@
 <td>The engine's built-in tool scenes; the bezier easing editor (visually shape easing curves and export code)</td>
 </tr>
 <tr>
+<td><a href="015_devmode/index.html">Developer Mode</a></td>
+<td>Type <code>e</code> <code>n</code> <code>d</code> to unlock, <code>F10</code> opens the wave picker: jump straight to any wave script or end the current enemy turn</td>
+</tr>
+<tr>
 <td><a href="010_debugger/index.html">Object Debugger</a></td>
 <td>In-game click / drag sprites, change properties, four-point deformation, export object code</td>
 </tr>
@@ -3010,7 +3044,7 @@
 </tr>
 <tr>
 <td><a href="030_hotkeys/index.html">Engine Hotkeys</a></td>
-<td>Full table of <code>F2</code> ~ <code>F9</code> hotkeys: reload, fullscreen, hot-reload, debug info, hitboxes, the two debuggers</td>
+<td>Full table of <code>F2</code> ~ <code>F10</code> hotkeys: reload, fullscreen, hot-reload, debug info, hitboxes, the two debuggers, the wave picker</td>
 </tr>
 <tr>
 <td><a href="040_preload/index.html">Resource Preloading</a></td>

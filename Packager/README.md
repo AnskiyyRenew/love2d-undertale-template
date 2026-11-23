@@ -34,6 +34,98 @@ python count_lua_files.py "D:\path\to\project"
 
 Windows 下也可以直接双击 [`run.bat`](run.bat)（优先使用 `pythonw`，无黑窗口）。
 
+## 一键安装运行环境 / One-click runtime setup
+
+在全新的机器或虚拟机里跑本项目，只缺一个 LÖVE 12.0。`setup/` 下的脚本负责把这件事做完：
+下载官方构建、解开、放到仓库内、验证能启动。
+
+| 系统 | 入口 | 启动游戏 |
+| ---- | ---- | -------- |
+| Windows | 双击 `setup\install.bat` | `play.bat` |
+| Linux / macOS | `sh setup/install.sh` | `sh play.sh` |
+| 全新机器（还没有仓库） | `setup\bootstrap.bat` / `sh setup/bootstrap.sh` | 同上 |
+| 任意 | 环境报告：`install.bat -Check` / `install.sh --check` | |
+
+脚本做的事与不做的事：
+
+- 装到 `Packager/tools/love`，**不写系统目录、不改 PATH**。删掉 `Packager/tools` 就是卸载。
+- 校验 `love.exe` / `love.dll` / `SDL3.dll`（Windows）或可执行位（Linux / macOS），并读一次版本号。
+- 顺手报告 git / python / `love-android` 模板是否就位，但**不安装**它们——APK 工具链（JDK 17 + SDK + NDK）几十 GB，按需自己装。
+- 输出为英文：Windows 控制台默认代码页是 GBK，中文提示在部分环境会变乱码。
+
+### 全新机器：连仓库一起装 / bootstrap
+
+上面的 `install.*` 自己就在仓库里，没有仓库就先跑不了，所以另有一个独立的引导脚本。
+它不读 `setup.conf`、也不要求自己在检出目录里，可以单独拷进虚拟机：
+
+```bat
+:: Windows
+bootstrap.bat                                  :: 克隆到 .\love2d-undertale-template，再装 LÖVE
+bootstrap.bat -Dir D:\dev\se                   :: 换个目录
+bootstrap.bat -Update                          :: 已有克隆则 git pull --ff-only
+```
+
+```bash
+# Linux / macOS
+sh bootstrap.sh                                # 同上
+sh bootstrap.sh --dir ~/dev/se
+sh bootstrap.sh --update
+```
+
+| Windows | Linux / macOS | 作用 |
+| ------- | ------------- | ---- |
+| `-Dir <d>` | `--dir <d>` | 克隆目标目录（默认当前目录下的 `love2d-undertale-template`） |
+| `-Update` | `--update` | 对已有克隆执行 `git pull --ff-only` |
+| `-Zip` | `--zip` | 跳过 git，直接下快照压缩包 |
+| `-Full` | `--full` | 取完整历史（默认 `--depth 1` 浅克隆） |
+| `-SkipLOVE` | `--skip-love` | 只克隆，不装 LÖVE |
+| `-Force` / `-Check` | `--force` / `--check` | 透传给 `install.*` |
+
+几点行为：
+
+- **默认浅克隆**。受控内容约 138 MB，完整历史约两倍，测试机上用不到；要历史加 `-Full`。
+- **没有 git 也能用**：自动退回 `codeload` 的 zip 快照（约 67 MB）。快照没有 `.git`，不能 `-Update`，
+  刷新就再跑一次 `-Zip`。
+- 目标目录已存在且非空（除非已有 `conf.lua`）时直接报错，不会往现有目录里混东西。
+- 克隆完会校验 `conf.lua`，再把控制权交给该检出里的 `install.*` 装 LÖVE。
+
+> 引导脚本要能从虚拟机里访问到：共享文件夹、U 盘、`git clone` 一次再拷，或者从 raw 地址下载：
+> `curl -fsSL -O https://raw.githubusercontent.com/AnskiyyRenew/love2d-undertale-template/main/Packager/setup/bootstrap.sh`。
+> 那条 raw 链接在推送前是 404（`Packager/setup/` 还没进远端）。
+
+### 改写下载源
+
+所有地址在 [`setup/setup.conf`](setup/setup.conf) 里，`KEY=VALUE`，改完直接重跑即可，不用动脚本。
+默认指向 [love2d/love](https://github.com/love2d/love) 官方 CI 的 `main` 构建，因为 **12.0 目前只有 CI 产物**，没有带 tag 的正式发布。几件常用的事：
+
+| 需求 | 做法 |
+| ---- | ---- |
+| 锁定某个 commit | 把地址里第二个 `main` 换成 commit 哈希 |
+| 换回稳定版 11.5 | 填 `https://github.com/love2d/love/releases/download/11.5/love-11.5-win64.zip` |
+| 离线 / 内网 | 先把包放到任意位置，`install.bat -Url <地址>` 或 `install.sh --url <地址>` 指定一次 |
+| 保留下载的压缩包 | `KEEP_ARCHIVE=1`（缓存在 `tools/cache`） |
+
+官方 CI 产物是「zip 套 zip」（外层还夹着一个 Windows 安装器 exe），两个脚本都会自动往里解开，
+所以直接给 `.love` 之外的任意官方 / 第三方打包 zip 也能用。
+
+### 参数
+
+| Windows | Linux / macOS | 作用 |
+| ------- | ------------- | ---- |
+| `-Check` | `--check` | 只打印环境报告，不下载 |
+| `-Force` | `--force` | 已装也重装（换版本时用） |
+| `-Url <u>` | `--url <u>` | 本次改用另一个下载地址 |
+| `-Dest <d>` | `--dest <d>` | 本次装到另一个目录 |
+
+`install.sh` 另有一个 `--platform linux|macos`，用于在一台机器上验证另一平台的分支（解包结构不同）。
+
+### 依赖
+
+Windows 只需要系统自带的 PowerShell 5.1（Win10/11 都有），脚本自己带 `-ExecutionPolicy Bypass`，
+不需要预先装 Python 或 git。Linux / macOS 需要 `curl` 或 `wget` 之一，以及 `unzip`（缺失时依次退回
+`ditto` / `bsdtar` / `python3 -m zipfile`）。macOS 上脚本会顺手清掉 `com.apple.quarantine`，
+否则未签名的 CI 构建会被 Gatekeeper 拦下。
+
 ## Lua 跨平台兼容检查 / Lua compatibility check
 
 手动运行的独立检查器：按不同"严格程度"静态检查项目里的 Lua 文件是否能跑通。
@@ -92,7 +184,7 @@ Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（**默�
 ## 依赖 / Requirements
 
 - **Python 3**（仅使用标准库，官方 Windows 安装包自带 tkinter，无需额外安装）
-- 生成 `.exe`：本机需安装 LÖVE（含 `love.exe`）
+- 生成 `.exe`：本机需安装 LÖVE（含 `love.exe`），可用 [`setup/`](setup/) 一键装到 `tools/love`
 - 生成 Android 准备文件：需下载 [love-android](https://github.com/love2d/love-android) 模板
 - 生成 love-js：可选，需要 Node.js + [love.js](https://github.com/Davidobot/love.js)
 
@@ -204,6 +296,9 @@ Packager/
   check_compat.py     # Lua 跨平台兼容检查器（三级严格度）
   check_compat.bat    # 检查器 Windows 启动脚本（默认 --strict 2）
   run.bat             # Windows 启动脚本
+  play.bat / play.sh  # 用 tools/love 里的运行时启动游戏
+  setup/              # 一键装运行环境（bootstrap / install / setup.conf）
+  tools/love/         # 装好后的 LÖVE 运行时（gitignored，删掉即卸载）
   rcedit-x64.exe      # 给导出的 exe 写图标 / 版本信息的工具（随仓库分发）
   love-android/       # love-android 模板（git 子模块，clone 后才有）
   README.md           # 本说明

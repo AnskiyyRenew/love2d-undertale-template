@@ -202,8 +202,8 @@ function love.load()
         local ok_act, err_act = Discord.setActivity({
             details     = "Fighting Sans",
             state       = "Route: Genocide",
-            large_image = "qq20250220-225345",
-            large_text  = "It's a bad time.",
+            large_image = "icon",
+            large_text  = "SoulEngine",
             start       = Discord.timestamp(),   -- elapsed timer
         })
         if (not ok_act) then

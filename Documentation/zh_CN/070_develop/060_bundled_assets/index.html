@@ -27,7 +27,7 @@
     
     
       
-        <title>❕️ 内置资源一览 - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ 内置资源一览 - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +110,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -246,13 +246,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1226,7 +1226,7 @@
   <span class="md-ellipsis">
     
   
-    计时器
+    ❕️ 计时器
   
 
     
@@ -1563,7 +1563,7 @@
   <span class="md-ellipsis">
     
   
-    回合脚本
+    ❕️ 回合脚本
   
 
     
@@ -2063,7 +2063,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy 转化库
+    ❕️ ShaderToy 转化库
   
 
     
@@ -2326,6 +2326,8 @@
       
         
       
+        
+      
     
     
     
@@ -2438,6 +2440,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 开发者模式（回合跳转）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../020_devtool/index.html" class="md-nav__link">
         
   
@@ -2473,7 +2503,7 @@
   <span class="md-ellipsis">
     
   
-    引擎热键
+    ❕️ 引擎热键
   
 
     
@@ -4032,8 +4062,13 @@ UI/Battle Screen/Shards/spr_heartshards_0..3.png
 </tbody>
 </table>
 <div class="admonition warning">
-<p class="admonition-title">Android 上的 .so</p>
-<p>原生库<strong>不能</strong>塞在 <code>game.love</code> 里加载，Android 需要放进 <code>app/src/main/jniLibs/&lt;abi&gt;/</code>。细节见 <a href="../050_secrets/index.html">密钥原生库</a> 与 <a href="../../100_export/index.html">导出</a>。</p>
+<p class="admonition-title">原生库不能留在包里加载</p>
+<p><code>ffi.load</code> / <code>require</code> 走操作系统加载器，读不到 <code>game.love</code> 内部，因此原生库必须落在包外：</p>
+<ul>
+<li><strong>Windows</strong>：打包脚本把这些 <code>.dll</code> 复制到 exe 同目录，并按原相对路径镜像一份。fused exe 在磁盘上没有源码树，<code>Resources/Libs/...</code> 这类路径对它不起作用。</li>
+<li><strong>Android</strong>：放进 <code>app/src/main/jniLibs/&lt;abi&gt;/</code>。</li>
+</ul>
+<p>细节见 <a href="../050_secrets/index.html">密钥原生库</a> 与 <a href="../../100_export/index.html">导出</a>。</p>
 </div>
 <hr />
 <h2 id="_10">想自己核一遍<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>

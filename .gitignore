@@ -31,6 +31,10 @@ Packager/Secrets/secrets.local.json
 Packager/Secrets/build/
 Resources/Libs/Secrets/
 
+# Portable LOVE runtime installed by Packager/setup (about 14 MB per platform,
+# plus the download cache). Delete the folder to uninstall.
+Packager/tools/
+
 # Android signing material (keystore + its password). Local only: committing a
 # signing key to a public repo is worse than losing it. Back this folder up
 # somewhere safe - an APK signed with a lost key can never be updated.

@@ -27,7 +27,7 @@
     
     
       
-        <title>Networking - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ Networking - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href=".." title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Networking
+              ❕️ Networking
             
           </span>
         </div>
@@ -246,13 +246,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href=".." title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1226,7 +1226,7 @@
   <span class="md-ellipsis">
     
   
-    Timer
+    ❕️ Timer
   
 
     
@@ -1563,7 +1563,7 @@
   <span class="md-ellipsis">
     
   
-    Turn Script
+    ❕️ Turn Script
   
 
     
@@ -2063,7 +2063,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy Conversion Library
+    ❕️ ShaderToy Conversion Library
   
 
     
@@ -2324,6 +2324,8 @@
       
         
       
+        
+      
     
     
     
@@ -2436,6 +2438,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../070_develop/015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Developer Mode (Wave Jump)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../070_develop/020_devtool/index.html" class="md-nav__link">
         
   
@@ -2471,7 +2501,7 @@
   <span class="md-ellipsis">
     
   
-    Engine Hotkeys
+    ❕️ Engine Hotkeys
   
 
     
@@ -3015,7 +3045,7 @@
 
 
 
-  <h1>Networking</h1>
+  <h1>❕️ Networking</h1>
 
 <p>The networking topic covers the engine's three built-in networking/multiplayer libraries. They're independent of each other; use whichever you need:</p>
 <table>
@@ -3118,6 +3148,10 @@ See <a href="000_gamejolt/index.html">GameJolt</a>.</p>
 <p class="admonition-title">Android / Mobile</p>
 <p>Both <code>https.dll</code> and <code>discord-rpc-*.dll</code> are <strong>Windows-only</strong> dynamic libraries and can't be loaded even if packed into an Android package.
 These two libraries auto-degrade on non-Windows platforms (<code>isAvailable()</code> returns <code>false</code>) — <strong>don't</strong> hang critical logic on them.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Windows packaging</p>
+<p>The packager copies both <code>.dll</code> files next to the exe, so no manual step is needed. See <a href="../100_export/index.html">Export → Windows</a> for the reasoning and the copy rules.</p>
 </div>
 <hr />
 <h2 id="pages-in-this-topic">Pages in This Topic<a class="headerlink" href="#pages-in-this-topic" title="Permanent link">&para;</a></h2>

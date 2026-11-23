@@ -1,5 +1,5 @@
 local scene = {}
-local mus, ins = Audio.PlayMusic("End.ogg", 0, true)
+local mus, ins = Audio.PlayMusic("mus_lastgoodbye.ogg", 0, true)
 ins:VolumeTransition(0, 1, 3)
 
 local leaving = false
@@ -11,8 +11,8 @@ t:SetAlign("center")
 
 local strs = {
     "Start.ogg made by Anskiyy",
-    "End.ogg made by Anskiyy",
     "HOWEVER I'M BAD AT THESE↑",
+    "lb.ogg made by Toby Fox",
     "I'M TEST TEXT TEST.",
     "NYEH HEH HEH"
 }

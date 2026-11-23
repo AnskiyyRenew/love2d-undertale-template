@@ -27,7 +27,7 @@
     
     
       
-        <title>网络开发 - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ 网络开发 - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../index.html" title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              网络开发
+              ❕️ 网络开发
             
           </span>
         </div>
@@ -246,13 +246,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../index.html" title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1226,7 +1226,7 @@
   <span class="md-ellipsis">
     
   
-    计时器
+    ❕️ 计时器
   
 
     
@@ -1563,7 +1563,7 @@
   <span class="md-ellipsis">
     
   
-    回合脚本
+    ❕️ 回合脚本
   
 
     
@@ -2063,7 +2063,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy 转化库
+    ❕️ ShaderToy 转化库
   
 
     
@@ -2324,6 +2324,8 @@
       
         
       
+        
+      
     
     
     
@@ -2436,6 +2438,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../070_develop/015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 开发者模式（回合跳转）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../070_develop/020_devtool/index.html" class="md-nav__link">
         
   
@@ -2471,7 +2501,7 @@
   <span class="md-ellipsis">
     
   
-    引擎热键
+    ❕️ 引擎热键
   
 
     
@@ -3015,7 +3045,7 @@
 
 
 
-  <h1>网络开发</h1>
+  <h1>❕️ 网络开发</h1>
 
 <p>网络开发专题讲引擎自带的三个联网/联机相关的库。它们彼此独立，按需取用：</p>
 <table>
@@ -3118,6 +3148,10 @@
 <p class="admonition-title">Android / 移动端</p>
 <p><code>https.dll</code> 与 <code>discord-rpc-*.dll</code> 都是 <strong>Windows 专用</strong>动态库，打进 Android 包也加载不了。
 这两个库在非 Windows 平台会自动降级（<code>isAvailable()</code> 返回 <code>false</code> ），<strong>不要</strong>把关键逻辑挂在它们身上。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Windows 打包</p>
+<p>这两个 <code>.dll</code> 由打包脚本复制到 exe 同目录，不需要手动处理。原因与复制规则见 <a href="../100_export/index.html">导出 → Windows</a> 。</p>
 </div>
 <hr />
 <h2 id="_3">本专题页面<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>

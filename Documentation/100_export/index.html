@@ -25,7 +25,7 @@
     
     
       
-        <title>Export & Release - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ Export & Release - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -94,7 +94,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href=".." title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,13 +108,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Export & Release
+              ❕️ Export & Release
             
           </span>
         </div>
@@ -244,13 +244,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href=".." title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1224,7 +1224,7 @@
   <span class="md-ellipsis">
     
   
-    Timer
+    ❕️ Timer
   
 
     
@@ -1561,7 +1561,7 @@
   <span class="md-ellipsis">
     
   
-    Turn Script
+    ❕️ Turn Script
   
 
     
@@ -2061,7 +2061,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy Conversion Library
+    ❕️ ShaderToy Conversion Library
   
 
     
@@ -2322,6 +2322,8 @@
       
         
       
+        
+      
     
     
     
@@ -2434,6 +2436,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../070_develop/015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Developer Mode (Wave Jump)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../070_develop/020_devtool/index.html" class="md-nav__link">
         
   
@@ -2469,7 +2499,7 @@
   <span class="md-ellipsis">
     
   
-    Engine Hotkeys
+    ❕️ Engine Hotkeys
   
 
     
@@ -3157,7 +3187,7 @@
 
 
 
-  <h1>Export & Release</h1>
+  <h1>❕️ Export & Release</h1>
 
 <p>The game runs, the content is done — now it's time to turn it into <strong>something others can download and open</strong>.</p>
 <p>This step has two parts: first get the config right (three spots in <code>conf.lua</code>), then hand the project to the packaging tool. The engine ships with a packaging tool at <code>Packager/</code> in the project root.</p>
@@ -3361,6 +3391,11 @@ run.bat<span class="w">            </span><span class="c1"># or manually: python
 <h2 id="windows-exe">Windows: exe<a class="headerlink" href="#windows-exe" title="Permanent link">&para;</a></h2>
 <p>Requires LÖVE installed on the machine (the UI needs to point at the directory containing <code>love.exe</code>).</p>
 <p>The output is a <strong>folder</strong>, not a single exe — <code>love.dll</code>, <code>SDL2.dll</code>, etc. must sit with the exe; missing even one means it won't open.</p>
+<div class="admonition note">
+<p class="admonition-title">The project's own <code>.dll</code> files are copied too</p>
+<p>These libraries (<code>Resources/Libs/https.dll</code>, <code>Resources/Libs/DiscordRPC/discord-rpc-x64.dll</code>, <code>Scripts/Libraries/PerfectPixel/cpp.dll</code> and so on) are loaded through <code>ffi.load</code> / <code>require</code> by the OS loader, which cannot read them out of the <code>.love</code> archive; a fused exe also has no source tree on disk for the original paths.</p>
+<p>The packager copies them <strong>flat next to the exe</strong> and additionally <strong>mirrors each one at its original relative path</strong>, so loaders that still probe <code>Resources/Libs/...</code> keep working. On a name clash the LÖVE runtime copy is kept; when x86/x64 builds share a name, the x64 one is kept.</p>
+</div>
 <p>When releasing, there are two ways to ship:</p>
 <ul>
 <li>Zip up the <strong>entire folder</strong> and send it; players unzip and double-click the exe inside.</li>

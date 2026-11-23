@@ -27,7 +27,7 @@
     
     
       
-        <title>❕️ Bundled Assets - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ Bundled Assets - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../.." title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +110,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -246,13 +246,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../.." title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1226,7 +1226,7 @@
   <span class="md-ellipsis">
     
   
-    Timer
+    ❕️ Timer
   
 
     
@@ -1563,7 +1563,7 @@
   <span class="md-ellipsis">
     
   
-    Turn Script
+    ❕️ Turn Script
   
 
     
@@ -2063,7 +2063,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy Conversion Library
+    ❕️ ShaderToy Conversion Library
   
 
     
@@ -2326,6 +2326,8 @@
       
         
       
+        
+      
     
     
     
@@ -2438,6 +2440,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ Developer Mode (Wave Jump)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../020_devtool/index.html" class="md-nav__link">
         
   
@@ -2473,7 +2503,7 @@
   <span class="md-ellipsis">
     
   
-    Engine Hotkeys
+    ❕️ Engine Hotkeys
   
 
     
@@ -4032,8 +4062,13 @@ UI/Battle Screen/Shards/spr_heartshards_0..3.png
 </tbody>
 </table>
 <div class="admonition warning">
-<p class="admonition-title">Shared objects on Android</p>
-<p>Native libraries <strong>cannot</strong> be loaded out of <code>game.love</code> on Android — they have to go into <code>app/src/main/jniLibs/&lt;abi&gt;/</code>. Details in <a href="../050_secrets/index.html">Native Secret Store</a> and <a href="../../100_export/index.html">Export</a>.</p>
+<p class="admonition-title">Native libraries cannot load from inside the archive</p>
+<p><code>ffi.load</code> / <code>require</code> go through the OS loader, which cannot read inside <code>game.love</code>, so native libraries have to live outside the package:</p>
+<ul>
+<li><strong>Windows</strong>: the packager copies these <code>.dll</code> files next to the exe and mirrors them at their original relative paths. A fused exe has no source tree on disk, so paths such as <code>Resources/Libs/...</code> resolve to nothing.</li>
+<li><strong>Android</strong>: they go into <code>app/src/main/jniLibs/&lt;abi&gt;/</code>.</li>
+</ul>
+<p>Details in <a href="../050_secrets/index.html">Native Secret Store</a> and <a href="../../100_export/index.html">Export</a>.</p>
 </div>
 <hr />
 <h2 id="verify-it-yourself">Verify it yourself<a class="headerlink" href="#verify-it-yourself" title="Permanent link">&para;</a></h2>

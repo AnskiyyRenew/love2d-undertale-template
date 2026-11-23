@@ -1,0 +1,6 @@
+# The setup and play shell scripts are meant to be copied onto Linux / macOS
+# machines (VM shared folder, raw download from GitHub), so their line ending
+# must not depend on the clone's core.autocrlf. A CRLF .sh fails on the first
+# line there. Batch files are left alone: every .bat in this repo is stored
+# with LF and cmd reads it fine, so forcing CRLF would only churn the tree.
+*.sh text eol=lf

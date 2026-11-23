@@ -33,7 +33,6 @@ local function HandleFlee()
 end
 
 local function FleeUpdate(dt)
-    print("Fleeing")
 end
 
 local function EnteringState(oldstate, newstate)

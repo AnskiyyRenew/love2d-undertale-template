@@ -27,7 +27,7 @@
     
     
       
-        <title>计时器 - SoulEngine Documentation (3.0.0)</title>
+        <title>❕️ 计时器 - SoulEngine Documentation (3.0.2)</title>
       
     
     
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.2)" class="md-header__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            SoulEngine Documentation (3.0.0)
+            SoulEngine Documentation (3.0.2)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              计时器
+              ❕️ 计时器
             
           </span>
         </div>
@@ -246,13 +246,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="SoulEngine Documentation (3.0.0)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.0)" data-md-component="logo">
+    <a href="../../index.html" title="SoulEngine Documentation (3.0.2)" class="md-nav__button md-logo" aria-label="SoulEngine Documentation (3.0.2)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    SoulEngine Documentation (3.0.0)
+    SoulEngine Documentation (3.0.2)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1235,7 +1235,7 @@
   <span class="md-ellipsis">
     
   
-    计时器
+    ❕️ 计时器
   
 
     
@@ -1253,7 +1253,7 @@
   <span class="md-ellipsis">
     
   
-    计时器
+    ❕️ 计时器
   
 
     
@@ -1674,7 +1674,7 @@
   <span class="md-ellipsis">
     
   
-    回合脚本
+    ❕️ 回合脚本
   
 
     
@@ -2174,7 +2174,7 @@
   <span class="md-ellipsis">
     
   
-    ShaderToy 转化库
+    ❕️ ShaderToy 转化库
   
 
     
@@ -2435,6 +2435,8 @@
       
         
       
+        
+      
     
     
     
@@ -2547,6 +2549,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../070_develop/015_devmode/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❕️ 开发者模式（回合跳转）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../070_develop/020_devtool/index.html" class="md-nav__link">
         
   
@@ -2582,7 +2612,7 @@
   <span class="md-ellipsis">
     
   
-    引擎热键
+    ❕️ 引擎热键
   
 
     
@@ -3146,7 +3176,7 @@
 
 
 
-  <h1>计时器</h1>
+  <h1>❕️ 计时器</h1>
 
 <p>计时器用于在指定的帧数或秒数之后执行代码。</p>
 <p>计时器库路径： <code>Scripts/Libraries/Timer.lua</code></p>
@@ -3184,14 +3214,16 @@
 <p>按帧的版本每次 <code>Update</code> 把内部计数 <code>+1</code> ，所以间隔写 <code>60</code> 表示每 60 帧；按秒的版本累加 <code>dt</code> ，写 <code>1.5</code> 表示每 1.5 秒。</p>
 <hr />
 <h2 id="runframe-runsecond">每隔一段时间执行：<code>runFrame</code> / <code>runSecond</code><a class="headerlink" href="#runframe-runsecond" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="nv">timers</span><span class="p">.</span><span class="nf">runFrame</span><span class="p">(</span><span class="nv">func</span><span class="p">,</span><span class="w"> </span><span class="nv">interval</span><span class="p">,</span><span class="w"> </span><span class="nv">count</span><span class="p">)</span>
-<span class="nv">timers</span><span class="p">.</span><span class="nf">runSecond</span><span class="p">(</span><span class="nv">func</span><span class="p">,</span><span class="w"> </span><span class="nv">interval</span><span class="p">,</span><span class="w"> </span><span class="nv">count</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nv">timers</span><span class="p">.</span><span class="nf">runFrame</span><span class="p">(</span><span class="nv">func</span><span class="p">,</span><span class="w"> </span><span class="nv">interval</span><span class="p">,</span><span class="w"> </span><span class="nv">count</span><span class="p">,</span><span class="w"> </span><span class="nv">immediate</span><span class="p">)</span>
+<span class="nv">timers</span><span class="p">.</span><span class="nf">runSecond</span><span class="p">(</span><span class="nv">func</span><span class="p">,</span><span class="w"> </span><span class="nv">interval</span><span class="p">,</span><span class="w"> </span><span class="nv">count</span><span class="p">,</span><span class="w"> </span><span class="nv">immediate</span><span class="p">)</span>
 </code></pre></div>
 <ul>
 <li><code>func</code> 到点执行的回调。</li>
 <li><code>interval</code> 间隔。<code>runFrame</code> 单位是<strong>帧</strong>（默认 <code>60</code> ），<code>runSecond</code> 单位是<strong>秒</strong>（默认 <code>1.0</code> ）。</li>
 <li><code>count</code> 一共执行多少次（默认 <code>1</code> ）。</li>
+<li><code>immediate</code> 传 <code>true</code> 时，计时器创建的那一刻先调用一次 <code>func</code>，这次调用计入 <code>count</code>，之后才按 <code>interval</code> 正常计时（默认 <code>false</code>，即维持旧行为）。</li>
 </ul>
+<p><code>immediate</code> 计入 <code>count</code> 的含义：<code>runFrame(func, 60, 3, true)</code> 会在创建时执行 1 次，之后第 60 帧、第 120 帧各 1 次，共 3 次。若希望立即这次不占用总数，把 <code>count</code> 相应加 1 即可（上例写 <code>4</code> 则在第 180 帧还有一次）。</p>
 <div class="admonition example">
 <p class="admonition-title">示例</p>
 <div class="highlight"><pre><span></span><code><span class="c1">-- 每 30 帧触发一次，共 4 次</span>
@@ -3203,6 +3235,11 @@
 <span class="nv">timers</span><span class="p">.</span><span class="nf">runSecond</span><span class="p">(</span><span class="kr">function</span><span class="p">()</span>
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;half second&quot;</span><span class="p">)</span>
 <span class="kr">end</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1">-- 立即执行 1 次，之后每 0.5 秒 1 次，共 3 次</span>
+<span class="nv">timers</span><span class="p">.</span><span class="nf">runSecond</span><span class="p">(</span><span class="kr">function</span><span class="p">()</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;now, then every half second&quot;</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 </code></pre></div>
 </div>
 <hr />
