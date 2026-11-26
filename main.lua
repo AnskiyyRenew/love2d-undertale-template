@@ -1,3 +1,8 @@
+-- Main entry point. Bootstraps the engine globals, then forwards LOVE's
+-- callbacks to whichever scene is currently active.
+
+-- Console and input bootstrap: the engine feeds characters itself, so LOVE's own
+-- text input stays off; on Windows the console switches to UTF-8 for CJK logs.
 love = require("love")
 love.keyboard.setTextInput(false)
 if (not _RELEASED) then
@@ -8,15 +13,18 @@ if (not _RELEASED) then
         end
     end
 end
+
+-- Path resolution first, so ImportFile knows where to look; FuncProtector wraps
+-- love.* and becomes the SE global used by everything below.
 require("Scripts.Libraries.Engine.PathDefiner")
 SE = ImportFile("Engine.FuncProtector")
 print("Configuration loaded, engine version: " .. _VER)
 print("配置已加载成功，引擎版本:             " .. _VER .. "\n")
 
+-- Engine libraries, exposed as globals so scenes and hacks can use them without
+-- requiring anything. Order matters: later entries depend on earlier ones.
 LuaEX = ImportFile("Utils.LuaExtended")
 Global = ImportFile("Global")
--- Every font load goes through Fonts.New: Game/Resources/Fonts wins over
--- Resources/Fonts, so a game can swap any typeface by dropping a same-named file.
 Fonts = ImportFile("Fonts")
 Collisions = ImportFile("Collisions")
 Tween = ImportFile("Tween")
@@ -31,13 +39,13 @@ Scenes = ImportFile("SceneManager")
 Layers = ImportFile("Layers")
 Sprites = ImportFile("Sprites")
 Typers = ImportFile("Typers")
--- Must load after Typers (Label wraps InstText) and Layers.
 GUI = ImportFile("GUI")
--- Dev-only modules: nil in release builds (_RELEASED); call sites are nil-guarded.
+
+-- Development-only tools; they are dropped to nil in released builds, along with
+-- the hotkeys that open them.
 if (not _RELEASED) then
     Debugger = ImportFile("Engine.Debugger")
     DevTool = ImportFile("Engine.DevTool")
-    -- e-n-d unlocks it, F10 opens the wave picker.
     DevMode = ImportFile("Engine.DevMode")
 else
     Debugger = nil
@@ -46,7 +54,9 @@ else
 end
 Gamejolt = ImportFile("GamejoltAPI")
 Discord = ImportFile("DiscordRPC")
--- Root conf_pure.lua (defaults), then Game/conf_pure.lua (overrides); F2 re-runs both.
+
+-- Runtime setup that needs the libraries above: game config, the 2.0 compat
+-- layer, localization, the window border and the RNG seed.
 Conf = ImportFile("Engine.GameConf")
 Conf.Load()
 ImportFile("Engine.2_0")
@@ -57,7 +67,8 @@ Border.SetEnabled(false)
 Border.FadeIn(0)
 math.randomseed()
 
--- Simulate virtual keyboard / gamepad on desktop (PureConf "ControllerSimulation").
+-- Controller options from the game config: fake input devices for testing, and
+-- the analog deadzone applied to real ones.
 local _controllerSim = Global.GetVariable("ControllerSimulation")
 if (_controllerSim) then
     if (_controllerSim.virtualKeyboard) then
@@ -67,42 +78,41 @@ if (_controllerSim) then
         Joystick.SimulateConnection(true)
     end
 end
-
--- Analog stick dead-zone (PureConf "ControllerDeadzone").
 local _deadzone = Global.GetVariable("ControllerDeadzone")
 if (_deadzone ~= nil) then
     Controller.SetDeadzone(_deadzone)
 end
 
--- Game-side hacks (Game/Hacks/) load after every engine library and before the
--- first scene, so a hack can patch engine modules without editing Scripts/.
+-- Hacks are applied before the first scene loads, so a patch can already replace
+-- gameplay code from the very first frame.
 Hack = ImportFile("Engine.HackLoader")
 Hack.Load()
 
+-- Frame pacing clock; frameTime is refreshed every frame because the FPS setting
+-- can change at runtime. Then the startup scene.
 local frameTime = 1 / Global.GetVariable("FPS")
 local startTime = SE.timer.getTime()
 
 local scene_
 Scenes.switchTo(Global.GetVariable("FirstRoom"))
 
+-- Canvas-to-window transform. ScreenScale, DrawX and DrawY are globals because
+-- scenes, GUI and mouse conversion read them directly.
 ScreenScale = 1
 DrawX, DrawY = 0, 0
 local MAIN_CANVAS, INTERMEDIATE_CANVAS
 
--- SCREEN_SCALE (conf.lua) decides how big the game canvas is drawn; the canvas
--- is always dead-centre and Border uses the same scale, so they cannot drift.
--- Legacy: SCREEN_SCALE nil -> FILL_SCREEN ("auto" fullscreen, 1:1 otherwise).
 local screenScaleMode = SCREEN_SCALE
 if (screenScaleMode == nil) then
     screenScaleMode = FILL_SCREEN and "auto" or false
 end
 
+-- Recomputes the scale and the canvas offset for the current window size.
+-- With BORDER_MODE the whole border is fitted first, then the offset is pushed
+-- inwards by the opening inside the border art.
 local function updateScreenScale()
     local screen_w, screen_h = SE.graphics.getDimensions()
 
-    -- BORDER_MODE scales by the Border art instead of the canvas, so the frame
-    -- fits the window and the canvas drops into its inner opening. Otherwise the
-    -- canvas itself is fit to the window and no frame is drawn.
     if (BORDER_MODE) then
         local bw = BORDER_WIDTH or CANVAS_WIDTH
         local bh = BORDER_HEIGHT or CANVAS_HEIGHT
@@ -116,7 +126,6 @@ local function updateScreenScale()
             ScreenScale = borderFit
         end
 
-        -- Canvas opening inside the Border art; Border.SetOpening() can override it.
         local ox, oy = Border.GetOpening(bw, bh)
         local borderDrawX = math.floor((screen_w - bw * ScreenScale) * 0.5 + 0.5)
         local borderDrawY = math.floor((screen_h - bh * ScreenScale) * 0.5 + 0.5)
@@ -129,7 +138,6 @@ local function updateScreenScale()
     if (fit <= 0 or fit ~= fit) then fit = 1 end
 
     if (screenScaleMode == "integer") then
-        -- Pixel-perfect: whole multiples; shrink if the window is smaller.
         local whole = math.floor(fit)
         ScreenScale = (whole >= 1) and whole or fit
     elseif (screenScaleMode == "auto" or screenScaleMode == true) then
@@ -157,16 +165,17 @@ function GetScreenScale()
     return ScreenScale
 end
 
+-- Startup: pick the border art, let the queued scene switch settle, allocate the
+-- two canvases, then bring up Discord Rich Presence.
 function love.load()
-    -- Flush the deferred scene synchronously so scene_ is set before any love.*
-    -- event (e.g. love.resize) can fire ahead of the first update.
 
-    -- Default frame, lazy-loaded; scenes switch via Border.SetImage / FadeIn.
     Border.SetImage("ruins")
 
     Scenes.flushPendingSwitch()
     scene_ = Scenes.current
 
+    -- Readable stencil canvases: scenes draw into MAIN_CANVAS, and the screen
+    -- shader chain ping-pongs between it and INTERMEDIATE_CANVAS.
     MAIN_CANVAS = SE.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, nil, {
         format = "stencil",
         readable = true
@@ -181,9 +190,10 @@ function love.load()
 
     updateScreenScale()
 
+    -- Discord Rich Presence. Failures only print a line: a missing or closed
+    -- Discord client must never stop the game.
     Discord.application_id = Global.GetVariable("DiscordAppID")
 
-    -- DiscordRPC fails silently unless these callbacks are hooked.
     Discord.onReady(function(user)
         print("[DiscordRPC] READY  app=" .. tostring(Discord.application_id) ..
               "  user=" .. tostring(user and user.username))
@@ -204,7 +214,7 @@ function love.load()
             state       = "Route: Genocide",
             large_image = "icon",
             large_text  = "SoulEngine",
-            start       = Discord.timestamp(),   -- elapsed timer
+            start       = Discord.timestamp(),
         })
         if (not ok_act) then
             print("[DiscordRPC] setActivity() FAILED: " .. tostring(err_act))
@@ -212,16 +222,17 @@ function love.load()
     end
 end
 
+-- Per-frame update. A long stall (loading, window drag, breakpoint) is clamped
+-- so sprites cannot tunnel through walls or skip collision checks.
 function love.update(dt)
     dt = math.min(dt, 1 / 20)
 
-    -- Scene switches are queued so a switchTo during callbacks is not re-entrant.
     Scenes.flushPendingSwitch()
 
+    -- Global systems first (border, input, tweens, sprites, audio, dev tools);
+    -- the scene and the camera come after.
     Border.Update(dt)
     Guard.Update(dt)
-    -- Order matters: poll the gamepad, mirror it onto Keyboard's simulated keys,
-    -- then Keyboard.Update() finalises all key states before the scene reads them.
     Joystick.Update()
     Controller.Update()
     Keyboard.Update()
@@ -240,6 +251,8 @@ function love.update(dt)
     if (scene_.update and not scene_.pausing) then scene_.update(dt) end
     Camera:Update(dt)
 
+    -- Software frame limiter: sleep the remaining budget, then spin until the
+    -- frame time is spent, so the FPS setting wins over the monitor refresh rate.
     frameTime = 1 / Global.GetVariable("FPS")
     local endTime = SE.timer.getTime()
     local elapsedTime = endTime - startTime
@@ -256,10 +269,12 @@ function love.update(dt)
     startTime = SE.timer.getTime()
 end
 
+-- Draw pass, in order: scene -> screen shaders -> window (border plus scaled
+-- canvas) -> debug overlays.
 function love.draw()
+    -- Scene pass: everything lands on MAIN_CANVAS at game resolution, with the
+    -- camera transform applied and the stencil buffer cleared.
     SE.graphics.setCanvas({MAIN_CANVAS, stencil = true})
-    -- Clear colour AND stencil: a stencil left over from one wave leaks into
-    -- every later wave, so the mask buffer must be zeroed per frame.
     SE.graphics.clear(0, 0, 0, 1, true, false, true)
 
     Camera:apply()
@@ -268,9 +283,10 @@ function love.draw()
         scene_.draw()
     end
     Camera:unload()
-    -- Drawn in canvas space: a scene switch or camera move must not shift it.
     if (DevMode and DevMode.Draw) then DevMode.Draw() end
 
+    -- Optional post-process chain. Each shader reads one canvas and writes the
+    -- other; source and target swap so the final image ends up in source.
     local shaders = Global.GetVariable("ScreenShaders") or {}
     local source = MAIN_CANVAS
     local target = INTERMEDIATE_CANVAS
@@ -286,12 +302,11 @@ function love.draw()
         end
     end
 
+    -- Present to the window: clear it, paint the border art if enabled, then blit
+    -- the canvas at DrawX/DrawY with ScreenScale applied.
     SE.graphics.setCanvas()
     SE.graphics.clear(0, 0, 0, 1)
 
-    -- Border frame, drawn BEHIND the gameplay canvas at the same scale and
-    -- aligned to its rectangle. Only in BORDER_MODE, where the screen is already
-    -- sized to the frame, so it cannot overflow.
     if (BORDER_MODE) then
         Border.Draw()
     end
@@ -302,21 +317,25 @@ function love.draw()
 
     SE.graphics.setColor(1, 1, 1, 1)
     SE.graphics.draw(source)
-    if (not Border.enabled) then
-        local r, g, b = unpack(Global.GetVariable("MainColor"))
+    if (BORDER_MODE and not Border.enabled) then
+        local r, g, b = unpack(Global.GetVariable("MainColor") or {1, 1, 1})
+        SE.graphics.setColor(r, g, b, 1)
         SE.graphics.setLineWidth(2)
         SE.graphics.rectangle("line", -1, -1, 642, 482)
+        SE.graphics.setColor(1, 1, 1, 1)
     end
     SE.graphics.pop()
 
+    -- Debug overlays draw in window space, outside the scaled transform.
     if (Debugger and Debugger.Draw) then Debugger.Draw() end
 
-    -- DevTool renders its own canvas and pushes it into the SDL child window.
     if (DevTool and DevTool.Draw) then DevTool.Draw() end
 
     VirtualKeyboard.Draw()
 end
 
+-- Global hotkeys run before the scene, so a scene can never swallow them:
+-- F4 toggles fullscreen, F2 reloads localization and re-enters the F2 room.
 function love.keypressed(key, scancode, isrepeat)
     if (key == "f4") then
         local fullscreen = SE.window.getFullscreen()
@@ -330,25 +349,22 @@ function love.keypressed(key, scancode, isrepeat)
         return
     elseif (key == "f2") then
         Localize.reload()
-        -- Re-execute BOTH config scripts (root defaults + Game overrides).
         if (Conf and Conf.Load) then Conf.Load() end
         Scenes.switchTo(Global.GetVariable("F2Room"))
     end
+
+    -- Development hotkeys, skipped in releases: F8 dev tool, F5 hot reload,
+    -- F6 debug dump. F5 drops both module trees and re-enters the same scene.
     if (not _RELEASED) then
         if (DevTool and DevTool.Toggle and key == "f8") then
             DevTool.Toggle()
             return
         elseif (key == "f5") then
             Localize.reload()
-            -- Unapply the hacks BEFORE dropping the patched modules, so Load()
-            -- re-applies onto fresh tables instead of stacking wrappers.
             if (Hack and Hack.Unapply) then Hack.Unapply() end
             ClearModuleTree("Scripts.Libraries")
-            -- Game content is a second root: without this, Game/Souls,
-            -- Game/Encounter ... keep their module-level state across a reload.
             ClearGameTree()
             local sceneName = Scenes.name_current
-            -- Unload whichever copy was loaded (Game area or root).
             if (Scenes.UnloadModule) then
                 Scenes.UnloadModule(sceneName)
             else
@@ -373,22 +389,22 @@ function love.keypressed(key, scancode, isrepeat)
         end
     end
 
-    -- The panel swallows its own keys (arrows / confirm must not reach the
-    -- battle menu underneath); otherwise it only watches the unlock sequence and F10.
     if (DevMode and DevMode.HandleKey and DevMode.HandleKey(key, isrepeat)) then
         return
     end
 
-    -- SDL child-window keys are unreliable, so forward them from the main window
-    -- (only while the tool has focus or the mouse hovers it); the scene still gets them.
     if (not _RELEASED) and DevTool and DevTool.HandleKey and DevTool.WantsKeys then
         local _devShift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
         DevTool.HandleKey(key, isrepeat, _devShift)
     end
 
+    -- Only keys no global handler consumed reach the scene.
     if (scene_.keypressed and not scene_.pausing) then scene_.keypressed(key, scancode, isrepeat) end
 end
 
+-- Input and window events are forwarded to the scene and skipped while it is
+-- pausing. Mouse and touch pass through the on-screen keyboard first: if a
+-- virtual key takes the event, the scene never sees it.
 function love.keyreleased(key, scancode)
     if (scene_.keyreleased and not scene_.pausing) then scene_.keyreleased(key, scancode) end
 end
@@ -467,8 +483,6 @@ function love.wheelmoved(x, y)
 end
 
 function love.focus(f)
-    -- Losing focus delivers no mouse/touch releases: drop held virtual keys so
-    -- nothing stays stuck down in the background.
     if (not f) then VirtualKeyboard.ReleaseAll() end
     if (scene_.focus and not scene_.pausing) then scene_.focus(f) end
 end
@@ -490,6 +504,7 @@ function love.directorydropped(dir)
     if (scene_.directorydropped and not scene_.pausing) then scene_.directorydropped(dir) end
 end
 
+-- Shut down Rich Presence, then let the scene save or clean up before exit.
 function love.quit()
     print("quitting")
     Discord.shutdown()
