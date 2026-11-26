@@ -188,6 +188,25 @@ Windows 下也可以直接双击 [`check_compat.bat`](check_compat.bat)（**默�
 - 生成 Android 准备文件：需下载 [love-android](https://github.com/love2d/love-android) 模板
 - 生成 love-js：可选，需要 Node.js + [love.js](https://github.com/Davidobot/love.js)
 
+## Web / love-js 导出
+
+装到项目本地（目录已在 `.gitignore` 中，不会进版本库）：
+
+```bash
+npm install --prefix Packager/tools/love-js --no-audit --no-fund love.js
+```
+
+装完后 `build_tool.py` 启动时会把 love.js 命令自动填进输入框。手动调用等价于：
+
+```bash
+node "Packager/tools/love-js/node_modules/love.js/index.js" -c -t "SoulEngine" -m 134217728 game.love out
+```
+
+- npm 上的 love.js 目前是 11.x 运行时，不提供 LÖVE 12 新增 API；用 12 专属接口的游戏需要另找 Web 方案。
+- `-m` 必须大于 `.love` 体积，工具默认值 16 MB 对本项目不够，已自动设为 128 MB。
+- `-c` 用兼容模式，普通静态服务器即可；不加 `-c` 时浏览器需要 `Cross-Origin-Opener-Policy` / `Cross-Origin-Embedder-Policy` 响应头。
+- Web 页面必须通过 HTTP 服务打开，`file://` 直接打开无效。
+
 ## Android / APK 导出
 
 工具的 Android 选项**默认只产出构建准备文件**（模板副本 + `game.love`），
@@ -271,21 +290,28 @@ at any time from the "Language / 语言" menu.
 
 ## 防循环打包（内存炸弹）说明 / Anti-recursive packaging
 
-为避免把工具本身或已生成的产物再次打包进去导致“内存炸弹”，工具 **默认始终排除**：
+为避免把工具本身或已生成的产物再次打包进去导致“内存炸弹”，工具有以下排除规则：
 
-- 工具自身脚本文件（`build_tool.py`）
-- 工具所在文件夹（`Packager/`，当其位于项目内时）
-- 输出目录（默认 `<项目>/Export`）
+- 工具自身脚本文件（`build_tool.py`）：始终排除
+- 输出目录（默认 `<项目>/Export`）：始终排除
+- `Packager/` / `Export/` / `soulengine-doc3/`：游戏包（`.love`、`.exe`、Android、Web）**始终排除**；源码备份按“排除打包工具文件夹”复选框决定
 - 已有的 `*.love` 文件（可在“排除设置”中关闭）
 - `.git` / `.vscode` / `__pycache__` / `.workbuddy` 等目录（可在“排除设置”中关闭）
 
-以上规则都可在界面“排除设置”里调整，但工具自身与输出目录始终会被排除。
+`love-android` 模板通常有数 GB 的源码与构建缓存，不能进入游戏包。关闭“排除打包工具文件夹”只会让源码备份带上完整工具目录，不会让 Android 模板混进 `.love`。
 
-To avoid recursive packaging ("memory bomb"), the tool always excludes its own
-script, its own folder (when inside the project), the output directory, and
-existing `*.love` files. VCS/tooling directories such as `.git`, `.vscode`,
-`__pycache__` and `.workbuddy` are skipped as well. These can be adjusted under
-"Exclusions", but the tool itself and the output directory are always excluded.
+To avoid recursive packaging ("memory bomb"), the tool applies these rules:
+
+- Its own script (`build_tool.py`) and the output directory are always excluded.
+- `Packager/`, `Export/` and `soulengine-doc3/` are always excluded from the
+  game payload (`.love`, `.exe`, Android and Web exports). The source backup
+  still follows the "Exclude the packager tool folder" checkbox.
+- Existing `*.love` files and VCS/tooling directories such as `.git`,
+  `.vscode`, `__pycache__` and `.workbuddy` can be toggled under "Exclusions".
+
+The `love-android` template often contains several GB of sources and build
+caches. Turning off the tool-folder checkbox only affects the source backup;
+it no longer lets the Android template leak into the game archive.
 
 ## 结构 / Layout
 

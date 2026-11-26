@@ -16,12 +16,13 @@ Safety note (important!)
 ------------------------
 To avoid recursive packaging ("memory bomb"), the tool ALWAYS excludes:
   * its own script file,
-  * its own folder (when it is inside the project),
   * the output directory,
+  * tooling/docs folders from the game payload (see GAME_PAYLOAD_EXCLUDED_DIRS),
   * existing *.love files (when the option is enabled, default on).
-The output directory defaults to "<project>/Export" and is excluded
-automatically, so the generated archives are never re-packaged into
-themselves.
+Its own folder is excluded by a checkbox (default on). The output directory
+defaults to "<project>/Export" and is always excluded, so generated archives
+are never re-packaged into themselves. The source backup still honours the
+checkbox and may contain the tool folder.
 
 Requirements
 ------------
@@ -57,6 +58,10 @@ DEFAULT_VCS_DIRS = {".git", ".svn", ".hg", ".idea", ".vscode",
                     "__pycache__", "node_modules", ".cache", ".gradle",
                     ".workbuddy"}
 DEFAULT_EXCLUDED_EXTS = ".love, .pyc, .pyo, .tmp, .bak"
+# These folders are tooling/docs, never game content. They are hard-excluded
+# from the .love payload even if the "exclude tool folder" checkbox is off;
+# the source backup still follows the checkbox and can include them.
+GAME_PAYLOAD_EXCLUDED_DIRS = {"Export", "Packager", "soulengine-doc3"}
 # love-android: the "embed" flavour bakes game.love into the APK. Use the
 # "...Record..." variants instead when the game records microphone audio.
 DEFAULT_ANDROID_TASK = "assembleEmbedNoRecordRelease"
@@ -89,10 +94,10 @@ STRINGS = {
         "rcedit": "rcedit 路径（可选，用于嵌入图标）:",
         "icon_file": "exe 图标 (.ico/.png)（可选）:",
         "android_template": "love-android 模板目录:",
-        "lovejs_cmd": "love.js 命令（可选，如 npx love.js）:",
+        "lovejs_cmd": "love.js 命令（本地安装后自动填写）:",
         "section_excludes": "排除设置（防止循环打包）",
         "excluded_exts": "排除的扩展名（逗号分隔）:",
-        "exclude_tool": "排除打包工具文件夹本身",
+        "exclude_tool": "排除打包工具文件夹本身（仅影响源码备份）",
         "exclude_out": "排除输出目录",
         "exclude_vcs": "排除 .git/.vscode/__pycache__ 等",
         "exclude_love": "排除已有的 *.love 文件",
@@ -128,6 +133,7 @@ STRINGS = {
         "msg_source_created": "已生成源码备份: {path}",
         "msg_excluded_tool": "已排除工具目录: {path}",
         "msg_excluded_output": "已排除输出目录: {path}",
+        "msg_auto_excluded_game": "游戏包已强制跳过开发工具/文档目录: {dirs}（源码备份不受影响）",
         "msg_icon_embedded": "已嵌入图标: {path}",
         "msg_icon_skipped": "未找到 rcedit，跳过图标嵌入（不影响运行）。",
         "err_rcedit": "rcedit 执行失败: {err}",
@@ -163,10 +169,10 @@ STRINGS = {
             "     工具会把 game.love 放入 app/src/embed/assets（旧模板自动退回\n"
             "     app/src/main/assets）。勾选 gradlew 构建可直接出 APK，\n"
             "     否则用 Android Studio 打开该目录构建。\n"
-            "   - love-js: 可填写 love.js 命令（如 npx love.js），\n"
-            "     否则仅生成 game.love 与说明。\n"
-            "4. 排除设置默认已排除工具本身、输出目录、*.love、.git 等，\n"
-            "   防止循环打包（内存炸弹）。\n"
+            "   - love-js: 装到 Packager/tools/love-js 后命令会自动填好；\n"
+            "     需带 -m（默认 16 MB 不够），建议 -c 兼容模式。\n"
+            "4. 游戏包始终排除 Packager/、Export/、soulengine-doc3/；\n"
+            "   排除设置还可控制 *.love、.git 等，防止循环打包（内存炸弹）。\n"
             "5. 点击“开始打包”。"
         ),
     },
@@ -194,10 +200,10 @@ STRINGS = {
         "rcedit": "rcedit path (optional, to embed icon):",
         "icon_file": "exe icon (.ico/.png) (optional):",
         "android_template": "love-android template directory:",
-        "lovejs_cmd": "love.js command (optional, e.g. npx love.js):",
+        "lovejs_cmd": "love.js command (auto-filled when installed locally):",
         "section_excludes": "Exclusions (prevent recursive packing)",
         "excluded_exts": "Excluded extensions (comma separated):",
-        "exclude_tool": "Exclude the packager tool folder itself",
+        "exclude_tool": "Exclude the packager tool folder (source backup only)",
         "exclude_out": "Exclude the output directory",
         "exclude_vcs": "Exclude .git/.vscode/__pycache__ etc.",
         "exclude_love": "Exclude existing *.love files",
@@ -233,6 +239,7 @@ STRINGS = {
         "msg_source_created": "Created source backup: {path}",
         "msg_excluded_tool": "Excluded tool directory: {path}",
         "msg_excluded_output": "Excluded output directory: {path}",
+        "msg_auto_excluded_game": "Game payload always skips tooling/docs folders: {dirs} (source backup is unaffected)",
         "msg_icon_embedded": "Icon embedded: {path}",
         "msg_icon_skipped": "rcedit not found; skipped icon embedding (does not affect running).",
         "err_rcedit": "rcedit failed: {err}",
@@ -270,10 +277,10 @@ STRINGS = {
             "     the tool places game.love into app/src/embed/assets (falls back to\n"
             "     app/src/main/assets on older templates). Tick the gradlew option to\n"
             "     build the APK directly, or open the folder in Android Studio.\n"
-            "   - love-js: optionally provide a love.js command (e.g. npx love.js);\n"
-            "     otherwise only game.love and a README are produced.\n"
-            "4. The exclusion settings skip the tool itself, the output directory,\n"
-            "   *.love, .git etc. by default to avoid recursive packing.\n"
+            "   - love-js: install into Packager/tools/love-js to fill the command\n"
+            "     automatically. Add -m (16 MB default is too small); -c is safest.\n"
+            "4. The game payload always skips Packager/, Export/ and\n"
+            "   soulengine-doc3/. Exclusion settings also control *.love, .git etc.\n"
             "5. Click Build."
         ),
     },
@@ -341,6 +348,17 @@ def find_rcedit():
         if os.path.isfile(p):
             return p
     return shutil.which("rcedit") or None
+
+
+def find_lovejs_cmd(project_dir):
+    """Return a ready love.js command when the local npm package is present."""
+    entry = os.path.join(project_dir, "Packager", "tools", "love-js",
+                         "node_modules", "love.js", "index.js")
+    node = shutil.which("node") or "node"
+    if not os.path.isfile(entry):
+        return ""
+    title = os.path.basename(os.path.abspath(project_dir)).replace('"', "")
+    return '"%s" "%s" -c -t "%s" -m 134217728' % (node, entry, title)
 
 
 def find_android_template():
@@ -471,6 +489,18 @@ def iter_project_files(project_dir, exclude_dirs, exclude_exts, exclude_paths):
                 continue
             rel = os.path.relpath(fp, project_dir).replace(os.sep, "/")
             yield rel, fp
+
+
+def game_payload_exclusions(project_dir, exclude_dirs, exclude_paths):
+    """Return exclusion sets for the game .love (hard-excludes tooling dirs)."""
+    dirs = set(exclude_dirs)
+    dirs.update(GAME_PAYLOAD_EXCLUDED_DIRS)
+    paths = list(exclude_paths)
+    for name in sorted(GAME_PAYLOAD_EXCLUDED_DIRS):
+        p = os.path.join(os.path.abspath(project_dir), *name.split("/"))
+        if os.path.isdir(p):
+            paths.append(p)
+    return dirs, paths
 
 
 def copy_project_dlls(project_dir, exe_dir, exclude_dirs, exclude_paths,
@@ -987,6 +1017,10 @@ class PackagerApp:
             rc = find_rcedit()
             if rc:
                 self.var_rcedit.set(rc)
+        if not self.var_lovejs.get():
+            cmd = find_lovejs_cmd(cwd)
+            if cmd:
+                self.var_lovejs.set(cmd)
         self.status.set(self.s("status_ready"))
 
     def _pick_dir(self, var, on_pick=None):
@@ -1104,13 +1138,18 @@ class PackagerApp:
 
         self._emit("msg_start", name=name)
 
+        game_exclude_dirs, game_exclude_paths = game_payload_exclusions(
+            project_dir, exclude_dirs, exclude_paths)
+
         need_love = bool(self.var_love.get() or self.var_exe.get()
                          or self.var_android.get() or self.var_web.get())
         love_path = None
         if need_love:
+            self._emit("msg_auto_excluded_game",
+                       dirs=", ".join(sorted(GAME_PAYLOAD_EXCLUDED_DIRS)))
             love_path = os.path.join(output_dir, name + ".love")
-            count = create_zip(project_dir, love_path, exclude_dirs,
-                               exclude_exts, exclude_paths)
+            count = create_zip(project_dir, love_path, game_exclude_dirs,
+                               exclude_exts, game_exclude_paths)
             if self.var_love.get():
                 self._emit("msg_love_created", path=love_path, count=count)
             else:
@@ -1161,8 +1200,8 @@ class PackagerApp:
             # Game-owned native libs (https.dll, discord-rpc-*.dll, cpp.dll, ...)
             # live inside the .love, but the OS loader cannot read the archive.
             # Flatten them beside the exe so bare-name ffi.load / require work.
-            copy_project_dlls(project_dir, exe_dir, exclude_dirs,
-                              exclude_paths + [exe_dir], reserved, self._emit)
+            copy_project_dlls(project_dir, exe_dir, game_exclude_dirs,
+                              game_exclude_paths + [exe_dir], reserved, self._emit)
             # The secret store is not in love_dir (it lives under
             # Resources/Libs/Secrets), so the loops above cannot pick it up.
             # A fused exe has no source tree, so it has to sit beside the exe.
