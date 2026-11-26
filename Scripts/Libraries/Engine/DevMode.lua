@@ -1,12 +1,5 @@
---[[
-    Scripts/Libraries/Engine/DevMode.lua
-    In-game developer mode: type e-n-d to unlock, then jump between waves.
-    Entry: Update / Draw / HandleKey / Mouse*; the scene below is paused while
-    the panel is open. The overlay draws in 640x480 canvas space.
-    Every label is a DevMode.* key from Localization/<lang>.json.
-]]
+--- In-game developer mode: type e-n-d to unlock, then jump between waves.
 
--- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua).
 if (_RELEASED) then
     return {}
 end
@@ -36,8 +29,8 @@ local devmode = {
     _notice_time = 0,
 }
 
--- Localize is imported after this module, so the global is resolved per lookup;
--- keys live in the engine's Localization/<lang>.json, Game may override them.
+--- Localize is imported after this module, so the global is resolved per lookup;
+--- keys live in the engine's Localization/<lang>.json, Game may override them.
 ---@param key string A DevMode.* key from the language files.
 ---@param formats table|string|nil Passed through to Localize.localizeText.
 ---@return string text The translation, or the key when Localize is unavailable.
@@ -80,8 +73,6 @@ local COL = {
     scrollbar = { 1, 1, 1, 0.35 },
 }
 
--- The panel mixes CJK labels with ASCII wave names, so a string is split into
--- ASCII / non-ASCII runs drawn with determination_mono 13 and simsun 13.
 local font_ascii, font_cjk
 
 local function ensureFonts()
@@ -106,7 +97,7 @@ local function eachSegment(str, fn)
             local b = str:byte(j)
             if (b == nil) then break end
             if ((b < 128) ~= is_ascii) then break end
-            j = j + (is_ascii and 1 or 3) -- UTF-8 CJK is 3 bytes
+            j = j + (is_ascii and 1 or 3)
         end
 
         fn(str:sub(i, j - 1), is_ascii)
@@ -148,12 +139,14 @@ local function drawText(str, x, y, color)
 end
 
 --- Draw `str` so that its right edge lands on `right`.
+---@param str string
+---@param right number
+---@param y number
+---@param color table
 local function drawTextRight(str, right, y, color)
     return drawText(str, right - textWidth(str), y, color)
 end
 
--- Same resolution order as the engine (Game area first, engine fallback). A
--- folder is a namespace: the module name is prefix .. "." .. relative path.
 local WAVE_ROOTS = {
     { dir = "Game/Waves",    prefix = "Game.Waves",    labelKey = "DevMode.Root.Game" },
     { dir = "Scripts/Waves", prefix = "Scripts.Waves", labelKey = "DevMode.Root.Engine" },
@@ -172,7 +165,6 @@ local function isDirectory(path)
         return info.type == "directory" or info.type == "dir"
     end
 
-    -- No usable getInfo: a path that can be listed is a directory.
     local ok2, items = pcall(function () return SE.filesystem.getDirectoryItems(path) end)
     return (ok2 and type(items) == "table")
 end
@@ -187,7 +179,6 @@ local function collectRows(rows, dir, rel, depth, prefix)
     local folders, files = {}, {}
 
     for _, item in ipairs(listDir(dir)) do
-        -- "_template.lua" and friends are scaffolding, not waves.
         if (item:sub(1, 1) ~= "." and item:sub(1, 1) ~= "_") then
             local full = dir .. "/" .. item
             if (isDirectory(full)) then
@@ -213,7 +204,7 @@ local function collectRows(rows, dir, rel, depth, prefix)
     end
 
     for _, item in ipairs(files) do
-        local base = item:sub(1, -5) -- strip ".lua"
+        local base = item:sub(1, -5)
         local wave = (rel == "") and base or (rel .. "." .. base)
 
         table.insert(rows, {
@@ -318,7 +309,6 @@ local function revealCurrent()
     end
 
     if (not root_dir) then
-        -- Not loaded yet: assume the Game area, the engine probes it first.
         root_dir, rel = WAVE_ROOTS[1].dir, wave
     end
 
@@ -330,7 +320,6 @@ local function revealCurrent()
         table.insert(parts, part)
     end
 
-    -- Every part but the last is a folder of the wave's namespace.
     for i = 1, #parts - 1 do
         path = path .. "/" .. parts[i]
         devmode._expanded[path] = true
@@ -355,6 +344,7 @@ function devmode.SetCursor(index)
 end
 
 --- Put the cursor on the row whose path is `path` (used after expanding a folder).
+---@param path string
 local function focusPath(path)
     for i, row in ipairs(devmode._rows) do
         if (row.path == path) then
@@ -454,7 +444,6 @@ function devmode.Open()
     revealCurrent()
     devmode.Rebuild()
 
-    -- Cursor on the wave that is playing, else on the first wave row.
     local wave = currentWave()
     local found = false
     if (wave) then
@@ -504,8 +493,6 @@ function devmode.Toggle()
     if (devmode.enabled) then
         print("[DevMode] developer mode ON")
         print("[DevMode]   e-n-d again = lock | F10 = wave picker | S = end turn | I = invincible")
-        -- Only open by itself inside a battle: pausing the overworld on a key
-        -- sequence would be a surprise. F10 opens the panel anywhere.
         if (battleReady()) then
             devmode.Open()
         else
@@ -558,7 +545,6 @@ local function trackSequence(key)
             devmode.Toggle()
         end
     else
-        -- Wrong letter: only restart the buffer when it is the first one.
         devmode._seq = (key:lower() == SEQUENCE:sub(1, 1)) and key:lower() or ""
     end
 end
@@ -608,8 +594,6 @@ function devmode.HandleKey(key, isrepeat)
             return true
         end
 
-        -- e-n-d also works inside the panel: it locks the mode and closes
-        -- everything, the only way out that does not need F10.
         if (#key == 1 and key:match("^%a$")) then
             trackSequence(key)
             if (not devmode.open) then return true end
@@ -620,7 +604,6 @@ function devmode.HandleKey(key, isrepeat)
         if (key == "s") then endWave(); return true end
         if (key == "i") then devmode.ToggleInvincible(); return true end
 
-        -- Swallow everything else: the battle below must not act on it.
         return true
     end
 
@@ -647,6 +630,9 @@ end
 
 --- love.mousepressed hook. Swallows every click while the panel is up.
 ---@return boolean consumed
+---@param x number
+---@param y number
+---@param button number
 function devmode.MousePressed(x, y, button)
     if (not devmode.open) then return false end
     if (button ~= 1) then return true end
@@ -670,6 +656,8 @@ end
 
 --- love.mousemoved hook.
 ---@return boolean consumed
+---@param x number
+---@param y number
 function devmode.MouseMoved(x, y)
     if (not devmode.open) then return false end
     local cx, cy = GUI.Input.ScreenToCanvas(x, y)
@@ -679,6 +667,8 @@ end
 
 --- love.wheelmoved hook.
 ---@return boolean consumed
+---@param _ number
+---@param y number
 function devmode.WheelMoved(_, y)
     if (not devmode.open) then return false end
 
@@ -693,9 +683,6 @@ function devmode.Update(dt)
         ensureHurtHook()
     end
 
-    -- Battle.TIME_F only advances while a battle drives it, so it separates "old
-    -- Battle table" from "battle running". Skipped while the panel is open,
-    -- where the scene is paused on purpose.
     if (not devmode.open) then
         if (type(Battle) == "table" and type(Battle.TIME_F) == "number") then
             devmode._battle_fresh = (Battle.TIME_F ~= devmode._last_time_f)
@@ -715,14 +702,11 @@ function devmode.Update(dt)
 
     if (not devmode.open) then return end
 
-    -- A scene switch under the panel would leave the old scene paused forever.
     if (Scenes.current ~= devmode._scene) then
         devmode.Close()
         return
     end
 
-    -- Cursor position is read every frame: mousemoved may never fire (it does not
-    -- when the OS scales the window).
     local sx, sy = SE.mouse.getPosition()
     devmode._mouse.x, devmode._mouse.y = GUI.Input.ScreenToCanvas(sx, sy)
 
@@ -746,7 +730,6 @@ function devmode.Draw()
     SE.graphics.setLineWidth(2)
     SE.graphics.rectangle("line", PANEL.x, PANEL.y, PANEL.w, PANEL.h)
 
-    -- Title + live battle state
     drawText(L("DevMode.Title"), ROW_X, TITLE_Y, COL.title)
     local state_text = L("DevMode.State.Wave") .. " " .. tostring(currentWave() or "-") ..
         "   " .. L("DevMode.State.State") .. " " ..
@@ -756,7 +739,6 @@ function devmode.Draw()
 
     drawText(L("DevMode.Info"), ROW_X, INFO_Y, COL.info)
 
-    -- Row list
     SE.graphics.setScissor(PANEL.x + 2, LIST_Y, PANEL.w - 4, LIST_H)
     for i = 1, VISIBLE_ROWS do
         local index = devmode._scroll + i - 1
@@ -785,8 +767,6 @@ function devmode.Draw()
             drawText(row.label, indent + textWidth("  "), base_y,
                 is_current and COL.current or COL.wave)
 
-            -- Inside a namespace the leaf name alone is ambiguous, so the full
-            -- wave name an encounter would use is repeated on the right.
             if (row.depth > 1) then
                 drawTextRight(row.wave, PANEL.x + PANEL.w - 12, base_y,
                     is_current and COL.current or COL.hint)
@@ -796,7 +776,6 @@ function devmode.Draw()
 
     SE.graphics.setScissor()
 
-    -- Scrollbar (only when the list overflows)
     if (#rows > VISIBLE_ROWS) then
         local track_h = LIST_H - 4
         local bar_h = math.max(16, track_h * VISIBLE_ROWS / #rows)
@@ -807,7 +786,6 @@ function devmode.Draw()
         SE.graphics.rectangle("fill", PANEL.x + PANEL.w - 8, bar_y, 3, bar_h)
     end
 
-    -- Footer: live notice (errors, jump results) or the key hints
     local footer
     if (devmode._notice) then
         footer = devmode._notice
@@ -818,7 +796,6 @@ function devmode.Draw()
         }), ROW_X, HINT_Y, COL.hint)
     end
 
-    -- Row count on the right of the footer
     drawTextRight("#" .. tostring(#rows), PANEL.x + PANEL.w - 12, HINT_Y, COL.hint)
 
     SE.graphics.setColor(1, 1, 1, 1)

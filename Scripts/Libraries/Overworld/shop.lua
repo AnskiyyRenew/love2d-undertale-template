@@ -1,8 +1,4 @@
---[[
-Overworld shop library: buy, sell, talk topics and the exit flow.
-States: IDLE -> BUY / SELL / TALK, plus MESSAGE and EXITING which hand the
-screen to the main typer; both return to `message_return` when dismissed.
-]]
+--- Overworld shop library: buy, sell, talk topics and the exit flow.
 local shop = {
     data = (DATA and DATA.player) or {gold = 0, items = {}},
     background = Sprites.CreateSprite("px.png", -100),
@@ -10,31 +6,20 @@ local shop = {
     main_text = {},
     end_text = nil,
 
-    --- Whether the shop buys from the player. When false, "Sell" plays
-    --- `no_sell_text` instead of opening the list.
     sellable = true,
     no_sell_text = nil,
 
-    --- Default line for refusing one specific item (sell price 0). Per-item
-    --- overrides live in `refusals`.
     cannot_sell_text = nil,
 
-    --- Aside typed into the right-hand column while the topic list is open.
-    --- Per-topic overrides live in `opinions.talk`.
     talk_opinion = nil,
 
-    --- Inventory cap; the SELL list and the "n/8" readout both use it.
     max_items = 8,
 
-    --- Text box widths in pixels; longer text wraps. Defaults match the board
-    --- layout (main x=40..600, opinion x=460..630, intro x=448..630).
     main_width = 560,
     opinion_width = 170,
     intro_width = 182,
-    --- Master switch for the wrapping above; off means manual "\n" only.
     auto_wrap = true,
 
-    --- Colour an unread talk topic is listed in (UNDERTALE yellow).
     new_color = {1, 1, 0},
 
     _leavekey = false,
@@ -42,6 +27,9 @@ local shop = {
 
 --- Localize with an explicit fallback; extra arguments go to string.format for
 --- both the localized value and the fallback.
+---@param key string
+---@param ... any
+---@param fallback string
 local function L(key, fallback, ...)
     local count = select("#", ...)
     local args = nil
@@ -63,8 +51,6 @@ shop.no_sell_text = L("Overworld.Shop.Text.NoSelling", "* Sorry, I'm not buying\
 shop.main = Typers.EText.New(shop.main_text, {40, 260}, 5, {shop.main_width, 0}, "none")
 shop.main.auto_wrap = shop.auto_wrap
 
--- The main typer is Destroy()ed as soon as it finishes a "manual" line, so
--- anything that shows another line afterwards has to rebuild it.
 local main_alive = true
 local function ensureMain()
     if (shop.main and main_alive) then return shop.main end
@@ -158,7 +144,6 @@ do
     local t = Typers.InstText.New("", {75, 260 + (i - 1) * 40}, 1)
     table.insert(goods_buttons, t)
 end
--- Resting colour of a list row; unread talk topics use `new_color`.
 local row_color = goods_buttons[1].color or {1, 1, 1}
 local goods_default_color = {row_color[1], row_color[2], row_color[3]}
 
@@ -184,23 +169,21 @@ local function applyTextWidths()
 end
 
 local goods = {}
-local amounts = {}          -- id -> number|nil; nil means unlimited stock
+local amounts = {}
 local prices = {buy = {}, sell = {}}
 local opinions = {buy = {}, sell = {}, talk = {}}
-local introductions = {}    -- id -> short description shown in the intro panel
-local refusals = {}         -- id -> refusal line; falls back to shop.cannot_sell_text
-local talks = {}            -- {{topic = ..., texts = {...}, seen = n}}
-local queues = {}           -- {{refs = {...}, cursor = n}} - see shop.SetQueue
+local introductions = {}
+local refusals = {}
+local talks = {}
+local queues = {}
 
 local states = {"BUY", "SELL", "TALK"}
 local choosing_page = "IDLE"
 local choosing_b = 1
 local choosing_a = 1
 local goods_startpos = 0
-local list = {}             -- rows of the state currently on screen
+local list = {}
 local message_return = "IDLE"
--- Typers.Update runs before scene.update, so the confirm that dismissed a
--- message is still pressed when shop.Update runs in the same frame.
 local input_lock = false
 
 local text_pointer = Typers.InstText.New("1 / 1", {10, 460}, 2)
@@ -232,6 +215,8 @@ end
 
 --- Fill an item / topic name into author copy ("I don't need any %s."). A
 --- stray "%" must not crash the shop; a list returns a list.
+---@param text table
+---@param name string
 local function fillName(text, name)
     if (type(text) == "table") then
         local out = {}
@@ -252,6 +237,8 @@ end
 
 --- The line played when the shop will not take `id`: per-item override, then
 --- shop-wide default, then localization.
+---@param id string
+---@param name string
 local function cannotSellText(id, name)
     local text = refusals[id]
     if (text == nil) then text = shop.cannot_sell_text end
@@ -278,6 +265,7 @@ end
 
 --- A topic body may be a string or a list of lines; always normalized to a list,
 --- because EText walks a list one entry per confirm press.
+---@param text table
 local function normalizeTexts(text)
     if (type(text) == "table") then
         local out = {}
@@ -292,11 +280,15 @@ local function normalizeTexts(text)
 end
 
 --- Never read yet. Drives which member a queue is on.
+---@param entry table
+---@return boolean
 local function isUnread(entry)
     return (entry ~= nil and (entry.seen or 0) <= 0)
 end
 
 --- Carries the "(New)" tag, which a topic only earns when a queue reveals it.
+---@param entry table
+---@return boolean
 local function isFlaggedNew(entry)
     return (entry ~= nil and entry.fresh == true)
 end
@@ -315,6 +307,7 @@ local function resolveTalkRef(ref)
 end
 
 --- The entries a queue currently covers, in declaration order.
+---@param q table
 local function queueTopics(q)
     local out = {}
     for i = 1, #q.refs
@@ -327,6 +320,7 @@ end
 
 --- The one entry a queue is showing: first unread wins, otherwise the cursor
 --- rotates.
+---@param q table
 local function queueCurrent(q)
     local topics = queueTopics(q)
     local n = #topics
@@ -343,6 +337,7 @@ end
 
 --- True when a topic belongs to a queue and is not the member it is on: exactly
 --- one member of a queue is ever listed.
+---@return boolean
 local function isTalkHidden(entry)
     if (not entry) then return false end
 
@@ -361,6 +356,7 @@ end
 
 --- Record that a topic has been read and move its queue past it; whatever it
 --- reveals next gets the "(New)" tag, but only on its first reveal.
+---@param entry table
 local function markTalkRead(entry)
     if (not entry) then return end
     entry.seen = (entry.seen or 0) + 1
@@ -418,7 +414,6 @@ local function buildList(state)
         for i = 1, #talks
         do
             local entry = talks[i]
-            -- A queue contributes exactly one row: the member it is on.
             if (not isTalkHidden(entry)) then
                 result[#result + 1] = {
                     id = entry.topic,
@@ -478,8 +473,6 @@ local function updateButtons()
         local t = goods_buttons[i]
         local row = list[i + goods_startpos]
         if (row) then
-            -- Unread topics are highlighted; InstText bakes colour into its
-            -- letters, so recolour before SetText.
             local c = goods_default_color
             if (choosing_page == "TALK" and row.is_new) then
                 c = shop.new_color or {1, 1, 0}
@@ -606,6 +599,8 @@ end
 
 --- Hand the screen to the main typer for one line, then go back to
 --- `return_state`.
+---@param text string
+---@param return_state string
 local function showMessage(text, return_state)
     message_return = return_state or "IDLE"
     choosing_page = "MESSAGE"
@@ -673,8 +668,6 @@ local function tryBuy()
     Audio.PlaySound("snd_buyitem.wav")
     refreshStatus()
 
-    -- The row keeps its slot (it may just have turned into "Sold Out"), so the
-    -- cursor stays where it is.
     list = buildList("BUY")
     clampCursor()
     updateButtons()
@@ -781,6 +774,7 @@ function shop.SetAmount(id, amount)
 end
 
 ---@return number remaining stock; math.huge when unlimited.
+---@param id string
 function shop.GetAmount(id)
     local amount = amounts[id]
     if (amount == nil) then return math.huge end
@@ -803,6 +797,8 @@ end
 --- The shopkeeper's remark about an item, typed into the right-hand column.
 --- Panel copy, not dialogue: it must NOT carry the "* " prefix (that also
 --- triggers EText's hanging indent and pushes the text off the column).
+---@param id string
+---@param opinion string
 function shop.SetBuyOpinion(id, opinion)
     opinions.buy[id] = opinion
 end
@@ -817,6 +813,8 @@ end
 
 --- Sell price, defaulting to half of the buy price (rounded down) when the
 --- scene never set one explicitly.
+---@param id number
+---@return number
 function shop.GetSellPrice(id)
     local price = prices.sell[id]
     if (price ~= nil) then return price end
@@ -836,7 +834,6 @@ end
 --- shop-wide default; (topic, opinion) sets a per-topic override.
 function shop.SetTalkOpinion(topic, opinion)
     if (opinion == nil) then
-        -- One argument: it is the shop-wide default.
         shop.talk_opinion = topic
         return
     end
@@ -845,11 +842,14 @@ end
 
 --- The aside that would be shown for `topic`, after falling back through the
 --- shop-wide default to the localization. "%s" is filled in with the topic.
+---@param topic string|nil
+---@return string|nil
 function shop.GetTalkOpinion(topic)
     return talkOpinionText((topic == nil) and nil or tostring(topic))
 end
 
---- Bulk version: SetTalkOpinions({天气 = "又聊天气？", 时间 = "……"}).
+--- Bulk version: SetTalkOpinions({weather = "Talking about the weather again?", time = "..."}).
+---@param map table
 function shop.SetTalkOpinions(map)
     if (type(map) ~= "table") then return end
     for k, v in pairs(map)
@@ -868,6 +868,7 @@ function shop.ClearTalkOpinions()
 end
 
 --- Opinion for whichever list is open right now.
+---@param id string
 function shop.GetOpinion(id)
     if (choosing_page == "SELL") then
         return shop.GetSellOpinion(id)
@@ -879,6 +880,8 @@ function shop.GetOpinion(id)
 end
 
 --- Short blurb shown in the sliding panel while an item is highlighted.
+---@param id string
+---@param text string
 function shop.SetIntroduction(id, text)
     introductions[id] = text
 end
@@ -888,6 +891,7 @@ function shop.GetIntroduction(id)
 end
 
 --- Bulk version: SetIntroductions({CrabApple = "+20 HP", HotCat = "+12 HP"}).
+---@param map table
 function shop.SetIntroductions(map)
     if (type(map) ~= "table") then return end
     for k, v in pairs(map)
@@ -913,9 +917,10 @@ end
 --- What the keeper says when asked to buy an item they will not take (sell
 --- price 0). One argument sets the shop-wide default; (id, text) overrides one
 --- item. "%s" is filled with the item name; a list plays one line per confirm.
+---@param id string
+---@param text string
 function shop.SetCannotSellText(id, text)
     if (text == nil) then
-        -- One argument: it is the shop-wide default.
         shop.cannot_sell_text = (type(id) == "table") and id or tostring(id or "")
         return
     end
@@ -924,6 +929,7 @@ end
 
 --- The line for `id` after falling back to the shop-wide default and the
 --- localization; "%s" is filled with the item name.
+---@param id string
 function shop.GetCannotSellText(id)
     local item = findItem(id)
     local name = (item and item.name) or tostring(id or "")
@@ -931,6 +937,7 @@ function shop.GetCannotSellText(id)
 end
 
 --- Bulk version: SetCannotSellTexts({Stick = "...", Bandage = {"...", "..."}}).
+---@param map table
 function shop.SetCannotSellTexts(map)
     if (type(map) ~= "table") then return end
     for k, v in pairs(map)
@@ -951,6 +958,8 @@ end
 --- Add a talk topic. The body may be one line or a list, played one line per
 --- confirm press.
 ---@return integer the new topic count
+---@param topic table
+---@param text string
 function shop.AddTalk(topic, text)
     local entry
     if (type(topic) == "table") then
@@ -972,6 +981,7 @@ end
 
 --- Replace every topic. Accepts an array of entries or a topic -> body map;
 --- a body may be a string or a list of lines.
+---@param list_ table
 function shop.SetTalks(list_)
     talks = {}
     if (type(list_) ~= "table") then return end
@@ -1006,9 +1016,9 @@ end
 --- the queue starts over. Members are topic names or 1-based indexes, resolved
 --- lazily, and each call adds one independent queue.
 ---@return integer the new queue count
+---@param ... any
 function shop.SetQueue(...)
     local refs = {...}
-    -- SetQueue({"a", "b"}) - a single table argument is the member list.
     if (#refs == 1 and type(refs[1]) == "table") then
         local inner = refs[1]
         refs = {}
@@ -1022,7 +1032,8 @@ function shop.SetQueue(...)
     return #queues
 end
 
---- Replace every queue at once: SetQueues({{"天气", "时间"}, {"出口", "秘密"}}).
+--- Replace every queue at once: SetQueues({{"weather", "time"}, {"exit", "secret"}}).
+---@param list_ table
 function shop.SetQueues(list_)
     queues = {}
     if (type(list_) ~= "table") then return end
@@ -1059,12 +1070,15 @@ end
 
 --- True while the topic carries the "(New)" tag, i.e. a queue has just
 --- revealed it and it has not been read since.
+---@param index number
 function shop.IsTalkNew(index)
     return isFlaggedNew(resolveTalkRef(index))
 end
 
 --- Force the "(New)" tag on a topic on or off. Handy for topics that sit
 --- outside any queue, since those never get tagged on their own.
+---@param index number
+---@param value any
 function shop.SetTalkNew(index, value)
     local entry = resolveTalkRef(index)
     if (not entry) then return end
@@ -1073,6 +1087,7 @@ function shop.SetTalkNew(index, value)
 end
 
 --- True while the topic has never been read at all.
+---@param index number
 function shop.IsTalkUnread(index)
     return isUnread(resolveTalkRef(index))
 end
@@ -1080,6 +1095,8 @@ end
 --- Mark a topic read (true) / unread (false) and drop its "(New)" tag. Unread
 --- members jump to the front of their queue, which is how a save restores
 --- conversation progress.
+---@param index number
+---@param seen boolean
 function shop.SetTalkSeen(index, seen)
     local entry = resolveTalkRef(index)
     if (not entry) then return end
@@ -1116,6 +1133,7 @@ end
 
 --- Width of the main text box (greeting, refusals, talk bodies). Default 560
 --- (board is x=40..600).
+---@param width number
 function shop.SetMainTextWidth(width)
     shop.main_width = math.max(0, tonumber(width) or shop.main_width)
     applyTextWidths()
@@ -1126,12 +1144,14 @@ end
 
 --- Width of the right-hand column the shopkeeper's opinion is typed into.
 --- Default 170 (x=460..630).
+---@param width number
 function shop.SetOpinionWidth(width)
     shop.opinion_width = math.max(0, tonumber(width) or shop.opinion_width)
     applyTextWidths()
 end
 
 --- Width of the sliding goods-introduction panel. Default 182 (x=448..630).
+---@param width number
 function shop.SetIntroWidth(width)
     shop.intro_width = math.max(0, tonumber(width) or shop.intro_width)
     applyTextWidths()
@@ -1139,6 +1159,9 @@ end
 
 --- All three at once: SetTextWidths(main, opinion, intro). `nil` keeps the
 --- current value.
+---@param main_width number
+---@param opinion_width number
+---@param intro_width number
 function shop.SetTextWidths(main_width, opinion_width, intro_width)
     if (main_width) then shop.main_width = math.max(0, tonumber(main_width) or shop.main_width) end
     if (opinion_width) then shop.opinion_width = math.max(0, tonumber(opinion_width) or shop.opinion_width) end
@@ -1150,6 +1173,7 @@ function shop.SetTextWidths(main_width, opinion_width, intro_width)
 end
 
 --- Master switch for automatic line breaking (on by default).
+---@param enabled boolean
 function shop.SetAutoWrap(enabled)
     shop.auto_wrap = (enabled and true or false)
     applyTextWidths()
@@ -1192,7 +1216,6 @@ function shop.Update(dt)
         return
     end
 
-    -- The main typer owns the screen (and the confirm key) while it is talking.
     if (choosing_page == "MESSAGE" or choosing_page == "EXITING") then
         return
     end
@@ -1284,12 +1307,9 @@ function shop.Update(dt)
 end
 
 function shop.Clear()
-    -- Nothing may fire while the scene is torn down: Layers.clear() runs right
-    -- after this and would otherwise re-enter shop logic via _onComplete.
     if (shop.main) then shop.main._onComplete = nil end
     if (opinion_text) then opinion_text._onComplete = nil end
 
-    -- Unload the module so reopening a shop re-executes it fresh.
     ClearModuleTree("Scripts.Libraries.Overworld.shop")
 end
 

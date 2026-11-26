@@ -1,12 +1,4 @@
--- GameConf -- loads the configuration script, Game area first.
---
---   conf_pure.lua        (root)    engine defaults, always executed
---   Game/conf_pure.lua   (Game)    overrides, executed after it
---
--- The Game copy OVERLAYS the root one: conf_pure.lua is a script defining
--- globals, so a replacing Game copy would leave every variable it forgot
--- undefined. If it exists but throws, the config is rolled back to the root
--- snapshot — a broken Game config degrades to engine defaults, never half-applied.
+--- GameConf -- loads the configuration script, Game area first.
 
 local Conf = {}
 
@@ -88,6 +80,7 @@ end
 --- Load the configuration: engine defaults, then the Game overrides.
 --- Safe to call again (F2 / hot reload): both scripts are re-executed, not
 --- served from the require cache.
+---@return boolean
 function Conf.Load()
     local ok, message = runScript(ROOT_CONF)
     if (not ok) then

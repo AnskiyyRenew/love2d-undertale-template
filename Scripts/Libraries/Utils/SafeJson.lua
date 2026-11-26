@@ -8,13 +8,13 @@ safejson.config = {
         ["getmetatable"] = true,
         ["eval"] = true,
         ["exec"] = true,
-        ["execscript"] = true,  -- execScript → execscript
-        ["function"] = true,    -- Function → function
+        ["execscript"] = true,
+        ["function"] = true,
         ["__proto__"] = true,
         ["constructor"] = true,
         ["prototype"] = true,
-        ["settimeout"] = true,  -- setTimeout → settimeout
-        ["setinterval"] = true, -- setInterval → setinterval
+        ["settimeout"] = true,
+        ["setinterval"] = true,
         ["window"] = true,
         ["document"] = true,
         ["global"] = true,
@@ -29,7 +29,7 @@ safejson.config = {
         ["alert"] = true,
         ["confirm"] = true,
         ["prompt"] = true,
-        ["evalscript"] = true,  -- evalScript → evalscript
+        ["evalscript"] = true,
 
         ["script"] = true,
         ["iframe"] = true,
@@ -38,8 +38,8 @@ safejson.config = {
         ["javascript:"] = true,
         ["os.execute"] = true,
         ["io.popen"] = true,
-        ["\x00"] = true,    -- Null character
-        ["\\u0000"] = true  -- Unicode null character
+        ["\x00"] = true,
+        ["\\u0000"] = true
     },
     max_depth = 100,
     max_items = 12000,
@@ -48,20 +48,27 @@ safejson.config = {
 }
 
 local error_types = {
-    MALFORMED = 1,      -- Malformed JSON
-    UNSAFE_KEY = 2,     -- Dangerous key name
-    CIRCULAR = 3,       -- Circular reference
-    OVER_LIMIT = 4      -- Over the limit
+    MALFORMED = 1,
+    UNSAFE_KEY = 2,
+    CIRCULAR = 3,
+    OVER_LIMIT = 4
 }
 
+--- Decodes escaped unicode sequences in a string into lowercase UTF-8 characters.
+---@param str string
+---@return string
 local function normalize_unicode(str)
     return str:gsub("\\u([%da-fA-F][%da-fA-F][%da-fA-F][%da-fA-F])", function(u)
         return utf8.char(tonumber(u, 16)):lower()
     end)
 end
 
+--- Rejects payloads containing suspicious escape sequences or injection patterns.
+---@param str string
+---@return boolean
+---@return string|nil
 local function precheck_json(str)
-    if str:find("\\u[0-9a-fA-F][0-9a-fA-F]00") then  -- Detect possible null character variants
+    if str:find("\\u[0-9a-fA-F][0-9a-fA-F]00") then
         return false, "Suspicious Unicode escape sequence"
     end
     if str:find("\\x[0-9a-fA-F][0-9a-fA-F]") and str:find("\\u[0-9a-fA-F]") then
@@ -76,6 +83,10 @@ local function precheck_json(str)
     return true
 end
 
+--- Detects a leading UTF-8 byte order mark in the payload.
+---@param str string
+---@return boolean
+---@return string|nil
 local function check_bom(str)
     if str:sub(1,3) == "\xEF\xBB\xBF" then
         return false, "BOM header detected"
@@ -83,6 +94,9 @@ local function check_bom(str)
     return true
 end
 
+--- Verifies that no debug hook is installed, which would indicate tampering.
+---@return boolean
+---@return string|nil
 local function anti_tamper_check()
     if debug and debug.gethook then
         local hook = debug.gethook()
@@ -93,14 +107,26 @@ local function anti_tamper_check()
     return true
 end
 
+--- Checks that current memory usage stays below the configured cap.
+---@return boolean
+---@return string|nil
 local function check_resource_limits()
-    local max_mem = 100 * 1024 * 1024 -- 100MB
+    local max_mem = 100 * 1024 * 1024
     if collectgarbage("count") * 1024 > max_mem then
         return false, "Memory limit exceeded"
     end
     return true
 end
 
+--- Recursively validates a decoded value against depth, size, cycle and keyword limits.
+---@param obj any
+---@param path string|nil
+---@param visited table|nil
+---@param item_count number|nil
+---@param depth number|nil
+---@param config table
+---@return boolean
+---@return string|nil
 local function check_object_safety(obj, path, visited, item_count, depth, config)
     path = path or ""
     visited = visited or {}
@@ -161,8 +187,13 @@ local function check_object_safety(obj, path, visited, item_count, depth, config
     return true
 end
 
+--- Decodes a JSON string after running all safety checks, returning an error and code on failure.
+---@param jsonString string
+---@param options table|nil
+---@return table|nil
+---@return string|nil
+---@return number|nil
 function safejson.parse(jsonString, options)
-    -- Turn all letters to lowercase for uniformity
     if type(jsonString) == "string" then
         jsonString = normalize_unicode(jsonString)
     end
@@ -203,6 +234,9 @@ function safejson.parse(jsonString, options)
     return jsonData
 end
 
+--- Serializes a Lua value into a JSON string.
+---@param value any
+---@return string
 function safejson.encode(value)
     return safejson.json.encode(value)
 end

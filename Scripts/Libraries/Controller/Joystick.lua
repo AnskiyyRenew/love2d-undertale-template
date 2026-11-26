@@ -1,31 +1,21 @@
---[[
-    Joystick.lua - gamepad controller (auto-detect, gamepad mapping with raw
-    fallback, analog sticks/triggers, binds, simulation).
-    Same state convention as Keyboard: 0 released, 1 just pressed, 2 held,
-    -1 just released. Entry: Update / GetState / GetAxis / Bind.
-]]
+--- Joystick.lua - gamepad controller (auto-detect, gamepad mapping with raw fallback, analog sticks/triggers, binds, simulation).
 
 local Joystick = {
-    joysticks = {},          -- array of connected LÖVE joystick objects
-    enabled = true,          -- master switch (AllowPlayerInput)
-    deadzone = 0.15,         -- analog deadzone (0..1)
-    axisThreshold = 0.5,     -- value a trigger must exceed to count as pressed
+    joysticks = {},
+    enabled = true,
+    deadzone = 0.15,
+    axisThreshold = 0.5,
 
-    -- logical button name -> { pressed, pressaux, state }
     buttons = {},
-    -- logical axis name -> current float value
     axes = {},
 
-    -- bind name -> { keys = { ... } } (same concept as Keyboard.Bind)
     binds = {},
 
-    -- simulation
-    simulatedButtons = {},   -- name -> { pressed, pressaux, state }
-    simulatedAxes = {},      -- name -> float value
-    simulatedConnection = false, -- fake an active gamepad
+    simulatedButtons = {},
+    simulatedAxes = {},
+    simulatedConnection = false,
 }
 
--- LÖVE standard gamepad button names (used when joystick:isGamepad() is true)
 local gamepadButtons = {
     "a", "b", "x", "y",
     "back", "guide", "start",
@@ -34,12 +24,10 @@ local gamepadButtons = {
     "dpup", "dpdown", "dpleft", "dpright",
 }
 
--- Analog gamepad axes (reported as axis values)
 local gamepadAxisNames = {
     "leftx", "lefty", "rightx", "righty", "triggerleft", "triggerright",
 }
 
--- Analog axes -> virtual button names (dead-zone / threshold driven)
 local axisButtonMaps = {
     { axis = "leftx",        negative = "leftstickleft",  positive = "leftstickright" },
     { axis = "lefty",        negative = "leftstickup",     positive = "leftstickdown" },
@@ -63,6 +51,7 @@ local function applyDeadzone(v)
 end
 
 --- Get (creating if needed) the state table for a logical button.
+---@param name string
 local function ensureButton(name)
     local b = Joystick.buttons[name]
     if (not b) then
@@ -73,11 +62,14 @@ local function ensureButton(name)
 end
 
 --- Set the raw "is down" flag of a logical button.
+---@param name string
+---@param down boolean
 local function setButton(name, down)
     ensureButton(name).pressed = not not down
 end
 
 --- Finalize a button's state from pressed/pressaux (edge detection).
+---@param b table
 local function finalizeButtonState(b)
     if (b.pressed and b.pressed == b.pressaux) then
         b.state = 2
@@ -175,7 +167,6 @@ function Joystick.Bind(name, ...)
     Joystick.binds[name] = { keys = {...} }
 end
 
--- Default binds (Undertale-style, matching the Keyboard binds)
 Joystick.Bind("confirm", "a")
 Joystick.Bind("cancel", "b")
 Joystick.Bind("menu", "start", "y", "back")
@@ -189,6 +180,7 @@ Joystick.Bind("left", "dpleft", "leftstickleft")
 Joystick.Bind("right", "dpright", "leftstickright")
 
 --- Poll a single joystick object (wrapped in pcall for safety).
+---@param joy table
 local function pollJoystick(joy)
     if (not joy) then return end
     local ok = pcall(function()
@@ -208,7 +200,6 @@ local function pollJoystick(joy)
                 Joystick.axes[ax] = v or 0
             end
         else
-            -- Fallback: expose raw buttons/axes with numbered names (btn1, axis1, ...)
             local btnCount = joy:getButtonCount()
             for i = 1, btnCount do
                 setButton("btn" .. i, joy:isDown(i - 1))
@@ -220,7 +211,6 @@ local function pollJoystick(joy)
         end
     end)
     if (not ok) then
-        -- joystick probably disconnected mid-poll; drop it cleanly
         Joystick.Disconnect(joy)
     end
 end
@@ -240,8 +230,6 @@ end
 
 --- Call this every frame (main.lua -> love.update).
 function Joystick.Update()
-    -- Sync the connected list each frame (cheap), so we pick up hot-plugged pads
-    -- even if love.joystickadded wasn't wired up.
     if (SE.joystick and SE.joystick.getJoysticks) then
         local list = SE.joystick.getJoysticks()
         local present = {}
@@ -256,8 +244,6 @@ function Joystick.Update()
         end
     end
 
-    -- Reset raw button and axis states each frame; polling below re-marks what
-    -- is down, so an unplugged pad releases cleanly.
     for name, b in pairs(Joystick.buttons) do
         b.pressed = false
     end
@@ -270,20 +256,16 @@ function Joystick.Update()
         pollJoystick(joy)
     end
 
-    -- Simulated axes must be applied BEFORE the virtual buttons are derived,
-    -- so SimulateAxis() also drives the virtual stick/trigger buttons.
     for name, v in pairs(Joystick.simulatedAxes) do
         Joystick.axes[name] = v
     end
 
     updateAxesAsButtons()
 
-    -- Simulated buttons override the real ones
     for name, sim in pairs(Joystick.simulatedButtons) do
         setButton(name, sim.pressed)
     end
 
-    -- Finalize the edge states for every known button
     for name, b in pairs(Joystick.buttons) do
         finalizeButtonState(b)
     end

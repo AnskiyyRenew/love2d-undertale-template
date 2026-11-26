@@ -5,18 +5,24 @@ world.interactions = {
     current_object = nil,
     current_id = 0,
     current_obj = nil,
-    -- Every object the player is currently touching (used by getTouchResult).
     touching = {},
 }
 
--- Check whether one side of a contact is the player ("oworld.char") and the
--- other side is the given object type.
+--- Check whether one side of a contact is the player ("oworld.char") and the
+--- other side is the given object type.
+---@param dataA table
+---@param dataB table
+---@param objectType string
+---@return boolean
 local function isPlayerCollision(dataA, dataB, objectType)
     return (dataA and dataA.type == "oworld.char" and dataB and dataB.type == objectType) or
            (dataB and dataB.type == "oworld.char" and dataA and dataA.type == objectType)
 end
 
--- When the oworld.char is colliding with an object, remember its type and id.
+--- When the oworld.char is colliding with an object, remember its type and id.
+---@param dataA table
+---@param dataB table
+---@param objectType string
 local function handleInteraction(dataA, dataB, objectType)
     world.interactions.can_interact = true
     world.interactions.current_object = objectType
@@ -25,8 +31,6 @@ local function handleInteraction(dataA, dataB, objectType)
     if (dataA.type == objectType) then world.interactions.current_id = dataA.id end
     if (dataB.type == objectType) then world.interactions.current_id = dataB.id end
 
-    -- Track the object for getTouchResult (deduplicated: beginContact can fire
-    -- more than once for the same object).
     local found = false
     for i = 1, #world.interactions.touching do
         if (world.interactions.touching[i].object == obj) then
@@ -48,8 +52,11 @@ local function handleInteraction(dataA, dataB, objectType)
     end
 end
 
--- Remove the object from the touched list; if others remain, keep the first
--- as the "current" interaction.
+--- Remove the object from the touched list; if others remain, keep the first
+--- as the "current" interaction.
+---@param dataA table
+---@param dataB table
+---@param objectType string
 local function clearInteraction(dataA, dataB, objectType)
     local obj = dataA.object or dataB.object
     for i = #world.interactions.touching, 1, -1 do
@@ -122,6 +129,7 @@ function world.Init()
 end
 
 ---Step the physics world. Called every frame from map.Update.
+---@param dt number
 function world.Update(dt)
     if (world.physics_world and not world.physics_world:isDestroyed()) then
         world.physics_world:update(dt)

@@ -8,7 +8,7 @@ local speed = 2
 local time = 0
 local dir = "idle"
 
--- Contract: _temp.lua. The trail timer and facing are per-run, reset here.
+--- Contract: _temp.lua. The trail timer and facing are per-run, reset here.
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.
@@ -60,9 +60,7 @@ function action.Update(dt)
             end
         end
         if (Global.GetVariable("UseRealTime(dt)")) then
-            -- Put your dt logic here.
         else
-            -- Put your frames logic here.
             local move_x = 0
             local move_y = 0
 

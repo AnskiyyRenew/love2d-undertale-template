@@ -1,10 +1,4 @@
---[[
-    GUI Label - text label (mixed Latin/CJK, wraps Typers.InstText)
-
-    Reuses InstText's bondfont (Latin determination_mono 27, CJK simsun 13
-    scaled x2); InstText auto-splits glyphs by byte length, so callers never
-    handle fonts. Top-left origin; align "left" (default) / "center" / "right".
-]]
+--- GUI Label - text label (mixed Latin/CJK, wraps Typers.InstText)
 
 local Label = {}
 Label.__index = Label
@@ -14,6 +8,7 @@ Label.__index = Label
 ---@param pos table {x, y} origin
 ---@param layer number|nil layer (default 1000)
 ---@param size table|nil {boxWidth, _} auto-wrap box width (default {640,0} = no wrap)
+---@return table
 function Label.New(text, pos, layer, size)
     local inst = Typers.InstText.New(text, pos, (layer or 1000), size)
     local self = setmetatable({ inst = inst }, Label)
@@ -42,6 +37,7 @@ function Label:SetAlpha(a)
 end
 
 --- Set the auto-wrap box width. Pass nil or 0 to disable wrapping.
+---@param w number
 function Label:SetWrapWidth(w)
     if (w and w > 0) then
         self.inst.auto_wrap = true
@@ -57,7 +53,7 @@ function Label:Rebuild()
     self.inst:Rebuild()
 end
 
--- Direct access to the underlying InstText instance (advanced; use with care)
+--- Direct access to the underlying InstText instance (advanced; use with care)
 function Label:Inst()
     return self.inst
 end

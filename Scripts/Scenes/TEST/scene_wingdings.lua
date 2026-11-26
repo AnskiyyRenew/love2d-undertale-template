@@ -1,17 +1,11 @@
---[[
-    Visual test of Wingdings.ttf in three forms: default bondfont,
-    UseBondFont with eng + non-eng = Wingdings, and an inline [font:...] tag.
-    Run: set Global "FirstRoom" to "TEST.scene_wingdings".
-]]
+--- Visual test of Wingdings.ttf in three forms: default bondfont, UseBondFont with eng + non-eng = Wingdings, and an inline [font:...] tag.
 
 local scene = {}
 local SAMPLE = "GOT YOU BOTH.\nSTILL DARING TO WRITE\nNONSENSE ON THE BOARD."
 
--- 1) default bondfont
 local e1 = Typers.EText.New(SAMPLE, {60, 60}, "GUI")
 e1.voices = {}
 
--- 2) UseBondFont with eng + non-eng = Wingdings.ttf
 local e2 = Typers.EText.New(SAMPLE, {60, 210}, "GUI")
 e2.voices = {}
 e2:UseBondFont({
@@ -21,7 +15,6 @@ e2:UseBondFont({
     non_engfunc = function() end,
 })
 
--- 3) inline [font:...] tag
 local e3 = Typers.EText.New("[font:Wingdings.ttf]" .. SAMPLE, {60, 360}, "GUI")
 e3.voices = {}
 

@@ -13,6 +13,8 @@ font:setFilter("nearest", "nearest")
 local tip = Fonts.New("Mars Needs Cunnilingus.ttf", 13, "mono")
 tip:setFilter("nearest", "nearest")
 
+--- Advances the intro timer, blinks the prompt and enters battle on confirm.
+---@param dt number Delta time in seconds.
 function scene.update(dt)
     time = time + 1
     if (time >= 180 and time % 60 == 0) then
@@ -24,6 +26,7 @@ function scene.update(dt)
     end
 end
 
+--- Draws the blinking prompt, the credits lines and the engine version.
 function scene.draw()
     SE.graphics.setFont(font)
     SE.graphics.setColor(0.4, 0.4, 0.4, alpha)
@@ -40,6 +43,7 @@ function scene.draw()
     SE.graphics.printf(_VER, 0, 460, 640, "right")
 end
 
+--- Stops all audio and removes every layer of the scene.
 function scene.clear()
     Audio.Clear()
     Layers.clear()

@@ -35,13 +35,9 @@ function atk.SetMaxDamage(dmg)
     damage = dmg
 end
 
--- Animations carry their own bound methods (see Battle.BindAnimation), so
--- callers just write `anim.Hurt()` / `anim.OnAttack(data)`. An unbound module
--- is skipped.
-
--- Interface: signal that the targeted enemy has been hit. The battle system
--- dispatches to the enemy's Hurt() by enemy.id, so this never couples to a
--- specific animation.
+--- Interface: signal that the targeted enemy has been hit. The battle system
+--- dispatches to the enemy's Hurt() by enemy.id, so this never couples to a
+--- specific animation.
 function atk.Hurt()
     if (not enemy or not enemy.id) then
         return
@@ -53,9 +49,10 @@ function atk.Hurt()
     end
 end
 
--- Interface: signal the enemy's animation that the strike was LAUNCHED (before
--- the hit lands). `data` carries enemy / damage / perfect / offset / position /
--- attack (this pattern).
+--- Interface: signal the enemy's animation that the strike was LAUNCHED (before
+--- the hit lands). `data` carries enemy / damage / perfect / offset / position /
+--- attack (this pattern).
+---@param data table
 function atk.Attack(data)
     if (not enemy or not enemy.animation) then
         return
@@ -89,7 +86,7 @@ function atk.Update(dt)
             bar.velocity.x = 0
             local bonus_factor = math.abs(bar.x - tar.x)
             if (not atk._max) then
-                if (bonus_factor <= 12) then -- Perfect
+                if (bonus_factor <= 12) then
                     damage = math.ceil(enemy.maxdamage + math.random(0, enemy.dmg_float))
                 else
                     damage = math.max(enemy.maxdamage * 0.2, math.ceil(0.9 * (enemy.maxdamage) * (280 - bonus_factor) / 280))
@@ -147,6 +144,5 @@ function atk.Update(dt)
         end
     end
 end
-
 
 return atk

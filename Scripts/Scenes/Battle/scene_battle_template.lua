@@ -5,15 +5,14 @@ Battle.SetEndRoom("scene_end")
 Game = Battle.SetGame("dummy")
 Blasters = ImportFile("Attacks.Blasters")
 
--- InitAnimation is a factory: each enemy needs its own instance.
---Game:InitAnimation(1, {320, 120})
---Game:InitAnimation(2, {120, 140})
 local enemies = Game.enemies
 
 local function DefenseEnding()
 end
 
--- Handlers
+--- Handlers
+---@param enemy table
+---@param action table
 local function HandleActions(enemy, action)
     Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
 end
@@ -74,7 +73,6 @@ local function OnHit(bullet)
     end
 end
 
--- Overrides the battle module reads by name; do not rename.
 Battle.DefenseEnding = DefenseEnding
 Battle.HandleActions = HandleActions
 Battle.HandleItems = HandleItems
@@ -82,8 +80,6 @@ Battle.EnteringState = EnteringState
 Battle.HandleFlee = HandleFlee
 Battle.FleeUpdate = FleeUpdate
 Battle.OnHit = OnHit
-
-
 
 local shader = ImportFile("Gradiant", "shader")
 shader:send("topLeftColor", {1, 0, 1, 0.5})

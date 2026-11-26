@@ -9,18 +9,14 @@ local function typeDetector(var, tar_types)
     return false
 end
 
--- Only the folder inside "Blaster/" is configurable; file names are fixed
--- (spr_gasterblaster_0..5.png / beam.png, snd_intro.wav / snd_fire.wav).
 local BLASTER_SPRITE_FOLDER = "Blaster/"
 local BLASTER_SOUND_FOLDER = "Blaster/"
 
--- Legacy flat layout, still resolved as a fallback.
 local FLAT_BLASTER_SOUND_FOLDER = "Blaster"
 
 local DEFAULT_SPRITE_FOLDER = "Default"
 local DEFAULT_SOUND_FOLDER = "Default"
 
--- Game area first, main root second - same order the engine resolves assets in.
 local SPRITE_ROOTS = { "Game/Resources/Sprites/", "Resources/Sprites/" }
 local SOUND_ROOTS = { "Game/Resources/Sounds/", "Resources/Sounds/" }
 
@@ -333,7 +329,6 @@ function blasters.Update(dt)
             b.time = b.time + 1
             local time, img, wait, fire, finalp, finala = b.time, b.image, b.wait_time, b.fire_time, b.final_pos, b.final_angle
 
-            -- Normal blasters.
             if (time <= wait) then
                 img:MoveTo(
                     img.x + (finalp[1] - img.x) / 8,

@@ -4,6 +4,7 @@ local wave = {
     objects = {}
 }
 
+--- Destroys all wave objects, unloads their modules and marks the wave ended.
 function wave.EndWave()
     for i = #wave.objects, 1, -1
     do
@@ -20,6 +21,9 @@ function wave.EndWave()
     wave.ENDED = true
 end
 
+--- Loads a wave module once and records its path for later cleanup.
+---@param path string
+---@return table|nil
 function wave.Import(path)
     local lib
     local ok, err = pcall(function ()

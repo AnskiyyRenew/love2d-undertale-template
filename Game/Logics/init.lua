@@ -1,3 +1,4 @@
+--- Live overworld data: room, position, player stats and the flag tables that overworld scenes read and write.
 local path = (...):match("(.-)[^%.]+$")
 local logic = {}
 

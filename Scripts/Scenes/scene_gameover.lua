@@ -12,6 +12,8 @@ gameover.alpha = 0
 local time = 0
 local leave = false
 local mus, ins
+--- Plays the heartbreak sequence, fades in the game over screen and leaves.
+---@param dt number Seconds elapsed since the previous frame.
 function scene.update(dt)
     time = time + 1
 
@@ -40,6 +42,8 @@ function scene.update(dt)
                 shard:MoveTo(heart:GetPosition())
                 shard.color = heart.color
 
+                --- Applies gravity to a shard and removes it once it falls off screen.
+                ---@param self table The shard sprite instance.
                 shard.Step = function (self)
                     self.velocity.y = self.velocity.y + 0.1
 
@@ -58,6 +62,7 @@ function scene.update(dt)
 
         if (time == 240) then
             local t = Typers.EText.New(Localize.localizeText("Battle.GameoverText", {Player.name}), {120, 300}, 0)
+            --- Starts fading out the music so the scene can leave.
             t._onComplete = function ()
                 leave = true
                 time = 0
@@ -73,9 +78,11 @@ function scene.update(dt)
     end
 end
 
+--- Draws nothing; the sprites and text render themselves through the layers.
 function scene.draw()
 end
 
+--- Clears all layers when the scene is unloaded.
 function scene.clear()
     Layers.clear()
 end

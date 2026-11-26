@@ -1,18 +1,8 @@
---[[
-    Scripts/Libraries/Engine/2_0.lua
-    Backward-compatibility layer that runs SE "12.0" / v2.0 projects on the
-    current engine: fills the old global names (global, sprites, typers, layers,
-    keyboard, masks, tween, audio, scenes, collisions, luaex, windows, maths,
-    localize, _CAMERA_/cam) with adapters over the current modules.
-    Load after the current engine globals, i.e. require("Scripts.Libraries.Engine.2_0").
-    Gaps still to migrate: GUIManager, Timeline, timer, ShaderToy API, old shaders
-    and gameplay modules, old typer tag vocabulary and easing names.
-]]
+--- Backward-compatibility layer that runs SE "12.0" / v2.0 projects on the current engine: fills the old global names (global, sprites, typers, layers, keyboard, masks, tween, audio, scenes, collisions, luaex, windows, maths, localize, _CAMERA_/cam) with adapters over the current modules.
 
 local compat = {}
 compat.VERSION = "2_0"
 
--- Set to true to overwrite globals that already exist (default: only fill gaps).
 compat.force = compat.force or false
 
 local function sset(name, value)
@@ -22,7 +12,9 @@ local function sset(name, value)
     end
 end
 
--- Resolve an engine module: prefer the loaded global, else try ImportFile.
+--- Resolve an engine module: prefer the loaded global, else try ImportFile.
+---@param import_path string
+---@param gname string
 local function resolve(gname, import_path)
     local v = _G[gname]
     if (v ~= nil) then return v end
@@ -36,7 +28,6 @@ end
 local GlobalMod = resolve("Global", "Global")
 
 if (GlobalMod) then
-    -- Keep a couple of v2.0 defaults alive if the old project expects them.
     pcall(function()
         if (GlobalMod.EnsureVariable) then
             GlobalMod.EnsureVariable("LAYER", 30)
@@ -46,8 +37,10 @@ if (GlobalMod) then
 
     local global_compat = {}
 
-    -- Define the colon methods FIRST: with __newindex installed, a plain
-    -- assignment lands in the variable store instead of this table.
+--- Define the colon methods FIRST: with __newindex installed, a plain
+--- assignment lands in the variable store instead of this table.
+---@param name string
+---@param value any
     function global_compat:SetVariable(name, value) return GlobalMod.SetVariable(name, value) end
     function global_compat:GetVariable(name) return GlobalMod.GetVariable(name) end
     function global_compat:EnsureVariable(name, value) return GlobalMod.EnsureVariable(name, value) end
@@ -96,7 +89,6 @@ local Masks = resolve("Masks", "Masks")
 if (Masks) then
     if (not Masks.setTest) then
         function Masks.setTest(value)
-            -- Best-effort alias: the current engine exposes Use()/Clear().
             if (value ~= nil and value ~= 0 and Masks.Use) then
                 pcall(Masks.Use, value)
             elseif (Masks.Clear) then
@@ -133,8 +125,10 @@ if (Audio) then
         end
     end
 
-    -- Attach colon-callable methods to playback instances if they lack them
-    -- (old code calls ins:VolumeTransition(...)).
+--- Attach colon-callable methods to playback instances if they lack them
+--- (old code calls ins:VolumeTransition(...)).
+---@param inst table
+---@return table
     local function attach_inst_methods(inst)
         if (type(inst) ~= "table") then return inst end
         local map = {
@@ -270,17 +264,13 @@ local NAMED_COLORS = {
 
 local function translate_legacy_tags(s)
     if (type(s) ~= "string") then return s end
-    -- [fontSize:index,size] / [fontSize:size] -> [size:size]
     s = s:gsub("%[fontSize:%s*%d+%s*,%s*(%d+)%s*%]", "[size:%1]")
     s = s:gsub("%[fontSize:%s*(%d+)%s*%]", "[size:%1]")
-    -- [function:...] -> [func:...]
     s = s:gsub("%[function:", "[func:")
-    -- named colors -> colorhex
     s = s:gsub("%[([%a_]+)%]", function(name)
         local hex = NAMED_COLORS[name:lower()]
         return hex and ("[colorhex:" .. hex .. "]") or ("[" .. name .. "]")
     end)
-    -- tags with no current equivalent: strip (documented gaps)
     s = s:gsub("%[fontIndex:[^%]]*%]", "")
     s = s:gsub("%[pattern:[^%]]*%]", "")
     s = s:gsub("%[space:[^%]]*%]", "")
@@ -359,7 +349,6 @@ local function legacy_wrap(typer)
 end
 
 if (Typers) then
-    -- alias for the old instances list name
     if (Typers.insts and not Typers.instances) then
         Typers.instances = Typers.insts
     end
@@ -385,7 +374,6 @@ if (Typers) then
         sset("CreateText", Typers.CreateText)
     end
 
-    -- typers.DrawText -> current InstText (instant)
     if (InstText and InstText.New) then
         Typers.DrawText = function(text, position, layer)
             if (type(text) == "table") then text = text[1] end
@@ -400,7 +388,6 @@ if (Typers) then
         sset("CreateInstantText", Typers.DrawText)
     end
 
-    -- Stub only: the current EText builds its own bubble via :ShowBubble().
     if (not Typers.SpawnBubble) then
         Typers.SpawnBubble = function(x, y, w, h, layer)
             return { x = x, y = y, w = w, h = h, layer = layer }

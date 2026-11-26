@@ -1,14 +1,4 @@
---[[
-    GUI TextInput - editable single-line text field
-
-    Window-style box + InstText-rendered text + blinking cursor. Focus enables
-    love.textinput (OS character events) and key repeat (backspace hold); the
-    scene routes textinput / keypressed / update / clear to the field.
-
-    Layout: x,y = top-left of the box (w,h includes the border); text is
-    left-aligned with a 6px pad. maxLen counts UTF-8 characters, not bytes;
-    Backspace removes one codepoint.
-]]
+--- GUI TextInput - editable single-line text field
 
 local primitives = require((...):match("(.-)[^%.]+$") .. "primitives")
 local Label      = require((...):match("(.-)[^%.]+$") .. "label")
@@ -16,21 +6,22 @@ local Label      = require((...):match("(.-)[^%.]+$") .. "label")
 local TextInput = {}
 TextInput.__index = TextInput
 
-local BORDER_COLOR = {1, 1, 1}  -- white border (unfocused)
-local FOCUS_COLOR  = {1, 1, 0}  -- yellow border (focused)
-local PLACEHOLDER_COLOR = {0.5, 0.5, 0.5}  -- dim placeholder text
-local TEXT_PAD = 6              -- left padding inside the box
+local BORDER_COLOR = {1, 1, 1}
+local FOCUS_COLOR  = {1, 1, 0}
+local PLACEHOLDER_COLOR = {0.5, 0.5, 0.5}
+local TEXT_PAD = 6
 local CURSOR_W = 2
-local FONT_H   = 27             -- determination_mono size; InstText default bondfont
-local BLINK_PERIOD = 30         -- frames at 60fps -> ~0.5s on/off
+local FONT_H   = 27
+local BLINK_PERIOD = 30
 
--- Count UTF-8 codepoints (not bytes). Used for maxLen.
+--- Count UTF-8 codepoints (not bytes). Used for maxLen.
+---@param s table
 local function charCount(s)
     local count, i = 0, 1
     while (i <= #s) do
         local b = s:byte(i)
         if (b < 0x80) then i = i + 1
-        elseif (b < 0xC0) then i = i + 1      -- invalid lead, skip
+        elseif (b < 0xC0) then i = i + 1
         elseif (b < 0xE0) then i = i + 2
         elseif (b < 0xF0) then i = i + 3
         else i = i + 4 end
@@ -39,16 +30,17 @@ local function charCount(s)
     return count
 end
 
--- Remove the last UTF-8 codepoint from s.
+--- Remove the last UTF-8 codepoint from s.
+---@param s table
 local function dropLastChar(s)
     if (s == "") then return "" end
     local p = #s
     while (p > 1) do
         local b = s:byte(p)
         if (b >= 0x80 and b < 0xC0) then
-            p = p - 1   -- continuation byte; keep walking back
+            p = p - 1
         else
-            break       -- start of a codepoint
+            break
         end
     end
     return s:sub(1, p - 1)
@@ -71,11 +63,6 @@ function TextInput.New(opts)
     self._cursorVisible = true
     self.onSubmit = opts.onSubmit
     self._destroyed = false
-    -- Layering: the box (border + black fill) must be BELOW the text, and the
-    -- cursor must be ABOVE the text. Layers sorts same-layer entries by _id
-    -- (registration order), so a same-layer Label + box would let the box's
-    -- black interior cover the text. Split them: box=layer, text=layer+1,
-    -- cursor=layer+2. The caller-facing layer stays `self.layer`.
     local boxLayer    = self.layer
     local textLayer   = self.layer + 1
     local cursorLayer = self.layer + 2
@@ -101,8 +88,8 @@ function TextInput.New(opts)
     return self
 end
 
--- Cursor x = box x + pad + total text width (last letter.x + last letter.width).
--- For empty text, that's just box x + pad.
+--- Cursor x = box x + pad + total text width (last letter.x + last letter.width).
+--- For empty text, that's just box x + pad.
 function TextInput:_cursorX()
     local inst = self._label:Inst()
     local letters = inst and inst.letters
@@ -131,6 +118,8 @@ function TextInput:_refresh()
 end
 
 --- Hit-test the box rect (including the border).
+---@param px number
+---@param py number
 function TextInput:ContainsPoint(px, py)
     return px >= self.x and px <= self.x + self.w
        and py >= self.y and py <= self.y + self.h
@@ -160,7 +149,6 @@ end
 
 function TextInput:SetText(t)
     self.text = tostring(t or "")
-    -- truncate to maxLen characters (UTF-8 aware)
     if (self.maxLen > 0 and charCount(self.text) > self.maxLen) then
         local i, count = 1, 0
         while (i <= #self.text and count < self.maxLen) do
@@ -183,6 +171,7 @@ end
 
 --- love.textinput handler. Append the character(s); single-line so newlines
 --- are stripped. Respects maxLen (character count, UTF-8 aware).
+---@param text table
 function TextInput:HandleTextInput(text)
     if (not self.focused) then return end
     if (not text or text == "") then return end
@@ -210,6 +199,8 @@ end
 ---   backspace -> remove last UTF-8 codepoint
 ---   escape    -> blur
 ---   return/kpenter -> fire onSubmit
+---@param key string
+---@return boolean
 function TextInput:HandleKeyPressed(key)
     if (not self.focused) then return false end
     if (key == "backspace") then
@@ -229,6 +220,7 @@ function TextInput:HandleKeyPressed(key)
 end
 
 --- Advance the cursor blink. Call from scene.update.
+---@param dt number
 function TextInput:Update(dt)
     if (not self.focused) then return end
     self._blink = self._blink + 1

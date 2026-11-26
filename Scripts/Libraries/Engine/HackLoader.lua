@@ -1,27 +1,15 @@
--- HackLoader -- game-side "hack" injection for engine internals.
---
--- Engine libraries under Scripts.Libraries are NOT part of the Game override
--- mechanism, so Game/Hacks/*.lua is the supported way in. Files run once at
--- startup (numeric prefix order, "_" files skipped), each returning
--- {name, apply(Hack)} or a plain function.
---
---   Hack.Replace(engine_module, game_module)       whole-module replacement
---   Hack.After(module_name, fn)                    fn(module) as soon as loaded
---   Hack.Wrap / Set / Patch(owner, key, value)     function-level surgery
---   Hack.Unapply()                                 undo everything (F5 reload)
+--- HackLoader -- game-side "hack" injection for engine internals.
 
 local Hack = {}
 
--- Registry kept in a GLOBAL: F5 drops this module from package.loaded, so a
--- module-local table would be replaced and Unapply() would lose every original.
 local state = _HACK_STATE
 if (not state) then
     state = {
-        overrides = {},  -- engine module name -> Game module name
-        after     = {},  -- module name -> {fn, ...}
-        loaders   = {},  -- module name -> previous package.preload entry (false = none)
-        applied   = {},  -- hack module name -> display name
-        patches   = {}   -- applied field patches, newest last (Unapply walks back)
+        overrides = {},
+        after     = {},
+        loaders   = {},
+        applied   = {},
+        patches   = {}
     }
     _HACK_STATE = state
 end
@@ -33,7 +21,6 @@ end
 local function err(message)
     print("[Hack] ERROR: " .. tostring(message))
 end
-
 
 --- Load a module the way require() would, ignoring package.preload (so our own
 --- loader can never recurse into itself).
@@ -57,7 +44,6 @@ local function loadModuleFromSearchers(module_name)
     package.preload[module_name] = saved
     if (not ok) then error(mod, 0) end
 
-    -- Lua 5.1 turns a loader that returns nil into `true` in package.loaded.
     if (mod == nil) then mod = package.loaded[module_name] end
     return mod
 end
@@ -133,7 +119,6 @@ local function patchFields(owner, patch, label)
         end
     end
 end
-
 
 --- Replace an engine module with a Game-area module. Not-yet-loaded modules go
 --- through package.preload; already-loaded ones are hot-swapped with a warning.
@@ -247,7 +232,6 @@ function Hack.Patch(owner, patch, label)
     patchFields(owner, patch, label)
 end
 
-
 local HACK_DIR = "Game/Hacks"
 
 --- Does the file exist? Never infer it from a failed load.
@@ -263,8 +247,6 @@ local function fileExists(path)
     return (readable and content ~= nil)
 end
 
---- Declarative overrides: Game/Overrides.lua maps engine module name -> Game
---- module name, applied through the same preload machinery as Hack.Replace.
 local OVERRIDES_FILE = "Game/Overrides.lua"
 local OVERRIDES_MODULE = "Game.Overrides"
 
@@ -331,7 +313,6 @@ end
 --- Load and run every hack in Game/Hacks/, plus the declarative
 --- Game/Overrides.lua mapping. Safe to call again after Unapply().
 function Hack.Load()
-    -- Overrides first: a hack replacing the same module then wins (with a warning).
     loadOverrides()
 
     local files = listHackFiles()
@@ -382,11 +363,9 @@ function Hack.Unapply()
     end
 
     for module_name, entry in pairs(state.loaders) do
-        -- entry.previous is nil when nothing was registered before us.
         package.preload[module_name] = entry.previous
     end
 
-    -- Drop the hack modules from the require cache so a reload picks up edits.
     package.loaded[OVERRIDES_MODULE] = nil
     for module_name in pairs(state.applied) do
         package.loaded[module_name] = nil
@@ -399,6 +378,7 @@ function Hack.Unapply()
 end
 
 --- Print what is currently applied (used at startup and by the F6 debug dump).
+---@return number
 function Hack.Report()
     local count = 0
     for _ in pairs(state.applied) do count = count + 1 end

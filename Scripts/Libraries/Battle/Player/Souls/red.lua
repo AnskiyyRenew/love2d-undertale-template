@@ -6,7 +6,7 @@ local action = {
 
 local speed = 2
 
--- The soul contract lives in _temp.lua.
+--- The soul contract lives in _temp.lua.
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.

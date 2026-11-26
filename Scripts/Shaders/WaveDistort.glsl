@@ -1,7 +1,12 @@
+// Elapsed time in seconds; advances the wave phase.
 extern float time;
+// Peak displacement as a fraction of the texture size (0.06 = 6% of width on X, 6% of height on Y).
 extern float amplitude;
+// Phase per texture pixel; higher values give a tighter ripple.
 extern float frequency;
+// Wave speed in radians per second.
 extern float speed;
+// Texture size in pixels; converts UV to pixel coordinates so the ripple is even on X and Y.
 extern vec2 tex_size;
 
 vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords) {

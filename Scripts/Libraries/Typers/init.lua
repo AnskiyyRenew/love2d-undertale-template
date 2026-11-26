@@ -8,12 +8,11 @@ Typers.EText = require(path .. "Typers.etext")
 Typers.SText = require(path .. "Typers.stext")
 Typers.InstText = require(path .. "Typers.insttext")
 
--- Lifetime of the default CC animation, in frames: the last tween writes its
--- final value on frame 123, so the rest is margin.
 local CC_DEFAULT_LIFE = 125
 
--- Destroy a CC's InstText and drop it from the update list. Safe from inside a
--- CC's own anim_func: Typers.Update walks the list backwards.
+--- Destroy a CC's InstText and drop it from the update list. Safe from inside a
+--- CC's own anim_func: Typers.Update walks the list backwards.
+---@param cc table
 local function cc_dispose(cc)
     if (not cc) then return end
     cc._dead = true
@@ -68,6 +67,7 @@ end
 
 --- Width and height of the text a typer currently holds, as two numbers.
 --- Works on any typer instance; `0, 0` when it holds no letters.
+---@param typer table
 function Typers.GetLettersSize(typer)
     if (typer and typer.GetLettersSize) then
         return typer:GetLettersSize()
@@ -106,8 +106,6 @@ function Typers.ClearAll()
         end
     end
 
-    -- Floating texts live in their own list, not InstText.insts. Destroy is
-    -- idempotent, so entries already disposed above are no-ops here.
     for i = #Typers._cc, 1, -1 do
         local cc = Typers._cc[i]
         if (cc and cc.inst and cc.inst.Destroy) then

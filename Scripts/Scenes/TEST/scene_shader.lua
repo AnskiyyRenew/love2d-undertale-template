@@ -19,13 +19,17 @@ local bg = Sprites.CreateSprite("px.png", 0)
 bg:Scale(640, 480)
 bg:SetShaders({s.shader})
 
+--- Advances the shader clock used by the animated background.
+---@param dt number Delta time in seconds.
 function scene.update(dt)
     s:update(dt)
 end
 
+--- Draws nothing; the shader background is a sprite owned by the scene.
 function scene.draw()
 end
 
+--- Removes every layer belonging to the shader test scene.
 function scene.clear()
     Layers.clear()
 end

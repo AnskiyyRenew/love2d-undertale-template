@@ -6,8 +6,6 @@ scenes.module_current = ""
 scenes.pending_clear = false
 scenes._pending_switch = nil
 
--- Scene lookup roots, tried in order: a scene in Game/Scenes/ overrides the
--- engine default in Scripts/Scenes/.
 scenes.MODULE_ROOTS = {
     "Game.Scenes.",
     "Scripts.Scenes."
@@ -25,8 +23,6 @@ local function sceneNameOf(path)
     local name = normalize_path(path or "")
     name = name:gsub("^%.+", ""):gsub("%.+$", "")
     name = name:gsub("^[Ss]cripts%.", "")
-    -- Only the full "Game.Scenes." prefix is stripped, so a scene under a folder
-    -- literally named "Game" ("Game.foo") is not mistaken for the Game area.
     name = name:gsub("^[Gg]ame%.[Ss]cenes%.", "")
     name = name:gsub("^[Ss]cenes%.", "")
     return name
@@ -83,7 +79,6 @@ local function findSceneModule(name)
 
             local ok, loaded = pcall(require, module_name)
             if (ok and loaded) then
-                -- A Game copy that exists but throws is named as such, never "not found".
                 if (first_error) then
                     print("[Scenes] WARNING: '" .. tostring(first_error_module) ..
                         "' exists but failed to load; using " .. module_name .. " instead.")
@@ -102,7 +97,6 @@ local function findSceneModule(name)
         end
     end
 
-    -- Scene exists somewhere but its top-level code threw: never mask that.
     if (found_module) then
         if (found_root ~= scenes.MODULE_ROOTS[1]) then
             print("[Scenes] WARNING: '" .. name .. "' not found in " ..
@@ -134,7 +128,10 @@ local function unloadSceneModule(name)
 end
 
 --- Perform the actual switch: unload the current scene and load the new one.
---- @private
+---@private
+---@param sceneName string
+---@param ... any
+---@param reset boolean
 local function doSwitch(sceneName, reset, ...)
     local persistent = false
     sceneName = sceneNameOf(sceneName)
@@ -186,8 +183,6 @@ local function doSwitch(sceneName, reset, ...)
 
         print("[Scenes] Scene loaded: " .. sceneName .. " (" .. module_name .. ")")
     elseif (module_name) then
-        -- The file was found but its top-level code threw: report the real error
-        -- and install a no-op stub so the engine keeps running.
         print("[Scenes] Failed to load scene '" .. sceneName .. "':")
         print("  [" .. tostring(error_module) .. "] " .. tostring(lookup_error))
         print("[Scenes] Continuing with a no-op stub scene in place of '" .. sceneName .. "'.")
@@ -201,7 +196,6 @@ local function doSwitch(sceneName, reset, ...)
             }
         end
     else
-        -- Found under no root at all: a genuine error, so make noise.
         local tried = {}
         for _, root in ipairs(scenes.MODULE_ROOTS) do
             table.insert(tried, root .. sceneName .. "  (" .. modulePathOf(root .. sceneName) .. ")")
@@ -221,8 +215,6 @@ end
 ---@param sceneName string The name of the scene to switch to.
 ---@param ... any|nil (optional) Additional arguments to pass to the new scene's load function.
 function scenes.switchTo(sceneName, ...)
-    -- Deferred to the start of the next frame (see flushPendingSwitch), so the
-    -- new scene never receives the keypress that triggered the switch.
     scenes._pending_switch = {sceneName, {...}}
 end
 

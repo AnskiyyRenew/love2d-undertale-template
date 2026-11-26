@@ -30,6 +30,8 @@ black.color = {0, 0, 0}
 black.alpha = 0
 
 local time = 0
+--- Spawns rain, fades in the credits text and handles the final fade out.
+---@param dt number Seconds elapsed since the previous frame.
 function scene.update(dt)
     time = time + 1
 
@@ -39,6 +41,8 @@ function scene.update(dt)
     rain:Scale(1, math.random(10, 15))
     rain.ypivot = 1
     rain.rotation = 20
+    --- Drifts a raindrop down the screen and removes it once it exits.
+    ---@param self table The raindrop sprite instance.
     rain.Step = function (self)
         self.alpha = alpha
         self:Move(-math.sin(math.rad(self.rotation)) * 1 * self.yscale, math.cos(math.rad(self.rotation)) * 1 * self.yscale)
@@ -78,9 +82,11 @@ function scene.update(dt)
     end
 end
 
+--- Draws nothing; the text and rain sprites render through the layers.
 function scene.draw()
 end
 
+--- Stops all audio and clears all layers when the scene is unloaded.
 function scene.clear()
     Audio.Clear()
     Layers.clear()

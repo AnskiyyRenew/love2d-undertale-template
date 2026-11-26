@@ -20,17 +20,16 @@ function masks.New(shape, x, y, w, h, r, value, image)
         r = r or 0,
         value = value or 1,
         isactive = true,
-        -- "image" shape only:
-        image = image,    -- love.Image, or sprite table with .image field
-        scaleX = nil,     -- manual X scale (overrides w-based scale when set)
-        scaleY = nil,     -- manual Y scale (overrides h-based scale when set)
-        ox = nil,         -- origin X (defaults to imageWidth / 2)
-        oy = nil,         -- origin Y (defaults to imageHeight / 2)
+        image = image,
+        scaleX = nil,
+        scaleY = nil,
+        ox = nil,
+        oy = nil,
     }
 
-    ---Let a mask follow a sprite's position, scale, and rotation.
-    ---Image masks derive w/h from the scaled size; manual scaleX/scaleY still win.
-    ---@param sprite table
+---Let a mask follow a sprite's position, scale, and rotation.
+---Image masks derive w/h from the scaled size; manual scaleX/scaleY still win.
+---@param sprite table
     function self:Follow(sprite)
         self.x = sprite.x
         self.y = sprite.y
@@ -64,11 +63,9 @@ function masks.Draw(tab)
                 elseif mask.shape == "ellipse" or mask.shape == "circle" then
                     SE.graphics.ellipse("fill", 0, 0, mask.w / 2, mask.h / 2)
                 elseif mask.shape == "image" or mask.shape == "img" then
-                    -- Only fragments the sprite shader emits reach the stencil, so
-                    -- fully transparent pixels never become mask.
                     local img = mask.image
                     if img and type(img) == "table" and img.image then
-                        img = img.image  -- tolerate sprite tables
+                        img = img.image
                     end
 
                     if img then
@@ -128,7 +125,6 @@ function masks.Clear()
         SE.graphics.setColorMask(true)
         SE.graphics.setStencilState()
         SE.graphics.pop()
-        -- pop("all") restored the caller's "keep, greater" state (test ON).
         SE.graphics.setStencilState()
     end)
 

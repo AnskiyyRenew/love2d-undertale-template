@@ -1,7 +1,10 @@
+// Colors blended horizontally along the top edge, left to right.
 extern vec4 topLeftColor;
 extern vec4 topRightColor;
+// Colors blended horizontally along the bottom edge, left to right.
 extern vec4 bottomLeftColor;
 extern vec4 bottomRightColor;
+// Rotation of the gradient around the texture center, in degrees; 0 keeps it axis-aligned.
 extern float angle = 0.0;
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {

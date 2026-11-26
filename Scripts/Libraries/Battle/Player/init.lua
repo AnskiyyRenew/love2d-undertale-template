@@ -11,12 +11,6 @@ local function copy_soul(soul)
     return new
 end
 
--- Soul resolution, Game area first:
---   Game.Souls.<name> -> Game/Souls/<name>.lua
---   Scripts.Libraries.Battle.Player.Souls.<name> -> engine fallback
---
--- Existence is probed on the filesystem, not inferred from a failed require:
--- pcall cannot tell "not there" from "there but threw".
 local SOUL_ROOTS = {"Game.Souls.", path .. "Player.Souls."}
 
 --- Describe a module name as a project-relative file path, for filesystem probes.
@@ -42,11 +36,11 @@ local function soulModuleExists(module_name)
     return (readable and content ~= nil)
 end
 
--- The soul resolved by the last requireSoul() call.
---
--- Player.action IS the soul module table, so state a soul writes on itself
--- survives in package.loaded and would leak into the next battle. The old
--- module is dropped before a new one loads, like SceneManager does.
+--- The soul resolved by the last requireSoul() call.
+---
+--- Player.action IS the soul module table, so state a soul writes on itself
+--- survives in package.loaded and would leak into the next battle. The old
+--- module is dropped before a new one loads, like SceneManager does.
 ---@type string|nil
 local current_soul_id = nil
 
@@ -72,7 +66,6 @@ local function requireSoul(id)
         error("[Player] Invalid soul name.", 0)
     end
 
-    -- Unload the previous soul, then the one about to load.
     unloadSoulModule(current_soul_id)
     unloadSoulModule(id)
     current_soul_id = id
@@ -108,7 +101,6 @@ local function requireSoul(id)
     end
 
     if (found_module) then
-        -- Every candidate exists but none loaded: re-raise the real error.
         error(first_error, 0)
     end
 
@@ -173,7 +165,6 @@ function Player.SetSoul(id, args, use_sound)
     end
     local _id = id
 
-    -- Numeric shortcuts for the souls the engine ships.
     if (_id == 1) then
         _id = "red"
     elseif (_id == 2) then
@@ -230,8 +221,6 @@ function Player.NewSoul(id, args, use_sound)
     sprite.color = {1, 0, 0}
     sprite._hitbox = {4, 4}
 
-    -- The soul sets itself up on the fresh sprite; the copy keeps its fields
-    -- private to this entry in Player.souls.
     local module = initSoul(requireSoul(_id), sprite, Player.canMove, args)
     local soul = copy_soul(module)
 
@@ -352,7 +341,6 @@ function Player.BluePlatform(x, y, width, args)
     spr.xscale = _width / spr.width
     spr.rotation = platform.rotation
 
-    -- White highlight line that always rides a hair above the platform sprite.
     local line = Sprites.CreateSprite("Soul Library Sprites/platformline.png", spr.layer + 0.0001)
     line.color = platform.line_color
     line.alpha = platform.line_alpha
@@ -371,7 +359,7 @@ function Player.BluePlatform(x, y, width, args)
     platform._last_y = spr.y
     platform._line_stencils = spr._stencils
 
-    ---Keeps the highlight line glued to the platform sprite.
+---Keeps the highlight line glued to the platform sprite.
     function platform:Sync()
         local img, ln = self.image, self.line
         if (not img or not ln) then return end
@@ -396,20 +384,22 @@ function Player.BluePlatform(x, y, width, args)
         end
     end
 
-    ---Moves the platform (keeps its sprite and line in sync).
+---Moves the platform (keeps its sprite and line in sync).
     function platform:MoveTo(nx, ny)
         self.image:MoveTo(nx, ny)
         self:Sync()
     end
 
-    ---Sets the platform's angle.
+---Sets the platform's angle.
+---@param angle number
     function platform:SetRotation(angle)
         self.rotation = (angle or 0)
         self.image.rotation = self.rotation
         self:Sync()
     end
 
-    ---Sets the platform's visual width.
+---Sets the platform's visual width.
+---@param w number
     function platform:SetWidth(w)
         self.width = (w or 50)
         self.image.xscale = self.width / self.image.width
@@ -422,7 +412,7 @@ function Player.BluePlatform(x, y, width, args)
         self.line:SetStencils(stencils)
     end
 
-    ---Removes the platform, its sprite and its highlight line from the scene.
+---Removes the platform, its sprite and its highlight line from the scene.
     function platform:Destroy()
         if (self.line) then
             self.line:Destroy()
@@ -479,8 +469,6 @@ function Player.BluePlatformCollide(sprite, vertical)
     local speed = sprite.speed or {x = 0, y = 0}
     local frame_dx, frame_dy = (speed.x or 0), (speed.y or 0)
 
-    -- The foot sits half the player's height below its centre along the local
-    -- "down"; it scales with yscale so a crouched soul still lands correctly.
     local half_h = math.max(2, ((sprite.height or 16) * (sprite.yscale or 1)) / 2)
     local psin = math.sin(math.rad(sprite.rotation or 0))
     local pcos = math.cos(math.rad(sprite.rotation or 0))
@@ -505,32 +493,24 @@ function Player.BluePlatformCollide(sprite, vertical)
                 local last_x = (platform._last_x or img.x)
                 local last_y = (platform._last_y or img.y)
 
-                -- Foot, current and previous, expressed in platform-local space.
                 local pdx, pdy = prev_fx - last_x, prev_fy - last_y
                 local ply = pdy * cos - pdx * sin
                 local cdx, cdy = cur_fx - img.x, cur_fy - img.y
                 local clx = cdx * cos + cdy * sin
                 local cly = cdy * cos - cdx * sin
 
-                -- Half-extent of the (possibly rotated) player square on the
-                -- platform's x axis.
                 local rel = math.rad((sprite.rotation or 0) - (img.rotation or 0))
                 local ext_x = half_h * (math.abs(math.cos(rel)) + math.abs(math.sin(rel)))
 
                 local overlaps = (clx + ext_x - 4 > -pw / 2) and (clx - ext_x + 4 < pw / 2)
 
-                -- The surface is a band, not an exact line: the foot is snapped
-                -- with sin/cos, so on an angled platform it can sit a hair below
-                -- the surface and an exact test would never re-trigger.
                 local tol = (platform.surface_tolerance or 2)
                 local crossed = (ply <= surface + tol) and (cly >= surface - tol)
 
                 if (overlaps and crossed) then
-                    -- Snap the foot exactly onto the top face...
                     local snap = surface - cly
                     sprite:Move(-snap * sin, snap * cos)
 
-                    -- ...and ride along if the platform moved sideways this frame.
                     if (platform.mode == "move") then
                         local carry = (img.x - last_x) * cos + (img.y - last_y) * sin
                         sprite:Move(carry * cos, carry * sin)
@@ -545,8 +525,6 @@ function Player.BluePlatformCollide(sprite, vertical)
     return false
 end
 
--- Soul field that opts a soul into the blue one-way platforms. Opt in only:
--- a soul that leaves it out passes straight through.
 local PLATFORM_FIELD = "use_platforms"
 
 ---Does the ACTIVE soul want to be caught by the one-way platforms?
@@ -574,8 +552,6 @@ function Player.UpdatePlatforms(dt)
         return
     end
 
-    -- Advance moving platforms first (and keep their highlight line glued on), so
-    -- the collision below uses their new spot.
     for _, platform in ipairs(platforms) do
         local img = platform.image
         if (img and img.image and platform.speed) then
@@ -600,7 +576,6 @@ function Player.UpdatePlatforms(dt)
     end
     Player.platform_ground = grounded
 
-    -- Remember where the platforms ended up, for the carry / crossing test.
     for _, platform in ipairs(platforms) do
         local img = platform.image
         if (img) then
@@ -631,16 +606,9 @@ function Player.Update(dt)
         do
             if (b.isBullet) then
                 local coll_b = Collisions.FollowShape(b)
-                -- The player's own box: the sprite's image rectangle narrowed to
-                -- `_hitbox` when one is set (a 16x16 heart tested as a small box).
                 local coll_p = Sprites.GetHitbox(Player.sprite)
 
-                -- Both shapes carry their own kind (`shape`), so a bullet set to
-                -- "ellipse" is tested as an ellipse, not as its rectangle.
                 if (Collisions.ShapeWithShape(coll_b, coll_p)) then
-                    -- Broad phase hit. When either side opted into perfect-pixel
-                    -- collision the rectangulated shapes decide; nil means
-                    -- neither did, so the box result stands.
                     local pp = Sprites.PPCollide(b, Player.sprite)
                     if (pp == nil or pp == true) then
                         Battle.OnHit(b)

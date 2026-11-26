@@ -2,6 +2,8 @@
 precision highp float;
 #endif
 
+// Size of one texture pixel in UV units ({1/width, 1/height}); UVs snap to this grid so
+// upscaled pixel art keeps hard texel edges with only minimal antialiasing.
 extern vec2 texture_pixel_size;
 
 vec4 texture_point_smooth(Image tex, vec2 uv, vec2 pixel_size) {

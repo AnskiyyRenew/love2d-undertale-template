@@ -1,15 +1,13 @@
---[[
-计时器模块：以帧或以秒为单位触发回调。主循环需每帧调用 timers.Update(dt)。
-
-running 是暂停开关（暂停期间不累计、不触发，实例仍存活）；active 是生存
-标记，置 false 后当帧末尾从列表移除（stop 或自然完成都会置它）。
-]]
+--- Timer module: fires callbacks per frame or per second. The main loop must call timers.Update(dt) every frame.
 
 local timers = {
     insts = {}
 }
 
--- 实例方法均返回 self，可链式调用（如 t:pause():restart()）。
+--- Instance methods return self, so calls chain (e.g. t:pause():restart()).
+---@param updateFunc function Per-frame advance of this timer.
+---@param completeCheck function|nil Returns true once the timer has run its course.
+---@return table
 local function createTimer(updateFunc, completeCheck)
     local timer = {
         time = 0,
@@ -58,10 +56,12 @@ local function createTimer(updateFunc, completeCheck)
     return timer
 end
 
--- immediate 为 true 时，创建当刻先调用一次 func（计入 count），再进入正常时序。
--- 例：runFrame(func, 60, 3, true) → 立即 1 次，第 60、120 帧各 1 次，共 3 次。
-
--- 按帧计时：每 interval 帧触发一次，累计 count 次后自动结束（默认 60 帧 / 1 次）。
+--- Frame-based timer: fires every `interval` frames, `count` times in total, then stops.
+---@param func function
+---@param interval number|nil Frames between two calls; 60 when omitted.
+---@param count number|nil Total number of calls; 1 when omitted.
+---@param immediate boolean|nil Fire once on creation and count it against `count`.
+---@return table
 function timers.runFrame(func, interval, count, immediate)
     local timer = createTimer(
         function(self, dt)
@@ -89,8 +89,13 @@ function timers.runFrame(func, interval, count, immediate)
     return timer
 end
 
--- 按秒计时：每 interval 秒触发一次，累计 count 次后自动结束（默认 1 秒 / 1 次）。
--- 走 dt 累计，受帧率波动影响比 runFrame 小。
+--- Second-based timer: fires every `interval` seconds, `count` times in total, then stops.
+--- Counts with dt, so frame-rate spikes disturb it less than runFrame.
+---@param func function
+---@param interval number|nil Seconds between two calls; 1.0 when omitted.
+---@param count number|nil Total number of calls; 1 when omitted.
+---@param immediate boolean|nil Fire once on creation and count it against `count`.
+---@return table
 function timers.runSecond(func, interval, count, immediate)
     local timer = createTimer(
         function(self, dt)
@@ -118,8 +123,13 @@ function timers.runSecond(func, interval, count, immediate)
     return timer
 end
 
--- 按帧的「持续段」计时器：先空等 delay 帧，随后在 during 帧内每帧调用 func，
--- 结束时调用一次 afterfunc（可省略）并自动停止。
+--- Frame-based span timer: idles for `delay` frames, calls func every frame for `during` frames,
+--- then calls afterfunc once (optional) and stops.
+---@param func function
+---@param delay number|nil Idle frames before the span starts.
+---@param during number|nil Length of the span in frames.
+---@param afterfunc function|nil Called once when the span ends.
+---@return table
 function timers.duringFrame(func, delay, during, afterfunc)
     local timer = createTimer(
         function(self, dt)
@@ -162,7 +172,12 @@ function timers.duringFrame(func, delay, during, afterfunc)
     return timer
 end
 
--- 按秒的「持续段」计时器：语义同 duringFrame，delay / during 以秒为单位并按 dt 累计。
+--- Second-based span timer: same semantics as duringFrame, with delay / during in seconds and counted by dt.
+---@param func function
+---@param delay number|nil Idle seconds before the span starts.
+---@param during number|nil Length of the span in seconds.
+---@param afterfunc function|nil Called once when the span ends.
+---@return table
 function timers.duringSecond(func, delay, during, afterfunc)
     local timer = createTimer(
         function(self, dt)
@@ -205,7 +220,9 @@ function timers.duringSecond(func, delay, during, afterfunc)
     return timer
 end
 
--- 推进所有计时器。倒序遍历，这样移除已结束的实例不会打乱尚未处理的下标。
+--- Advances every timer. Iterates backwards so removing a finished instance
+--- cannot shift the indices that are still to come.
+---@param dt number
 function timers.Update(dt)
     for i = #timers.insts, 1, -1
     do

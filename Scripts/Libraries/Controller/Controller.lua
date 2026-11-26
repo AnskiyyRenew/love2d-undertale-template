@@ -1,15 +1,10 @@
---[[
-    Controller.lua - unified multi-device input (Keyboard + Joystick).
-    Controller.Update mirrors the gamepad onto Keyboard's simulated keys;
-    Controller.GetState merges both devices (1/2/-1/0, bind-style priority).
-]]
+--- Controller.lua - unified multi-device input (Keyboard + Joystick).
 
 local Controller = {
-    -- logical names mirrored from the gamepad onto Keyboard keys
     mirror = { "up", "down", "left", "right", "confirm", "cancel", "menu", "shift" },
-    mirrorPressed = {},      -- name -> boolean (whether we currently mirror it)
-    enableMirror = true,     -- set false to disable the mirror bridge
-    deadzone = 0.15,         -- analog deadzone; filtering happens in Joystick.GetAxis
+    mirrorPressed = {},
+    enableMirror = true,
+    deadzone = 0.15,
 }
 
 --- Release every key this bridge mirrored (gamepad disconnect / input off).
@@ -99,7 +94,6 @@ end
 function Controller.GetVector()
     local x, y = 0, 0
     if (Joystick and Joystick.GetAxis) then
-        -- GetAxis already applies the dead-zone and re-scales to 0..1.
         x = Joystick.GetAxis("leftx")
         y = Joystick.GetAxis("lefty")
     end

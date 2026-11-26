@@ -1,6 +1,13 @@
+// Time left before the dissolve finishes, in seconds; also seeds the noise, so the
+// dust pattern redraws every frame while it counts down.
 uniform number dt;
+// Vertical position of the dissolve front in texture space (0 = top, 1 = bottom).
+// Everything above this line has started to tear away.
 uniform number scan_y;
+// Reciprocal of the drawn texture size ({1/width, 1/height}); converts pixel amounts to UV.
 uniform vec2 screen_size_inv;
+// Draw scale on X and Y; the band thickness is divided by it, so the torn edge keeps
+// its on-screen size when the sprite is scaled.
 uniform vec2 scale_factor;
 
 number noise(vec2 p, number s) {

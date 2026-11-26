@@ -139,6 +139,7 @@ end
 
 ---Escape Lua pattern magic characters so a plain string can be embedded into a
 ---pattern safely (dots, dashes, parens, etc. won't be interpreted as pattern).
+---@param path table
 local function escape_pattern(path)
     return (path:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1"))
 end

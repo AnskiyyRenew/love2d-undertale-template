@@ -8,17 +8,22 @@ Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 
--- InitAnimation is a factory: each enemy gets its own sprite instance.
 Game:InitAnimation(1, {320, 140})
 local enemies = Game.enemies
 
+--- Placeholder ending hook for the defense phase; intentionally empty.
 local function DefenseEnding()
 end
 
+--- Routes the selected ACT entry to its localized dialogue line and reopens ACT.
+---@param enemy table Enemy definition that owns the action table.
+---@param action table Chosen action entry from the ACT menu.
 local function HandleActions(enemy, action)
     Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
 end
 
+--- Consumes the chosen item, heals the player and prints the result text.
+---@param item table Inventory item that was used.
 local function HandleItems(item)
     print("Used " .. item.name)
 
@@ -29,6 +34,7 @@ local function HandleItems(item)
     }, "ACTIONSELECT")
 end
 
+--- Animates the soul running away, then marks the battle as finished.
 local function HandleFlee()
     Audio.PlaySound("snd_flee.wav")
     local legs_ = Sprites.CreateSprite("Soul Library Sprites/spr_heartgtfo_0.png", Player.sprite.layer)
@@ -50,13 +56,20 @@ local function HandleFlee()
     end)
 end
 
+--- Per-frame hook for the flee state; currently has no work to do.
+---@param dt number Seconds elapsed since the previous frame.
 local function FleeUpdate(dt)
 end
 
+--- Delegates every battle state change to the shared default handler.
+---@param oldstate string State the battle is leaving.
+---@param newstate string State the battle is entering.
 local function EnteringState(oldstate, newstate)
     Battle.defaultEnteringState(oldstate, newstate)
 end
 
+--- Applies bullet damage according to its hurt mode and the arrow keys held.
+---@param bullet table Bullet that collided with the player soul.
 local function OnHit(bullet)
     local damage = 1
     local color = (bullet["HurtMode"] or "normal")
@@ -75,7 +88,6 @@ local function OnHit(bullet)
     end
 end
 
--- Overrides the battle module reads by name; do not rename.
 Battle.DefenseEnding = DefenseEnding
 Battle.HandleActions = HandleActions
 Battle.HandleItems = HandleItems
@@ -83,8 +95,6 @@ Battle.EnteringState = EnteringState
 Battle.HandleFlee = HandleFlee
 Battle.FleeUpdate = FleeUpdate
 Battle.OnHit = OnHit
-
-
 
 local shader = ImportFile("Gradiant", "shader")
 shader:send("topLeftColor", {1, 0, 1, 0.5})
@@ -97,11 +107,14 @@ background:Scale(640, 480)
 background.color = {0, 0, 0}
 background:SetShaders({shader})
 
+--- Advances the battle and keeps the blaster attack pattern in sync.
+---@param dt number Seconds elapsed since the previous frame.
 function scene.update(dt)
     Battle.Update(dt)
     Blasters.Update(dt)
 end
 
+--- Releases all layers and resets the battle state.
 function scene.clear()
     Layers.clear()
     Battle.Clear()

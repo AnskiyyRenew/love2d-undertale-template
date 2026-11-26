@@ -1,9 +1,5 @@
 local scene = {}
 
--- Overworld save-data bridge. `DATA` (Game/Logics) holds the live overworld
--- stats, while an encounter module only defines template values. Idempotent:
--- EXP / GOLD are consumed on write-back, so nothing is double-counted.
-
 ---Push the overworld save data into the live Player so the battle starts with
 ---the carried name / LV / HP instead of the Game module's template values.
 local function ApplyDataToPlayer()
@@ -28,15 +24,19 @@ Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 Game:AddItem({id = "STABLE", _color = {0.5, 0, 0}, name = "ImNotFood"})
 
--- InitAnimation is a factory: each enemy gets its own sprite instance.
 Game:InitAnimation(1, {320, 140})
 Game:InitAnimation(2, {120, 140})
 local enemies = Game.enemies
 
+--- Routes the selected ACT entry to its localized dialogue line and reopens ACT.
+---@param enemy table Enemy definition that owns the action table.
+---@param action table Chosen action entry from the ACT menu.
 local function HandleActions(enemy, action)
     Battle.BattleDialogue(Localize.localizeText("Battle.Actions.Texts." .. enemy.id .. "." .. action.id), "ACTIONSELECT")
 end
 
+--- Consumes the chosen item, heals the player and prints the result text.
+---@param item table Inventory item that was used.
 local function HandleItems(item)
     print("Used " .. item.name)
 
@@ -47,6 +47,7 @@ local function HandleItems(item)
     }, "ACTIONSELECT")
 end
 
+--- Animates the soul running away, then marks the battle as finished.
 local function HandleFlee()
     Audio.PlaySound("snd_flee.wav")
     local legs_ = Sprites.CreateSprite("Soul Library Sprites/spr_heartgtfo_0.png", Player.sprite.layer)
@@ -68,13 +69,20 @@ local function HandleFlee()
     end)
 end
 
+--- Per-frame hook for the flee state; currently has no work to do.
+---@param dt number Seconds elapsed since the previous frame.
 local function FleeUpdate(dt)
 end
 
+--- Delegates every battle state change to the shared default handler.
+---@param oldstate string State the battle is leaving.
+---@param newstate string State the battle is entering.
 local function EnteringState(oldstate, newstate)
     Battle.defaultEnteringState(oldstate, newstate)
 end
 
+--- Adds Karma to the player whenever one of the boss bullets lands.
+---@param bullet table Bullet that collided with the player soul.
 local function OnHit(bullet)
     Player.AddKR(2)
 end
@@ -94,7 +102,6 @@ local function Win()
     Battle.defaultWin(extra)
 end
 
--- Overrides the battle module reads by name; do not rename.
 Battle.HandleActions = HandleActions
 Battle.HandleItems = HandleItems
 Battle.EnteringState = EnteringState
@@ -103,16 +110,17 @@ Battle.FleeUpdate = FleeUpdate
 Battle.OnHit = OnHit
 Battle.Win = Win
 
-
-
 local background = Sprites.CreateSprite("px.png", "Background")
 background:Scale(640, 480)
 background.color = {0, 0, 0}
 
+--- Advances the battle simulation by one frame.
+---@param dt number Seconds elapsed since the previous frame.
 function scene.update(dt)
     Battle.Update(dt)
 end
 
+--- Writes the battle results back and releases all layers and battle state.
 function scene.clear()
     ReturnData()
     Layers.clear()

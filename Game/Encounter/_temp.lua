@@ -1,3 +1,4 @@
+--- Encounter template: copy it, rename the enemy ids and point animation / wave at your own modules.
 local encounter = {
     narration = Localize.localizeText("Battle.Narration.Default"),
     can_flee = true,
@@ -57,8 +58,5 @@ do
     e._id = encounter.enemy_id
     encounter.enemy_id = encounter.enemy_id + 1
 end
-
--- Battle.game_apis (via metatable) adds encounter:AddEnemy(data),
--- encounter:AddItem(item) and encounter:forceAttack(id, value).
 
 return encounter

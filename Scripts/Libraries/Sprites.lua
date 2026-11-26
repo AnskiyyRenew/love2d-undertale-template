@@ -4,7 +4,7 @@ local sprites = {
 }
 
 local last_cache_cleanup = 0
-local CACHE_CLEAN_INTERVAL = 5 -- seconds between cleanup runs
+local CACHE_CLEAN_INTERVAL = 5
 local function getLRUThreshold()
     local ok, v = pcall(function()
         return Global.GetVariable("OPT_LRU_SPRITES")[2]
@@ -23,9 +23,6 @@ local function getPixelPerfectShader()
     return pixel_smooth_shader
 end
 
--- Filter changes are GPU texture state: only re-applied when the request
--- changes. Keyed per image, so sprites sharing a texture must want the same
--- filter (`pixel_smooth` is the only path asking for "linear").
 local _applied_filter = setmetatable({}, {__mode = "k"})
 
 local function applyFilter(image, min_filter, mag_filter)
@@ -36,15 +33,11 @@ local function applyFilter(image, min_filter, mag_filter)
     image:setFilter(min_filter, mag_filter)
 end
 
--- Pixel snapping. Nearest-neighbour art needs the quad's EDGES on whole
--- pixels, so the edge is snapped and the centre follows (a snapped centre is
--- only correct for even-sized art). Applied at draw time only: stored x / y
--- keep their sub-pixel value, so slow motion still accumulates.
--- `sprites.pixel_snap` is the global switch; a sprite's own `pixel_snap`
--- (true / false, nil = follow global) overrides it.
 sprites.pixel_snap = false
 
 --- Snap one coordinate to the nearest whole pixel (half-up).
+---@param v number
+---@return number
 local function snapCoord(v)
     if (type(v) ~= "number") then return v end
     return math.floor(v + 0.5)
@@ -56,12 +49,15 @@ end
 
 --- Snap the LEADING EDGE of a quad to the pixel grid and return the centre that
 --- puts it there. `offset` is edge-to-centre distance (pivot offset * scale).
+---@param centre number
+---@param offset number
 function sprites.SnapEdge(centre, offset)
     if (type(centre) ~= "number") then return centre end
     return snapCoord(centre - (offset or 0)) + (offset or 0)
 end
 
 --- Turn pixel snapping on / off for every sprite that does not override it.
+---@param enabled boolean
 function sprites.SetPixelSnap(enabled)
     sprites.pixel_snap = (enabled == true)
 end
@@ -132,19 +128,13 @@ local function loadImageSafe(path)
     return result, imgData, true
 end
 
--- Perfect-pixel collision. A sprite normally collides as its whole image
--- rectangle; PP replaces that with the rectangles tiling its own opaque
--- pixels, cached per IMAGE (several sprites may share one texture, and an LRU
--- release can drop the data). Rects are {x, y, w, h} in image pixel space,
--- origin top-left. Hits are decided by sprites.PPCollide, which answers nil
--- while NEITHER side opted in, so callers keep their own (cheaper) box answer.
 local PP_LIB = "Scripts.Libraries.PerfectPixel"
 local PP_LIB_PURE = "Scripts.Libraries.PerfectPixel.pure"
 
-local pp_rects = setmetatable({}, {__mode = "k"})       -- image -> rect list (false = no usable data)
-local pp_image_data = setmetatable({}, {__mode = "k"})  -- image -> the ImageData behind it
-local pp_backend = nil                                   -- nil = unresolved, false = none, table = usable
-local pp_is_pure = false                                 -- true once the pure-Lua twin is in charge
+local pp_rects = setmetatable({}, {__mode = "k"})
+local pp_image_data = setmetatable({}, {__mode = "k"})
+local pp_backend = nil
+local pp_is_pure = false
 
 --- Remember which ImageData backs an image, so perfect-pixel collision can read
 --- its pixels later. Both maps use weak keys, so an LRU release drops them too.
@@ -241,8 +231,6 @@ local function rectsForImage(image, path)
 
     local rects = runRectangulation(backend, image_data)
 
-    -- The C backend can fail on its first real call; retry with the pure-Lua
-    -- twin and keep using it from then on.
     if (not rects and not pp_is_pure) then
         local pure = loadPPBackend(PP_LIB_PURE)
         if (pure) then
@@ -287,8 +275,6 @@ local function imageRectsToWorld(sprite, rects)
     local cos_a, sin_a = math.cos(rad), math.sin(rad)
     local sx, sy = sprite.xscale or 1, sprite.yscale or 1
 
-    -- Pivot offset in image pixels; image centre for a bare table without
-    -- the prototype's GetPivotOffset.
     local ox, oy = (sprite.width or 0) * 0.5, (sprite.height or 0) * 0.5
     if (sprite.GetPivotOffset) then
         ox, oy = sprite:GetPivotOffset()
@@ -394,7 +380,6 @@ function sprites.PPCollide(a, b)
     if (not a_pp and not b_pp) then return nil end
     if (not Collisions) then return nil end
 
-    -- No usable tiling: fall back to that side's box.
     local shapes_a = (a_pp and sprites.GetPPShapes(a)) or nil
     local shapes_b = (b_pp and sprites.GetPPShapes(b)) or nil
     if (not shapes_a) then shapes_a = {sprites.GetHitbox(a)} end
@@ -434,8 +419,6 @@ function sprites.ClearPPCache()
     pp_is_pure = false
 end
 
--- Sprites are looked up in Game/Resources/Sprites/ first, then in the main
--- Resources/Sprites/ tree.
 local SPRITE_ROOT = "Resources/Sprites/"
 local GAME_SPRITE_ROOT = "Game/Resources/Sprites/"
 
@@ -546,13 +529,13 @@ local function findSpriteFromCache(path)
     return img, loaded
 end
 
--- Optional solidity: a sprite can opt into a real static Box2D fixture via
--- Sprite:Solid(...). All solid fixtures share ONE world, created lazily and
--- stepped once per frame at the end of sprites.Update.
 local solid_world = nil
 
--- preSolve: "xy" (default) collides in every direction; "y" is a one-way
--- platform (only from above); "x" is a one-way wall (horizontal only).
+--- preSolve: "xy" (default) collides in every direction; "y" is a one-way
+--- platform (only from above); "x" is a one-way wall (horizontal only).
+---@param fixtureA table
+---@param fixtureB table
+---@param contact table
 local function solidPreSolve(fixtureA, fixtureB, contact)
     local dataA = fixtureA:getUserData() or {}
     local dataB = fixtureB:getUserData() or {}
@@ -584,10 +567,8 @@ local function solidPreSolve(fixtureA, fixtureB, contact)
 
     local enabled = true
     if (axis == "y") then
-        -- Above the top face, moving down or resting; jumping up passes through.
         enabled = (oy <= sy - halfH + 1) and (ovy >= 0)
     elseif (axis == "x") then
-        -- Beside the wall's vertical band, so it can be jumped over.
         enabled = (math.abs(oy - sy) <= halfH + 4)
     end
     contact:setEnabled(enabled)
@@ -600,10 +581,10 @@ function sprites.GetSolidWorld()
     if (not solid_world or solid_world:isDestroyed()) then
         solid_world = SE.physics.newWorld(0, 0, true)
         solid_world:setCallbacks(
-            function() end,  -- beginContact
-            function() end,  -- endContact
-            solidPreSolve,   -- preSolve (axis-aware solidity)
-            function() end   -- postSolve
+            function() end,
+            function() end,
+            solidPreSolve,
+            function() end
         )
     end
     return solid_world
@@ -684,8 +665,6 @@ function sprites.MultiDust(sprs, sound, remove, time)
         shader:send("screen_size_inv", {1/self._dust.w, 1/self._dust.h})
         shader:send("scale_factor", {1, 1})
         SE.graphics.setShader(shader)
-        -- Baked at the sprites' real sub-pixel positions, so it gets the same
-        -- whole-pixel snap when the switch is on.
         local dx, dy = self._dust.x, self._dust.y
         if (sprites.pixel_snap) then
             dx, dy = snapCoord(dx), snapCoord(dy)
@@ -778,7 +757,6 @@ end
 function sprites.ShadowSprite(sprite, target_scale, duration, speed)
     if ((not sprite) or (not sprite.image)) then return nil end
 
-    -- Draw just behind the source (only numeric layers can be offset).
     local layer = sprite.layer
     if (type(layer) == "number") then layer = layer - 0.1 end
     local shadow = sprites.CreateSprite(sprite.path, layer)
@@ -863,9 +841,6 @@ local sprite_methods = {}
 
         local ox, oy = self:GetPivotOffset()
 
-        -- Shake and pixel snap are DRAW-ONLY: they are written into the
-        -- "_x"/"_y" storage so every draw path picks them up, then restored.
-        -- Stored x / y is never modified, so sub-pixel motion still accumulates.
         local base_x = rawget(self, "_x")
         local base_y = rawget(self, "_y")
         local draw_x, draw_y = base_x, base_y
@@ -875,7 +850,6 @@ local sprite_methods = {}
             draw_y = draw_y + (self._shake.dy or 0)
         end
 
-        -- Snap the quad's EDGE, not its centre: parity-safe for odd-sized art.
         local snap = self.pixel_snap
         if (snap == nil) then snap = sprites.pixel_snap end
         if (snap) then
@@ -891,12 +865,10 @@ local sprite_methods = {}
 
         local stencil_active = (#self._stencils > 0)
         if stencil_active then
-            Masks.Draw(self._stencils)  -- Write masks into stencil buffer
-            Masks.Use()                 -- Activate stencil test
+            Masks.Draw(self._stencils)
+            Masks.Use()
         end
 
-        -- Dust overrides every other shader. It uses the baked canvas so the
-        -- shader UV space stays axis-aligned regardless of rotation.
         if self._dust.use then
             local shader = getDustShader()
             local progress = 1.0 - (self._dust.time / self._dust.duration)
@@ -963,8 +935,6 @@ local sprite_methods = {}
                                 math.abs(self.rotation) > 0.001
 
         if (use_pixel_smooth) then
-            -- Linear filter + PixelSmooth shader keeps rotated pixel art crisp.
-            -- Routed through applyFilter so the filter cache stays truthful.
             applyFilter(self.image, "linear")
 
             local shader = getPixelPerfectShader()
@@ -995,9 +965,11 @@ local sprite_methods = {}
         end
     end
 
-    --- Draw an 8-directional outline behind the sprite: the 4 cardinal plus the
-    --- 4 diagonal offsets, each exactly t pixels (square, not sqrt(2)-scaled).
-    --- Always nearest-filtered and unshaded, so it stays crisp.
+--- Draw an 8-directional outline behind the sprite: the 4 cardinal plus the
+--- 4 diagonal offsets, each exactly t pixels (square, not sqrt(2)-scaled).
+--- Always nearest-filtered and unshaded, so it stays crisp.
+---@param ox number
+---@param oy number
     function sprite_methods:_drawOutline(ox, oy)
         local outline = self.outline
         if not outline then return end
@@ -1024,8 +996,8 @@ local sprite_methods = {}
         SE.graphics.setColor(1, 1, 1, 1)
     end
 
-    --- Internal: draw the sprite through the four-point deformation shader.
-    --- Corner order: p1=top-left, p2=top-right, p3=bottom-left, p4=bottom-right.
+--- Internal: draw the sprite through the four-point deformation shader.
+--- Corner order: p1=top-left, p2=top-right, p3=bottom-left, p4=bottom-right.
     function sprite_methods:_drawFourPointImage()
         local fp = self._four_point
 
@@ -1048,8 +1020,6 @@ local sprite_methods = {}
         shader:send("p3", {fp.p3[1], fp.p3[2]})
         shader:send("p4", {fp.p4[1], fp.p4[2]})
 
-        -- The quad is drawn stretched to the corners' bounding box; the shader
-        -- computes the correct UV per pixel to produce the deformation.
         SE.graphics.setShader(shader)
         SE.graphics.setColor(self.color[1], self.color[2], self.color[3], self.alpha)
         applyFilter(self.image, "nearest")
@@ -1100,13 +1070,10 @@ local sprite_methods = {}
     end
 
     function sprite_methods:Update(dt)
-        -- Coordinate writes below are tracked by the metatable.
         self.speed.x = 0
         self.speed.y = 0
         self.is_moving = false
 
-        -- Apply parent anchor first, then velocity on top: velocity always moves
-        -- the sprite, even while it has a parent.
         if self.parent and self.parent.image then
             if self.follow_mode == "full" then
                 local angle = math.rad(self.parent.rotation)
@@ -1153,7 +1120,6 @@ local sprite_methods = {}
                         self.visible = false
                     end
                 elseif (anim.mode == "looponce") then
-                    -- Plays once, then holds the first frame until re-triggered.
                     if (not anim.done) then
                         self:Set(anim.textures[anim.frame])
                         anim.frame = anim.frame + 1
@@ -1179,7 +1145,6 @@ local sprite_methods = {}
             end
         end
 
-        -- Shake is visual only: Draw() consumes the offset, x / y stay untouched.
         if (self._shake and self._shake.use) then
             local shake = self._shake
             shake.time = shake.time - dt
@@ -1196,7 +1161,6 @@ local sprite_methods = {}
             end
         end
 
-        -- Keep the static fixture glued to the sprite's current centre.
         if (self._solid and self._solid.body and not self._solid.body:isDestroyed()) then
             self._solid.body:setPosition(self.x, self.y)
         end
@@ -1215,8 +1179,6 @@ local sprite_methods = {}
     end
 
     function sprite_methods:Dust(sound, remove, time)
-        -- Bake the current image (whatever animation frame) so the dust shader
-        -- works in local UV space regardless of rotation.
         local w = self.width
         local h = self.height
         local dust_canvas = createStencilCanvas(w, h)
@@ -1237,13 +1199,13 @@ local sprite_methods = {}
         self._dust.duration = self._dust.time
     end
 
-    --- Add or remove an outline. Calling without valid colours (or setting
-    --- self.outline = nil) removes it.
-    ---@param r number Red (0-1)
-    ---@param g number Green (0-1)
-    ---@param b number Blue (0-1)
-    ---@param a number Alpha (0-1)
-    ---@param t number Thickness in pixels
+--- Add or remove an outline. Calling without valid colours (or setting
+--- self.outline = nil) removes it.
+---@param r number Red (0-1)
+---@param g number Green (0-1)
+---@param b number Blue (0-1)
+---@param a number Alpha (0-1)
+---@param t number Thickness in pixels
     function sprite_methods:Outline(r, g, b, a, t)
         if r == nil or g == nil or b == nil then
             self.outline = nil
@@ -1252,24 +1214,24 @@ local sprite_methods = {}
         self.outline = {r, g, b, a or 1, t or 1}
     end
 
-    --- Enable or disable four-point control mode: the texture is stretched so
-    --- its corners land on the points from SetFourPoint / SetFourPointP, and
-    --- x / y / rotation / xscale / yscale are NOT used.
-    ---@param enabled boolean
+--- Enable or disable four-point control mode: the texture is stretched so
+--- its corners land on the points from SetFourPoint / SetFourPointP, and
+--- x / y / rotation / xscale / yscale are NOT used.
+---@param enabled boolean
     function sprite_methods:SetFourPointMode(enabled)
         self._four_point.enabled = enabled
     end
 
-    --- Set all four corner points at once.
-    --- Order: p1=top-left, p2=top-right, p3=bottom-left, p4=bottom-right.
-    ---@param p1x number Top-left X
-    ---@param p1y number Top-left Y
-    ---@param p2x number Top-right X
-    ---@param p2y number Top-right Y
-    ---@param p3x number Bottom-left X
-    ---@param p3y number Bottom-left Y
-    ---@param p4x number Bottom-right X
-    ---@param p4y number Bottom-right Y
+--- Set all four corner points at once.
+--- Order: p1=top-left, p2=top-right, p3=bottom-left, p4=bottom-right.
+---@param p1x number Top-left X
+---@param p1y number Top-left Y
+---@param p2x number Top-right X
+---@param p2y number Top-right Y
+---@param p3x number Bottom-left X
+---@param p3y number Bottom-left Y
+---@param p4x number Bottom-right X
+---@param p4y number Bottom-right Y
     function sprite_methods:SetFourPoint(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y)
         self._four_point.p1 = {p1x, p1y}
         self._four_point.p2 = {p2x, p2y}
@@ -1277,10 +1239,10 @@ local sprite_methods = {}
         self._four_point.p4 = {p4x, p4y}
     end
 
-    --- Set a single corner point for four-point control.
-    ---@param index integer Point index (1=top-left, 2=top-right, 3=bottom-left, 4=bottom-right)
-    ---@param x     number X coordinate
-    ---@param y     number Y coordinate
+--- Set a single corner point for four-point control.
+---@param index integer Point index (1=top-left, 2=top-right, 3=bottom-left, 4=bottom-right)
+---@param x     number X coordinate
+---@param y     number Y coordinate
     function sprite_methods:SetFourPointP(index, x, y)
         local key = "p" .. index
         if self._four_point[key] then
@@ -1292,7 +1254,6 @@ local sprite_methods = {}
     function sprite_methods:Move(x, y)
         self.x = self.x + x
         self.y = self.y + y
-        -- Recalculate anchor_px so parent tracking stays correct
         if self.parent and self.parent.image then
             local dx = self.x - self.parent.x
             local dy = self.y - self.parent.y
@@ -1312,7 +1273,6 @@ local sprite_methods = {}
     function sprite_methods:MoveTo(x, y)
         self.x = x
         self.y = y
-        -- Recalculate anchor_px so parent tracking stays correct
         if self.parent and self.parent.image then
             local dx = self.x - self.parent.x
             local dy = self.y - self.parent.y
@@ -1330,8 +1290,6 @@ local sprite_methods = {}
     end
 
     function sprite_methods:Set(p)
-        -- Store the fully resolved path, so path comparisons and repeat Set
-        -- calls with the already-resolved value behave identically.
         local resolved_p = normalizeSpritePath(p) or p
         self.path = resolved_p
         self.image = findSpriteFromCache(resolved_p)
@@ -1340,9 +1298,6 @@ local sprite_methods = {}
             self.height = self.image:getHeight()
         end
 
-        -- A Set outside the animation force-replaces any active SetAnimation.
-        -- Frame advances from the animation loop pass a frame already in the
-        -- texture list, so those leave the animation intact.
         local anim = self.animation
         if (anim and #anim.textures > 0) then
             local p_norm = normalizeSpritePath(p)
@@ -1366,15 +1321,15 @@ local sprite_methods = {}
         end
     end
 
-    --- The file actually displayed by this sprite.
-    ---@return string|nil The resolved path ("Resources/Sprites/..." or "Game/Resources/Sprites/...").
+--- The file actually displayed by this sprite.
+---@return string|nil The resolved path ("Resources/Sprites/..." or "Game/Resources/Sprites/...").
     function sprite_methods:GetImagePath()
         return self.path
     end
 
-    --- Whether this sprite is currently driven by an animation. Returns the
-    --- frame list, not a path (despite the name).
-    ---@return boolean
+--- Whether this sprite is currently driven by an animation. Returns the
+--- frame list, not a path (despite the name).
+---@return boolean
     function sprite_methods:GetAnimationPath()
         local anim = self.animation
         if (anim and anim.textures and #anim.textures > 0) then
@@ -1413,7 +1368,6 @@ local sprite_methods = {}
     function sprite_methods:Anchor(x, y)
         self.xanchor = x
         self.yanchor = y
-        -- Convert proportional anchor to pixel offset using parent dimensions
         if self.parent and self.parent.image then
             self.xanchor_px = x * self.parent.width
             self.yanchor_px = y * self.parent.height
@@ -1526,7 +1480,6 @@ local sprite_methods = {}
     end
 
     function sprite_methods:Destroy()
-        -- Drop any solid collision body before removing the sprite.
         self:UnSolid()
         Layers.remove(self)
         for i = #sprites.images, 1, -1 do
@@ -1541,17 +1494,17 @@ local sprite_methods = {}
         self:Destroy()
     end
 
-    --- Turn this sprite into a solid obstacle backed by a static Box2D body.
-    --- The box is centred on the sprite and kept in sync every frame; all solid
-    --- sprites share one world (see sprites.GetSolidWorld).
-    ---@param axis string|nil "x" = solid horizontally only (one-way wall, can be
-    ---                        jumped over / walked under); "y" = solid vertically
-    ---                        only from the top (one-way platform); "xy" / nil =
-    ---                        fully solid in every direction.
-    ---@param box table|nil Optional {width = .., height = ..}; defaults to the
-    ---                      sprite image size.
+--- Turn this sprite into a solid obstacle backed by a static Box2D body.
+--- The box is centred on the sprite and kept in sync every frame; all solid
+--- sprites share one world (see sprites.GetSolidWorld).
+---@param axis string|nil "x" = solid horizontally only (one-way wall, can be
+---                        jumped over / walked under); "y" = solid vertically
+---                        only from the top (one-way platform); "xy" / nil =
+---                        fully solid in every direction.
+---@param box table|nil Optional {width = .., height = ..}; defaults to the
+---                      sprite image size.
+---@return table
     function sprite_methods:Solid(axis, box)
-        -- Also accept Sprite:Solid({width = .., height = ..}).
         if (type(axis) == "table") then
             box = axis
             axis = nil
@@ -1562,7 +1515,6 @@ local sprite_methods = {}
         axis = axis or "xy"
         if (axis ~= "x" and axis ~= "y") then axis = "xy" end
 
-        -- Re-calling Solid replaces any previous collider.
         self:UnSolid()
 
         local w = (box and box.width) or self.width or 1
@@ -1590,7 +1542,8 @@ local sprite_methods = {}
         return self
     end
 
-    --- Remove the solid collision body from this sprite (if any).
+--- Remove the solid collision body from this sprite (if any).
+---@return table
     function sprite_methods:UnSolid()
         local solid = self._solid
         if (solid and solid.body and not solid.body:isDestroyed()) then
@@ -1600,8 +1553,8 @@ local sprite_methods = {}
         return self
     end
 
-    --- Query whether this sprite is currently solid.
-    ---@return string|false The active axis ("x", "y" or "xy"), or false when not solid.
+--- Query whether this sprite is currently solid.
+---@return string|false The active axis ("x", "y" or "xy"), or false when not solid.
     function sprite_methods:IsSolid()
         local solid = self._solid
         if (solid and solid.body and not solid.body:isDestroyed()) then
@@ -1610,20 +1563,18 @@ local sprite_methods = {}
         return false
     end
 
-    --- Turn perfect-pixel collision on or off. When on, the sprite collides as
-    --- the rects tiling its opaque pixels; decide hits with sprites.PPCollide.
-    --- `_hitbox` only applies while PP is off -- PP uses the art's real pixels.
-    ---@param enabled boolean
-    ---@return boolean ok Whether a usable tiling was found (false = PP stays off).
-    ---@return integer count How many rectangles the tiling has.
+--- Turn perfect-pixel collision on or off. When on, the sprite collides as
+--- the rects tiling its opaque pixels; decide hits with sprites.PPCollide.
+--- `_hitbox` only applies while PP is off -- PP uses the art's real pixels.
+---@param enabled boolean
+---@return boolean ok Whether a usable tiling was found (false = PP stays off).
+---@return integer count How many rectangles the tiling has.
     function sprite_methods:SetPPCollision(enabled)
         if (enabled ~= true) then
             self.pp_collision = false
             return false, 0
         end
 
-        -- Resolve now, so a failure is visible at the call site rather than
-        -- silently swallowing every hit later on.
         local shapes = sprites.GetPPShapes(self)
         if (not shapes) then
             self.pp_collision = false
@@ -1636,24 +1587,24 @@ local sprite_methods = {}
         return true, #shapes
     end
 
-    --- Whether this sprite uses perfect-pixel collision.
-    ---@return boolean
+--- Whether this sprite uses perfect-pixel collision.
+---@return boolean
     function sprite_methods:IsPPCollision()
         return self.pp_collision == true
     end
 
-    --- Collide as an ellipse inscribed in the same box (`_hitbox` / image size),
-    --- so it only removes corners and never grows the hit area. Perfect-pixel
-    --- collision, when on, replaces this shape entirely.
-    ---@param kind string|nil "ellipse" (or "circle" / "oval"), "rect" (or
-    ---                       "rectangle" / "box"); nil means "rect".
-    ---@return boolean ok False when `kind` is not a known shape name.
+--- Collide as an ellipse inscribed in the same box (`_hitbox` / image size),
+--- so it only removes corners and never grows the hit area. Perfect-pixel
+--- collision, when on, replaces this shape entirely.
+---@param kind string|nil "ellipse" (or "circle" / "oval"), "rect" (or
+---                       "rectangle" / "box"); nil means "rect".
+---@return boolean ok False when `kind` is not a known shape name.
     function sprite_methods:SetHitboxShape(kind)
         return sprites.SetHitboxShape(self, kind)
     end
 
-    --- The kind of shape this sprite collides as: "ellipse" or "rect".
-    ---@return string
+--- The kind of shape this sprite collides as: "ellipse" or "rect".
+---@return string
     function sprite_methods:GetHitboxShape()
         return sprites.GetHitboxShape(self)
     end
@@ -1672,10 +1623,9 @@ function sprites.CreateSprite(path, layer)
         end
     end
 
-    ---@type Sprite
+---@type Sprite
     local sprite = {}
 
-    -- Intercept `layer` (mark Layers dirty) and `x` / `y` (track speed) writes.
     setmetatable(sprite, {
         __index = function(t, k)
             if k == "layer" then
@@ -1716,9 +1666,7 @@ function sprites.CreateSprite(path, layer)
     sprite._layer_value = layer or 0
     sprite.is_moving = false
     sprite.pixel_smooth = false
-    -- Perfect-pixel collision is opt-in: see sprite:SetPPCollision.
     sprite.pp_collision = false
-    -- Resolve first (Game copy wins) so sprite.path names the file really loaded.
     local full_path = resolveGameSpritePath(path)
     sprite.path = full_path
     sprite.image, sprite._loaded = findSpriteFromCache(full_path)
@@ -1756,7 +1704,6 @@ function sprites.CreateSprite(path, layer)
     sprite.color = {1, 1, 1}
     sprite.alpha = 1
     sprite.visible = true
-    -- Optional outline: {r, g, b, a, thickness}. nil removes it.
     sprite.outline = nil
 
     sprite.parent = nil
@@ -1776,8 +1723,6 @@ function sprites.CreateSprite(path, layer)
         remove = false
     }
 
-    -- Shake state (see sprites.ShakeSprite). Visual only: the offset is applied
-    -- at draw time and never written into x / y.
     sprite._shake = {
         use = false,
         time = 0,
@@ -1790,10 +1735,10 @@ function sprites.CreateSprite(path, layer)
 
     sprite._four_point = {
         enabled = false,
-        p1 = {0, 0},  -- top-left
-        p2 = {0, 0},  -- top-right
-        p3 = {0, 0},  -- bottom-left
-        p4 = {0, 0},  -- bottom-right
+        p1 = {0, 0},
+        p2 = {0, 0},
+        p3 = {0, 0},
+        p4 = {0, 0},
     }
 
     sprite.animation = {
@@ -1804,7 +1749,6 @@ function sprites.CreateSprite(path, layer)
         frame = 1,
         done = false
     }
-
 
     Layers.add(sprite)
     table.insert(sprites.images, sprite)
@@ -1827,11 +1771,10 @@ function sprites.CreateSpriteQuad(path, quad, layer)
     local qh = math.floor(quad.height or 0)
     if (qw <= 0 or qh <= 0) then return {} end
 
-    ---@type Sprite
+---@type Sprite
     local sprite = sprites.CreateSprite(path, layer)
     if ((not sprite) or (not sprite.image)) then return sprite end
 
-    -- Swap in a cropped copy so width / height match the region, not the sheet.
     local full_path = resolveGameSpritePath(path)
     local sheet_w = sprite.image:getWidth()
     local sheet_h = sprite.image:getHeight()
@@ -1872,7 +1815,6 @@ function sprites.CreateSpriteQuad(path, quad, layer)
         sprite.height = qh
         sprite.quad = {x = qx, y = qy, width = qw, height = qh}
     end
-    -- On any crop failure the sprite keeps the full sheet image, so it still works.
 
     return sprite
 end
@@ -1884,8 +1826,6 @@ function sprites.Update(dt)
         if now - last_cache_cleanup >= CACHE_CLEAN_INTERVAL then
             local threshold = getLRUThreshold()
 
-            -- Built FIRST so `last_used` reflects real rendering activity, not
-            -- cache-access timestamps.
             local in_use_images = {}
             for _, spr in ipairs(sprites.images) do
                 if spr.image then
@@ -1920,8 +1860,6 @@ function sprites.Update(dt)
         end
     end
 
-    -- Step the shared solidity world once per frame. Sprites synced their own
-    -- solid bodies in Update; any dynamic body is resolved here.
     if (solid_world and not solid_world:isDestroyed()) then
         solid_world:update(dt)
     end

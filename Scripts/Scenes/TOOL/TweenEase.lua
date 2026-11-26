@@ -16,7 +16,6 @@ local function new_top_button(text, x, y, w, h, func)
     }
 end
 
--- Bezier curve editor state
 local bezier_points = {
     {x = 0.0, y = 0.0},
     {x = 0.33, y = 0.67},
@@ -29,13 +28,11 @@ local anim_t = 0
 local anim_duration = 120
 local drag_idx = nil
 
--- Canvas area (right side of the screen)
 local CANVAS_X = 220
 local CANVAS_Y = 40
 local CANVAS_W = 360
 local CANVAS_H = 400
 
--- Hit radius for control points, px
 local PT_RADIUS = 6
 
 local function screen_to_curve(sx, sy)
@@ -50,7 +47,9 @@ local function curve_to_screen(cx, cy)
     return sx, sy
 end
 
--- De Casteljau at parameter t (0~1). Returns y first, then x.
+--- De Casteljau at parameter t (0~1). Returns y first, then x.
+---@param points table
+---@param t number
 local function bezier_eval(points, t)
     local n = #points
     if n == 0 then return 0, 0 end
@@ -118,7 +117,6 @@ local function point_add()
         table.insert(bezier_points, selected_idx, new_pt)
     else
         local y, x = bezier_eval(bezier_points, 0.5)
-        -- Offset slightly so the new point is draggable, not exactly on the curve.
         local new_pt = {x = clamp01(x + 0.02), y = clamp01(y + 0.02)}
         local insert_at = math.max(2, math.floor(#bezier_points / 2))
         table.insert(bezier_points, insert_at, new_pt)
@@ -128,7 +126,6 @@ end
 
 local function point_delete()
     if selected_idx and #bezier_points > 2 then
-        -- First and last points are the start / end anchors.
         if selected_idx == 1 or selected_idx == #bezier_points then
             print("Cannot delete start or end anchor point")
             return
@@ -211,7 +208,6 @@ local function draw_canvas()
     SE.graphics.printf("0", CANVAS_X - 2, CANVAS_Y + CANVAS_H + 2, 20, "center")
     SE.graphics.printf("1", CANVAS_X + CANVAS_W - 10, CANVAS_Y + CANVAS_H + 2, 20, "center")
 
-    -- Diagonal reference line (linear = y=x)
     SE.graphics.setColor(0.3, 0.3, 0.3, 1)
     local lx0, ly0 = curve_to_screen(0, 0)
     local lx1, ly1 = curve_to_screen(1, 1)
@@ -242,7 +238,6 @@ local function draw_canvas()
     for i, pt in ipairs(bezier_points) do
         local sx, sy = curve_to_screen(pt.x, pt.y)
 
-        -- Selected point halo
         if i == selected_idx then
             SE.graphics.setColor(1, 1, 0, 1)
             SE.graphics.circle("fill", sx, sy, PT_RADIUS + 3)
@@ -250,7 +245,6 @@ local function draw_canvas()
             SE.graphics.circle("fill", sx, sy, PT_RADIUS + 1)
         end
 
-        -- Start / end anchors are squares, inner points are circles.
         if i == 1 or i == #bezier_points then
             SE.graphics.setColor(0.3, 1.0, 0.3, 1)
             SE.graphics.rectangle("fill", sx - PT_RADIUS, sy - PT_RADIUS, PT_RADIUS * 2, PT_RADIUS * 2)

@@ -1,5 +1,7 @@
 local template = ImportFile("Engine._FuncList")
 
+--- Builds Lua source for a love module adapter skeleton from the function list.
+---@return string
 local function generate_adapter()
     local code = "local se = {\n"
 
@@ -23,5 +25,3 @@ local function generate_adapter()
 end
 
 local f = io.open("adapter_skeleton.lua", "w")
---f:write(generate_adapter())
---f:close()

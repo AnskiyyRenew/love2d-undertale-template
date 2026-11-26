@@ -1,15 +1,5 @@
---[[
-    Scripts/Libraries/Engine/Debugger.lua
-    In-game object debugger (Ctrl+D toggles interaction mode).
+--- In-game object debugger (Ctrl+D toggles interaction mode).
 
-    Left-click selects an object, drag moves it; right-click opens the context
-    menu (clone / export / flip / rotate / properties panel). F9 toggles the
-    on-screen info text. Set `spr.debugger_ignored = true` to hide a sprite.
-
-    Dev-only: loaded only when _RELEASED is false.
-]]
-
--- Release build: dev-only tool, load nothing (see _RELEASED in conf.lua).
 if (_RELEASED) then
     return {}
 end
@@ -20,7 +10,6 @@ local debugger = {
     current_property = nil,
     show = false,
 
-    -- Alpha of the on-screen info/property text (F9 toggles between 0 and 1)
     info_alpha = 1,
 
     drag_pending = false,
@@ -40,7 +29,6 @@ local debugger = {
         object = nil,
     },
 
-    -- Properties panel (right side of screen, 640x480 logical res)
     panel = {
         show = false,
         x = 435,
@@ -48,16 +36,14 @@ local debugger = {
         width = 200,
         padding = 5,
         line_height = 24,
-        editing = false,      -- true while typing into a field
-        edit_field = nil,     -- string key of the field being edited
-        edit_buffer = "",     -- current text in the edit field
+        editing = false,
+        edit_field = nil,
+        edit_buffer = "",
     },
 
-    -- Four-point handle dragging
-    handle_drag_index = 0,   -- 0=none, 1-4=corner being dragged
+    handle_drag_index = 0,
     handle_radius = 6,
 
-    -- Color swatches for the quick-color picker
     swatches = {
         {1,1,1}, {0.9,0.9,0.9}, {0.7,0.7,0.7}, {0.5,0.5,0.5}, {0.3,0.3,0.3},
         {1,0.8,0.8}, {1,0.5,0.5}, {1,0,0}, {0.8,0.2,0}, {0.5,0,0},
@@ -216,7 +202,6 @@ local function clamp(val, min, max)
     return math.max(min, math.min(max, val))
 end
 
--- Fields shown in the properties panel: {key, label, format_string}
 local panel_fields = {
     {key = "x",       label = "X",       fmt = "%.2f"},
     {key = "y",       label = "Y",       fmt = "%.2f"},
@@ -250,7 +235,6 @@ function debugger.Update()
             print("Debugger info text:", (debugger.info_alpha > 0) and "visible" or "hidden")
         end
 
-        -- 1) Handle field editing (keyboard input)
         if (panel.editing and panel.edit_field) then
             local obj = debugger.current_object
             if (not obj) then
@@ -311,12 +295,10 @@ function debugger.Update()
                     panel.editing = false
                     panel.edit_field = nil
                 end
-                -- Don't process mouse input while editing
                 return
             end
         end
 
-        -- 2) Context menu handling
         if (menu.show) then
             if (mouse1_state == 1) then
                 if (point_in_menu(mouse_x, mouse_y, menu)) then
@@ -335,10 +317,9 @@ function debugger.Update()
             return
         end
 
-        -- 3) Properties panel click handling
         if (panel.show and debugger.current_object) then
             local obj = debugger.current_object
-            local field_area_top = panel.y + 25  -- after title
+            local field_area_top = panel.y + 25
 
             if (mouse1_state == 1) then
                 if (point_in_rect(mouse_x, mouse_y, panel.x, panel.y, panel.width, 480)) then
@@ -353,7 +334,7 @@ function debugger.Update()
                     end
 
                     local btn_y = field_area_top + #panel_fields * panel.line_height + 5
-                    local swatch_start_y = btn_y  -- will be adjusted below
+                    local swatch_start_y = btn_y
 
                     if (obj._four_point and point_in_rect(mouse_x, mouse_y, panel.x + panel.padding, btn_y, panel.width - panel.padding * 2, panel.line_height)) then
                         obj._four_point.enabled = not obj._four_point.enabled
@@ -383,7 +364,6 @@ function debugger.Update()
                         local num_swatches = #debugger.swatches
                         local rows = math.ceil(num_swatches / debugger.swatches_per_row)
                         local swatch_total = debugger.swatch_size + debugger.swatch_gap
-                        -- Match Draw's layout: "Color:" label + 15px offset before the grid
                         local grid_y = swatch_start_y + 15
 
                         for si, color in ipairs(debugger.swatches) do
@@ -403,7 +383,6 @@ function debugger.Update()
 
         end
 
-        -- 4) Four-point handle drag detection
         local obj = debugger.current_object
         if (obj and obj._four_point and obj._four_point.enabled) then
             local fp = obj._four_point
@@ -431,14 +410,12 @@ function debugger.Update()
             debugger.handle_drag_index = 0
         end
 
-        -- 5) Object selection (only when not dragging a handle)
         if (debugger.handle_drag_index == 0 and not debugger.drag_pending and not debugger.dragging) then
             debugger.current_object = nil
             debugger.current_property = nil
 
             for i, layer in ipairs(Layers.layers) do
                 for j, object in ipairs(layer.objects) do
-                    -- debugger_ignored = true -> the Debugger skips this object entirely
                     if (object.type == "object" and object.visible and not object.debugger_ignored) then
                         local obj_x, obj_y = object.x, object.y
                         local obj_width, obj_height = math.abs(object.width * (object.xscale or 1)), math.abs(object.height * (object.yscale or 1))
@@ -466,15 +443,11 @@ function debugger.Update()
             end
         end
 
-        -- 6) Right-click context menu trigger
         if (mouse2_state == 1 and debugger.current_object) then
             local menu_height = #context_menu_items * menu.item_height
             local screen_w = CANVAS_WIDTH or 640
             local screen_h = CANVAS_HEIGHT or 480
             menu.show = true
-            -- Keep the menu fully on screen: near the bottom edge it opens
-            -- upward (its bottom sits at the screen bottom) instead of running
-            -- off-screen, and near the right edge it shifts left to stay inside.
             menu.x = clamp(mouse_x, 0, screen_w - menu.width)
             menu.y = clamp(mouse_y, 0, screen_h - menu_height)
             menu.object = debugger.current_object
@@ -484,7 +457,6 @@ function debugger.Update()
             return
         end
 
-        -- 7) Object drag (only when not in four-point handle drag)
         if (debugger.handle_drag_index == 0) then
             if (mouse1_state == 1) then
                 debugger.press_x, debugger.press_y = mouse_x, mouse_y
@@ -567,16 +539,15 @@ function debugger.Draw()
             local obj_width, obj_height = obj.width * (obj.xscale or 1), obj.height * (obj.yscale or 1)
             SE.graphics.rectangle("line", obj_x - obj_width * 0.5, obj_y - obj_height * 0.5, obj_width, obj_height)
 
-            -- Draw four-point handles (if four-point mode enabled)
             if (obj._four_point and obj._four_point.enabled) then
                 local fp = obj._four_point
                 local points = {fp.p1, fp.p2, fp.p3, fp.p4}
                 local labels = {"TL", "TR", "BL", "BR"}
                 local colors = {
-                    {1, 0.3, 0.3},  -- TL: red
-                    {0.3, 1, 0.3},  -- TR: green
-                    {0.3, 0.3, 1},  -- BL: blue
-                    {1, 1, 0.3},    -- BR: yellow
+                    {1, 0.3, 0.3},
+                    {0.3, 1, 0.3},
+                    {0.3, 0.3, 1},
+                    {1, 1, 0.3},
                 }
                 local hr = debugger.handle_radius
 
@@ -605,7 +576,6 @@ function debugger.Draw()
                 end
             end
 
-            -- Draw Properties Panel (right side)
             local panel = debugger.panel
             if (panel.show) then
                 local px = panel.x
@@ -618,13 +588,13 @@ function debugger.Draw()
                 local field_h = #panel_fields * lh
                 local extra_h = 0
                 if (obj._four_point) then
-                    extra_h = extra_h + lh * 2 + 4  -- two buttons + gap
+                    extra_h = extra_h + lh * 2 + 4
                 end
                 if (obj.color) then
                     local num_swatches = #debugger.swatches
                     local rows = math.ceil(num_swatches / debugger.swatches_per_row)
                     local swatch_total = debugger.swatch_size + debugger.swatch_gap
-                    extra_h = extra_h + rows * swatch_total + 5 + 15  -- "Color:" label + grid
+                    extra_h = extra_h + rows * swatch_total + 5 + 15
                 end
                 local total_h = title_h + field_h + extra_h + pp * 4
 
@@ -672,7 +642,7 @@ function debugger.Draw()
                 end
 
                 local btn_y = field_top + #panel_fields * lh + 5
-                local swatch_start_y = btn_y  -- will be adjusted below
+                local swatch_start_y = btn_y
 
                 if (obj._four_point) then
                     local btn_text = obj._four_point.enabled and "[X] Four-Point" or "[  ] Four-Point"

@@ -32,9 +32,6 @@ function wave.Update(dt)
     mask:Follow(Arena.black)
 
     time = time + 1
-    if (time == 680) then
-        -- EndWave()
-    end
 end
 
 return wave

@@ -1,5 +1,4 @@
--- Test scene for hostChannel. px.png is a white 1x1 texture, so src.r is 1
--- everywhere and the screen must render solid red.
+--- Test scene for hostChannel. px.png is a white 1x1 texture, so src.r is 1
 local scene = {}
 
 local shadertoy = ImportFile("ShaderToy")

@@ -33,10 +33,11 @@ local function clamp(value, min, max)
     return math.max(min, math.min(value, max))
 end
 
--- Drop a single arena's mask from arenas.stencils.
---
--- The array is mutated in place, never replaced: minus arenas capture it by
--- reference. isactive = false neutralises the copies older sprites still hold.
+--- Drop a single arena's mask from arenas.stencils.
+---
+--- The array is mutated in place, never replaced: minus arenas capture it by
+--- reference. isactive = false neutralises the copies older sprites still hold.
+---@param mask table
 local function unregister_mask(mask)
     if (not mask) then return end
 
@@ -50,9 +51,12 @@ local function unregister_mask(mask)
     end
 end
 
--- Half-extent of a sprite from its image size and scale. The player heart is
--- 16x16 at scale 1, hence the (8, 8) default; the 2px floor keeps collisions
--- sane at tiny scales.
+--- Half-extent of a sprite from its image size and scale. The player heart is
+--- 16x16 at scale 1, hence the (8, 8) default; the 2px floor keeps collisions
+--- sane at tiny scales.
+---@param sprite table
+---@return number
+---@return number
 local function sprite_half(sprite)
     if (not sprite) then return 8, 8 end
     local bw = (sprite.width or 16)
@@ -115,9 +119,12 @@ local function check_nearest_arena()
     return nearest
 end
 
--- A world-space point is valid when it is inside an active plus arena AND
--- outside every active minus arena (both shrunk/expanded by the player's
--- half-size).
+--- A world-space point is valid when it is inside an active plus arena AND
+--- outside every active minus arena (both shrunk/expanded by the player's
+--- half-size).
+---@param px number
+---@param py number
+---@return boolean
 local function is_point_valid(px, py)
     local in_plus = false
     local half_x, half_y = sprite_half(Player.sprite)
@@ -148,7 +155,6 @@ local function is_point_valid(px, py)
 
     if (not in_plus) then return false end
 
-    -- Minus arenas expand by the 10px visual margin plus the player half-size.
     for _, a in ipairs(arenas.insts)
     do
         if (a.is_active and a.mode == "minus") then
@@ -174,8 +180,10 @@ local function is_point_valid(px, py)
     return true
 end
 
--- Circular brute-force search for the nearest valid landing point, out to
--- max_radius; returns (px, py) when nothing valid is found.
+--- Circular brute-force search for the nearest valid landing point, out to
+--- max_radius; returns (px, py) when nothing valid is found.
+---@param px number
+---@param py number
 local function find_nearest_valid(px, py)
     local step = 4
     local max_radius = 300
@@ -200,12 +208,15 @@ local function find_nearest_valid(px, py)
         end
     end
 
-    -- Fallback: original position.
     return px, py
 end
 
--- Shared arena probe. `ox`/`oy` is an offset from the player's centre, so the
--- foot (PlayerOnGround) and the head (PlayerOnCeiling) share this code.
+--- Shared arena probe. `ox`/`oy` is an offset from the player's centre, so the
+--- foot (PlayerOnGround) and the head (PlayerOnCeiling) share this code.
+---@param player table
+---@param ox number
+---@param oy number
+---@return boolean
 local function side_touching(player, ox, oy)
     local px, py = player.x + ox, player.y + oy
 
@@ -219,7 +230,6 @@ local function side_touching(player, ox, oy)
             local w, h = a.width, a.height
 
             if (a.mode == "plus") then
-                -- Touching when the probe leaves the arena on any side.
                 if (a.shape == "rectangle") then
                     if (lx < -w / 2 or lx > w / 2 or ly < -h / 2 or ly > h / 2) then
                         return true
@@ -231,9 +241,6 @@ local function side_touching(player, ox, oy)
                     end
                 end
             elseif (a.mode == "minus") then
-                -- Touching when the probe enters the range. Arenas.Update keeps
-                -- the player's centre outside the expanded forbidden zone, so the
-                -- raw [-w/2, w/2] range is never reached: widen it by 4px.
                 local half_w = w / 2 + 4
                 local half_h = h / 2 + 4
 
@@ -256,8 +263,6 @@ end
 function arenas.PlayerOnGround(player)
     local psin, pcos = math.sin(math.rad(player.rotation)), math.cos(math.rad(player.rotation))
 
-    -- Probe distance is the player's half-height plus 2px, so the foot pokes
-    -- past the boundary; a crouched soul probes a shorter distance.
     local _, half_y = sprite_half(player)
     local dist = half_y + 2
     return side_touching(player, -psin * dist, pcos * dist)
@@ -652,7 +657,6 @@ function arenas.Update(dt)
                 local lx = dx * cos + dy * sin
                 local ly = dy * cos - dx * sin
 
-                -- Forbidden zone: the minus rectangle plus the player half-size.
                 local min_lx, max_lx = -(w + arena.thickness * 2) / 2 - p_half_x, (w + arena.thickness * 2) / 2 + p_half_x
                 local min_ly, max_ly = -(h + arena.thickness * 2) / 2 - p_half_y, (h + arena.thickness * 2) / 2 + p_half_y
 
@@ -664,8 +668,6 @@ function arenas.Update(dt)
 
                     local min_dist = math.min(d_left, d_right, d_bottom, d_top)
 
-                    -- Snap past the nearest edge (+1px), or the next frame's
-                    -- boundary check re-detects the player as inside.
                     if (min_dist == d_left)   then lx = min_lx - 1
                     elseif (min_dist == d_right)  then lx = max_lx + 1
                     elseif (min_dist == d_bottom) then ly = min_ly - 1
@@ -675,7 +677,6 @@ function arenas.Update(dt)
                     p.x = arena.x + lx * cos - ly * sin
                     p.y = arena.y + lx * sin + ly * cos
 
-                    -- Pushed outside the playable area: find the nearest valid spot.
                     if (not is_point_valid(p.x, p.y)) then
                         local nx, ny = find_nearest_valid(p.x, p.y)
                         p.x, p.y = nx, ny
@@ -694,10 +695,6 @@ function arenas.Clear()
         end
     end
 
-    -- insts[1] is the main battle box and outlives Clear(), so its plus mask
-    -- must survive: only the masks still owned by a live arena are kept.
-    --
-    -- The array is rebuilt in place, because minus arenas hold it by reference.
     local alive = {}
 
     for _, a in ipairs(arenas.insts)

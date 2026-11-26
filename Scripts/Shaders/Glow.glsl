@@ -1,6 +1,10 @@
+// RGB color added along the detected edges.
 extern vec3 glow_color;
+// Strength of the added glow: 0 disables it, 1 adds the color at full intensity.
 extern float glow_intensity;
+// Luminance difference below this value does not glow; higher values keep only sharp outlines.
 extern float threshold;
+// Texture size in pixels; used to step exactly one texel toward each neighbour.
 extern vec2 tex_size;
 
 vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords) {

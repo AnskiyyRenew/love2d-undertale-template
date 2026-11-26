@@ -17,13 +17,8 @@ local setup_hpbar = {
 local kr_configuration = true
 local time_kr = 0
 
--- Layout: the status line is derived from ONE configurable origin (`text_pos`);
--- the "KR" label and HP numbers follow the right end of the HP bar. Every
--- element mirrors its live coordinates into the `pos_*` tables (ui.GetLayout).
 local text_pos = {30, 400}
--- Left edge (x) and height (y) shared by the three HP bars.
 local bar_pos = {245 + 30, 410}
--- The "HP" label never moves left of this, so it cannot hit the numbers.
 local hpname_limit = 245
 
 local bar_maxhp = Sprites.CreateSprite("px.png", "UI")
@@ -67,9 +62,6 @@ local pos_ = {
 }
 local kr_color = {1, 0, 1}
 
--- `pos_*` hold the LIVE position of each element (updated every draw pass);
--- `text_pos` is the origin they derive from. 15 px = one `ui_font` character
--- (the font is 24 px monospace).
 local pos_name = {30, 400}
 local pos_lv = {30, 400}
 local pos_hpname = {30, 400}
@@ -80,13 +72,11 @@ local name = Layers.add_external(function ()
     drawOutlinedText(ui_font, Global.GetVariable("MainColor"), Player.name, pos_name[1], pos_name[2], 2)
 end, "UI")
 local lv = Layers.add_external(function ()
-    -- Offset by the name width plus the two trailing spaces.
     pos_lv[1] = text_pos[1] + 15 * (Player.name:len() + 2)
     pos_lv[2] = text_pos[2]
     drawOutlinedText(ui_font, Global.GetVariable("MainColor"), "LV  " .. Player.lv, pos_lv[1], pos_lv[2], 2)
 end, "UI")
 local hpname = Layers.add_external(function ()
-    -- Sits right after the LV text, but never closer than `hpname_limit`.
     pos_hpname[1] = math.max(
         text_pos[1] + 15 * (Player.name:len() + 2) + 15 * (("LV  " .. Player.lv):len()) + 20,
         hpname_limit
@@ -103,8 +93,6 @@ local krname = Layers.add_external(function ()
     end
 end)
 local hptext = Layers.add_external(function ()
-    -- Numbers follow the bar's right end; the KR variant leaves a wider gap
-    -- because the KR value is appended.
     if (not kr_configuration) then
         pos_hptext[1] = bar_maxhp.x + bar_maxhp.xscale + 10
         pos_hptext[2] = text_pos[2]
@@ -342,7 +330,6 @@ function ui.SetBarPosition(x, y)
     if (type(x) ~= "number") then return end
     bar_maxhp:MoveTo(x, y or bar_maxhp.y)
     bar_hp:MoveTo(x, y or bar_hp.y)
-    -- bar_kr hangs off the right end of bar_hp (same rule as barUpdate).
     bar_kr.x = x + (bar_hp.xscale or 0)
     if (type(y) == "number") then bar_kr.y = y end
 end
@@ -380,20 +367,16 @@ end
 ---@return table layout
 function ui.GetLayout()
     return {
-        text = {text_pos[1], text_pos[2]},       -- configured text origin
-        bar = {bar_maxhp.x, bar_maxhp.y},        -- configured bar origin
-        hpname_limit = hpname_limit,             -- clamp for the "HP" label
+        text = {text_pos[1], text_pos[2]},
+        bar = {bar_maxhp.x, bar_maxhp.y},
+        hpname_limit = hpname_limit,
         name = {pos_name[1], pos_name[2]},
         lv = {pos_lv[1], pos_lv[2]},
-        hpname = {pos_hpname[1], pos_hpname[2]}, -- same x as pos_.hpname
+        hpname = {pos_hpname[1], pos_hpname[2]},
         krname = {pos_krname[1], pos_krname[2]},
         hptext = {pos_hptext[1], pos_hptext[2]},
     }
 end
-
--- HP bar sprites are handed back directly (color, alpha, outline, ... work),
--- with two caveats: `xscale` is rewritten every frame by ui.barUpdate(), and
--- the shared left edge must go through ui.SetBarPosition().
 
 --- The current-HP bar (yellow).
 ---@return Sprite

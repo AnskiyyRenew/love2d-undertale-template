@@ -8,6 +8,10 @@ beat.beat = 0
 beat.offset = 0
 
 local time = 0
+--- Queues a callback to fire once the given beat, plus an optional offset, is reached.
+---@param target number
+---@param call function
+---@param offset number|nil
 function beat.CreateEvent(target, call, offset)
     table.insert(beat.events, {
         _target = target,
@@ -16,6 +20,8 @@ function beat.CreateEvent(target, call, offset)
     })
 end
 
+--- Advances the beat counter and fires every event whose target has been passed.
+---@param dt number
 function beat.Update(dt)
     time = time + dt
     beat.beat = beat.beat + dt * beat.bpm / 60
@@ -31,10 +37,15 @@ function beat.Update(dt)
     end
 end
 
+--- Sets the tempo in beats per minute, defaulting to 120.
+---@param bpm number|nil
 function beat.SetBPM(bpm)
     beat.bpm = (bpm or 120)
 end
 
+--- Reports whether the current beat exactly matches the given beat number.
+---@param target number
+---@return boolean
 function beat.OnBeat(target)
     local bool = false
 

@@ -1,13 +1,4 @@
--- sans animation.
--- Contract: Game/Animations/_temp.lua (plain table factory, dot calls at the
--- call site, functions bound by Battle.BindAnimation).
---
--- Three sprites for the battle body, repositioned every frame: torso (follows
--- yoff / 1.5), head (follows yoff + headx / heady), legs (static, pinned under
--- the torso except for the hurt knock-back). `self.cpos` is the HEAD CENTRE, so
--- `Game:InitAnimation(i, {320, 140})` puts the skull at (320, 140).
--- Ported from a 30 FPS room: every counter advances by `dt * SOURCE_FPS`.
--- bounce 0 = still, 1 = idle 8-shape, 2 = medium bob, 3 = tired bob.
+--- sans animation. Contract: Game/Animations/_temp.lua (plain table factory, dot calls at the call site, functions bound by Battle.BindAnimation).
 
 local Sans = {}
 
@@ -16,21 +7,21 @@ local SOURCE_FPS = 30
 local BODY_DIR = "Characters/Sans/"
 local FACE_DIR = BODY_DIR .. "Face/"
 
--- Screen pixels at scale 2; TORSO_OFFSET_Y is the original `y + 42`.
 local TORSO_OFFSET_Y = 42
--- LEG_GAP: 0 = legs touch the torso bottom, negative tucks, positive leaves a gap.
 local LEG_GAP = 0
 local TORSO_BOB_DAMP = 1.5
 
--- Idle torso cycle: spr_sansb_torso_0 .. 7.
 local TORSO_FRAMES = 8
 local TORSO_INTERVAL = 0.10
 
-local HEAD_FRAMES = 11 -- spr_sans_bface_0 .. 10
-local SWEAT_FRAMES = 3 -- spr_sansb_face_sweat_0 .. 2 (NOT in Resources yet)
-local EYE_FRAMES = 2   -- spr_sansb_blueeye_0 .. 1
+local HEAD_FRAMES = 11
+local SWEAT_FRAMES = 3
+local EYE_FRAMES = 2
 
 --- Build the list of "path_0.png" .. "path_<count-1>.png" for a sheet.
+---@param prefix string
+---@param count number
+---@param dir string
 local function frameList(dir, prefix, count)
     local list = {}
     for i = 0, count - 1 do
@@ -40,6 +31,7 @@ local function frameList(dir, prefix, count)
 end
 
 --- Height of a sprite as it is actually drawn (scale 2 here).
+---@param sprite table
 local function drawnHeight(sprite)
     if (not sprite) then return 0 end
     return (sprite.height or 0) * (sprite.yscale or 1)
@@ -48,7 +40,6 @@ end
 function Sans.New(pos)
     local self = {}
 
-    -- Back-reference to this module's function table. Do not rename it.
     self._class = Sans
 
     self.running = true
@@ -57,35 +48,32 @@ function Sans.New(pos)
     self.hurting = false
     self.intensity = 16
 
-    self.bounce = 1       -- idle 8-shape by default
-    self.bounce_scale = 1 -- multiplies the sway amplitude
+    self.bounce = 1
+    self.bounce_scale = 1
     self.siner = 0
-    self.xoff = 0         -- last sway (read-only, for other code)
-    self.yoff = 0         -- last bob (read-only, for other code)
+    self.xoff = 0
+    self.yoff = 0
 
     self.headx = 0
     self.heady = 0
-    -- true: headx / heady ease back to 0 on their own.
     self.head_auto_return = true
     self.head_return_speed = 6
 
-    self.faceemotion = 0 -- spr_sans_bface_<n>.png, 0..10
-    self.facetype = 0    -- 0 = normal, 1 = blue eye
-    self.f_i = 0         -- blue-eye frame timer
-    self.sweat = 0       -- 0 = none, 1..3
+    self.faceemotion = 0
+    self.facetype = 0
+    self.f_i = 0
+    self.sweat = 0
 
-    self.movearm = 1 -- 0 = torso idle cycle runs, ~= 0 pauses it
+    self.movearm = 1
 
     self.torsoframe = 0
     self.torso_time = 0
 
-    -- Cached frame paths, so no string concatenation happens per frame.
     self.head_frames = frameList(FACE_DIR, "spr_sans_bface", HEAD_FRAMES)
     self.torso_frames = frameList(BODY_DIR, "spr_sansb_torso", TORSO_FRAMES)
     self.sweat_frames = frameList(FACE_DIR, "spr_sansb_face_sweat", SWEAT_FRAMES)
     self.eye_frames = frameList(FACE_DIR, "spr_sansb_blueeye", EYE_FRAMES)
 
-    -- Last applied frames, so Set() is only called when something changed.
     self._last_face = 0
     self._last_eye = -1
     self._last_sweat = -1
@@ -107,21 +95,18 @@ function Sans.Init(self, pos)
     body:Scale(2, 2)
     head:Scale(2, 2)
 
-    -- Same-layer sprites draw in `_id` order: legs → torso → head stacks correctly.
     self.legs = legs
     self.body = body
     self.head = head
 
-    -- Offsets come from the real sprite heights, so another sheet stays aligned.
     self.torso_dy = TORSO_OFFSET_Y
     self.legs_dy = TORSO_OFFSET_Y
-        + drawnHeight(body) * 0.5 -- bottom edge of the torso
-        + drawnHeight(legs) * 0.5  -- centre of the legs
+        + drawnHeight(body) * 0.5
+        + drawnHeight(legs) * 0.5
         + LEG_GAP
 
     self.cpos = {_pos[1], _pos[2]}
 
-    -- Place once so nothing flashes at (0, 0) before the first Update().
     Sans.ApplyOffsets(self, 0, 0, 0)
 end
 
@@ -138,10 +123,11 @@ end
 
 --- Lazily build a head overlay (blue eye / sweat) and put it right on top of
 --- the head. Returns nil (once) when the image is missing from Resources.
+---@param path string
+---@param z_offset number
 function Sans.CreateOverlay(self, path, z_offset)
     local sprite = Sprites.CreateSprite(path, "UI")
     if (not sprite or not sprite.image or sprite._loaded == false) then
-        -- Missing image → the engine hands back a 1x1 placeholder; drop it.
         if (sprite and sprite.Destroy) then
             sprite:Destroy()
         end
@@ -149,7 +135,6 @@ function Sans.CreateOverlay(self, path, z_offset)
     end
 
     sprite:Scale(2, 2)
-    -- `_id` sets draw order within a layer; a small offset keeps overlays on top.
     sprite._id = (self.head._id or 0) + (z_offset or 0.1)
     Layers.mark_dirty()
     return sprite
@@ -183,16 +168,19 @@ function Sans.EnsureSweat(self)
 end
 
 --- Bounce mode: 0 = still, 1 = idle 8-shape, 2 = medium bob, 3 = tired bob.
+---@param mode number
 function Sans.SetBounce(self, mode)
     self.bounce = math.floor(mode or 0)
 end
 
 --- Head expression (0..10 → spr_sans_bface_<n>.png).
+---@param index number
 function Sans.SetFace(self, index)
     self.faceemotion = math.max(0, math.min(HEAD_FRAMES - 1, math.floor(index or 0)))
 end
 
 --- 0 = normal face, 1 = blue eye.
+---@param t number
 function Sans.SetFaceType(self, t)
     self.facetype = math.floor(t or 0)
     self.f_i = 0
@@ -200,11 +188,13 @@ function Sans.SetFaceType(self, t)
 end
 
 --- Sweat drops: 0 = none, 1..3 (needs the missing spr_sansb_face_sweat_*.png).
+---@param level number
 function Sans.SetSweat(self, level)
     self.sweat = math.max(0, math.min(SWEAT_FRAMES, math.floor(level or 0)))
 end
 
 --- Show the blue eye for `duration` seconds, then go back to the normal face.
+---@param duration number
 function Sans.FlashBlueEye(self, duration)
     self.facetype = 1
     self.f_i = 0
@@ -230,7 +220,6 @@ function Sans.ApplyOffsets(self, xoff, yoff, shake_x)
 
     local bob = yoff / TORSO_BOB_DAMP
 
-    -- Legs are static (ignore xoff / yoff) but follow the hurt knock-back.
     self.legs:MoveTo(self.cpos[1] + shake, ay + self.legs_dy)
 
     self.body:MoveTo(ax, ay + self.torso_dy + bob)
@@ -291,6 +280,7 @@ end
 
 --- OPTIONAL: called when an attack is launched at this enemy, before the hit lands.
 --- `data` fields: enemy, damage, perfect, offset, position, attack (see _temp.lua).
+---@param data table
 function Sans.OnAttack(self, data)
     local ty = 220
     Tween.CreateTween(function (v)
@@ -316,10 +306,8 @@ function Sans.Update(self, dt)
         return
     end
 
-    -- One 30 FPS "frame tick": every ported counter advances by this much.
     local step = dt * SOURCE_FPS
 
-    -- Sway / bounce.
     local xoff, yoff = 0, 0
     local bounce = math.floor(self.bounce or 0)
 
@@ -343,7 +331,6 @@ function Sans.Update(self, dt)
     self.xoff = xoff
     self.yoff = yoff
 
-    -- Hurt shake.
     local shake_x = 0
     if (self.hurting) then
         shake_x = self.intensity
@@ -359,7 +346,6 @@ function Sans.Update(self, dt)
         end
     end
 
-    -- Head offsets (attack poses).
     if (self.head_auto_return) then
         local k = math.min(1, (self.head_return_speed or 6) * dt)
         self.headx = self.headx - self.headx * k
@@ -368,7 +354,6 @@ function Sans.Update(self, dt)
         if (math.abs(self.heady) < 0.05) then self.heady = 0 end
     end
 
-    -- Blue-eye auto-off (only for FlashBlueEye).
     if (self._blueeye_timer) then
         self._blueeye_timer = self._blueeye_timer - dt
         if (self._blueeye_timer <= 0) then
@@ -381,7 +366,6 @@ function Sans.Update(self, dt)
         end
     end
 
-    -- Torso idle cycle; movearm ~= 0 (arm pose playing) pauses it.
     if (math.floor(self.movearm or 0) == 0) then
         self.torso_time = self.torso_time + dt
         if (self.torso_time >= TORSO_INTERVAL) then
@@ -391,14 +375,10 @@ function Sans.Update(self, dt)
         end
     end
 
-    -- Face / blue eye / sweat.
     Sans.UpdateFace(self, step)
 
-    -- Place every part.
     Sans.ApplyOffsets(self, xoff, yoff, shake_x)
 
-    -- self.dead is set by Battle.Update at HP 0 + killable. No death sheet yet,
-    -- so freeze the sway and let Destroy() dust the body.
     if (self.dead) then
         self.bounce = 0
     end
@@ -411,7 +391,6 @@ function Sans.Destroy(self)
         return
     end
 
-    -- `sound` is true for the first part only: one dust sound, not three.
     local sound = true
     for _, sprite in ipairs({self.legs, self.body, self.head}) do
         if (sprite) then

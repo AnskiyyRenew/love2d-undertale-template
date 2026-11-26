@@ -1,4 +1,4 @@
--- GameJolt Game API v1.2 client. https://gamejolt.com/game-api/doc
+--- GameJolt Game API v1.2 client. https://gamejolt.com/game-api/doc
 
 local gamejolt = {}
 
@@ -16,19 +16,20 @@ gamejolt._session_auto = {
     last_error = nil
 }
 
--- Flipped to true only once the API has accepted a pair of credentials.
 gamejolt._verified = false
 
 local function nonEmpty(value)
     return type(value) == "string" and value:match("%S") ~= nil
 end
 
--- Tokens pasted out of a browser carry whitespace and the API rejects them verbatim.
+--- Tokens pasted out of a browser carry whitespace and the API rejects them verbatim.
+---@param value table
 local function trim(value)
     return value:match("^%s*(.-)%s*$")
 end
 
--- Unencoded spaces, "&" or "=" corrupt the URL and change what the server hashes.
+--- Unencoded spaces, "&" or "=" corrupt the URL and change what the server hashes.
+---@return string
 local function urlencode(value)
     local text = tostring(value)
     return (text:gsub("\n", "\r\n"):gsub("([^%w%-%._~])", function(char)
@@ -36,7 +37,7 @@ local function urlencode(value)
     end))
 end
 
--- Shared credential fragment appended to every user-scoped endpoint.
+--- Shared credential fragment appended to every user-scoped endpoint.
 local function userParams()
     return "&username=" .. urlencode(gamejolt.username) ..
            "&user_token=" .. urlencode(gamejolt.user_token)
@@ -49,7 +50,7 @@ local function requireConfig()
     return true
 end
 
--- Without this, user-scoped endpoints raise while concatenating nil.
+--- Without this, user-scoped endpoints raise while concatenating nil.
 local function requireLogin()
     if (not gamejolt.isLoggedIn()) then
         return false, "GameJolt: not authenticated, call gamejolt.authUser(username, user_token) first"
@@ -62,8 +63,9 @@ local function generateSignature(request_path)
     return md5.sumhexa(input)
 end
 
--- Returns payload, or false, message, kind: "transport" (unreachable, bad HTTP
--- status, unparseable body) or "api" (the server explicitly refused).
+--- Returns payload, or false, message, kind: "transport" (unreachable, bad HTTP
+--- status, unparseable body) or "api" (the server explicitly refused).
+---@param path string
 local function apiRequest(path)
     if (not https or type(https.request) ~= "function") then
         local platform = (SE and SE.system and SE.system.getOS and SE.system.getOS()) or "Unknown"
@@ -73,7 +75,6 @@ local function apiRequest(path)
 
     local url = gamejolt.base_url .. path .. "&signature=" .. generateSignature(path)
 
-    -- lua-https: returns code, body, headers; DNS / TLS failures may raise.
     local raised, code, body = pcall(https.request, url)
     if (not raised) then
         return false, "HTTPS request failed: "..tostring(code), "transport"
@@ -96,7 +97,6 @@ local function apiRequest(path)
         return false, "Malformed response: missing response envelope", "transport"
     end
 
-    -- GameJolt reports success as the string "true"/"false", not a boolean.
     if (payload.success == false or payload.success == "false") then
         return false, payload.message or "API error", "api"
     end
@@ -119,7 +119,6 @@ local function sessionAutoTick(dt)
     local result, err, kind = gamejolt.sessionPing(state.status)
     if (result == nil or result == false) then
         state.last_error = err
-        -- A refusal means the credentials stopped working: stop the heartbeat.
         if (kind == "api") then
             state.enabled = false
             gamejolt._verified = false
@@ -129,15 +128,14 @@ local function sessionAutoTick(dt)
     end
 end
 
-
 ---Initializes the GameJolt API with the provided app ID and private key.
 ---@param app_id number|string
 ---@param private_key string
+---@return boolean
 function gamejolt.init(app_id, private_key)
     gamejolt.app_id = tonumber(app_id)
     gamejolt.private_key = private_key
     gamejolt.base_url = "https://api.gamejolt.com/api/game/v1_2"
-    -- Pointing at another game must not keep the previous player logged in.
     gamejolt.logout()
     return (gamejolt.app_id ~= nil and gamejolt.private_key ~= nil)
 end

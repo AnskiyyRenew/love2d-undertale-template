@@ -1,13 +1,5 @@
 ---@diagnostic disable: undefined-field
 
--- Game-first module resolution. The Game area wins, the engine directory is the
--- fallback:
---   encounters      Game.Encounter.<file>    (Game-only, no engine twin)
---   waves           Game.Waves.<name>      -> Scripts.Waves.<name>
---   attack patterns Game.Attacks.<name>    -> Scripts...Battle.PlayerAttacks.<name>
---   souls           Game.Souls.<name>      -> Scripts...Battle.Player.Souls.<name>
--- Files are probed on disk before require: pcall(require) cannot tell a missing
--- module from one whose top-level code threw.
 local BATTLE_MODULE_ROOTS = {
     waves = {"Game.Waves.", "Scripts.Waves."},
     attacks = {"Game.Attacks.", "Scripts.Libraries.Battle.PlayerAttacks."}
@@ -48,7 +40,6 @@ end
 ---@return any error_message
 ---@return string|nil error_module
 local function requireGameFirst(roots, name)
-    -- Every path returns the full 4-value shape: a bare `return nil` collapses to one.
     if (not name) or (name == "") then return nil, nil, nil, nil end
 
     local found_module = nil
@@ -135,7 +126,6 @@ local function loadAttackPattern(name)
     return nil, module_name
 end
 
-
 Layers.new_layer("BOTTOM", -1000)
 Layers.new_layer("Background", -10)
 Layers.new_layer("UI", 0)
@@ -170,7 +160,6 @@ local battle = {
     dialog_texts = nil,
 
     attack = default_attack,
-    -- Resolved module names, so battle.Clear() can drop them from either root.
     attack_paths = {default_attack_module},
     wave = "wave",
     _wave = {},
@@ -185,7 +174,6 @@ local battle = {
     _end = false,
     _end_time = 0,
 
-    -- Set false before SetGame() for a scripted fight that owns Player.hp.
     auto_overworld_sync = true,
     _data_synced = false
 }
@@ -193,6 +181,7 @@ local battle = {
 ---Public wrapper so other Battle modules (e.g. UI states) can drop the wave
 ---module without hard-coding which root it came from. Defined after the `battle`
 ---table because it assigns a field on that table.
+---@param wave_name string
 function battle.ClearWaveModule(wave_name)
     clearWaveModule(wave_name)
 end
@@ -211,7 +200,6 @@ blacktop.Step = function (self)
     end
 end
 
--- Load battle method APIs for attaching to encounter tables via metatable
 local game_apis = require(path .. "Battle.game_apis")
 
 Player = battle.player
@@ -244,8 +232,8 @@ end
 function battle.DefenseEnding() end
 function battle.HandleActions(enemy, action) end
 function battle.HandleItems(item) end
--- Override on the battle table for custom spare handling; the default hands the
--- turn back to the enemy.
+--- Override on the battle table for custom spare handling; the default hands the
+--- turn back to the enemy.
 function battle.HandleSpare() battle.ChangeState("DEFENDING") end
 function battle.HandleFlee() end
 function battle.FleeUpdate(dt) end
@@ -287,7 +275,6 @@ local function defaultEnteringState(old, new)
         battle.mainarena:Resize(565, 130)
         battle.mainarena:RotateTo(0)
         battle.mainarena.is_active = false
-        -- Narration reappears once the arena finishes restoring (battle.UpdateRestore).
         battle.restoring_arena = true
     end
 
@@ -299,7 +286,7 @@ end
 battle.EnteringState = defaultEnteringState
 battle.defaultEnteringState = defaultEnteringState
 
--- Single entry point for state changes: EnteringState runs once per real change.
+--- Single entry point for state changes: EnteringState runs once per real change.
 function battle.ChangeState(new_state)
     if (battle.state == new_state) then
         return
@@ -313,13 +300,9 @@ function battle.SetEndRoom(room)
     battle.room_end = room
 end
 
--- Overworld save-data bridge. `DATA` (Game/Logics) holds the live overworld
--- stats, while an encounter module only defines template values. Runs for every
--- battle while overworld data is loaded, and is idempotent: EXP / GOLD are
--- consumed on write-back, so nothing is ever counted twice.
-
 ---Is this battle linked to an overworld save? False for battle-only games,
 ---where `DATA` is never assigned.
+---@return boolean
 function battle.HasOverworldData()
     if (battle.auto_overworld_sync == false) then return false end
     return (type(DATA) == "table" and type(DATA.player) == "table")
@@ -327,6 +310,7 @@ end
 
 ---Start the battle with the stats the overworld is carrying. Runs at the end of
 ---SetGame(), so it overrides the encounter module's template values.
+---@return boolean
 function battle.SyncFromOverworld()
     if (not battle.HasOverworldData()) then return false end
 
@@ -343,6 +327,7 @@ end
 
 ---Write this battle's results back into the overworld save data: HP, EXP, GOLD
 ---and any level-ups from `DATA.lv_data`.
+---@return boolean
 function battle.SyncToOverworld()
     if (not battle.HasOverworldData()) then return false end
     if (battle._data_synced) then return false end
@@ -366,12 +351,10 @@ function battle.SyncToOverworld()
             p.atk   = row.at
             p.def   = row.df
 
-            -- Undertale-style: the gained max HP is added to the current HP.
             p.hp = math.min(p.maxhp, p.hp + (p.maxhp - old_max))
         end
     end
 
-    -- Consume the earnings so a second write-back can never double-count.
     battle.EXP = 0
     battle.GOLD = 0
     return true
@@ -381,6 +364,8 @@ end
 ---(EXP / GOLD), with `extra_texts` appended after them. Scenes override
 ---`Battle.Win` to react on victory; this implementation stays available as
 ---`Battle.defaultWin`.
+---@param extra_texts table
+---@param on_complete function
 function battle.Win(extra_texts, on_complete)
     battle.ChangeState("WIN")
     local texts = Localize.localizeText("Battle.WinTexts1", {Battle.EXP, Battle.GOLD})
@@ -397,11 +382,11 @@ function battle.Win(extra_texts, on_complete)
         battle._end = true
     end
 end
--- Base implementation, kept so a scene can override Battle.Win and still call it.
 battle.defaultWin = battle.Win
 
 ---Load an encounter script from Game/Encounter/ (there is no engine-side twin),
 ---then apply its template stats on top of any overworld save data.
+---@param file string
 function battle.SetGame(file)
     battle.gameName = "Game.Encounter." .. file
 
@@ -430,7 +415,6 @@ function battle.SetGame(file)
         if (player_data.hp) then Player.hp = player_data.hp end
         if (game_.wave) then Battle.wave = game_.wave end
 
-        -- Overworld save data wins over the encounter module's template stats.
         battle.SyncFromOverworld()
 
         Battle.ChangeState(game_.state or "ACTIONSELECT")
@@ -440,7 +424,6 @@ function battle.SetGame(file)
         end
         UI.barUpdate()
 
-        -- Attach game_apis so encounter:AddItem / AddEnemy / forceAttack work.
         if (type(game_) == "table") then
             setmetatable(game_, {__index = game_apis})
         end
@@ -469,13 +452,13 @@ function battle.SetAttackPattern(pattern)
         return
     end
 
-    -- Fall back to the default attack pattern so ACTIONSELECT still works.
     print("[Battle - PlayerAttack] Falling back to the default pattern (stick).")
     battle.attack = default_attack
 end
 
 ---Load a wave script, Game area first. A missing or broken wave falls back to the
 ---default "wave" script so a battle always has something to run.
+---@param wave_name string
 function battle.LoadWave(wave_name)
     local name = (wave_name and wave_name ~= "") and wave_name or "wave"
     local roots = BATTLE_MODULE_ROOTS.waves
@@ -496,7 +479,6 @@ function battle.LoadWave(wave_name)
         end
     end
 
-    -- Fall back through the resolver so a Game-side "wave" override still wins.
     local fallback_module, fallback, fallback_error = requireGameFirst(roots, "wave")
     battle.waveModule = fallback_module or battle.waveModule
 
@@ -516,13 +498,9 @@ function battle.Defending()
 
     local _wave = battle.LoadWave(Battle.wave)
 
-    -- The wave table is shared: a previous run may have left _end = true behind.
     _wave._end = false
     Battle._wave = _wave
 end
-
--- Debug helpers: jump straight to a wave, and end the current turn early. Both
--- go through the normal transitions, so nothing is left half torn down.
 
 ---End the running enemy turn right now, as if its wave had called EndWave().
 ---Development builds only.
@@ -535,7 +513,6 @@ function battle.DebugEndWave()
     if (battle._wave.EndWave) then
         battle._wave.EndWave()
     end
-    -- A stale ENDED = true would end the NEXT wave immediately.
     battle._wave.ENDED = false
 
     battle.ChangeState("ACTIONSELECT")
@@ -559,7 +536,6 @@ function battle.DebugJumpWave(wave_name)
         return false, "battle is already over"
     end
 
-    -- Tear the current turn down the normal way so its bullets get destroyed.
     if (battle.state == "DEFENDING" and type(battle._wave) == "table") then
         if (battle._wave.EndWave) then
             battle._wave.EndWave()
@@ -570,11 +546,9 @@ function battle.DebugJumpWave(wave_name)
         battle.ChangeState("ACTIONSELECT")
     end
 
-    -- Drop the cached module so the file's top-level code runs again.
     clearWaveModule(wave_name)
 
     battle.wave = wave_name
-    -- Otherwise UpdateRestore would reveal the narration in the middle of the wave.
     battle.restoring_arena = false
     battle.narration_text:SetText("")
 
@@ -584,11 +558,6 @@ function battle.DebugJumpWave(wave_name)
         "' (" .. tostring(battle.waveModule) .. ")")
     return true, nil
 end
-
--- Animation dispatch. An animation is a plain table split in two: the MODULE
--- (what require returns, holds the functions) and an INSTANCE (what New(pos)
--- returns, holds the state plus `_class` pointing back at the module).
--- BindAnimation hangs dot-callable closures on the instance; no metatable.
 
 ---The function table that drives `anim`: `anim._class`, the module itself for a
 ---bare module (a scene that never called `Game:InitAnimation`), or nil.
@@ -630,7 +599,6 @@ function battle.BindAnimation(instance, module)
 
     for name, fn in pairs(module) do
         if (type(fn) == "function" and name ~= "New" and instance[name] == nil) then
-            -- Copied into locals so each closure captures its own pair.
             local method_name, method_fn = name, fn
             instance[name] = function (first, ...)
                 if (first == instance) then
@@ -646,9 +614,6 @@ function battle.BindAnimation(instance, module)
     return instance
 end
 
--- Hitbox viewer (development builds only): F7 toggles an overlay showing the
--- shapes really tested each frame — every `isBullet` sprite plus the player
--- soul(s). Drawn on the TOP layer; unreachable in a release build.
 local HITBOX_KEY = "f7"
 
 battle.debug_hitboxes = false
@@ -728,7 +693,6 @@ end
 --- of everything) and restores every graphics state it touches, because the
 --- layer pass keeps drawing after it.
 local function drawHitboxOverlay()
-    -- The entry stays registered while hidden (cheaper than re-hooking).
     if (not battle.debug_hitboxes) then
         battle.hitbox_sprites = 0
         battle.hitbox_shapes = 0
@@ -743,7 +707,6 @@ local function drawHitboxOverlay()
 
     local sprite_count, shape_count = 0, 0
 
-    -- Souls first (cyan), bullets last (red) so they land on top.
     for _, soul in ipairs(Player.souls) do
         local spr = soul.sprite
         if (spr and spr.image and spr.visible ~= false) then
@@ -808,8 +771,6 @@ function battle.ToggleHitboxes(show)
 end
 
 function battle.Update(dt)
-    -- F7 toggles the viewer; re-hooked every frame while on, because a scene
-    -- clear wipes the layer system's external draws.
     if (not _RELEASED) then
         if (Keyboard.GetState(HITBOX_KEY) == 1) then
             battle.ToggleHitboxes()
@@ -823,23 +784,19 @@ function battle.Update(dt)
     Arenas.Update(dt)
     UI.Update(dt)
 
-    -- Timers
     battle.TIME_F = battle.TIME_F + 1
     battle.TIME_R = battle.TIME_R + dt
 
-    -- Enemies Animation
     if (not battle.game) then return end
     for _, v in ipairs(battle.game.enemies)
     do
         local anim = v.animation
         if (anim) then
-            -- Fields monsters commonly read straight off `self`.
             anim.enemy    = v
             anim.canspare = v.canspare
             anim.killable = v.killable
             anim.hp       = v.hp
             anim.maxhp    = v.maxhp
-            -- Convenience signal: HP has reached 0 and the enemy is killable.
             anim.dead     = (v.hp ~= nil and v.hp <= 0 and v.killable == true)
 
             if (type(anim) == "table" and anim._bound and anim.Update) then
@@ -853,9 +810,10 @@ function battle.Update(dt)
     end
 end
 
--- Called on the way back from DEFENDING to ACTIONSELECT. Waits for the arena to
--- finish restoring on its own, then reveals the narration. While the flag is
--- set, state.Update() routes confirm/cancel here, so the menu cannot open early.
+--- Called on the way back from DEFENDING to ACTIONSELECT. Waits for the arena to
+--- finish restoring on its own, then reveals the narration. While the flag is
+--- set, state.Update() routes confirm/cancel here, so the menu cannot open early.
+---@param dt number
 function battle.UpdateRestore(dt)
     if (not battle.restoring_arena) then
         return
@@ -869,24 +827,18 @@ function battle.UpdateRestore(dt)
 end
 
 function battle.Clear()
-    -- Hand HP / EXP / GOLD (and any level-ups) back to DATA before dropping modules.
     battle.SyncToOverworld()
 
-    -- Clear the game module tree so it re-queries Localize on next load
     if battle.gameName then
         ClearModuleTree(battle.gameName)
     end
 
-    -- attack_paths holds resolved names, so both roots are covered; the tree clear
-    -- below catches any that were never registered.
     for i = #battle.attack_paths, 1, -1
     do
         ClearModuleTree(battle.attack_paths[i])
     end
     ClearGameTree("Attacks")
 
-    -- Game-area content: without this, re-entering a battle would hand back last
-    -- run's modules, state included.
     ClearGameTree("Encounter")
     ClearGameTree("Animations")
     ClearGameTree("Waves")
@@ -898,11 +850,9 @@ function battle.Clear()
         Battle._wave._paths = {}
     end
     Battle._wave = {}
-    -- Clear the wave wrapper under both roots and reset the shared wave state.
     clearWaveModule(Battle.wave)
     battle.restoring_arena = false
 
-    -- Clear the whole Battle library tree (UI, buttons, Player, Arenas, ...).
     ClearModuleTree("Scripts.Libraries.Attacks")
     ClearModuleTree("Scripts.Libraries.Battle")
 end

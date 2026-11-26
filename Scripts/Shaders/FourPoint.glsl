@@ -3,9 +3,13 @@
 // Takes 4 corner coordinates and maps the texture to fill the quadrilateral.
 // p1 = top-left, p2 = top-right, p3 = bottom-left, p4 = bottom-right
 
+// Top-left corner of the quad, in the same pixel space as screen_coords.
 extern vec2 p1;
+// Top-right corner of the quad.
 extern vec2 p2;
+// Bottom-left corner of the quad.
 extern vec2 p3;
+// Bottom-right corner of the quad.
 extern vec2 p4;
 
 vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords) {

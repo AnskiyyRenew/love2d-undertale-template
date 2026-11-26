@@ -1,10 +1,4 @@
---[[
-InstText: draws the whole text instantly, no typing animation. Splits ASCII and
-CJK characters and renders each with its bondfont entry. Entry points:
-typers.New, typers.ClearCache; instances expose SetText / SetAlign / Rebuild.
-]]
--- Shared mask / shader helpers. Resolved through the engine module path so a
--- Game-area whole-file copy of a typer still finds it.
+--- InstText: draws the whole text instantly, no typing animation. Splits ASCII and
 local render = require("Scripts.Libraries.Typers.render")
 
 local typers = {
@@ -47,6 +41,8 @@ end
 
 --- Text objects are shared by every instance with the same font + char, so only
 --- release and evict the cache entry once the last reference is gone.
+---@param font table
+---@param char string
 local function releaseTextObject(font, char)
     local key = getTextCacheKey(font, char)
     local cache_entry = text_cache[key]
@@ -78,7 +74,7 @@ local function getTextObject(font, char)
 end
 
 function typers.BondFont(byte, engfont, non_engfont, engfunc, non_engfunc)
-    if (charlen(byte) == 1) then -- English character.
+    if (charlen(byte) == 1) then
         engfunc()
         return getFont(engfont.font, engfont.size)
     else
@@ -99,7 +95,6 @@ end
 function typers.New(text, position, layer, size)
     local typer = {}
 
-    -- Metatable to intercept `.layer` writes and mark Layers dirty.
     setmetatable(typer, {
         __index = function(t, k)
             if k == "layer" then
@@ -113,26 +108,21 @@ function typers.New(text, position, layer, size)
                 Layers.mark_dirty()
             elseif k == "font" then
                 rawset(t, k, v)
-                -- A directly-set font applies to both bondfont entries with
-                -- empty funcs, so the whole text uses this single font.
                 if (t.bondfont) then
                     t.bondfont.engfont.font = v
                     t.bondfont.non_engfont.font = v
                     t.bondfont.engfunc = function() end
                     t.bondfont.non_engfunc = function() end
                 end
-                -- InstText pre-renders letters, so re-render with the new font.
                 if (t.Rebuild) then t:Rebuild() end
             elseif k == "fontsize" then
                 rawset(t, k, v)
-                -- Same for the size: both bondfont entries are resized.
                 if (t.bondfont) then
                     t.bondfont.engfont.size = v
                     t.bondfont.non_engfont.size = v
                     t.bondfont.engfunc = function() end
                     t.bondfont.non_engfunc = function() end
                 end
-                -- InstText pre-renders letters, so re-render with the new size.
                 if (t.Rebuild) then t:Rebuild() end
             else
                 rawset(t, k, v)
@@ -149,7 +139,6 @@ function typers.New(text, position, layer, size)
     typer._layer_value = (layer or 0)
     typer.size = (size or {640, 0})
 
-    -- Bondfont config, matching ntext / stext.
     typer.bondfont = {
         engfont = {font = "determination_mono.ttf", size = 27},
         non_engfont = {font = "simsun.ttc", size = 13},
@@ -167,12 +156,9 @@ function typers.New(text, position, layer, size)
     typer.outline = nil
     typer.align = "left"
     typer.effect = {}
-    -- Word-aware wrapping: off by default, enabled by setting
-    -- `typer.auto_wrap = true` together with a box width in `typer.size[1]`.
     typer.auto_wrap = false
 
     local function rebuildLetters()
-        -- Release old text objects (evicts the cache, preventing reuse-after-free).
         if (typer.letters) then
             for _, letter in ipairs(typer.letters) do
                 if (letter.font and letter.char) then
@@ -182,7 +168,7 @@ function typers.New(text, position, layer, size)
         end
 
         typer.letters = {}
-        typer.lines = {}  -- {start, last, width}
+        typer.lines = {}
         local offset_x = 0
         local offset_y = 0
         local relative_x = 0
@@ -190,7 +176,7 @@ function typers.New(text, position, layer, size)
         local line_start = 1
         local i = 1
 
-        -- Close the line being built and move the pen down one row.
+--- Close the line being built and move the pen down one row.
         local function endLine()
             local line_width = offset_x
             for j = line_start, #typer.letters do
@@ -201,14 +187,16 @@ function typers.New(text, position, layer, size)
             offset_y = offset_y + getFont(typer.bondfont.engfont.font, typer.bondfont.engfont.size):getHeight()
         end
 
-        -- Box width in pixels; 0 (or auto_wrap off) means "never wrap".
+--- Box width in pixels; 0 (or auto_wrap off) means "never wrap".
+---@return boolean
         local function wrapWidth()
             if (not typer.auto_wrap) then return 0 end
             return (typer.size and typer.size[1]) or 640
         end
 
-        -- Width of the word starting at `from`, up to the next break
-        -- opportunity, so a word moves whole to the next line.
+--- Width of the word starting at `from`, up to the next break
+--- opportunity, so a word moves whole to the next line.
+---@return number
         local function wordWidth(from)
             local total = 0
             local j = from
@@ -243,7 +231,6 @@ function typers.New(text, position, layer, size)
                 i = i + 1
             elseif (max_width > 0 and char == " " and offset_x > 0
                     and offset_x + wordWidth(i + 1) > max_width) then
-                -- Word wrap: swallow the space and start the word on a new line.
                 endLine()
                 i = i + 1
             elseif (len == 1) then
@@ -253,7 +240,6 @@ function typers.New(text, position, layer, size)
                 local font = getFont(typer.bondfont.engfont.font, typer.bondfont.engfont.size)
                 relative_y = 0
                 local w = font:getWidth(char) * typer.scale
-                -- Hard break: only reached by a single word wider than the box.
                 if (max_width > 0 and offset_x > 0 and offset_x + w > max_width) then
                     endLine()
                 end
@@ -269,7 +255,7 @@ function typers.New(text, position, layer, size)
                     alpha = typer.alpha,
                     outline = typer.outline,
                     effect = typer.effect,
-                    line_width = 0,  -- filled after line ends
+                    line_width = 0,
                 })
                 offset_x = offset_x + w
                 i = i + 1
@@ -279,9 +265,8 @@ function typers.New(text, position, layer, size)
                 end
                 local font = getFont(typer.bondfont.non_engfont.font, typer.bondfont.non_engfont.size)
                 relative_x = 0
-                relative_y = 4  -- +4 y-offset for CJK
+                relative_y = 4
                 local w = font:getWidth(char) * typer.scale
-                -- CJK has no spaces, so every glyph is a break opportunity.
                 if (max_width > 0 and offset_x > 0 and offset_x + 2 + w > max_width) then
                     endLine()
                 end
@@ -298,13 +283,12 @@ function typers.New(text, position, layer, size)
                     alpha = typer.alpha,
                     outline = typer.outline,
                     effect = typer.effect,
-                    line_width = 0,  -- filled after line ends
+                    line_width = 0,
                 })
                 offset_x = offset_x + w + 2
                 i = i + len
             end
         end
-        -- Final line: fill in line_width for the remaining letters.
         if (line_start <= #typer.letters) then
             local line_width = offset_x
             for j = line_start, #typer.letters do
@@ -335,8 +319,10 @@ function typers.New(text, position, layer, size)
         local letters = typer.letters
         if (not letters) or (#letters == 0) then return end
 
-        -- `ox` / `oy` shift every letter: the shader pass draws the text at
-        -- -x, -y inside its own canvas, every other path passes 0, 0.
+--- `ox` / `oy` shift every letter: the shader pass draws the text at
+--- -x, -y inside its own canvas, every other path passes 0, 0.
+---@param ox number
+---@param oy number
         local function emit(ox, oy)
             for _, letter in ipairs(letters) do
                 local eff_x, eff_y = 0, 0
@@ -357,8 +343,6 @@ function typers.New(text, position, layer, size)
                     local t = ol[5] or 1
                     local s = letter.scale or 1
                     SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
-                    -- 8-directional outline: 8 shifted copies at t-pixel offsets.
-                    -- setLineWidth has no effect on draw.
                     SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
@@ -397,8 +381,9 @@ function typers.New(text, position, layer, size)
         rebuildLetters()
     end
 
-    --- Pixel width of the widest line, ignoring `typer.x`. Each letter stores
-    --- the total width of its own line in `line_width`.
+--- Pixel width of the widest line, ignoring `typer.x`. Each letter stores
+--- the total width of its own line in `line_width`.
+---@return number
     function typer:GetWidth()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
@@ -411,8 +396,8 @@ function typers.New(text, position, layer, size)
         return widest
     end
 
-    --- Pixel height of every line, ignoring `typer.y`. Includes the `\n` /
-    --- auto-wrap line gaps and each glyph's own `scale`.
+--- Pixel height of every line, ignoring `typer.y`. Includes the `\n` /
+--- auto-wrap line gaps and each glyph's own `scale`.
     function typer:GetHeight()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
@@ -420,7 +405,6 @@ function typers.New(text, position, layer, size)
         local top, bottom = nil, nil
         for _, letter in ipairs(letters) do
             local y = letter.y or 0
-            -- Unlike `width`, the height has `scale` applied here.
             local font = letter.font
             local h = ((font and font.getHeight) and font:getHeight() or 0) * (letter.scale or 1)
             if (top == nil or y < top) then top = y end
@@ -430,7 +414,7 @@ function typers.New(text, position, layer, size)
         return (bottom or 0) - top
     end
 
-    --- Both measurements in one call, returned as two numbers: width, height.
+--- Both measurements in one call, returned as two numbers: width, height.
     function typer:GetLettersSize()
         return typer:GetWidth(), typer:GetHeight()
     end
@@ -440,8 +424,6 @@ function typers.New(text, position, layer, size)
     end
 
     function typer:Destroy()
-        -- Idempotent: a stale second Destroy must not decrement refs again and
-        -- release a cache entry that a newer instance is still drawing.
         if (typer._destroyed) then return end
         typer._destroyed = true
 
@@ -455,7 +437,6 @@ function typers.New(text, position, layer, size)
                     releaseTextObject(letter.font, letter.char)
                 end
             end
-            -- Clear letters so a repeated Destroy call cannot re-release them.
             typer.letters = nil
         end
         for i = #typers.insts, 1, -1 do

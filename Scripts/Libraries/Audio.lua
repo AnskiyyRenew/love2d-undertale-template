@@ -2,8 +2,6 @@ local audio = {
     _path_sound = "Resources/Sounds/",
     _path_music = "Resources/Music/",
 
-    -- Per-game override roots, checked before the root ones. The order matches
-    -- _path_sound / _path_music so both bare names and rooted paths resolve.
     _game_path_sound = "Game/Resources/Sounds/",
     _game_path_music = "Game/Resources/Music/",
 
@@ -44,8 +42,6 @@ function audio.ResolvePath(kind, name)
 
     name = name:gsub("\\", "/")
 
-    -- Leading "/" is a love-fs absolute path; the Game twin and the root prefix
-    -- are still probed (the Typers write "/Voices/foo.wav" meaning "under Resources/Sounds/").
     if (name:sub(1, 1) == "/") then
         local relative = name:gsub("^/+", "")
         if (relative == "") then return name end
@@ -61,7 +57,6 @@ function audio.ResolvePath(kind, name)
         return name
     end
 
-    -- Already an explicit Game path: leave it, or it would be prefixed twice.
     if (name:sub(1, #game_prefix) == game_prefix) then
         return name
     end
@@ -81,74 +76,74 @@ end
 ---@param inst table
 ---@return table
 local function attachInstMethods(inst)
-    ---@param self table
-    ---@param startVolume number
-    ---@param targetVolume number
-    ---@param duration number
-    ---@return table
+---@param self table
+---@param startVolume number
+---@param targetVolume number
+---@param duration number
+---@return table
     function inst:VolumeTransition(startVolume, targetVolume, duration)
         return audio.VolumeTransition(self, startVolume, targetVolume, duration)
     end
 
-    ---@param self table
-    ---@param startPitch number
-    ---@param targetPitch number
-    ---@param duration number
-    ---@return table
+---@param self table
+---@param startPitch number
+---@param targetPitch number
+---@param duration number
+---@return table
     function inst:PitchTransition(startPitch, targetPitch, duration)
         return audio.PitchTransition(self, startPitch, targetPitch, duration)
     end
 
-    ---@param self table
-    ---@param duration number
-    ---@param targetVolume number
-    ---@return table
+---@param self table
+---@param duration number
+---@param targetVolume number
+---@return table
     function inst:FadeIn(duration, targetVolume)
         return audio.FadeIn(self, duration, targetVolume)
     end
 
-    ---@param self table
-    ---@param duration number
-    ---@param targetVolume number
-    ---@return table
+---@param self table
+---@param duration number
+---@param targetVolume number
+---@return table
     function inst:FadeOut(duration, targetVolume)
         return audio.FadeOut(self, duration, targetVolume)
     end
 
-    ---@param self table
-    ---@return table
+---@param self table
+---@return table
     function inst:Pause()
         return audio.Pause(self)
     end
 
-    ---@param self table
-    ---@return table
+---@param self table
+---@return table
     function inst:Resume()
         return audio.Resume(self)
     end
 
-    ---@param self table
-    ---@return table
+---@param self table
+---@return table
     function inst:Stop()
         return audio.Stop(self)
     end
 
-    ---@param self table
-    ---@param introEndTime number
-    ---@param outroStartTime number
-    ---@return table
+---@param self table
+---@param introEndTime number
+---@param outroStartTime number
+---@return table
     function inst:SetLoopingPoint(introEndTime, outroStartTime)
         return audio.SetLoopingPoint(self, introEndTime, outroStartTime)
     end
 
-    ---@param self table
-    ---@return table
+---@param self table
+---@return table
     function inst:FollowLoop()
         return audio.FollowLoop(self)
     end
 
-    ---@param self table
-    ---@return table
+---@param self table
+---@return table
     function inst:FollowOutro()
         return audio.FollowOutro(self)
     end
@@ -399,7 +394,6 @@ end
 function audio.PlaySound(sound, volume, loop)
     local inst = {}
     local resolved_path = audio.ResolvePath("sound", sound)
-    -- Cloning a preloaded template shares the decoded buffer, skipping the decode.
     local source
     local template = audio.cache[resolved_path] or audio.cache[sound]
     if (template) then
@@ -415,7 +409,6 @@ function audio.PlaySound(sound, volume, loop)
     inst.source = source
     inst.name = resolved_path
 
-    -- Update releases non-looping sources once they stop, hence this flag.
     inst.loop = loop or false
     inst.paused = false
     inst.stopped = false
@@ -433,7 +426,6 @@ end
 function audio.PlayMusic(music, volume, loop)
     local inst = {}
     local resolved_path = audio.ResolvePath("music", music)
-    -- Cloning a preloaded template shares the stream handle, skipping decoder setup.
     local source
     local template = audio.cache[resolved_path] or audio.cache[music]
     if (template) then
@@ -449,7 +441,6 @@ function audio.PlayMusic(music, volume, loop)
     inst.source = source
     inst.name = resolved_path
 
-    -- Update releases non-looping sources once they stop, hence this flag.
     inst.loop = loop ~= false
     inst.paused = false
     inst.stopped = false
@@ -556,7 +547,6 @@ function audio.PreloadFile(full_path, kind)
         return false
     end
 
-    -- Key by the raw path and by the resolved form so lookups hit either way.
     audio.cache[full_path] = source
     local resolved = audio.ResolvePath(kind, full_path)
     if (resolved and resolved ~= full_path) then

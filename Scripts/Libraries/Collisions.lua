@@ -9,7 +9,6 @@ function collisions.FollowShape(sprite)
     local w, h = width * xscale, height * yscale
     local angle = sprite.rotation or 0
 
-    -- Same pivot priority as Sprites.GetPivotOffset: pixel pivot, else proportional.
     local ox, oy
     if (sprite.xpivot_px and sprite.xpivot_px ~= 0) or (sprite.ypivot_px and sprite.ypivot_px ~= 0) then
         ox, oy = sprite.xpivot_px or 0, sprite.ypivot_px or 0
@@ -17,8 +16,6 @@ function collisions.FollowShape(sprite)
         ox, oy = (sprite.xpivot or 0.5) * width, (sprite.ypivot or 0.5) * height
     end
 
-    -- Sprites are rendered at world (sprite.x, sprite.y); the camera transform
-    -- is applied at draw time, so shapes stay in world space -- never transformPoint.
     local dx = (width * 0.5 - ox) * xscale
     local dy = (height * 0.5 - oy) * yscale
 
@@ -31,7 +28,6 @@ function collisions.FollowShape(sprite)
         w = math.abs(w),
         h = math.abs(h),
         angle = angle,
-        -- "ellipse" when the sprite asked for one (sprites.SetHitboxShape), else "rect".
         shape = sprite._hitbox_shape or "rect"
     }
 
@@ -288,9 +284,6 @@ function collisions.CircleWithCircle(circle1, circle2)
     return true
 end
 
--- Shape kinds: a table may carry `shape` = "ellipse"; anything else (including
--- a missing field) is a rectangle. The two dispatchers below are the only
--- places that need to look at the kind.
 collisions.SHAPE_RECT = "rect"
 collisions.SHAPE_ELLIPSE = "ellipse"
 

@@ -9,7 +9,6 @@ local map = {
     world = world,
 
     _debug_drawed = false,
-    -- Runtime objects placed from the map layers (physics bodies + data).
     objects = {
         marks = {},
         triggers = {},
@@ -21,11 +20,9 @@ local map = {
 
         unknowns = {}
     },
-    -- Raw Tiled objects, kept only for the debug drawer.
     debug_objects = {},
 }
 local debug_attris = {
-    -- color, relative base angle in degrees; the object's own `rotation` is added.
     marks = {{0.5, 1, 1}, 45},
     triggers = {{0.3, 1, 0.3}, 0},
     walls = {{1, 0.3, 0.3}, 0},
@@ -54,12 +51,9 @@ function layerHandlers.triggers(layer)
         )
 
         local shape = SE.physics.newRectangleShape(body, obj.width * 2, obj.height * 2)
-        -- The shape itself is the fixture in this engine.
         shape:setDensity(1)
         shape:setSensor(true)
 
-        -- Runtime object referenced from the fixture userData, so the
-        -- interaction system can read its properties (e.g. an "rr" key).
         local entry = {
             x = obj.x * 2,
             y = obj.y * 2,
@@ -161,8 +155,6 @@ end
 function layerHandlers.walls(layer)
     local objects = map.objects.walls
     local scale = 2
-    -- Wall friction. Box2D mixes contact friction as sqrt(f1 * f2), so this and
-    -- the player's own friction (char.lua) must both stay low.
     local wall_friction = 0.01
 
     local function rotatePoint(px, py, angle)
@@ -189,8 +181,6 @@ function layerHandlers.walls(layer)
                 table.insert(verts, (p.y - first.y) * scale)
             end
 
-            -- LÖVE 12 requires the polygon to be attached to a body: a detached
-            -- shape throws on setDensity / setUserData.
             local shape = SE.physics.newPolygonShape(body, verts)
             shape:setDensity(1)
             shape:setFriction(wall_friction)
@@ -348,7 +338,6 @@ end
 local function scan_layers(_map)
     for _, layer in ipairs(_map.layers) do
         if (layer.type == "objectgroup") then
-            -- Raw Tiled objects, kept for the debug drawer.
             local debug_list = map.debug_objects[layer.name]
             if (not debug_list) then
                 debug_list = {}
@@ -369,7 +358,6 @@ end
 local function draw_object_debug(obj, color, base_angle)
     local x, y = obj.x or 0, obj.y or 0
     local w, h = obj.width or 0, obj.height or 0
-    -- relative base angle + the object's own rotation (e.g. a 90deg wall)
     local angle = (base_angle or 0) + (obj.rotation or 0)
 
     SE.graphics.push()
@@ -418,22 +406,20 @@ end
 
 local function debug_keyboards(dt)
     if (Keyboard.GetState("space") == 1) then
-        -- Window pixel position -> canvas coordinate (0-640, 0-480).
         local mx, my = SE.mouse.getPosition()
         local canvas_x = (mx - DrawX) / ScreenScale
         local canvas_y = (my - DrawY) / ScreenScale
 
-        -- Canvas -> map world: screen = 2 * world + 320 - Camera.x.
         local wx = (canvas_x - 320 + Camera.x) / 2
         local wy = (canvas_y - 240 + Camera.y) / 2
 
-        -- Snap the camera so the world point under the mouse is the view centre.
         Camera.x = wx * 2
         Camera.y = wy * 2
     end
 end
 
 ---Destroy every physics body owned by the map objects.
+---@param objects table
 local function resetObjects(objects)
     for k, v in pairs(objects) do
         if (type(v) == "table") then
@@ -464,29 +450,23 @@ function map.Init(lua_file)
         return
     end
 
-    -- Make sure the physics world is ready.
     world.Init()
 
     map.current = lua_file
-    -- Game area first: a copy at Game/<path> overrides the built-in map.
     if (Overworld and Overworld.ResolveMapPath) then        map.current = Overworld.ResolveMapPath(lua_file)
     end
     map._map = sti(map.current, {"box2d"})
     map._map.draw_objects = false
 
-    -- Init objects in the layers (physics bodies + runtime data).
     scan_layers(map._map)
 
     map._debug = Overworld.debug
     debug_drawer()
 
     map._mapper = Layers.add_external(function ()
-        -- STI draws the map canvas at the screen origin (it calls lg.origin()),
-        -- so the translate must compensate the camera: screen = 2 * world + 320 - Camera.x.
         map._map:draw((320 - Camera.x) / 2, (240 - Camera.y) / 2, 2, 2)
     end, "Map")
 
-    -- Place the player at the first mark.
     local startMark = map.objects.marks[1]
     if (startMark) then
         char.SetPosition(startMark.x, startMark.y, (startMark.direction or DATA.direction))
@@ -506,9 +486,6 @@ function map.Init(lua_file)
 end
 
 function map.Update(dt)
-    -- Advance STI tile animations (Tiled animated tiles). Without this call the
-    -- animated tiles stay frozen on their first frame, because their frames are
-    -- only advanced inside STI's Map:update and swapped into the sprite batch.
     if (map._map and map._map.update) then
         map._map:update(dt)
     end
@@ -516,15 +493,10 @@ function map.Update(dt)
     world.Update(dt)
     char.Update(dt)
 
-    -- Auto-follow the player only while Overworld.follow_player is enabled
-    -- (bounds are applied by Camera:Update). When disabled, the camera stays
-    -- put and must be moved by code (Camera:setPosition / Camera.x / Camera.y).
     if (char.currentSprite and Overworld.follow_player) then
         Camera:setPosition(char.currentSprite.x, char.currentSprite.y)
     end
 
-    -- Object layer sorting (UponPlayer/BelowPlayer) always depends on the
-    -- player's position, regardless of whether the camera is following.
     if (char.currentSprite) then
         for i = #obj_sprites, 1, -1
         do
@@ -568,8 +540,6 @@ function map.Destroy()
     char.Destroy()
 end
 
--- Expose the player module so other code can reach it, e.g. `Map.char` or
--- `Char = overworld.map.char` in init.lua.
 map.char = char
 
 return map

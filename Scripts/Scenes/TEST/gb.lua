@@ -2,6 +2,8 @@ local scene = {}
 
 local gb = ImportFile("Attacks.Blasters")
 
+--- Steps the blaster manager and spawns blasters from the current mouse position.
+---@param dt number Delta time in seconds.
 function scene.update(dt)
     gb.Update(dt)
 
@@ -23,9 +25,11 @@ function scene.update(dt)
     end
 end
 
+--- Draws nothing; the blasters are rendered by their own attack module.
 function scene.draw()
 end
 
+--- Removes every layer belonging to the test scene.
 function scene.clear()
     Layers.clear()
 end

@@ -59,6 +59,8 @@ Layers.add_external(function ()
     end
 end)
 
+--- Jitters the letters and moves the selector according to directional input.
+---@param dt number Delta time in seconds.
 function scene.update(dt)
     for i = 1, #shakers
     do
@@ -89,9 +91,11 @@ function scene.update(dt)
     end
 end
 
+--- Draws nothing; the name screen renders through its layers instead.
 function scene.draw()
 end
 
+--- Removes every layer belonging to the name screen.
 function scene.clear()
     Layers.clear()
 end

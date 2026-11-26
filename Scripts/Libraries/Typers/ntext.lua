@@ -1,11 +1,4 @@
---[[
-NText: style is driven by an opts table. Every "&" starts a new operation that
-consumes the next opts entry (the last entry repeats), and "^" ends an operation
-and resets to default styling. Entry points: typers.New, typers.Update,
-typers.ClearCache.
-]]
--- Shared mask / shader helpers. Resolved through the engine module path so a
--- Game-area whole-file copy of a typer still finds it.
+--- NText: style is driven by an opts table. Every "&" starts a new operation that
 local render = require("Scripts.Libraries.Typers.render")
 
 local typers = {
@@ -226,7 +219,7 @@ function typers.TextureFont(path, width, height, amount, real_pattern)
 end
 
 function typers.BondFont(byte, engfont, non_engfont, engfunc, non_engfunc)
-    if (charlen(byte) == 1) then -- English character.
+    if (charlen(byte) == 1) then
         engfunc()
         return getFont(engfont.font, engfont.size)
     else
@@ -251,7 +244,6 @@ function typers.New(text, position, layer, size, opts, mode)
         max_letters = 1000
     }
 
-    -- Metatable to intercept `.layer` and `.font` writes.
     setmetatable(typer, {
         __index = function(t, k)
             if k == "layer" then
@@ -265,8 +257,6 @@ function typers.New(text, position, layer, size, opts, mode)
                 Layers.mark_dirty()
             elseif k == "font" then
                 rawset(t, k, v)
-                -- A directly-set font applies to both bondfont entries with
-                -- empty funcs, so the whole text uses this single font.
                 if (t.bondfont) then
                     t.bondfont.engfont.font = v
                     t.bondfont.non_engfont.font = v
@@ -275,7 +265,6 @@ function typers.New(text, position, layer, size, opts, mode)
                 end
             elseif k == "fontsize" then
                 rawset(t, k, v)
-                -- Same for the size: both bondfont entries are resized.
                 if (t.bondfont) then
                     t.bondfont.engfont.size = v
                     t.bondfont.non_engfont.size = v
@@ -304,8 +293,6 @@ function typers.New(text, position, layer, size, opts, mode)
         active = false,
         offset_applied = false
     }
-    -- Created eagerly (placeholder px.png) so `portrait.image` is always valid;
-    -- `active` tells whether a real portrait is currently shown.
     typer.portrait.image = Sprites.CreateSprite("px.png", typer.layer)
     if (typer.portrait.image and typer.portrait.image.animation) then
         typer.portrait.image:MoveTo(typer.x, typer.y + 55)
@@ -364,7 +351,6 @@ function typers.New(text, position, layer, size, opts, mode)
             typer.pos.relative[2] = 4
         end
     }
-    -- Bondfont toggle: a directly-set font turns it off, UseBondFont back on.
     typer.use_bondfont = true
 
     typer.mode = mode or "manual"
@@ -434,14 +420,12 @@ function typers.New(text, position, layer, size, opts, mode)
         typer.waittime = 0
     end
 
-    --- Pixel width of the widest line typed out so far, ignoring `typer.x`.
-    --- Only letters that already exist are measured, so it grows while typing.
+--- Pixel width of the widest line typed out so far, ignoring `typer.x`.
+--- Only letters that already exist are measured, so it grows while typing.
     function typer:GetWidth()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
 
-        -- `width` excludes `scale`, so scale it back in. A letter left of the
-        -- previous one means a new line started and closes the current line.
         local widest, line_right, prev_right, left = 0, 0, nil, nil
         for _, letter in ipairs(letters) do
             local x = letter.x or 0
@@ -461,8 +445,8 @@ function typers.New(text, position, layer, size, opts, mode)
         return widest - left
     end
 
-    --- Pixel height of every line typed out so far, ignoring `typer.y`.
-    --- Includes the `\n` / auto-wrap line gaps and each glyph's own `scale`.
+--- Pixel height of every line typed out so far, ignoring `typer.y`.
+--- Includes the `\n` / auto-wrap line gaps and each glyph's own `scale`.
     function typer:GetHeight()
         local letters = typer.letters
         if (not letters or #letters == 0) then return 0 end
@@ -479,14 +463,13 @@ function typers.New(text, position, layer, size, opts, mode)
         return (bottom or 0) - top
     end
 
-    --- Both measurements in one call, returned as two numbers: width, height.
+--- Both measurements in one call, returned as two numbers: width, height.
     function typer:GetLettersSize()
         return typer:GetWidth(), typer:GetHeight()
     end
 
     function typer:UseBondFont(config)
         typer.bondfont = config
-        -- Re-setting bondfont re-enables the bondfont feature.
         typer.use_bondfont = true
     end
 
@@ -495,7 +478,6 @@ function typers.New(text, position, layer, size, opts, mode)
         if (not portrait or not portrait.image) then return end
 
         if (#portrait.files == 0) then
-            -- No real portrait frames -> deactivate (do not destroy the sprite).
             portrait.active = false
             portrait.image.visible = false
             if (portrait.offset_applied) then
@@ -514,7 +496,7 @@ function typers.New(text, position, layer, size, opts, mode)
         portrait.image:MoveTo(typer.x - 70, typer.y + 55)
         portrait.image:Scale(portrait.scale[1], portrait.scale[2])
         portrait.image:SetAnimation(portrait.files, portrait.interval, portrait.mode)
-        portrait.image:Set(portrait.files[1]) -- show first frame immediately
+        portrait.image:Set(portrait.files[1])
         portrait.image.visible = true
     end
 
@@ -541,8 +523,6 @@ function typers.New(text, position, layer, size, opts, mode)
             typer.portrait.image = nil
         end
 
-        -- Deregister BEFORE firing _onComplete: the callback may switch scenes
-        -- and clear all typers, which would destroy this one a second time.
         Layers.remove(typer)
         for i = #typers.insts, 1, -1 do
             if (typers.insts[i] == typer) then
@@ -567,8 +547,6 @@ function typers.New(text, position, layer, size, opts, mode)
             typer.skip.skipping = true
         end
 
-        -- Fast-forward must be instant: clear any pending pause and open the
-        -- interval gate on the same frame that skipping starts.
         if (typer.skip.skipping) then
             typer.waittime = 0
             if (typer.time < typer.interval) then
@@ -577,11 +555,9 @@ function typers.New(text, position, layer, size, opts, mode)
         end
 
         if (typer.waittime > 0) then
-            -- Dedicated pause timer, independent of typer.time / typer.interval.
             typer.waittime = typer.waittime - dt
             if (typer.waittime <= 0) then
                 typer.waittime = 0
-                -- Resume on the next frame instead of waiting another interval.
                 typer.time = typer.interval
             end
         elseif (typer.time >= typer.interval and typer.sentence_index <= #typer.texts) then
@@ -622,8 +598,6 @@ function typers.New(text, position, layer, size, opts, mode)
                                 if (opt.scale) then typer.scale = opt.scale end
                                 if (opt.autowrap ~= nil) then typer.auto_wrap = opt.autowrap end
                                 if (opt.wait) then
-                                    -- waittime, not interval: a later option in
-                                    -- this scan must not overwrite the pause.
                                     if (not typer.skip.skipping) then
                                         typer.waittime = opt.wait
                                         typer.cantype = false
@@ -657,7 +631,6 @@ function typers.New(text, position, layer, size, opts, mode)
                     elseif (temp_char == "^") then
                         counter = counter + 1
                         if (not typer.skip.skipping) then
-                            -- Same as opt.wait: waittime, so a later option cannot eat it.
                             typer.waittime = 0.3
                             typer.cantype = false
                         end
@@ -761,7 +734,6 @@ function typers.New(text, position, layer, size, opts, mode)
                     typer.pos.offset[1] = typer.pos.offset[1] + typer.letters[new_index].width * (typer.scale or 1)
                     typer.pos.offset[2] = typer.pos.offset[2]
                     typer.letter_count = typer.letter_count + 1
-                    -- Trigger the talking portrait animation once per typed character.
                     if (typer.portrait and typer.portrait.active and typer.portrait.image) then
                         local panim = typer.portrait.image.animation
                         if (panim and #panim.textures > 0) then
@@ -813,8 +785,10 @@ function typers.New(text, position, layer, size, opts, mode)
         local letters = typer.letters
         if (not letters) or (#letters == 0) then return end
 
-        -- `ox` / `oy` shift every letter: the shader pass draws the text at
-        -- -x, -y inside its own canvas, every other path passes 0, 0.
+--- `ox` / `oy` shift every letter: the shader pass draws the text at
+--- -x, -y inside its own canvas, every other path passes 0, 0.
+---@param ox number
+---@param oy number
         local function emit(ox, oy)
             for i = 1, #letters do
                 local letter = letters[i]
@@ -841,8 +815,6 @@ function typers.New(text, position, layer, size, opts, mode)
                     local t = ol[5] or 1
                     local s = letter.scale or 1
                     SE.graphics.setColor(ol[1], ol[2], ol[3], ol[4])
-                    -- 8-directional outline: 8 shifted copies at t-pixel offsets.
-                    -- setLineWidth has no effect on draw.
                     SE.graphics.draw(letter.text_obj, main_x - t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x + t, main_y,      0, s, s)
                     SE.graphics.draw(letter.text_obj, main_x,      main_y - t, 0, s, s)
@@ -873,8 +845,6 @@ function typers.Update(dt)
     local insts = typers.insts
     for i = #insts, 1, -1 do
         local typer = insts[i]
-        -- typer can be nil here if one typer's Update triggered a scene switch
-        -- that cleared/destroyed the rest of the list mid-iteration.
         if (typer and typer.Update) then
             typer:Update(dt)
         end

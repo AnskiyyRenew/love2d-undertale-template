@@ -5,7 +5,10 @@ local bones = {
     _WALLC = {}
 }
 
--- 3D Math: axis rotation helpers (all angles in degrees)
+--- 3D Math: axis rotation helpers (all angles in degrees)
+---@param point table
+---@param center table
+---@param angle number
 local function _rotateX(point, center, angle)
     local rad = math.rad(angle)
     local y = point[2] - center[2]
@@ -42,9 +45,11 @@ local function _rotateZ(point, center, angle)
     }
 end
 
--- 3D → 2D projection helpers
+--- 3D → 2D projection helpers
 --- Orthographic projection; bulge > 0 adds a z-dependent scale (z=0 exact,
 --- z>0 shrinks, z<0 expands).
+---@param point table
+---@param bulge number
 local function _orthographic(point, bulge)
     if (bulge and bulge > 0) then
         local denom = bulge + point[3]
@@ -71,7 +76,6 @@ local function _characterFolder(whose)
     return "Sans"
 end
 
----Sound fallbacks for the files this project does not ship.
 local _soundFallbacks = {
     ["snd_pierce.wav"] = {"snd_spearappear.wav", "snd_lazer.wav"}
 }
@@ -104,7 +108,7 @@ function bones.New2D(whose, length, position, angle, velocity)
     local _whose = whose
     if (
         not _whose or
-        type(_whose) ~= "string" or 
+        type(_whose) ~= "string" or
         (_whose:lower() ~= "sans" and _whose:lower() ~= "papyrus")
     ) then
         print("[Attacks Bones] The argument 'whose' must be a string. Using 'sans' as default.")
@@ -156,7 +160,6 @@ function bones.New2D(whose, length, position, angle, velocity)
 
     bone.xpivot = 0.5
     bone.ypivot = 0.5
-    -- Head/tail width (px), used as the xpivot side-offset scale.
     bone.width = (bone.whose == "sans") and 10 or 13
 
     if (bone.whose == "sans") then
@@ -189,14 +192,12 @@ function bones.New2D(whose, length, position, angle, velocity)
     bone._body:MoveTo(999, 999)
     bone._tail:MoveTo(999, 999)
 
-    -- The three parts form ONE composite: never pixel-snap them individually,
-    -- or the caps drift off the shaft once offsets are fractional.
     bone._head.pixel_snap = false
     bone._body.pixel_snap = false
     bone._tail.pixel_snap = false
 
-    --- Change the layer of this 2D bone and all its Sprites.
-    --- @param layer string|number  The target layer (name string or numeric).
+--- Change the layer of this 2D bone and all its Sprites.
+---@param layer string|number  The target layer (name string or numeric).
     function bone:SetLayer(layer)
         self.layer = layer
         if self._head then self._head.layer = layer end
@@ -204,11 +205,11 @@ function bones.New2D(whose, length, position, angle, velocity)
         if self._tail then self._tail.layer = layer end
     end
 
-    --- Set the bone's anchor point (pivot), normalized 0~1 each.
-    --- ypivot runs along the bone (0 = head end, 1 = tail end);
-    --- xpivot runs across the width (10px for sans, 13px for papyrus).
-    --- @param xp number|nil  x pivot (omit to keep the current value)
-    --- @param yp number|nil  y pivot (omit to keep the current value)
+--- Set the bone's anchor point (pivot), normalized 0~1 each.
+--- ypivot runs along the bone (0 = head end, 1 = tail end);
+--- xpivot runs across the width (10px for sans, 13px for papyrus).
+---@param xp number|nil  x pivot (omit to keep the current value)
+---@param yp number|nil  y pivot (omit to keep the current value)
     function bone:SetPivot(xp, yp)
         if (type(xp) == "number") then self.xpivot = xp end
         if (type(yp) == "number") then self.ypivot = yp end
@@ -220,11 +221,11 @@ function bones.New2D(whose, length, position, angle, velocity)
         if self._tail then self._tail:SetStencils(stencils) end
     end
 
-
-    -- Pivot-aware edge offset: the anchor sits `offL` from the bone's centre
-    -- along its length (toward the head = positive) and is re-centred so the
-    -- bone stays flush against the arena edge. These To* helpers assume a
-    -- straight (0/90 deg) bone, so only ypivot matters here.
+--- Pivot-aware edge offset: the anchor sits `offL` from the bone's centre
+--- along its length (toward the head = positive) and is re-centred so the
+--- bone stays flush against the arena edge. These To* helpers assume a
+--- straight (0/90 deg) bone, so only ypivot matters here.
+---@param bone table
     local function _pivotAlong(bone)
         return (bone.ypivot - 0.5) * bone.length
     end
@@ -282,7 +283,7 @@ function bones.New2D(whose, length, position, angle, velocity)
         end
     end
 
-    ---Idempotent: a wall and bones.Clear() may both try to destroy the same bone.
+---Idempotent: a wall and bones.Clear() may both try to destroy the same bone.
     function bone:Destroy()
         if (self._destroyed) then
             return
@@ -306,17 +307,12 @@ function bones.New2D(whose, length, position, angle, velocity)
     return bone
 end
 
-
-
 function bones.New3D(points, percent, mode)
     local bone = {
         bones = {}
     }
     bone.concat = true
 
-    -- Metatable: bone.x / bone.y / bone.z map onto _center, and writing one
-    -- shifts every 3D vertex. x/y/z are never rawset into the table, so
-    -- __newindex fires on every assignment.
     local bone_mt = {}
     function bone_mt.__index(t, k)
         if (k == "x") then return t._center and t._center[1] end
@@ -335,7 +331,6 @@ function bones.New3D(points, percent, mode)
                 end
                 t._center[idx] = v
             end
-            -- x/y/z stay out of the table, so __newindex fires every time.
         else
             rawset(t, k, v)
         end
@@ -349,7 +344,6 @@ function bones.New3D(points, percent, mode)
     end
     bone.percent = _percent
 
-    -- Perspective ("p") or orthographic ("o", the default)
     local _mode = (mode or "orthographic")
     if (type(_mode) ~= "string") then
         _mode = "orthographic"
@@ -400,14 +394,14 @@ function bones.New3D(points, percent, mode)
         y / #_points,
         z / #_points,
     }
-    bone.bulge = 0  -- 0 = pure orthographic; >0 adds z-scale inflation effect
-    bone.xscale = 1 -- 2D view scale (applied post-projection, does not affect 3D data)
+    bone.bulge = 0
+    bone.xscale = 1
     bone.yscale = 1
 
-    --- Move the bone's center to (x, y, z) directly.
-    --- @param x number
-    --- @param y number
-    --- @param z number|nil  (optional)
+--- Move the bone's center to (x, y, z) directly.
+---@param x number
+---@param y number
+---@param z number|nil  (optional)
     function bone:MoveTo(x, y, z)
         local cx, cy, cz = self._center[1], self._center[2], self._center[3]
         local dz = (z ~= nil and z or cz)
@@ -425,10 +419,10 @@ function bones.New3D(points, percent, mode)
         self.x, self.y, self.z = x, y, dz
     end
 
-    --- Translate the bone by (x, y, z).
-    --- @param x number
-    --- @param y number
-    --- @param z number|nil  (optional)
+--- Translate the bone by (x, y, z).
+---@param x number
+---@param y number
+---@param z number|nil  (optional)
     function bone:Move(x, y, z)
         local dz = (z ~= nil and z or 0)
         for _, p in ipairs(self.points) do
@@ -444,9 +438,9 @@ function bones.New3D(points, percent, mode)
         self.z = self._center[3]
     end
 
-    --- Rotate all points around the bone's center.
-    --- @param axis string  "x", "y", or "z"
-    --- @param angle number  degrees
+--- Rotate all points around the bone's center.
+---@param axis string  "x", "y", or "z"
+---@param angle number  degrees
     function bone:Rotate(axis, angle)
         local rotFunc
         local a = axis:lower()
@@ -465,11 +459,11 @@ function bones.New3D(points, percent, mode)
         end
     end
 
-    --- Link two 3D points with a 2D bone.
-    --- @param whose string   "sans" or "papyrus"
-    --- @param point_1 number  1-based index of the first 3D point
-    --- @param point_2 number  1-based index of the second 3D point
-    --- @param percent_ number|nil  (optional) length as fraction of the edge
+--- Link two 3D points with a 2D bone.
+---@param whose string   "sans" or "papyrus"
+---@param point_1 number  1-based index of the first 3D point
+---@param point_2 number  1-based index of the second 3D point
+---@param percent_ number|nil  (optional) length as fraction of the edge
     function bone:Link(whose, point_1, point_2, percent_)
         local bone_ = bones.New2D(whose, 0)
         bone_.x = 999
@@ -488,10 +482,10 @@ function bones.New3D(points, percent, mode)
         end
     end
 
-    --- Scale the 2D view of all projected points around the bone's visual center.
-    --- Visual only: the internal 3D point data is untouched.
-    --- @param sx number  X scale factor (default 1)
-    --- @param sy number  Y scale factor (default 1)
+--- Scale the 2D view of all projected points around the bone's visual center.
+--- Visual only: the internal 3D point data is untouched.
+---@param sx number  X scale factor (default 1)
+---@param sy number  Y scale factor (default 1)
     function bone:Scale(sx, sy)
         self.xscale = sx or 1
         self.yscale = sy or 1
@@ -513,7 +507,6 @@ local function _destroyWall(wall)
     for i = #wall.bones, 1, -1
     do
         local bone = wall.bones[i]
-        -- Silences the tween of a wall torn down mid-animation.
         bone._wall_phase = nil
         if (not bone._destroyed) then
             bone:Destroy()
@@ -552,8 +545,6 @@ local function _wallSetStencils(wall, masks)
     end
 end
 
--- Method tables: _WALL (one sliding bone sprite per direction) and _WALLC
--- (20 bones per side) share these methods.
 local wall_methods = {
     SetStencils = _wallSetStencils,
     Destroy = _destroyWall
@@ -600,7 +591,6 @@ local function _wallTween(target, phase, easing, from, to, ticks, field)
 
     Tween.CreateTween(
         function (value)
-            -- A newer phase already took over: never write this one's value.
             if (target._wall_phase ~= phase) then
                 return
             end
@@ -608,9 +598,6 @@ local function _wallTween(target, phase, easing, from, to, ticks, field)
             target._wall_writes = target._wall_writes + 1
             target[field] = value
 
-            -- Call `ticks + 1` carries the final value; Tween makes one extra
-            -- call while dropping the animation, and that call reports the
-            -- finish so the last value gets a frame on screen.
             if (target._wall_writes > ticks + 1) then
                 target._wall_done = true
             end
@@ -649,8 +636,6 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
     rotation  = (rotation or 0)
     animation = _animationTable(animation)
 
-    -- wall.time starts at 1, so warntime 0 would never fire the extend tween;
-    -- clamp the schedule (the warning bar keeps using warntime).
     local intime = (warntime > 0) and warntime or 1
 
     local folder = _characterFolder(whose)
@@ -670,9 +655,9 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
     wall.warning:Scale(999, length * 2 + 12)
     wall.warning.alpha = 0.5
 
-    -- The wall sprite is done once it has left the arena again.
+--- The wall sprite is done once it has left the arena again.
+---@param spr table
     local function end_spr(spr)
-        -- Silences the tween that is still ticking for one more frame.
         spr._wall_phase = nil
         spr:Destroy()
         for i = #wall.bones, 1, -1
@@ -683,11 +668,6 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
         end
     end
 
-    -- The warning bar is moved directly; only 0/90/180/270 are supported.
-    --
-    -- Both phases travel between two fixed positions, so the retract starts from
-    -- the exact extended position. `over` is a safety net only: the normal
-    -- teardown is driven by _wallRetracted().
     local over = intime + animation.It + staytime + animation.Ot + 4
 
     if (direction == "down") then
@@ -786,7 +766,6 @@ function bones.Wall(arena, whose, warntime, staytime, length, direction, rotatio
                 end
             end
         else
-            -- The first frame past the warning phase is the impact frame.
             if (self.time == self.warntime + 1) then
                 _playSound("snd_pierce.wav")
             end
@@ -837,8 +816,6 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
     rotation  = (rotation or 0)
     animation = _animationTable(animation)
 
-    -- wall.time starts at 1, so warntime 0 would never fire the grow tween;
-    -- clamp the schedule (the warning bar keeps using warntime).
     local intime = (warntime > 0) and warntime or 1
 
     local cos, sin = math.cos(math.rad(rotation)), math.sin(math.rad(rotation))
@@ -857,8 +834,6 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
     wall.warning.alpha = 0.5
     wall.warning.rotation = rotation
 
-    -- Every bone of a complex wall shares the same grow/retract behaviour, with
-    -- the same tween timing as bones.Wall.
     local full  = length * 2
     local over  = intime + animation.It + staytime + animation.Ot + 4
 
@@ -882,8 +857,6 @@ function bones.WallComplex(arena, whose, warntime, staytime, length, direction, 
     end
 
     if (direction == "down") then
-        -- h = sqrt(pow(w / 2 * cos, 2) - pow(w / 2, 2))
-        -- h += w/2 * tan R
         wall.warning:MoveTo(
             X - (H / 2 + 10) * sin,
             Y + (H / 2 + 10) * cos + W / 2 * math.tan(math.rad(rotation)) + 6
@@ -1039,21 +1012,15 @@ function bones.Update(dt)
             local rad = math.rad(b.rotation)
             local s, c = math.sin(rad), math.cos(rad)
             local width = b.width or 10
-            local offL = (b.ypivot - 0.5) * b.length  -- along the bone (toward head = +)
-            local offS = (b.xpivot - 0.5) * width     -- to the side
+            local offL = (b.ypivot - 0.5) * b.length
+            local offS = (b.xpivot - 0.5) * width
 
-            -- Pixel snapping, composite edition: align the bone's bounding-box
-            -- EDGES to the grid, then lay every part out from there. Neither a
-            -- per-part nor a centre snap works for both art sets (odd papyrus
-            -- caps, even sans caps); integer edges keep both on the grid.
             local total = b.length + (b._head.height or 0) + (b._tail.height or 0)
-            local half_l = total * 0.5                       -- along the bone
-            local half_w = (b.width or 10) * 0.5             -- across it
-            -- AABB half extents (the two axes swap as the bone rotates).
+            local half_l = total * 0.5
+            local half_w = (b.width or 10) * 0.5
             local half_x = math.abs(half_l * s) + math.abs(half_w * c)
             local half_y = math.abs(half_l * c) + math.abs(half_w * s)
 
-            -- Distance from the anchor to the AABB centre (pivot offsets).
             local dx = offL * s + offS * c
             local dy = -offL * c + offS * s
 
@@ -1099,9 +1066,6 @@ function bones.Update(dt)
                 end
             end
 
-            -- Uniform z-zoom around the bone's center, reference distance 500:
-            -- z>0 shrinks, z<0 enlarges. The split formula avoids a singularity
-            -- at z = -500.
             if (isOrtho) then
                 local cz = b._center[3]
                 local factor
@@ -1117,8 +1081,6 @@ function bones.Update(dt)
                 end
             end
 
-            -- 2D view scale around the projected centre. Cosmetic: the internal
-            -- 3D point data is untouched, so (1, 1) restores the original look.
             local sx, sy = b.xscale or 1, b.yscale or 1
             if (sx ~= 1 or sy ~= 1) then
                 local pcx, pcy = 0, 0
@@ -1165,8 +1127,6 @@ function bones.Update(dt)
         end
     end
 
-    -- Walls are updated last, so newly tweened bone lengths apply from the next
-    -- frame on.
     for _, list in ipairs({bones._WALL, bones._WALLC})
     do
         for i = #list, 1, -1

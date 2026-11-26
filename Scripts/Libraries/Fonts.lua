@@ -1,10 +1,7 @@
--- Fonts library: every lookup goes through the Game area first, then falls
--- back to the engine directory. Callers may pass a bare filename, an already
--- rooted "Resources/Fonts/..." path, or an explicit Game path.
+--- Fonts library: every lookup goes through the Game area first, then falls
 local fonts = {
     _path  = "Resources/Fonts/",
 
-    -- Per-game override root, checked before _path.
     _gpath = "Game/Resources/Fonts/",
 }
 
@@ -36,13 +33,10 @@ function fonts.ResolvePath(name)
 
     name = name:gsub("\\", "/")
 
-    -- Already an explicit Game path: leave it, or it would be prefixed twice.
     if (name:sub(1, #fonts._gpath) == fonts._gpath) then
         return name
     end
 
-    -- Leading "/" is a love-fs absolute path; the Game twin and the engine root
-    -- are still probed before falling back to the original.
     if (name:sub(1, 1) == "/") then
         local relative = name:gsub("^/+", "")
         if (relative == "") then return name end
@@ -74,6 +68,7 @@ end
 --- Extra arguments (size, hinting, dpiscale) are forwarded untouched; a nil
 --- path uses the default font.
 ---@param path? string Font name, already-rooted path, or nil for the default font.
+---@param ... any
 ---@return Font
 function fonts.New(path, ...)
     if (path == nil) then

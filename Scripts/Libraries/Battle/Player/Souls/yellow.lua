@@ -17,8 +17,6 @@ local cool_down = 5
 local cd_timer = 5
 local bullets = {}
 
--- Bigshot effects on screen: orbiting charge particles and the charged shadow
--- heart. Keeping them in one registry lets a soul switch wipe them all.
 local bs_parts = {}
 local bs_shadow = nil
 
@@ -38,7 +36,7 @@ local function clear_bigshot()
     end
 end
 
--- Init: the soul contract lives in _temp.lua.
+--- Init: the soul contract lives in _temp.lua.
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.
@@ -54,7 +52,6 @@ function action.Init(sprite, can_move, args)
     end
     control_mode = 1
 
-    -- Drop the previous run's effects and re-arm the charge.
     clear_bigshot()
     bigshot_timer = 0
     bs_begin = false
@@ -111,13 +108,11 @@ function action.Update(dt)
     if (not can_move) then return end
     if (sprite) then
         if (Global.GetVariable("UseRealTime(dt)")) then
-            -- Put your dt logic here.
             if (up > 0) then sprite.y = sprite.y - speed * 60 * dt end
             if (down > 0) then sprite.y = sprite.y + speed * 60 * dt end
             if (left > 0) then sprite.x = sprite.x - speed * 60 * dt end
             if (right > 0) then sprite.x = sprite.x + speed * 60 * dt end
         else
-            -- Put your frames logic here.
             cd_timer = cd_timer - 1
             if (up > 0) then sprite.y = sprite.y - speed end
             if (down > 0) then sprite.y = sprite.y + speed end
@@ -177,9 +172,6 @@ function action.Update(dt)
                             )
                             part:Scale(0.1, 0.1)
                             part.Step = function (self)
-                                -- The button is read on the sprite itself: this
-                                -- Step keeps running after the soul stops
-                                -- updating, so nothing is stranded on screen.
                                 if (self._dying) then
                                     self.alpha = self.alpha - 0.06
                                     if (self.alpha <= 0) then
@@ -198,7 +190,6 @@ function action.Update(dt)
                                 self._offset = self._offset + 3
                                 self._radius = math.max(0, self._radius - 1)
 
-                                -- Fade in while it spirals towards the heart.
                                 local grow = (30 - self._radius) / 30
                                 self.alpha = math.min(1, self.alpha + 0.02)
                                 self:MoveTo(
@@ -206,8 +197,6 @@ function action.Update(dt)
                                     sprite.y + self._radius * math.sin(math.rad(self._offset))
                                 )
 
-                                -- `<= 0` covers the release frame (-1) and every
-                                -- frame after it (0).
                                 if (Controller.GetState("confirm") <= 0) then
                                     self._dying = true
                                 end
@@ -227,8 +216,6 @@ function action.Update(dt)
                         heart:MoveTo(sprite:GetPosition())
                         heart._time = 0
                         heart.Step = function (self)
-                            -- Rides along with the heart, so the marker stays on
-                            -- the player instead of at the cast spot.
                             self._time = self._time + 1
                             if (bs_shadow == self) then
                                 self:MoveTo(sprite:GetPosition())
@@ -253,8 +240,6 @@ function action.Update(dt)
                     end
                 end
 
-                -- Any release ends the charge, however far it got. The effects
-                -- fade themselves out in their own Step.
                 if (Controller.GetState("confirm") == -1) then
                     bigshot_timer = 0
                     bs_begin = false

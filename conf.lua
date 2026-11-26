@@ -1,41 +1,49 @@
--- Soul Engine Configuration File
+-- Soul Engine configuration file.
+-- These globals are read by main.lua and by the engine at startup.
+-- Engine version string.
+-- Printed on startup and shown on the error screen.
 _VER = "3.0.2-stable"
 
--- Set to true when building the game for release
+-- Release switch: false keeps the console, the debug libraries and the F5/F6/F8
+-- hotkeys; set it to true before exporting a public build.
 _RELEASED = false
 
+-- Game metadata: TITLE is the window title, VERSION is the game's own version
+-- (_VER above is the engine's); AUTHOR, CONTACT and WEBSITE show on the error screen.
 _INFO = {
     TITLE = "Soul Engine - v3.0.2",
-    VERSION = "0.0.0", -- your game's version (_VER above is the engine's)
+    VERSION = "0.0.0",
     AUTHOR = "end",
     CONTACT = "NaN",
     WEBSITE = "NaN",
 }
 
--- Game screen size. The Border art is authored for 960x540: a 640x480 game
--- screen with a 160/160/30/30 decorative frame around it.
+-- Nominal game resolution; also the window size when BORDER_MODE is off.
+-- Gameplay code should assume this size regardless of how the window is scaled.
 LOGICAL_WIDTH, LOGICAL_HEIGHT = 640, 480
+
+-- Size of the canvas the whole game renders into.
+-- Keep 640x480 unless the game is redesigned around another resolution.
 CANVAS_WIDTH, CANVAS_HEIGHT = 640, 480
 
--- Border art native size; its inner opening is the canvas centred inside it.
+-- Window size when BORDER_MODE is on: the 16:9 frame around the canvas.
+-- The border art is scaled to this size and the canvas sits in its opening.
 BORDER_WIDTH, BORDER_HEIGHT = 960, 540
 
--- How the game canvas is scaled. It is always dead-centre and the Border frame
--- is locked to it, so the opening can never drift away from the game screen.
---   "integer" -> whole-number scale (pixel-perfect, shrinks for small windows)
---   "auto"    -> fill as much of the window / screen as possible
---   false/nil -> 1:1, no scaling
+-- How the canvas is scaled into the window: "integer" for pixel-perfect steps,
+-- "auto" to fill, a number for a fixed multiple, false for 1:1.
 SCREEN_SCALE = "auto"
 
--- Legacy switch, only used when SCREEN_SCALE is nil.
+-- Legacy switch, read only when SCREEN_SCALE is nil.
+-- true behaves like "auto", false like a fixed 1:1 scale.
 FILL_SCREEN = true
 
--- true: fit the Border art to the window and drop the canvas into its inner
--- opening (same scale, top-left locked). false: fit the canvas alone and draw
--- no frame. Only applies when SCREEN_SCALE is "auto" / true / "integer".
+-- Draw the bordered frame (outer window plus the opening the game is seen through).
+-- false draws the canvas straight into the window with a thin outline instead.
 BORDER_MODE = false
 
--- Custom error screen; set false to see the raw LÖVE error instead.
+-- Use the custom error screen at the bottom of this file instead of LOVE's own.
+-- false returns early, so the errorhandler below is never defined.
 USE_ERRHANDLER = true
 
 function love.conf(t)
@@ -52,8 +60,6 @@ function love.conf(t)
 
     t.window.title = _INFO.TITLE
     t.window.icon = "icon.png"
-    -- Border size when BORDER_MODE is on (the frame fits 1:1 at startup),
-    -- otherwise the canvas size (game screen with no frame around it).
     t.window.width = BORDER_MODE and BORDER_WIDTH or LOGICAL_WIDTH
     t.window.height = BORDER_MODE and BORDER_HEIGHT or LOGICAL_HEIGHT
     t.window.borderless = false
@@ -63,7 +69,7 @@ function love.conf(t)
     t.window.fullscreen = false
     t.window.fullscreentype = "desktop"
     t.window.vsync = 0
-    t.window.msaa = 0                   -- keep 0 on mobile: 4x costs too much fill rate
+    t.window.msaa = 0
     t.window.depth = nil
     t.window.stencil = nil
     t.window.displayindex = 1
@@ -87,7 +93,7 @@ function love.conf(t)
     t.modules.sound = true
     t.modules.system = true
     t.modules.thread = true
-    t.modules.timer = true              -- disabling it makes the dt in love.update 0
+    t.modules.timer = true
     t.modules.touch = true
     t.modules.video = true
     t.modules.window = true
@@ -159,8 +165,6 @@ function love.errorhandler(msg)
             love.graphics.setColor(1, 1, 1)
             love.graphics.clear(0.15, 0.1, 0.15)
 
-            -- Loaded lazily: love.graphics is nil while conf.lua runs, so the
-            -- sprite can only be created here.
             if (not tdog) then
                 local dogFile = "Resources/Sprites/Attacks/Dogs/" .. dogs[math.random(#dogs)] .. ".png"
                 local ok, img = pcall(love.graphics.newImage, dogFile)

@@ -1,16 +1,33 @@
 local page = {_active = false}
 local elements = {}
 
+--- Clamps a value between the given bounds.
+---@param v number
+---@param max number
+---@param min number
+---@return number
 local function clamp(v, max, min)
     return (math.max(math.min(max, v), min))
 end
 
+--- Converts world coordinates into camera-relative screen coordinates.
+---@param x number
+---@param y number
+---@return number
+---@return number
 local function GetRelativePos(x, y)
     local rx = clamp(Camera.x, (Camera.max_x or math.huge), (Camera.min_x or -math.huge))
     local ry = clamp(Camera.y, (Camera.max_y or math.huge), (Camera.min_y or -math.huge))
     return rx - 320 + x, ry - 240 + y
 end
 
+--- Creates a bordered rectangle with show, hide and move helpers.
+---@param x number
+---@param y number
+---@param width number
+---@param height number
+---@param thickness number
+---@return table
 local function SpawnBlock(x, y, width, height, thickness)
     local block = {
         x = x,
@@ -28,22 +45,28 @@ local function SpawnBlock(x, y, width, height, thickness)
     black:Scale(block.w, block.h)
     black:MoveTo(block.x, block.y)
 
+    --- Destroys both sprites owned by this block.
     block.Destroy = function (self)
         white:Destroy()
         black:Destroy()
         block = nil
     end
 
+    --- Makes both block sprites fully transparent.
     block.Hide = function (self)
         white.alpha = 0
         black.alpha = 0
     end
 
+    --- Makes both block sprites fully opaque.
     block.Show = function (self)
         white.alpha = 1
         black.alpha = 1
     end
 
+    --- Moves both block sprites to the given position.
+    ---@param _x number
+    ---@param _y number
     block.UpdatePos = function (self, _x, _y)
         white:MoveTo(_x, _y)
         black:MoveTo(_x, _y)
@@ -76,6 +99,8 @@ local in_section = 1
 local in_channel = 1
 local total_sect = 1
 
+--- Opens the chest page and builds the item transfer UI.
+---@param chest string
 function page.Show(chest)
     in_section = 1
     in_channel = 1
@@ -131,6 +156,7 @@ function page.Show(chest)
     end
 end
 
+--- Rebuilds the item name labels for both inventory columns.
 local function refreshItems()
     for i = 1, 18 do
         local item
@@ -146,6 +172,7 @@ local function refreshItems()
     end
 end
 
+--- Closes the chest page and restores character control.
 function page.Hide()
     page._active = false
     block:Hide()
@@ -163,6 +190,7 @@ function page.Hide()
     end
 end
 
+--- Handles cursor navigation and item transfer input while the page is open.
 function page.Update()
     if (not page._active) then return end
 
@@ -188,8 +216,6 @@ function page.Update()
         end
     end
 
-    -- Clamp the cursor to the active section's range (corrects stale values
-    -- left behind by section switches or item swaps) and keep the heart in sync
     in_channel = math.max(1, math.min(in_channel, total_sect))
     local _, _y = GetRelativePos(0, 97 + (in_channel - 1) * 30)
     heart.y = _y

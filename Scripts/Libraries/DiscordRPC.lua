@@ -1,14 +1,9 @@
--- Discord Rich Presence over the discord-rpc C library, via LuaJIT FFI.
--- Needs Resources/Libs/DiscordRPC/discord-rpc-<arch>.dll (.so / .dylib).
--- main.lua: set discord.application_id (string), Discord.init() in love.load,
--- Discord.update(dt) every frame, Discord.setActivity{}, Discord.shutdown() on quit.
+--- Discord Rich Presence over the discord-rpc C library, via LuaJIT FFI.
 
 local discord = {}
 
 discord.VERSION = "2.1.0"
 
--- Must be a STRING: 19-digit ids exceed 2^53, so a Lua number literal would
--- lose precision and Discord would reject the connection.
 discord.application_id = nil
 
 discord.available = false
@@ -16,7 +11,8 @@ discord.last_error = nil
 
 discord.JoinReply = { No = 0, Yes = 1, Ignore = 2 }
 
--- Current unix timestamp, optionally shifted by `seconds` (activity start / finish).
+--- Current unix timestamp, optionally shifted by `seconds` (activity start / finish).
+---@param seconds number
 function discord.timestamp(seconds)
     return os.time() + (tonumber(seconds) or 0)
 end
@@ -77,39 +73,32 @@ if (ffi_ok) then
         void Discord_UpdateHandlers(DiscordEventHandlers* handlers);
     ]]
 
-    -- Holds every FFI callback trampoline so the GC never collects them.
     local callbacks = {}
     local function keepCallback(cb)
         callbacks[#callbacks + 1] = cb
         return cb
     end
 
-    -- Builds the ordered list of candidate DLL paths for the current platform.
+--- Builds the ordered list of candidate DLL paths for the current platform.
     local function buildDllCandidates()
         local candidates = {}
 
-        -- ffi.load uses the OS loader, not LÖVE's VFS, so paths must be real;
-        -- getSourceBaseDirectory() is the PARENT of the source folder, hence the
-        -- getSource() append.
         local source_dir = nil
         local ok_s, s = pcall(function() return SE.filesystem.getSource() end)
         local ok_b, b = pcall(function() return SE.filesystem.getSourceBaseDirectory() end)
         if (ok_s and type(s) == "string" and s ~= "") then
             s = s:gsub("\\", "/"):gsub("/+$", "")
-            -- getSource() may be a bare folder name or a full path: a drive
-            -- letter or leading slash means absolute, otherwise prepend the base.
             if (s:match("^%a:") or s:match("^/")) then
                 source_dir = s
             elseif (ok_b and type(b) == "string" and b ~= "") then
                 source_dir = b:gsub("\\", "/"):gsub("/+$", "") .. "/" .. s
             end
         elseif (ok_b and type(b) == "string" and b ~= "") then
-            -- No getSource(): fall back to the base directory.
             source_dir = b:gsub("\\", "/"):gsub("/+$", "")
         end
 
         local os_name = SE.system.getOS()
-        local arch = ffi.arch -- e.g. "x64" / "x86"
+        local arch = ffi.arch
 
         local names = {}
         if (os_name == "Windows") then
@@ -123,16 +112,14 @@ if (ffi_ok) then
             names[#names + 1] = "libdiscord-rpc.dylib"
             names[#names + 1] = "discord-rpc.dylib"
         else
-            return candidates -- unsupported OS
+            return candidates
         end
 
         local dirs = {}
-        -- Absolute paths into the real source folder are the only reliable ones.
         if (source_dir) then
             dirs[#dirs + 1] = source_dir .. "/Resources/Libs/DiscordRPC/"
             dirs[#dirs + 1] = source_dir .. "/Resources/Libs/"
         end
-        -- Relative fallbacks: only resolve when CWD == source folder.
         dirs[#dirs + 1] = "Resources/Libs/DiscordRPC/"
         dirs[#dirs + 1] = "Resources/Libs/"
         dirs[#dirs + 1] = ""
@@ -150,7 +137,6 @@ if (ffi_ok) then
             return true
         end
         local candidates, source_dir = buildDllCandidates()
-        -- Keep every candidate's error so the report names the failing path.
         local errors = {}
         for _, path in ipairs(candidates) do
             local ok_load, lib = pcall(ffi.load, path)
@@ -174,14 +160,13 @@ if (ffi_ok) then
             table.concat(errors, "\n    - ")
     end
 
-    -- User event callbacks (set via onJoin / onSpectate / onJoinRequest).
     local events = {
         ready = nil, disconnected = nil, errored = nil,
         joinGame = nil, spectateGame = nil, joinRequest = nil,
     }
     discord._events = events
 
-    -- Safely reads a C string, nil for NULL pointers.
+--- Safely reads a C string, nil for NULL pointers.
     local function cstr(p)
         if (p == nil or p == ffi.NULL) then
             return nil
@@ -201,8 +186,10 @@ if (ffi_ok) then
         }
     end
 
-    -- Called from C, so a Lua error here escapes the caller's pcall and shows up
-    -- as "unprotected error in call to Lua API": wrap every user callback.
+--- Called from C, so a Lua error here escapes the caller's pcall and shows up
+--- as "unprotected error in call to Lua API": wrap every user callback.
+---@param cb function
+---@param ... any
     local function safeCallback(cb, ...)
         if (not cb) then return end
         local ok, err = pcall(cb, ...)
@@ -241,8 +228,10 @@ if (ffi_ok) then
         return h
     end
 
-    -- Accepts Game-SDK style names (state / details / large_image / start) and
-    -- discord-rpc style names (largeImageKey / startTimestamp) alike.
+--- Accepts Game-SDK style names (state / details / large_image / start) and
+--- discord-rpc style names (largeImageKey / startTimestamp) alike.
+---@param t table
+---@return table
     local function presenceFromTable(t)
         local p = ffi.new("DiscordRichPresence")
         p.state = t.state or nil
@@ -269,10 +258,10 @@ if (ffi_ok) then
         return p
     end
 
-    ---Initializes Discord. Pass your app id (string!), or set discord.application_id.
-    ---@param client_id? string|number
-    ---@param options? table  { auto_register = boolean, steam_id = string }
-    ---@return boolean, string?
+---Initializes Discord. Pass your app id (string!), or set discord.application_id.
+---@param options table
+---@param client_id? string|number
+---@return boolean, string?
     function discord.init(client_id, options)
         options = options or {}
         if (discord.available) then
@@ -308,21 +297,19 @@ if (ffi_ok) then
         return true
     end
 
-    ---Pumps the SDK. Required every frame: presence syncs and callbacks fire there.
+---Pumps the SDK. Required every frame: presence syncs and callbacks fire there.
+---@param dt number
     function discord.update(dt)
         if (discord.available and discord._lib) then
             discord._lib.Discord_RunCallbacks()
         end
     end
-    -- jit.off: Discord_RunCallbacks re-enters Lua from JIT-ed code, which raises
-    -- "unprotected error in call to Lua API" once the ready event fires. `jit`
-    -- must be required explicitly, it is not a global.
     local ok_jit, jit = pcall(require, "jit")
     if (ok_jit and jit and jit.off) then
         jit.off(discord.update)
     end
 
-    ---Releases the Discord connection. Call from love.quit().
+---Releases the Discord connection. Call from love.quit().
     function discord.shutdown()
         if (discord.available and discord._lib) then
             pcall(discord._lib.Discord_Shutdown)
@@ -331,14 +318,15 @@ if (ffi_ok) then
         discord.client_id = nil
     end
 
-    ---Returns whether Discord has been initialized.
+---Returns whether Discord has been initialized.
+---@return boolean
     function discord.isAvailable()
         return discord.available and discord._lib ~= nil
     end
 
-    ---Sets the Rich Presence activity.
-    ---@param activity table
-    ---@return boolean, string?
+---Sets the Rich Presence activity.
+---@param activity table
+---@return boolean, string?
     function discord.setActivity(activity)
         if (not discord.isAvailable()) then
             return false, discord.last_error or "Discord not initialized"
@@ -350,8 +338,8 @@ if (ffi_ok) then
         return true
     end
 
-    ---Clears the current Rich Presence activity.
-    ---@return boolean, string?
+---Clears the current Rich Presence activity.
+---@return boolean, string?
     function discord.clearActivity()
         if (not discord.isAvailable()) then
             return false, discord.last_error or "Discord not initialized"
@@ -360,53 +348,59 @@ if (ffi_ok) then
         return true
     end
 
-    ---Registers a callback fired when the user joins via a join secret.
-    ---@param callback function  function(joinSecret)
+---Registers a callback fired when the user joins via a join secret.
+---@param callback function  function(joinSecret)
+---@return boolean
     function discord.onJoin(callback)
         events.joinGame = callback
         return true
     end
 
-    ---Registers a callback fired when the user spectates via a spectate secret.
-    ---@param callback function  function(spectateSecret)
+---Registers a callback fired when the user spectates via a spectate secret.
+---@param callback function  function(spectateSecret)
+---@return boolean
     function discord.onSpectate(callback)
         events.spectateGame = callback
         return true
     end
 
-    ---Registers a callback fired when another user requests to join.
-    ---@param callback function  function(user_table)
+---Registers a callback fired when another user requests to join.
+---@param callback function  function(user_table)
+---@return boolean
     function discord.onJoinRequest(callback)
         events.joinRequest = callback
         return true
     end
 
-    ---Registers a callback fired once Discord accepts the connection.
-    ---@param callback function  function(user_table|nil)
+---Registers a callback fired once Discord accepts the connection.
+---@param callback function  function(user_table|nil)
+---@return boolean
     function discord.onReady(callback)
         events.ready = callback
         return true
     end
 
-    ---Registers a callback fired when Discord disconnects.
-    ---@param callback function  function(errorCode, message)
+---Registers a callback fired when Discord disconnects.
+---@param callback function  function(errorCode, message)
+---@return boolean
     function discord.onDisconnected(callback)
         events.disconnected = callback
         return true
     end
 
-    ---Registers a callback fired when Discord reports an error.
-    ---An invalid or mismatched App ID normally shows up here.
-    ---@param callback function  function(errorCode, message)
+---Registers a callback fired when Discord reports an error.
+---An invalid or mismatched App ID normally shows up here.
+---@param callback function  function(errorCode, message)
+---@return boolean
     function discord.onError(callback)
         events.errored = callback
         return true
     end
 
-    ---Replies to a join request.
-    ---@param user_id string
-    ---@param reply number  discord.JoinReply.No / Yes / Ignore
-    ---@return boolean, string?
+---Replies to a join request.
+---@param user_id string
+---@param reply number  discord.JoinReply.No / Yes / Ignore
+---@return boolean, string?
     function discord.respond(user_id, reply)
         if (not discord.isAvailable()) then
             return false, discord.last_error or "Discord not initialized"
@@ -415,7 +409,6 @@ if (ffi_ok) then
         return true
     end
 
-    -- Shut down cleanly if the module is ever garbage collected.
     if (newproxy) then
         discord.gc_dummy = newproxy(true)
         getmetatable(discord.gc_dummy).__gc = function()
@@ -426,7 +419,9 @@ if (ffi_ok) then
     end
 
 else
-    -- No LuaJIT FFI available (e.g. a Lua 5.4 build of LÖVE): graceful no-ops.
+--- No LuaJIT FFI available (e.g. a Lua 5.4 build of LÖVE): graceful no-ops.
+---@return boolean
+---@return string
     local function unavailable()
         return false, "DiscordRPC: LuaJIT FFI is unavailable in this LÖVE build (Rich Presence disabled)."
     end

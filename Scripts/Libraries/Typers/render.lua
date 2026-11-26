@@ -1,18 +1,10 @@
---[[
-Stencil (mask) and shader support shared by the four typer modules. Required
-directly by each typer module, not through init.lua (that would be circular).
-Shaders need a baked canvas because glyph UVs are atlas-relative, not 0..1;
-masks and shaders combine: shader first, then the canvas goes through the mask.
-]]
+--- Stencil (mask) and shader support shared by the four typer modules. Required
 local render = {}
 
 local MASKS_WARNING = "[WARNING] typer:SetStencils - invalid mask object"
 local SHADERS_WARNING = "[WARNING] typer:SetShaders - invalid shader object"
 
--- Canvases are rounded up to this many pixels, so a growing text reuses one
--- canvas instead of allocating per frame.
 local CANVAS_STEP = 32
--- Distinct canvas sizes kept alive before the oldest entry is released.
 local CANVAS_CACHE_MAX = 12
 
 local canvas_cache = {}
@@ -38,6 +30,8 @@ end
 
 --- Two canvases of at least w x h, used as the ping-pong pair of a shader
 --- chain. Returns nil when no canvas could be created.
+---@param w number
+---@param h number
 local function acquire_canvases(w, h)
     local bw = math.max(CANVAS_STEP, math.ceil(w / CANVAS_STEP) * CANVAS_STEP)
     local bh = math.max(CANVAS_STEP, math.ceil(h / CANVAS_STEP) * CANVAS_STEP)
@@ -75,7 +69,6 @@ local function mask_list(value)
         return {}
     end
 
-    -- A single mask works too: {shape = "rect", ...}. A list never has `shape`.
     if (value.shape) then value = {value} end
 
     local list = {}
@@ -109,6 +102,7 @@ end
 
 --- Attach the mask / shader API to a typer instance and create its two lists.
 --- Called once per instance by every module's New().
+---@param typer table
 function render.install(typer)
     typer.stencils = {}
     typer.shaders = {}
@@ -167,6 +161,10 @@ end
 ---
 ---@param letters table  The instance's letter list.
 ---@param opts table|nil  Optional `align`, `scale_of` and `pad` hooks.
+---@return number
+---@return number
+---@return number
+---@return number
 function render.letter_bounds(letters, opts)
     opts = opts or {}
     local align = opts.align
@@ -225,14 +223,19 @@ end
 
 --- Bake the text into a canvas, run the shader chain over it and blit the
 --- result at (x, y). Returns false when no canvas was available.
+---@param draw_fn function
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param shaders table
+---@return boolean
 local function draw_shaded(draw_fn, x, y, w, h, shaders)
     local entry = acquire_canvases(w, h)
     if (not entry) then return false end
 
     local prev_canvas = SE.graphics.getCanvas()
 
-    -- Bake in the typer's own coordinate space: the camera transform is active
-    -- around Layers.draw and would offset the text inside the canvas.
     SE.graphics.push()
     SE.graphics.origin()
 
@@ -254,8 +257,6 @@ local function draw_shaded(draw_fn, x, y, w, h, shaders)
     SE.graphics.setCanvas(prev_canvas)
     SE.graphics.pop()
 
-    -- Unscaled blit, so every glyph keeps its baked position; each glyph's
-    -- colour travels inside the canvas.
     SE.graphics.setColor(1, 1, 1, 1)
     SE.graphics.draw(source, x, y)
     return true

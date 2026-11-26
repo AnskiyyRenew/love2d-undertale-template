@@ -2,8 +2,6 @@ local localize = {}
 local dkjson = ImportFile("Utils.dkjson")
 localize.currentLanguage = nil
 
--- Lookup layers, highest priority first. Game/Localization/ is merged ON TOP OF
--- Localization/, so a Game file only needs the keys it changes.
 local ROOT_LOCALIZATION = "Localization/"
 local GAME_LOCALIZATION = "Game/Localization/"
 local LAYER_PATHS = { GAME_LOCALIZATION, ROOT_LOCALIZATION }
@@ -13,6 +11,7 @@ local function languageFileName(language)
 end
 
 --- Read a file, tolerating a missing one (returns nil) and reporting real IO errors.
+---@param path string
 local function readFileOrNil(path)
     local ok, content = pcall(love.filesystem.read, path)
     if (not ok) then
@@ -24,6 +23,8 @@ end
 
 --- True for tables merged key-by-key instead of overwritten: anything holding
 --- at least one non-numeric key. Arrays are replaced whole.
+---@param value table
+---@return boolean
 local function isMergeableMap(value)
     if (type(value) ~= "table") then return false end
     for k in pairs(value) do
@@ -33,6 +34,9 @@ local function isMergeableMap(value)
 end
 
 --- Overlay `patch` onto `base` (mutates and returns `base`).
+---@param base table
+---@param patch table
+---@return table
 local function mergeInto(base, patch)
     for k, v in pairs(patch) do
         if (isMergeableMap(v) and isMergeableMap(base[k])) then
@@ -57,7 +61,6 @@ local function loadLanguage(language)
     local file_name = languageFileName(language)
     local layers = {}
 
-    -- Highest priority first, so index 1 wins the `primary` slot.
     for i = 1, #LAYER_PATHS do
         local path = LAYER_PATHS[i] .. file_name
         local content = readFileOrNil(path)
@@ -88,7 +91,6 @@ local function loadLanguage(language)
 
     return merged, sources[1], sources
 end
-
 
 --- Path of the highest priority existing layer, hinting where a language comes from.
 ---@param language string
@@ -178,7 +180,6 @@ function localize.localizeText(elements, formats)
         return nil
     end
 
-    -- Keys are flat dot-notation strings ("menu.start"), not nested lookups
     local current = file[key]
 
     if current == nil then
@@ -186,7 +187,9 @@ function localize.localizeText(elements, formats)
         return nil
     end
 
-    -- string.format substitution (%s, %d, %f, %x, ...); failures keep the raw text
+--- string.format substitution (%s, %d, %f, %x, ...); failures keep the raw text
+---@param text string
+---@return string
     local function applyFormats(text)
         if formats == nil then
             return text
@@ -208,7 +211,6 @@ function localize.localizeText(elements, formats)
         return applyFormats(current)
 
     elseif type(current) == "table" then
-        -- Format every string element (e.g. GameoverText array)
         if formats ~= nil then
             local result = {}
             for i = 1, #current do
@@ -221,7 +223,6 @@ function localize.localizeText(elements, formats)
             return result
         end
 
-        -- Return the array as-is (e.g. a list of actions)
         return current
 
     else

@@ -9,7 +9,6 @@ local state = {
     block_transition = false,
 
     logic_list = {
-        -- Transition rules; state changes only via Battle.ChangeState.
         {"confirm", "ACTIONSELECT", "FIGHTMENU", 1},
         {"confirm", "ACTIONSELECT", "ACTMENU", 2},
         {"confirm", "ACTIONSELECT", "ITEMMENU", 3},
@@ -288,7 +287,6 @@ local function state_behaviours_updater(dt)
                 choosing = 1
                 choosing_action = 1
                 choosing_enemy = 1
-                -- Drops whichever copy was loaded (Game area or engine dir).
                 Battle.ClearWaveModule(Battle.wave)
                 Battle.ChangeState("ACTIONSELECT")
             end
@@ -325,8 +323,6 @@ local function state_behaviours_updater(dt)
     elseif (s == "ITEMMENU") then
         local items = game.items
         local total_pages = math.max(1, math.ceil(#items / 4))
-
-        -- Two items per row, four per page (1,2 / 3,4, then 5,6 ...).
 
         if (Controller.GetState("right") == 1) then
             if (choosing % 2 == 0) then
@@ -473,8 +469,6 @@ function state.Update(dt)
     local current_state = Battle.state
     local current_button = UI.button_selecting
 
-    -- While the arena restores after a wave, narration waits for full size and
-    -- menu transitions are blocked so confirm / cancel cannot open a menu.
     if (Battle.restoring_arena) then
         Battle.UpdateRestore(dt)
     elseif state.block_transition then
@@ -485,7 +479,7 @@ function state.Update(dt)
             local key_action = rule[1]
             local source_state = rule[2]
             local target_state = rule[3]
-            local inbutton = rule[4]  -- nil if not provided
+            local inbutton = rule[4]
 
             local key_pressed = (Controller.GetState(key_action) == 1)
 
@@ -499,7 +493,6 @@ function state.Update(dt)
             if (key_pressed and state_matches and inbutton_matches) then
                 local items = get_items_table()
 
-                -- No items means ITEMMENU stays closed.
                 if (target_state == "ITEMMENU" and #items == 0) then
                     Audio.PlaySound("snd_phurt.wav")
                     break
@@ -510,13 +503,10 @@ function state.Update(dt)
                 Battle.selected_index = choosing
                 Battle.ChangeState(target_state)
 
-                -- Skip the first updater frame so the press that triggered the
-                -- transition does not immediately fire the attack.
                 if (target_state == "ATTACKING") then
                     skip_attack_updater = true
                 end
 
-                -- Same for MERCYMENU: the opening press must not spare at once.
                 if (target_state == "MERCYMENU") then
                     skip_mercy_updater = true
                 end

@@ -1,10 +1,8 @@
--- Tween.lua
--- tween.CreateTween(setter, easingType, direction, begin, final, duration, delay, destroyAfter)
--- tween.Update(dt) once per frame; durations are counted in ticks.
+--- Tween.lua - CreateTween(...) builds a tween, Update(dt) runs once per frame; durations are counted in ticks.
 
 local tween = {
     animations = {},
-    customEasings = {},   -- custom easings registered via CreateCustomTween
+    customEasings = {},
 }
 
 local function bounceOutRaw(t)
@@ -24,10 +22,8 @@ local function bounceOutRaw(t)
 end
 
 local builtinEasings = {
-    -- Linear (direction parameter is ignored, always use "linear")
     ["linear"] = function(t) return t end,
 
-    -- Quad
     ["quadin"] = function(t) return t * t end,
     ["quadout"] = function(t) return 1 - (1 - t) * (1 - t) end,
     ["quadinout"] = function(t)
@@ -37,12 +33,10 @@ local builtinEasings = {
         return -0.5 * (t * (t - 2) - 1)
     end,
 
-    -- Sine
     ["sinein"] = function(t) return 1 - math.cos(t * math.pi / 2) end,
     ["sineout"] = function(t) return math.sin(t * math.pi / 2) end,
     ["sineinout"] = function(t) return -0.5 * (math.cos(math.pi * t) - 1) end,
 
-    -- Cubic
     ["cubicin"] = function(t) return t ^ 3 end,
     ["cubicout"] = function(t) t = t - 1; return t ^ 3 + 1 end,
     ["cubicinout"] = function(t)
@@ -52,7 +46,6 @@ local builtinEasings = {
         return 0.5 * (t ^ 3 + 2)
     end,
 
-    -- Quart
     ["quartin"] = function(t) return t ^ 4 end,
     ["quartout"] = function(t) t = t - 1; return 1 - t ^ 4 end,
     ["quartinout"] = function(t)
@@ -62,7 +55,6 @@ local builtinEasings = {
         return -0.5 * (t ^ 4 - 2)
     end,
 
-    -- Quint
     ["quintin"] = function(t) return t ^ 5 end,
     ["quintout"] = function(t) t = t - 1; return t ^ 5 + 1 end,
     ["quintinout"] = function(t)
@@ -72,7 +64,6 @@ local builtinEasings = {
         return 0.5 * (t ^ 5 + 2)
     end,
 
-    -- Expo
     ["expoin"] = function(t) return 2 ^ (10 * (t - 1)) end,
     ["expoout"] = function(t) return 1 - 2 ^ (-10 * t) end,
     ["expoinout"] = function(t)
@@ -82,7 +73,6 @@ local builtinEasings = {
         return 0.5 * (2 - 2 ^ (-10 * t))
     end,
 
-    -- Circ
     ["circin"] = function(t) return 1 - math.sqrt(1 - t * t) end,
     ["circout"] = function(t) t = t - 1; return math.sqrt(1 - t * t) end,
     ["circinout"] = function(t)
@@ -92,7 +82,6 @@ local builtinEasings = {
         return 0.5 * (math.sqrt(1 - t * t) + 1)
     end,
 
-    -- Back
     ["backin"] = function(t)
         local s = 1.70158
         return t * t * ((s + 1) * t - s)
@@ -110,7 +99,6 @@ local builtinEasings = {
         return 0.5 * (t * t * ((s + 1) * t + s) + 2)
     end,
 
-    -- Elastic
     ["elasticin"] = function(t)
         local p, s = 0.3, 0.075
         t = t - 1
@@ -131,7 +119,6 @@ local builtinEasings = {
         return 0.5 * 2 ^ (-10 * t) * math.sin((t - s) * (2 * math.pi) / p) + 1
     end,
 
-    -- Bounce
     ["bounceout"] = bounceOutRaw,
     ["bouncein"] = function(t) return 1 - bounceOutRaw(1 - t) end,
     ["bounceinout"] = function(t)
@@ -156,9 +143,9 @@ function tween.CreateTween(variableSetter, easingType, direction, begin, final, 
         begin          = begin,
         final          = final,
         duration       = duration,
-        delay          = delay or 0,         -- remaining delay ticks, decremented every frame
-        destroyAfter   = destroyAfter or duration, -- ticks after which the animation is destroyed
-        time           = 0,                  -- ticks run so far (the delay phase is not counted)
+        delay          = delay or 0,
+        destroyAfter   = destroyAfter or duration,
+        time           = 0,
     }
     table.insert(tween.animations, animation)
     return animation
@@ -174,15 +161,14 @@ function tween.CreateCustomTween(name, easingFunc)
 end
 
 ---Called every frame, advances all animations
+---@param dt number
 function tween.Update(dt)
     for i = #tween.animations, 1, -1 do
         local animation = tween.animations[i]
 
-        -- Delay phase: only decrement, time is not counted yet
         if animation.delay > 0 then
             animation.delay = animation.delay - 1
 
-        -- Finished: write the final value once, then remove
         elseif animation.time > animation.destroyAfter then
             local ok, err = pcall(animation.variableSetter, animation.final)
             if not ok then
@@ -228,7 +214,6 @@ function tween.CreateBezierEasing(name, points)
             px[i] = points[i].x
             py[i] = points[i].y
         end
-        -- De Casteljau algorithm
         for level = n, 2, -1 do
             for i = 1, level - 1 do
                 px[i] = px[i] * (1 - t) + px[i + 1] * t

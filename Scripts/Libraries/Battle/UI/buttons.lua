@@ -121,21 +121,18 @@ function buttons.ResetAllState()
 end
 
 function buttons.RemoveButton(id)
-    -- Rebuild logic: redirect rules pointing at the deleted button, drop the
-    -- rules that start from it.
     local new_logic = {}
     for i = 1, #buttons.logic_buttons do
         local rule = buttons.logic_buttons[i]
         local source, target, trigger = rule[1], rule[2], rule[3]
 
         if source == id then
-            -- Rule starts from the deleted button: drop it.
         elseif target == id then
             local new_target
             if type(trigger) == "string" and (trigger == "left" or trigger == "prev") then
-                new_target = id - 1     -- reverse direction -> previous index
+                new_target = id - 1
             else
-                new_target = id + 1     -- forward direction -> next index
+                new_target = id + 1
             end
             table.insert(new_logic, {source, new_target, trigger})
         else
@@ -143,7 +140,6 @@ function buttons.RemoveButton(id)
         end
     end
 
-    -- Decrement every index that sat after the deleted one.
     for i = 1, #new_logic do
         local rule = new_logic[i]
         if rule[1] > id then
@@ -154,7 +150,6 @@ function buttons.RemoveButton(id)
         end
     end
 
-    -- Drop rules left out of bounds after repeated removals.
     local new_count = #buttons.buttons - 1
     for i = #new_logic, 1, -1 do
         local rule = new_logic[i]
@@ -176,7 +171,6 @@ function buttons.RemoveButton(id)
         table.remove(buttons.animations.selecting, id)
     end
 
-    -- Keep the cursor index inside the shrunken list.
     if buttons.button_selecting > #buttons.buttons then
         buttons.button_selecting = #buttons.buttons
     elseif buttons.button_selecting == id then

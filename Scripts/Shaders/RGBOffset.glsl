@@ -23,9 +23,13 @@
 // the object, so two sprites sharing one instance share its offsets. Create
 // one instance per sprite when they need different values.
 
+// Texture size in pixels; converts the pixel offsets below into UV. {1, 1} makes them raw UV.
 extern vec2 tex_size;
+// Red channel offset in pixels: +x right, -x left, +y down, -y up.
 extern vec2 r_offset;
+// Green channel offset in pixels, same axes as r_offset.
 extern vec2 g_offset;
+// Blue channel offset in pixels, same axes as r_offset.
 extern vec2 b_offset;
 
 // Sampled at an offset for one channel: the channel travels one way, so the

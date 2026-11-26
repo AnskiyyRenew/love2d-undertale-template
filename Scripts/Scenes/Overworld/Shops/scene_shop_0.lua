@@ -33,13 +33,17 @@ bg:SetAnimation({
     "Scene/Waterfall/spr_starpattern_3.png",
 }, 0.1)
 
+--- Advances the shop state machine every frame.
+---@param dt number Seconds elapsed since the previous frame.
 function scene.update(dt)
     shop.Update(dt)
 end
 
+--- Draws nothing; the shop module renders itself through the layers.
 function scene.draw()
 end
 
+--- Releases the shop module state and clears all layers.
 function scene.clear()
     shop.Clear()
     Layers.clear()

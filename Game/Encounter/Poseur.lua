@@ -1,3 +1,4 @@
+--- Encounter data for the sample Poseur fight: narration, flee odds and the enemy table.
 local encounter = {
     narration = Localize.localizeText("Battle.Narration.Default"),
     can_flee = true,
@@ -83,8 +84,5 @@ do
     e._id = encounter.enemy_id
     encounter.enemy_id = encounter.enemy_id + 1
 end
-
--- Battle.game_apis (via metatable) adds encounter:AddEnemy(data),
--- encounter:AddItem(item) and encounter:forceAttack(id, value).
 
 return encounter

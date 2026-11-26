@@ -1,15 +1,9 @@
--- Windows.lua (cross-platform)
--- Native window / OS helpers for LÖVE 12 (SDL3), loaded through LuaJIT FFI.
--- SDL3 paths work on Windows, macOS and Linux; the Win32 paths are Windows-only
--- fast paths. Exposed as SE.windows; every helper degrades to nil/false when the
--- native library is unavailable.
+--- Native window / OS helpers for LÖVE 12 (SDL3), loaded through LuaJIT FFI.
 
 ---@class WindowsLib
 ---Cross-platform native window utility library for LÖVE 12 (SDL3 + optional Win32 fast paths).
 local window = {}
 
-
----Host OS name as reported by the engine ("Windows" / "OS X" / "Linux" / "Android" / "iOS").
 local os_name = "Unknown"
 do
     local ok, v = pcall(function()
@@ -28,17 +22,14 @@ local is_ios     = os_name == "iOS"
 local is_desktop = is_windows or is_macos or is_linux
 local is_mobile  = is_android or is_ios
 
----Host OS name (read-only).
 window.platform = os_name
 
----LuaJIT FFI handle, or nil on builds without FFI (e.g. a pure-Lua iOS build).
 local ffi = nil
 do
     local ok, m = pcall(require, "ffi")
     if ok and type(m) == "table" then ffi = m end
 end
 
----LuaJIT `bit` handle, or nil (bit is optional; a pure-Lua fallback is used below).
 local bit = nil
 do
     local ok, m = pcall(require, "bit")
@@ -66,7 +57,6 @@ function window.hasFFI()
     return ffi ~= nil
 end
 
-
 local user32, gdi32, kernel32
 if is_windows and ffi then
     local function loadLib(name)
@@ -77,12 +67,9 @@ if is_windows and ffi then
     end
     user32 = loadLib("user32")
     gdi32 = loadLib("gdi32")
-    -- GetModuleHandle / GetLastError / GetCurrentProcessId live in kernel32, not user32
     kernel32 = loadLib("kernel32")
 end
 
-
--- SDL3 ships with LOVE 12 on every platform, so it is declared unconditionally.
 if ffi then
     ffi.cdef[[
         typedef struct SDL_Window SDL_Window;
@@ -388,9 +375,6 @@ if ffi and is_windows then
     ]]
 end
 
-
----Candidate SDL3 library names/paths, tried in order. A statically linked LOVE
----is covered by the "current process" fallback in LoadSDL() below.
 local SDL_CANDIDATES = {
     "SDL3",
     "SDL3.dll",
@@ -405,8 +389,8 @@ local SDL_CANDIDATES = {
     "/opt/local/lib/libSDL3.dylib",
 }
 
-local sdl = nil       -- loaded SDL3 library object, or nil
-local sdl_name = nil  -- human readable name of the loaded library (for diagnostics)
+local sdl = nil
+local sdl_name = nil
 
 ---Try to load one SDL3 library path.
 ---@param path string
@@ -442,7 +426,6 @@ function window.LoadSDL(path)
         end
     end
 
-    -- Last resort: statically linked SDL3 is only reachable through the current process.
     local ok, lib = pcall(ffi.load)
     if ok and lib then
         sdl, sdl_name = lib, "<current process>"
@@ -478,17 +461,15 @@ function window.SDLVersion()
     return nil
 end
 
-
--- Module-level persistent objects (critical: keep them alive to avoid GC)
-local wndProcRef = nil        -- WNDPROC callback (Win32 path), kept alive
+local wndProcRef = nil
 window.windowClassRegistered = false
-window._created = {}          -- hwnd -> { unicode=bool, className, title, titleW, titleLenW }
-window._sdlWindows = {}       -- SDL_Window* -> { renderer, title, color, canvasTex, ... }
-window._sdlClosePending = {}  -- SDL_Window* -> true (child window requested close, pending destroy)
-window._sdlKeyCallbacks = {}   -- SDL_Window* -> fun(key, scancode, isDown, isRepeat)
-window._sdlMouseCallbacks = {} -- SDL_Window* -> { motion=fun(...), button=fun(...), wheel=fun(...) }
-window._sdlHover = nil         -- managed child window under the mouse (key-forwarding fallback)
-local sdlEventWatchRef = nil  -- event-watch callback, kept alive to avoid GC
+window._created = {}
+window._sdlWindows = {}
+window._sdlClosePending = {}
+window._sdlKeyCallbacks = {}
+window._sdlMouseCallbacks = {}
+window._sdlHover = nil
+local sdlEventWatchRef = nil
 
 ---Whether a handle belongs to a window created by this module's SDL path.
 ---@param handle userdata
@@ -507,7 +488,6 @@ local function ptrOK(p)
     return ok and v ~= nil and v ~= 0
 end
 
-
 ---Get the LÖVE window handle.
 ---Windows: probes known class names, then the current process's windows.
 ---Other platforms: engine hook value, else the main window's SDL native handle.
@@ -522,7 +502,6 @@ function window.getHandle()
             end
         end
 
-        -- Fallback: enumerate the current process's windows
         local pid = kernel32.GetCurrentProcessId()
         local hwnd = ffi.cast("HWND", 0)
         while true do
@@ -542,7 +521,6 @@ function window.getHandle()
         if ok and h ~= nil then return h end
     end
 
-    -- SDL fallback: the main LÖVE window is the first SDL window we did not create ourselves
     local mainWin = window.getMainWindowSDL()
     if mainWin then
         local handle = window.SDLGetNativeHandle(mainWin)
@@ -560,12 +538,10 @@ end
 function window.processMessages(hwnd)
     if not (is_windows and user32) then return end
     local msg = ffi.new("MSG")
-    -- Choose W (Unicode) or A (ANSI) message functions based on how the window was created
     local created = hwnd and window._created[hwnd]
     local isW = created and created.unicode
     local peekMsg = (isW and user32.PeekMessageW) or user32.PeekMessageA
     local dispatch = (isW and user32.DispatchMessageW) or user32.DispatchMessageA
-    -- PM_REMOVE = 1
     while peekMsg(msg, hwnd, 0, 0, 1) ~= 0 do
         user32.TranslateMessage(msg)
         dispatch(msg)
@@ -596,7 +572,6 @@ local function utf8_to_wchar_utf16(str)
             i = i + 4
         end
         if cp >= 0x10000 then
-            -- Needs a surrogate pair
             cp = cp - 0x10000
             out[#out + 1] = 0xD800 + math.floor(cp / 0x400)
             out[#out + 1] = 0xDC00 + (cp % 0x400)
@@ -612,8 +587,13 @@ local function utf8_to_wchar_utf16(str)
     return buf, #out
 end
 
--- Default window procedure (Win32): white background + title text; cleans up on WM_DESTROY.
--- A Lua error inside an ffi callback crashes the process (0xC000041D), so it is caught here.
+--- Default window procedure (Win32): white background + title text; cleans up on WM_DESTROY.
+--- A Lua error inside an ffi callback crashes the process (0xC000041D), so it is caught here.
+---@param msg string
+---@param hwnd userdata
+---@param wParam number
+---@param lParam number
+---@return number
 local function nativeWndProc(hwnd, msg, wParam, lParam)
     local ok, res = pcall(function()
         if msg == ffi.C.WM_DESTROY then
@@ -621,18 +601,16 @@ local function nativeWndProc(hwnd, msg, wParam, lParam)
             return 0
         end
         if msg == ffi.C.WM_PAINT then
-            -- PAINTSTRUCT is 72 bytes on 64-bit; use a 128-byte buffer to avoid overflow
             local ps = ffi.new("uint8_t[128]")
             local hdc = user32.BeginPaint(hwnd, ps)
             if hdc ~= nil then
                 local rc = ffi.new("RECT")
                 user32.GetClientRect(hwnd, rc)
-                -- FillRect lives in user32.dll (not gdi32)
                 user32.FillRect(hdc, rc, gdi32.GetStockObject(ffi.C.WHITE_BRUSH))
                 local info = window._created[hwnd]
                 if info then
                     gdi32.SetBkMode(hdc, ffi.C.TRANSPARENT)
-                    gdi32.SetTextColor(hdc, 0x000000) -- black text
+                    gdi32.SetTextColor(hdc, 0x000000)
                     if info.unicode and info.titleW then
                         gdi32.TextOutW(hdc, 12, 10, info.titleW, info.titleLenW)
                     elseif info.title and not info.title:match("[^\x00-\x7F]") then
@@ -655,7 +633,6 @@ local function nativeWndProc(hwnd, msg, wParam, lParam)
     end
     return res
 end
-
 
 ---@class CreateWindowOptions
 ---Options for creating a native window.
@@ -707,13 +684,11 @@ function window.CreateWindowWin32(opts)
     local style     = opts.style or ffi.C.WS_OVERLAPPEDWINDOW
     local unicode   = (opts.unicode ~= false)
 
-    -- Must use GetModuleHandle(NULL), otherwise class registration fails
     local hInstance = kernel32.GetModuleHandleA(nil)
     if hInstance == nil then
         return nil, "GetModuleHandleA(NULL) failed, lastError=" .. tostring(kernel32.GetLastError())
     end
 
-    -- Create the callback once and keep it alive (GC-ing it causes registration failure or crashes)
     if wndProcRef == nil then
         local ok, err = pcall(function()
             wndProcRef = ffi.cast("WNDPROC", nativeWndProc)
@@ -734,7 +709,7 @@ function window.CreateWindowWin32(opts)
 
         local wc = ffi.new("WNDCLASSEXW")
         wc.cbSize = ffi.sizeof("WNDCLASSEXW")
-        wc.style = 3 -- CS_HREDRAW | CS_VREDRAW
+        wc.style = 3
         wc.lpfnWndProc = wndProcRef
         wc.cbClsExtra = 0
         wc.cbWndExtra = 0
@@ -749,7 +724,6 @@ function window.CreateWindowWin32(opts)
         local atom = user32.RegisterClassExW(wc)
         if atom == 0 then
             local err = tonumber(kernel32.GetLastError())
-            -- ERROR_CLASS_ALREADY_EXISTS = 1410: class already registered, can continue
             if err ~= 1410 then
                 return nil, "RegisterClassExW failed, lastError=" .. tostring(err)
             end
@@ -778,7 +752,6 @@ function window.CreateWindowWin32(opts)
         local atom = user32.RegisterClassExA(wc)
         if atom == 0 then
             local err = tonumber(kernel32.GetLastError())
-            -- ERROR_CLASS_ALREADY_EXISTS = 1410: class already registered, can continue
             if err ~= 1410 then
                 return nil, "RegisterClassExA failed, lastError=" .. tostring(err)
             end
@@ -792,7 +765,6 @@ function window.CreateWindowWin32(opts)
         return nil, "CreateWindowEx failed, lastError=" .. tostring(kernel32.GetLastError())
     end
 
-    -- Record window info (needed by processMessages / WM_PAINT)
     window._created[hwnd] = info
 
     user32.ShowWindow(hwnd, ffi.C.SW_SHOW)
@@ -817,18 +789,13 @@ function window.DestroyWindow(handle)
     return false
 end
 
--- SDL constants (matching the SDL3 headers)
 local SDL_INIT_VIDEO          = 0x00000020
 local SDL_WINDOW_BORDERLESS   = 0x00000010
 local SDL_WINDOW_RESIZABLE    = 0x00000020
 local SDL_WINDOWPOS_CENTERED  = 0x2FFF0000
-local SDL_PIXELFORMAT_RGBA32       = 0x16762004 -- ABGR8888 in memory: R,G,B,A (matches LÖVE rgba8)
+local SDL_PIXELFORMAT_RGBA32       = 0x16762004
 local SDL_TEXTUREACCESS_STREAMING  = 1
 
--- SDL event-watch callback: detects a close request for a child window (X button).
--- Only marks it pending; destroying it inside the SDL event context would re-enter.
--- LÖVE 12 also sends a spurious close-request shortly after a foreign window is
--- created, so requests within SDL_CLOSE_GRACE seconds are ignored.
 local SDL_CLOSE_GRACE = 2.0
 
 local function sdlEventWatch(userdata, event)
@@ -837,12 +804,9 @@ local function sdlEventWatch(userdata, event)
         local u = ffi.cast("uint32_t*", event)
         local etype = u[0]
         if etype == ffi.C.SDL_EVENT_WINDOW_CLOSE_REQUESTED then
-            -- SDL_WindowEvent layout (uint32): [0]=type [4]=windowID [5]=data1 [6]=data2
             local wid = u[4]
             for win, info in pairs(window._sdlWindows) do
                 if sdl.SDL_GetWindowID(win) == wid then
-                    -- Skip the spurious early close-request; SDLSimulateClose sets
-                    -- forceClose to bypass the grace period.
                     if info.forceClose or (os.clock() - (info.createdAt or 0) >= SDL_CLOSE_GRACE) then
                         window._sdlClosePending[win] = true
                     end
@@ -850,7 +814,6 @@ local function sdlEventWatch(userdata, event)
                 end
             end
         elseif etype == ffi.C.SDL_EVENT_WINDOW_FOCUS_GAINED or etype == ffi.C.SDL_EVENT_WINDOW_FOCUS_LOST then
-            -- SDL_WindowEvent layout: windowID at offset 16 (u[4])
             local wid = u[4]
             for win, info in pairs(window._sdlWindows) do
                 if sdl.SDL_GetWindowID(win) == wid then
@@ -859,15 +822,12 @@ local function sdlEventWatch(userdata, event)
                 end
             end
         elseif etype == ffi.C.SDL_EVENT_KEY_DOWN or etype == ffi.C.SDL_EVENT_KEY_UP then
-            -- Parse with the real SDL_KeyboardEvent struct so field offsets are always correct
             local kev = ffi.cast("SDL_KeyboardEvent*", event)
             local wid = kev.windowID
             local key = kev.key
             local scancode = kev.scancode
             local down = kev.down ~= 0
             local repeat_ = kev.repeat_ ~= 0
-            -- Forward keys when the child has focus, or when the mouse hovers it
-            -- (fallback if the OS never granted focus).
             local hoverWin = window._sdlHover
             for win, cb in pairs(window._sdlKeyCallbacks) do
                 if sdl.SDL_GetWindowID(win) == wid or (hoverWin ~= nil and win == hoverWin) then
@@ -885,7 +845,6 @@ local function sdlEventWatch(userdata, event)
                     break
                 end
             end
-            -- Clear hover when the cursor leaves the managed windows.
             if not hovered then
                 window._sdlHover = nil
             end
@@ -908,10 +867,10 @@ local function sdlEventWatch(userdata, event)
     if not ok then
         print("[Windows] EventWatch error: " .. tostring(res))
     end
-    return 1 -- 1 = keep the event; 0 = remove it from the queue
+    return 1
 end
 
--- Ensure the event watch is registered (idempotent)
+--- Ensure the event watch is registered (idempotent)
 local function ensureSdlEventWatch()
     if not sdl then return end
     if sdlEventWatchRef == nil then
@@ -936,18 +895,16 @@ function window.CreateWindowSDL(opts)
         return nil, "SDL3 not found (requires LÖVE 12)."
     end
     if is_mobile then
-        -- No window manager for a second top-level window, and no second GL context.
         return nil, "native child windows are not supported on " .. tostring(os_name) .. "."
     end
 
-    sdl.SDL_Init(SDL_INIT_VIDEO) -- already initialized by LÖVE; repeated calls are safe
-    ensureSdlEventWatch()        -- register the event watch (detect child-window X close)
+    sdl.SDL_Init(SDL_INIT_VIDEO)
+    ensureSdlEventWatch()
 
     local title = opts.title or "SDL Window"
     local w = opts.width or 480
     local h = opts.height or 320
 
-    -- SDL3 shows windows by default; flags start at 0.
     local flags = 0
     if opts.resizable then flags = bor(flags, SDL_WINDOW_RESIZABLE) end
     if opts.borderless then flags = bor(flags, SDL_WINDOW_BORDERLESS) end
@@ -957,13 +914,10 @@ function window.CreateWindowSDL(opts)
         return nil, "SDL_CreateWindow failed"
     end
 
-    -- SDL3 sets x/y separately; SDL_WINDOWPOS_CENTERED resolves per platform.
     local x = opts.x or SDL_WINDOWPOS_CENTERED
     local y = opts.y or SDL_WINDOWPOS_CENTERED
     sdl.SDL_SetWindowPosition(win, x, y)
-    -- SDL_RaiseWindow is deliberately not called: it triggered a spurious close-request.
 
-    -- Create a renderer (SDL3: passing NULL for the name uses the default renderer)
     local renderer = sdl.SDL_CreateRenderer(win, nil)
     if not ptrOK(renderer) then
         renderer = nil
@@ -973,7 +927,7 @@ function window.CreateWindowSDL(opts)
         renderer = renderer,
         title = title,
         color = opts.color or { 60, 120, 200 },
-        createdAt = os.clock(), -- used to ignore spurious early close-requests
+        createdAt = os.clock(),
     }
 
     return win
@@ -1009,7 +963,6 @@ function window.SDLPresentCanvas(win, canvas)
     local w, h = canvas:getDimensions()
     if w <= 0 or h <= 0 then return false end
 
-    -- Reuse the texture; rebuild it only when the size changes
     if not info.canvasTex or info.canvasTexW ~= w or info.canvasTexH ~= h then
         if info.canvasTex then
             sdl.SDL_DestroyTexture(info.canvasTex)
@@ -1022,7 +975,6 @@ function window.SDLPresentCanvas(win, canvas)
         end
     end
 
-    -- LÖVE 12: readbackTexture (Canvas:newImageData is deprecated); LÖVE 11: newImageData
     local ok, imgdata = pcall(function()
         if love.graphics.readbackTexture then
             return love.graphics.readbackTexture(canvas)
@@ -1030,14 +982,13 @@ function window.SDLPresentCanvas(win, canvas)
         return canvas:newImageData(0, 0, w, h)
     end)
     if not ok or not imgdata or type(imgdata.getString) ~= "function" then
-        -- Fall back to the older API (LÖVE 11)
         ok, imgdata = pcall(function()
             return canvas:newImageData(0, 0, w, h)
         end)
         if not ok or not imgdata then return false end
     end
 
-    local raw = imgdata:getString() -- RGBA8 byte order (matches SDL_PIXELFORMAT_RGBA32)
+    local raw = imgdata:getString()
     local pitch = w * 4
     sdl.SDL_UpdateTexture(info.canvasTex, nil, raw, pitch)
     sdl.SDL_RenderTexture(info.renderer, info.canvasTex, nil, nil)
@@ -1095,7 +1046,6 @@ function window.getMainWindowSDL()
     return nil
 end
 
--- Native handle property keys, one per SDL video backend.
 local NATIVE_HANDLE_KEYS = {
     win32   = "SDL.window.win32.hwnd",
     cocoa   = "SDL.window.cocoa.window",
@@ -1130,7 +1080,6 @@ function window.SDLGetNativeHandle(win, backend)
     for _, kind in ipairs(NATIVE_HANDLE_ORDER) do
         if backend == nil or backend == kind then
             local key = NATIVE_HANDLE_KEYS[kind]
-            -- X11 stores a number, the others a pointer: try both.
             local num = sdl.SDL_GetNumberProperty(props, key, 0)
             if num ~= nil and tonumber(num) ~= nil and tonumber(num) ~= 0 then
                 return tonumber(num), kind
@@ -1161,7 +1110,7 @@ function window.SDLSimulateClose(win, method)
             local hwnd = window.SDLGetNativeHandle(win, "win32")
             if ptrOK(hwnd) then
                 local info = window._sdlWindows[win]
-                if info then info.forceClose = true end -- bypass the creation-time grace period
+                if info then info.forceClose = true end
                 user32.SendMessageW(hwnd, ffi.C.WM_CLOSE, 0, 0)
                 return true, "native"
             end
@@ -1170,7 +1119,6 @@ function window.SDLSimulateClose(win, method)
     end
 
     if method == "event" then
-        -- Over-sized, zero-filled buffer: SDL_Event's size varies between builds.
         local ok = pcall(function()
             local buf = ffi.new("uint8_t[256]")
             local ev = ffi.cast("SDL_WindowEvent*", buf)
@@ -1182,7 +1130,6 @@ function window.SDLSimulateClose(win, method)
         return false, nil
     end
 
-    -- Portable fallback: mark it as close-pending; the caller destroys the window in its update.
     local info = window._sdlWindows[win]
     if info then info.forceClose = true end
     window._sdlClosePending[win] = true
@@ -1294,10 +1241,6 @@ function window.SDLKeyName(key)
     return ffi.string(p)
 end
 
--- No synthetic key-event helper: SDL_PushEvent of key events can crash this build.
--- Real presses in the focused child arrive through window.SDLSetKeyCallback.
-
-
 ---Set the opacity of a window through SDL (Windows / macOS / Linux).
 ---Wayland has no compositor-independent opacity: the call fails and reports false.
 ---@param win userdata The SDL_Window* handle
@@ -1310,7 +1253,6 @@ function window.setWindowOpacity(win, alpha)
     alpha = math.max(0, math.min(255, math.floor((alpha or 255) + 0.5)))
     local ok, res = pcall(function() return sdl.SDL_SetWindowOpacity(win, alpha / 255) end)
     if not ok then return false, "SDL_SetWindowOpacity failed: " .. tostring(res) end
-    -- SDL3 returns bool; Wayland (and some drivers) report false for unsupported opacity.
     if res == nil or res == false or res == 0 then
         return false, "SDL_SetWindowOpacity not supported by this video backend"
     end
@@ -1342,7 +1284,6 @@ function window.setTransparency(handle, alpha)
     end
 
     if sdl then
-        -- Non-Windows: the only sensible interpretation of a non-SDL handle is an SDL_Window*
         local ok, err = window.setWindowOpacity(handle, alpha)
         if not ok then print("[Windows] setTransparency: " .. tostring(err)) end
         return ok
@@ -1354,8 +1295,8 @@ end
 
 ---Set the background transparent, or use a colour key on Windows.
 ---@param handle userdata The window handle (SDL_Window* from this module, or an HWND on Windows)
+---@param alpha number
 ---@param colorKey? integer Color key (RGB) or nil for alpha-based transparency
----@param alpha? integer Alpha value 0-255
 ---@return boolean ok true on success
 ---@note The colour key is Win32-only; elsewhere the call degrades to alpha.
 function window.setBackgroundTransparent(handle, colorKey, alpha)
@@ -1383,7 +1324,6 @@ function window.setBackgroundTransparent(handle, colorKey, alpha)
     return window.setTransparency(handle, alpha or 0)
 end
 
-
 local function pack_u16_le(n)
     return string.char(n % 256, math.floor(n / 256) % 256)
 end
@@ -1398,6 +1338,7 @@ local function pack_u32_le(n)
 end
 
 ---@return integer|nil size Byte size of the file, or nil when it does not exist
+---@param path string
 local function fileSize(path)
     local f = io.open(path, "rb")
     if not f then return nil end
@@ -1423,6 +1364,12 @@ local function commandExists(bin)
 end
 
 ---Windows implementation: GDI Blit from a window/screen DC into a bottom-up 24bpp BMP.
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param path string
+---@param throughWindow boolean
 local function saveScreenshotWin32(x, y, w, h, path, throughWindow)
     if not (ffi and user32 and gdi32) then
         return false, "Win32 GDI libraries unavailable"
@@ -1465,7 +1412,6 @@ local function saveScreenshotWin32(x, y, w, h, path, throughWindow)
     bmi.bmiHeader.biBitCount = 24
     bmi.bmiHeader.biCompression = ffi.C.BI_RGB
 
-    -- BMP rows are padded to a 4-byte boundary
     local rowSize = math.floor((24 * w + 31) / 32) * 4
     local imageSize = rowSize * h
     bmi.bmiHeader.biSizeImage = imageSize
@@ -1483,11 +1429,11 @@ local function saveScreenshotWin32(x, y, w, h, path, throughWindow)
         return false, "cannot open output file: " .. tostring(openErr)
     end
     file:write("BM")
-    file:write(pack_u32_le(54 + imageSize))  -- bfSize
-    file:write(pack_u32_le(0))               -- bfReserved
-    file:write(pack_u32_le(54))              -- bfOffBits
+    file:write(pack_u32_le(54 + imageSize))
+    file:write(pack_u32_le(0))
+    file:write(pack_u32_le(54))
 
-    file:write(pack_u32_le(40))              -- biSize
+    file:write(pack_u32_le(40))
     file:write(pack_u32_le(w))
     file:write(pack_u32_le(h))
     file:write(pack_u16_le(1))
@@ -1509,17 +1455,22 @@ end
 ---Linux/macOS screen grabbers, tried in order until one exists and writes the file.
 ---@type table[] { bin = <executable>, fmt = <string.format template: x, y, w, h, path> }
 local UNIX_GRABBERS = is_macos and {
-    { bin = "screencapture", fmt = 'screencapture -x -R"%d,%d,%d,%d" "%s"' }, -- -x: no shutter sound
+    { bin = "screencapture", fmt = 'screencapture -x -R"%d,%d,%d,%d" "%s"' },
 } or {
-    { bin = "grim",      fmt = 'grim -g "%d,%d %dx%d" "%s"' },                      -- Wayland (sway / Hyprland)
-    { bin = "spectacle", fmt = 'spectacle --background --nonotify --region %d,%d,%d,%d --output "%s"' }, -- KDE
-    { bin = "scrot",     fmt = 'scrot -a %d,%d,%d,%d "%s"' },                       -- X11
-    { bin = "maim",      fmt = 'maim -g %dx%d+%d+%d "%s"' },                        -- X11
-    { bin = "import",    fmt = 'import -window root -crop %dx%d+%d+%d "%s"' },      -- ImageMagick (X11)
+    { bin = "grim",      fmt = 'grim -g "%d,%d %dx%d" "%s"' },
+    { bin = "spectacle", fmt = 'spectacle --background --nonotify --region %d,%d,%d,%d --output "%s"' },
+    { bin = "scrot",     fmt = 'scrot -a %d,%d,%d,%d "%s"' },
+    { bin = "maim",      fmt = 'maim -g %dx%d+%d+%d "%s"' },
+    { bin = "import",    fmt = 'import -window root -crop %dx%d+%d+%d "%s"' },
 }
 
 ---Unix implementation: shell out to a screen grabber.
 ---`throughWindow` is ignored: no portable "grab even when occluded" call exists.
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param path string
 local function saveScreenshotUnix(x, y, w, h, path)
     local tried = {}
     for _, grabber in ipairs(UNIX_GRABBERS) do
@@ -1563,7 +1514,6 @@ function window.saveScreenshot(x, y, w, h, path, throughWindow)
     end
     return false, "Unsupported platform for screenshots: " .. tostring(os_name)
 end
-
 
 ---Show a dialog (cross-platform, uses LÖVE's showMessageBox).
 ---@param message string The message text

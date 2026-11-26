@@ -1,13 +1,4 @@
--- Secrets.lua
--- Secret store backed by a compiled shared library, so secrets never appear as
--- plain text inside the .love archive.
---
--- ffi.load goes through the OS loader (LoadLibrary / dlopen), NOT LÖVE's virtual
--- filesystem: every candidate must be a real OS path.
---
--- Fallback order, which must never hard-fail: native library -> Secrets.fallback
--- table -> nil. A missing library is normal (web target, dev machine without a
--- build); callers treat nil as "feature unavailable" and degrade quietly.
+--- Secret store backed by a compiled shared library, so secrets never appear as plain text inside the .love archive.
 
 local Secrets = {}
 
@@ -17,15 +8,10 @@ do
     if ok and m then ffi = m end
 end
 
----Must match PROBE_MAGIC in gen_source.py.
 local PROBE_MAGIC = 0x5EC0DE
 
----Slot indices. Mirrors SLOT_ORDER in gen_source.py: append only, never reorder
----(the slot number is the binary contract with the compiled library).
 Secrets.SLOT_GAMEJOLT_PK = 0
 
----Plain-text fallback values, keyed by slot. Filled from conf_pure.lua at init;
----projects may also set these directly.
 Secrets.fallback = {}
 
 ---@type any|nil Loaded FFI namespace, or nil.
@@ -36,7 +22,6 @@ Secrets._path = nil
 Secrets._error = nil
 ---@type boolean Set once the load has been attempted; do not retry every call.
 Secrets._tried = false
-
 
 local function os_name()
     local ok, v = pcall(function()
@@ -52,8 +37,6 @@ local function lib_names(platform)
     if platform == "Windows" then
         return { "secrets.dll" }
     elseif platform == "Android" or platform == "Linux" then
-        -- Android resolves a bare soname through the app's nativeLibraryDir,
-        -- which is where the packager puts the jniLibs.
         return { "libsecrets.so" }
     elseif platform == "OS X" or platform == "iOS" then
         return { "libsecrets.dylib" }
@@ -61,14 +44,12 @@ local function lib_names(platform)
     return nil
 end
 
-
 ---Resolves the directory the game actually lives in on disk.
 local function source_dir()
     local ok_s, s = pcall(function() return SE.filesystem.getSource() end)
     local ok_b, b = pcall(function() return SE.filesystem.getSourceBaseDirectory() end)
     if (ok_s and type(s) == "string" and s ~= "") then
         s = s:gsub("\\", "/"):gsub("/+$", "")
-        -- Bare folder name -> combine with the base directory.
         if (s:match("^%a:") or s:match("^/")) then
             return s
         elseif (ok_b and type(b) == "string" and b ~= "") then
@@ -85,13 +66,10 @@ local function candidates(platform, names)
     local dirs = {}
     local src = source_dir()
     if src then
-        -- Source checkout: the library sits next to the other engine libs. A fused
-        -- exe reports the exe itself as source, so its own folder is probed too.
         dirs[#dirs + 1] = src .. "/Resources/Libs/Secrets/"
         dirs[#dirs + 1] = src .. "/"
         dirs[#dirs + 1] = src .. "/Resources/Libs/"
     end
-    -- Relative fallbacks; only resolve when CWD happens to be the game folder.
     dirs[#dirs + 1] = "Resources/Libs/Secrets/"
     dirs[#dirs + 1] = ""
     dirs[#dirs + 1] = "./"
@@ -104,7 +82,6 @@ local function candidates(platform, names)
     end
     return out
 end
-
 
 local function load_native()
     if (not ffi) then
@@ -146,9 +123,6 @@ local function load_native()
     return nil
 end
 
-
----Copies conf_pure.lua's plain-text values into the fallback table (once), so a
----dev machine without a compiled library still works.
 local _wired = false
 local function wire_fallback()
     if _wired then return end
@@ -170,7 +144,6 @@ local function ensure()
     Secrets._lib = load_native()
 end
 
-
 ---Initialises the store. Safe to call more than once; also runs lazily on the
 ---first get(), so callers don't have to call it.
 ---@return boolean native True when the native library was loaded.
@@ -179,7 +152,6 @@ function Secrets.init()
     ensure()
     return Secrets._lib ~= nil
 end
-
 
 ---True when secrets come from the compiled native library.
 ---@return boolean

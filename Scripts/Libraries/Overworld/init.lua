@@ -7,9 +7,6 @@ Layers.new_layer("GUI", 80)
 Layers.new_layer("TOP", 100)
 Layers.new_layer("DEBUG", 200)
 
--- Game-first resource resolution: Game/ is the per-game content root, the
--- engine tree is only a fallback / default.
-
 --- Describe a module name as a project-relative file path, for filesystem probes.
 ---@param module_name string e.g. "Game.Logics.items"
 ---@return string e.g. "Game/Logics/items.lua"
@@ -49,8 +46,6 @@ local function owRequireGameFirst(roots, name)
         if (owFileExists(owModulePathOf(module_name))) then
             local ok, loaded = pcall(require, module_name)
             if (ok and loaded) then
-                -- A Game-area copy that exists but throws is never silent, even
-                -- when a lower root supplies the module.
                 if (first_error) then
                     print("[Overworld] WARNING: '" .. tostring(first_error_module) ..
                         "' exists but failed to load; using " .. module_name .. " instead.")
@@ -67,7 +62,6 @@ local function owRequireGameFirst(roots, name)
                 first_error_module = module_name
             end
 
-            -- Found, but its top-level code threw: surface it.
             print("[Overworld] Error loading '" .. module_name .. "': " .. tostring(loaded))
         end
     end
@@ -78,8 +72,6 @@ DATA = DATA or require("Game.Logics")
 FLAG = DATA.flags
 CHEST = DATA.chests
 
--- Items live next to the logics: the Game copy wins over the engine default,
--- even when a stale `DATA` was carried over from a previous scene.
 ITEMS = ITEMS or owRequireGameFirst({
     "Game.Logics.",
     "Scripts.Logics."
@@ -102,9 +94,7 @@ local overworld = {
     stat = require(path .. "Overworld.stat"),
     inst = {},
     interacts = {},
-    -- "auto" derives the side from the player's screen position; "up" / "down" pin it.
     ui_prefer = "auto",
-    -- Canvas Y below which overlays flip up (2/3 of the 480px canvas).
     ui_threshold = 320,
 
     _enc = {
@@ -120,14 +110,9 @@ local overworld = {
     _leaving = false,
 
     debug = false,
-    -- Whether the camera auto-follows the player every frame. When false, move
-    -- it manually via Camera:setPosition / Camera.x / Camera.y.
     follow_player = true,
 }
 
--- One-frame lock so the confirm press that closed a dialog cannot immediately
--- re-trigger the interaction. `dialog_lock_pending` keeps it for the rest of the
--- frame in which _onComplete ran.
 local dialog_just_closed = false
 local dialog_lock_pending = false
 function overworld.JustOnDialog()
@@ -135,12 +120,10 @@ function overworld.JustOnDialog()
     dialog_lock_pending = true
 end
 
-
 Overworld = overworld
 Map = overworld.map
 World = overworld.map.world
 Char = overworld.map.char
--- Frisk Dance toggle for Char, read from the "EnableFriskDance" flag.
 Char.friskdance = overworld._friskdance
 Stat = overworld.stat
 Save = overworld._pages.save
@@ -167,6 +150,7 @@ function overworld.GetPlayerScreenY()
 end
 
 ---Mirror a canvas Y across the horizontal midline (y = 240).
+---@param y number
 function overworld.FlipY(y)
     return 480 - y
 end
@@ -213,11 +197,11 @@ function SpawnBlock(x, y, width, height, thickness)
     return block
 end
 
--- Restrict the camera to the map's ACTUAL tile coverage. map.width * tilewidth
--- is wrong: tile layers carry their own offset and infinite chunks may sit at
--- negative tile coordinates. Tiled pixels are drawn at 2x (one overworld unit =
--- 2 Tiled px), and Camera.x/y is the world point at the screen centre, clamped
--- to the covered rect minus half a viewport.
+--- Restrict the camera to the map's ACTUAL tile coverage. map.width * tilewidth
+--- is wrong: tile layers carry their own offset and infinite chunks may sit at
+--- negative tile coordinates. Tiled pixels are drawn at 2x (one overworld unit =
+--- 2 Tiled px), and Camera.x/y is the world point at the screen centre, clamped
+--- to the covered rect minus half a viewport.
 function overworld.AutoCameraBounds()
     local m = overworld.map._map
     if (not m) then return end
@@ -225,7 +209,6 @@ function overworld.AutoCameraBounds()
     local tw = m.tilewidth
     local th = m.tileheight
 
-    -- Covered pixel rectangle (min/max), built from the non-empty tiles.
     local min_px_x, min_px_y, max_px_x, max_px_y
     local function union(x0, y0, x1, y1)
         if (not min_px_x) then
@@ -241,8 +224,6 @@ function overworld.AutoCameraBounds()
     for _, layer in ipairs(m.layers) do
         if (layer.type == "tilelayer" and layer.visible ~= false) then
             if (layer.chunks) then
-                -- Infinite map: each chunk sits at an absolute (maybe negative)
-                -- tile coordinate; its own data grid is 1..width x 1..height.
                 for _, chunk in ipairs(layer.chunks) do
                     if (chunk.data) then
                         for cy = 1, chunk.height do
@@ -261,7 +242,6 @@ function overworld.AutoCameraBounds()
                     end
                 end
             else
-                -- Regular map: tile (x, y) renders at layer.x/y + (x-1)*tile.
                 local ox = layer.x or 0
                 local oy = layer.y or 0
                 for ly = 1, layer.height do
@@ -288,7 +268,6 @@ function overworld.AutoCameraBounds()
     local sy_t = min_px_y * 2
     local sy_b = max_px_y * 2
 
-    -- The visible world area equals the internal canvas (1:1 camera zoom).
     local view_w = CANVAS_WIDTH
     local view_h = CANVAS_HEIGHT
     local hw = view_w * 0.5
@@ -325,7 +304,6 @@ function overworld.ResolveMapPath(lua_file)
         return lua_file
     end
 
-    -- Absolute paths and paths already inside the Game area are left alone.
     if (lua_file:sub(1, 1) == "/") then return lua_file end
     if (lua_file:sub(1, #"Game/") == "Game/") then return lua_file end
 
@@ -339,8 +317,6 @@ end
 
 function overworld.Init(lua_file)
     overworld.map.Init(lua_file)
-    -- Camera bounds from the map's tiles right after load; a later explicit
-    -- Camera:setBounds still overrides this.
     overworld.AutoCameraBounds()
 end
 
@@ -388,8 +364,6 @@ end
 ---@param extra_key string | number | nil
 ---@return boolean | any
 function overworld.getInteractResult(obj_type, id, extra_key)
-    -- If a dialog just finished this frame, swallow EVERY interaction result for
-    -- the rest of the frame so the closing confirm cannot re-trigger them.
     if (dialog_just_closed) then
         return false
     end
@@ -398,7 +372,6 @@ function overworld.getInteractResult(obj_type, id, extra_key)
     local interactions = overworld.map.world.interactions
     if (not interactions) then return false end
     if (not interactions.current_object) then return false end
-    -- No dialog state machine exists yet, so there is no dialog-state guard here.
 
     local final_type = interactions.current_object
     if (final_type ~= obj_type) then return false end
@@ -460,7 +433,6 @@ end
 ---@param extra_key string | number | nil
 ---@return table | nil
 function overworld.FindObject(obj_type, id, extra_key)
-    -- Every object placed/spawned on the current map.
     local objects = overworld.map.objects
     if (not objects) then return nil end
 
@@ -488,19 +460,15 @@ end
 function overworld.dialogNew(texts, position)
     if (not Char.controlling) then return end
     Char.controlling = false
-    -- Stop the player immediately so the camera stays put. This can run before
-    -- map.Update, so zeroing the velocity prevents a one-frame slide.
     if (Char.collision.body) then
         Char.collision.body:setLinearVelocity(0, 0)
     end
-    dialog_just_closed = false -- a new dialog clears any stale frame lock
+    dialog_just_closed = false
     dialog_lock_pending = false
     local pos = position
     if (pos ~= "up" and pos ~= "down") then
         pos = overworld.ResolveUIPosition()
     end
-    -- 400 and 80 are mirrors across the midline (FlipY(400) == 80), so only the
-    -- box moves; the text below keeps its offset from the box and never flips.
     local y = (pos == "up") and overworld.FlipY(400) or 400
 
     local _x, _y = GetRelativePos(320, y)
@@ -511,7 +479,6 @@ function overworld.dialogNew(texts, position)
     _text._onComplete = function ()
         Char.controlling = true
         dialog.block:Destroy()
-        -- Lock every interaction for the rest of this frame.
         dialog_just_closed = true
         dialog_lock_pending = true
     end
@@ -582,16 +549,11 @@ end
 function overworld.Update(dt)
     DATA.time = DATA.time + dt
 
-    -- Release the one-frame dialog lock at the start of a NEW frame; if it was
-    -- set this frame by _onComplete, keep it for the rest of this frame.
     if (not dialog_lock_pending) then
         dialog_just_closed = false
     end
     dialog_lock_pending = false
 
-    -- stat before map on purpose: it zeroes the player's velocity before the
-    -- physics step, and dialogs built after this update read the camera that
-    -- map.Update just followed.
     overworld.stat.Update(dt)
     overworld.map.Update(dt)
 
@@ -666,8 +628,6 @@ blacktop.color = {0, 0, 0}
 blacktop:MoveTo(DATA.position[1], DATA.position[2])
 blacktop._decay = true
 blacktop.Step = function (self)
-    -- Char.currentSprite may not exist yet on the first frames after a scene
-    -- switch, or may already be gone; guard the follow.
     if (Char.currentSprite) then
         self:MoveTo(Char.currentSprite.x, Char.currentSprite.y)
     end
@@ -701,7 +661,6 @@ function overworld.Clear()
     Map.Destroy()
     Camera:unBounds()
 
-    -- Clear the whole Overworld library tree so it re-executes on next load.
     ClearModuleTree("Scripts.Libraries.Overworld")
 
     Camera:reset()

@@ -67,12 +67,6 @@ local db = {
     {id = "temyarmor", name = "temy armor"},
 }
 
--- Third-level menu action interface. Items: each id maps to
--- { use=fn, info=fn, drop=fn } with signature fn(id); a few items use
--- show_sprite(path) instead. Cell: each id maps to one fn(id).
--- Missing id or action falls through to DoItemAction's default.
--- Routing keys off id only, never name.
-
 local function drop_item(id)
     for i = #DATA.player.items, 1, -1 do
         if (DATA.player.items[i] == id) then
@@ -82,8 +76,9 @@ local function drop_item(id)
     end
 end
 
--- Full-screen sprite: takes control, and [X] destroys it and gives control back
--- (listens via the sprite's own Step callback).
+--- Full-screen sprite: takes control, and [X] destroys it and gives control back
+--- (listens via the sprite's own Step callback).
+---@param path string
 local function show_sprite(path)
     Char.controlling = false
     local spr = Sprites.CreateSprite(path, "GUI")
@@ -107,7 +102,6 @@ db._actions = {
     },
 }
 
--- Cell action table (keyed by id). Each value is fn(id).
 db._cell_actions = {
 }
 
@@ -122,13 +116,18 @@ function db.FindItemByID(id)
     end
 end
 
--- Legacy accessor: db._actions[id][action].
+--- Legacy accessor: db._actions[id][action].
+---@param id string
+---@param action string
+---@return boolean
 function db.GetActionByID(id, action)
     local entry = db._actions[id]
     return entry and entry[action]
 end
 
--- Third-level menu router: action ∈ {"use", "info", "drop"}, default dialog.
+--- Third-level menu router: action ∈ {"use", "info", "drop"}, default dialog.
+---@param id string
+---@param action string
 function db.DoItemAction(id, action)
     if (not id) then return end
     local entry = db._actions[id]
@@ -137,7 +136,6 @@ function db.DoItemAction(id, action)
         fn(id)
         return
     end
-    -- Default: build a generic line from the item name.
     local name = (db.FindItemByID(id) or {}).name or id
     if (action == "use") then
         Overworld.dialogNew("* You used the " .. name .. ".")
@@ -160,7 +158,9 @@ function db.DoCellAction(id)
     Overworld.dialogNew("* You called " .. name .. ".\n* But nobody answered.")
 end
 
--- Cell names live only in DATA.player.cells, not in the item table.
+--- Cell names live only in DATA.player.cells, not in the item table.
+---@param id string
+---@return string
 function db.FindCellNameByID(id)
     for _, c in ipairs(DATA.player.cells) do
         if (c.id == id) then

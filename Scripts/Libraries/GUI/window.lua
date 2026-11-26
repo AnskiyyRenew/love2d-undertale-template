@@ -1,18 +1,15 @@
---[[
-    GUI Window - UNDERTALE-style visual window
-
-    Two stacked rectangles (thick outer border + inner fill); purely visual.
-    Animation rate-limits toward a target (same smooth_value as Arenas);
-    Update must be driven by the caller (scene.update) — omit for static menus.
-    Top-left coords; :SetCenter switches to centre-point semantics.
-]]
+--- GUI Window - UNDERTALE-style visual window
 
 local primitives = require((...):match("(.-)[^%.]+$") .. "primitives")
 
 local Window = {}
 Window.__index = Window
 
--- Rate-limited approach (same as Arenas.smooth_value)
+--- Rate-limited approach (same as Arenas.smooth_value)
+---@param value number
+---@param target number
+---@param speed number
+---@return number
 local function smooth(value, target, speed)
     if (value > target) then
         return math.max(value - speed, target)
@@ -26,6 +23,7 @@ local DEFAULT_SPEEDS = { x = 7.5, y = 7.5, w = 15, h = 15, t = 15 }
 
 --- Create a window instance
 ---@param opts table {x,y,w,h,thickness,outer,inner,layer,visible,...}
+---@return table
 function Window.New(opts)
     opts = opts or {}
     local self = setmetatable({}, Window)
@@ -34,7 +32,7 @@ function Window.New(opts)
     self.w = (opts.w or 100)
     self.h = (opts.h or 100)
     self.thickness = opts.thickness or 5
-    self.outer = opts.outer          -- nil = MainColor at draw time
+    self.outer = opts.outer
     self.inner = opts.inner or {0, 0, 0}
     self.outerAlpha = opts.outerAlpha
     self.innerAlpha = opts.innerAlpha
@@ -56,6 +54,9 @@ function Window.New(opts)
 end
 
 --- Move toward target. imm=true syncs current coords immediately (no animation).
+---@param x number
+---@param y number
+---@param imm boolean
 function Window:MoveTo(x, y, imm)
     self.target.x = x
     self.target.y = y
@@ -63,11 +64,17 @@ function Window:MoveTo(x, y, imm)
 end
 
 --- Switch to centre-point coordinate semantics (converts to top-left)
+---@param cx number
+---@param cy number
+---@param imm boolean
 function Window:SetCenter(cx, cy, imm)
     self:MoveTo(cx - self.w / 2, cy - self.h / 2, imm)
 end
 
 --- Resize. imm=true syncs immediately.
+---@param w number
+---@param h number
+---@param imm boolean
 function Window:Resize(w, h, imm)
     self.target.w = (w > 0) and w or 0
     self.target.h = (h > 0) and h or 0
@@ -75,6 +82,10 @@ function Window:Resize(w, h, imm)
 end
 
 --- Resize and set the approach speed (pixels/frame)
+---@param w number
+---@param h number
+---@param sw number
+---@param sh number
 function Window:ResizeWithSpeed(w, h, sw, sh)
     self.target.w = (w > 0) and w or 0
     self.target.h = (h > 0) and h or 0
@@ -83,6 +94,8 @@ function Window:ResizeWithSpeed(w, h, sw, sh)
 end
 
 --- Set thickness. imm=true syncs immediately.
+---@param t number
+---@param imm boolean
 function Window:SetThickness(t, imm)
     self.target.thickness = t or 5
     if (imm) then self.thickness = self.target.thickness end
@@ -104,6 +117,7 @@ function Window:SetLayer(layer)
 end
 
 --- Smooth toward target. Call from scene.update.
+---@param dt number
 function Window:Update(dt)
     self.x = smooth(self.x, self.target.x, self.speeds.x)
     self.y = smooth(self.y, self.target.y, self.speeds.y)
@@ -118,6 +132,8 @@ function Window:GetCenter()
 end
 
 --- Whether a point falls inside the window rect (including the thick border)
+---@param px number
+---@param py number
 function Window:ContainsPoint(px, py)
     local t = self.thickness
     return px >= self.x - t and px <= self.x + self.w + t

@@ -1,24 +1,11 @@
---[[
-    GUI Input - mouse input helper (screen -> canvas space, edge-detected)
-
-    Raw love.mouse coordinates are WINDOW space; GUI components live in the
-    640x480 CANVAS space (conversion via main.lua's DrawX / DrawY / ScreenScale).
-    Edge-detects button state so a scene can poll IsPressed / IsReleased /
-    IsDown once per frame, mirroring the keyboard's `prev` table pattern.
-
-    The scene wires the four love callbacks (OnPressed / OnReleased / OnMoved /
-    OnWheel) and calls Update() at the TOP of scene.update, before any reads.
-    Left mouse button = 1.
-
-    State model: `held` is real-time; `pressed` / `released` / `wheel` are
-    frozen per-frame at the start of Update(), so the edges stay true for
-    exactly the frame that follows the event.
-]]
+--- GUI Input - mouse input helper (screen -> canvas space, edge-detected)
 
 local Input = {}
 
 --- Convert window screen coords -> canvas coords (640x480 space).
 --- DrawX / DrawY / ScreenScale are globals set by main.lua's updateScreenScale().
+---@param sx number
+---@param sy number
 function Input.ScreenToCanvas(sx, sy)
     local scale = ScreenScale or 1
     if (not scale or scale <= 0) then scale = 1 end
@@ -27,17 +14,14 @@ function Input.ScreenToCanvas(sx, sy)
     return (sx - dx) / scale, (sy - dy) / scale
 end
 
--- Real-time state (held is mutated directly; pressed/released/wheel/pos are
--- frozen per-frame by Update).
 local state = {
-    held     = {},       -- button -> bool, real-time
-    pressed  = {},       -- button -> bool, frozen for this frame
-    released = {},       -- button -> bool, frozen for this frame
-    wheel    = 0,        -- int, frozen for this frame
-    pos      = { x = 0, y = 0 },  -- canvas-space cursor
+    held     = {},
+    pressed  = {},
+    released = {},
+    wheel    = 0,
+    pos      = { x = 0, y = 0 },
 }
 
--- Pending events accumulate async between frames; swapped into `state` by Update.
 local pending = {
     pressed  = {},
     released = {},
@@ -71,8 +55,9 @@ function Input.OnMoved(sx, sy)
 end
 
 --- love.wheelmoved handler. Call from scene.wheelmoved.
+---@param x number
+---@param y number
 function Input.OnWheel(x, y)
-    -- Collapse to +1 / -1 / 0 per event; accumulate (rare double-notches).
     local d = (y > 0 and 1) or (y < 0 and -1) or 0
     pending.wheel = pending.wheel + d
 end
@@ -97,21 +82,25 @@ function Input.GetCanvasMouse()
 end
 
 --- Whether the button is currently held (real-time).
+---@return boolean
 function Input.IsDown(button)
     return state.held[button] == true
 end
 
 --- Whether the button had a down-edge this frame.
+---@return boolean
 function Input.IsPressed(button)
     return state.pressed[button] == true
 end
 
 --- Whether the button had an up-edge this frame.
+---@return boolean
 function Input.IsReleased(button)
     return state.released[button] == true
 end
 
 --- Wheel delta for this frame (+1 / -1 / 0).
+---@return number
 function Input.GetWheel()
     return state.wheel or 0
 end

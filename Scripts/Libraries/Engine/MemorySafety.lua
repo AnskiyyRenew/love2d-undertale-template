@@ -24,6 +24,8 @@ local warning = {
     "Audios"
 }
 
+--- Tracks engine resource counts and resets expired warning timers.
+---@param dt number
 function guard.Update(dt)
     if (not guard.running) then return end
 

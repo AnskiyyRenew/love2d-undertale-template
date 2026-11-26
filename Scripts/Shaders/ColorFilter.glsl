@@ -1,4 +1,6 @@
+// Grayscale blend factor: 0 keeps the original colors, 1 makes the image fully gray.
 extern float grayscale;
+// RGB multiplier applied after the grayscale step; {1, 1, 1} leaves colors untouched.
 extern vec3 tint_color;
 
 vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords) {

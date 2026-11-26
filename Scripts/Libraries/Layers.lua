@@ -40,6 +40,7 @@ end
 
 --- Sort in place by `layer`, then by `_id` so the order stays stable.
 ---@param t table The table to sort in-place.
+---@return boolean
 local function stable_sort(t)
     table.sort(t, function(a, b)
         local la = to_numeric_layer(a.layer)
@@ -83,9 +84,9 @@ local function wrap_layer(layer_obj)
         layer = layer_obj.layer,
         _id = layer_obj._id,
 
-        --- Add an object to this layer.
-        ---@param obj table The object to add.
-        ---@return table The added object.
+--- Add an object to this layer.
+---@param obj table The object to add.
+---@return table The added object.
         add = function(self, obj)
             obj.layer = layer_obj.layer
             obj._layer_id = layer_obj._id
@@ -97,9 +98,9 @@ local function wrap_layer(layer_obj)
             return obj
         end,
 
-        --- Remove an object from this layer.
-        ---@param obj table The object to remove.
-        ---@return boolean True if the object was successfully removed.
+--- Remove an object from this layer.
+---@param obj table The object to remove.
+---@return boolean True if the object was successfully removed.
         remove = function(self, obj)
             local removed = false
             for i = #layer_obj.objects, 1, -1 do
@@ -122,7 +123,7 @@ local function wrap_layer(layer_obj)
             return removed
         end,
 
-        --- Clear all objects from this layer.
+--- Clear all objects from this layer.
         clear = function(self)
             for i = #layer_obj.objects, 1, -1 do
                 local obj = layer_obj.objects[i]
@@ -140,7 +141,7 @@ local function wrap_layer(layer_obj)
             mark_dirty()
         end,
 
-        --- Draw all active objects in this layer.
+--- Draw all active objects in this layer.
         draw = function(self)
             if not layer_obj._active then return end
             for _, obj in ipairs(layer_obj.objects) do
@@ -150,14 +151,14 @@ local function wrap_layer(layer_obj)
             end
         end,
 
-        --- Return the number of objects in this layer.
-        ---@return integer
+--- Return the number of objects in this layer.
+---@return integer
         count = function(self)
             return #layer_obj.objects
         end,
 
-        --- Return the internal objects table of this layer.
-        ---@return table
+--- Return the internal objects table of this layer.
+---@return table
         get_objects = function(self)
             return layer_obj.objects
         end,
@@ -186,16 +187,16 @@ local function wrap_layer(layer_obj)
             mark_dirty()
         end,
 
-        --- Set whether this layer is active (visible).
-        ---@param active boolean
+--- Set whether this layer is active (visible).
+---@param active boolean
         set_active = function(self, active)
             self._active = active
             layer_obj._active = active
             mark_dirty()
         end,
 
-        --- Return whether this layer is currently active.
-        ---@return boolean
+--- Return whether this layer is currently active.
+---@return boolean
         is_active = function(self)
             return layer_obj._active
         end

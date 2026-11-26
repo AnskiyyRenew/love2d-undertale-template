@@ -5,12 +5,10 @@ local Keyboard = {
     simulatedKeys = {},
     allowInput = true,
 
-    -- touch support
-    touches = {},            -- map: touchid -> { id=touchid, screenX, screenY, x, y, pressed, pressaux, state }
-    touchToMouse = false,    -- if true, first active touch will simulate "mouse1" (via simulatedKeys)
+    touches = {},
+    touchToMouse = false,
 }
 
--- states: 0 (released), 1 (just pressed), 2 (held), -1 (just released)
 for i = 97, 122, 1
 do
     table.insert(Keyboard.keys, {id = string.char(i), state = 0, pressed = false, pressaux = false})
@@ -138,12 +136,9 @@ function Keyboard.TouchPressed(id, sx, sy)
     t.pressed = true
     Keyboard.touches[id] = t
 
-    -- Optional: map the first touch to mouse1 (using simulatedKeys so it doesn't interfere with SE.mouse)
     if Keyboard.touchToMouse then
-        -- only map if no other simulated mouse1 currently from touch
         if not Keyboard.simulatedKeys["__touch_mouse1"] or not Keyboard.simulatedKeys["__touch_mouse1"].pressed then
             Keyboard.simulatedKeys["mouse1"] = { pressed = true, pressaux = false, state = 1 }
-            -- mark special key so we can release later
             Keyboard.simulatedKeys["__touch_mouse1"] = { pressed = true, pressaux = false, state = 1 }
         end
     end
@@ -156,7 +151,6 @@ end
 function Keyboard.TouchMoved(id, sx, sy)
     local t = Keyboard.touches[id]
     if not t then
-        -- If it wasn't recorded before (some platforms may only send moved), create it
         t = { id = id, pressed = true, pressaux = false, state = 1 }
         Keyboard.touches[id] = t
     end
@@ -181,7 +175,6 @@ function Keyboard.TouchReleased(id, sx, sy)
     t.pressed = false
 
     if Keyboard.touchToMouse then
-        -- release mouse1 simulated key if it was from touch
         if Keyboard.simulatedKeys["__touch_mouse1"] and Keyboard.simulatedKeys["__touch_mouse1"].pressed then
             Keyboard.simulatedKeys["mouse1"] = { pressed = false, pressaux = true, state = -1 }
             Keyboard.simulatedKeys["__touch_mouse1"].pressed = false
@@ -230,8 +223,6 @@ local function updateTouchStates()
     end
 end
 
-
-
 --- Simulate a key press: 1 next frame, then 2 while held.
 ---@param key string
 function Keyboard.SimulatePress(key)
@@ -267,7 +258,6 @@ end
 ---@return integer
 function Keyboard.GetState(key)
     if (Keyboard.simulatedKeys[key]) then
-        -- State is computed every frame in Keyboard.Update() (same edge logic as real keys)
         return Keyboard.simulatedKeys[key].state or 0
     end
 
@@ -456,8 +446,6 @@ function Keyboard.Update()
         progress.timer = progress.timer + 1
     end
 
-    -- Finalize simulated key states with the same edge logic as real keys. Runs
-    -- after the AutoPress loop so an AutoPress press registers on the same frame.
     local staleKeys = {}
     for key, simKey in pairs(Keyboard.simulatedKeys) do
         if (simKey.pressed ~= nil) then
@@ -474,8 +462,6 @@ function Keyboard.Update()
                 simKey.pressaux = simKey.pressed
             end
 
-            -- A fully-released simulated key is dropped so it stops shadowing
-            -- real input for the same key name.
             if (not simKey.pressed and simKey.state == 0) then
                 table.insert(staleKeys, key)
             end

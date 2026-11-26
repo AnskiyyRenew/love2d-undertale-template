@@ -1,38 +1,27 @@
---[[
-    GUI Button - UNDERTALE-style button
-
-    Selection state: prefix (default "> ") + yellow; when not selected a
-    same-width space pad keeps the text from shifting (determination_mono is
-    monospaced). Hover sets yellow WITHOUT the prefix, so keyboard selection
-    and mouse hover stay visually distinct.
-
-    Pure component: selection / hover / triggering are driven by the scene via
-    SetSelected / SetHovered / Trigger / ContainsPoint, so it works with
-    keyboard, gamepad, and mouse alike.
-]]
+--- GUI Button - UNDERTALE-style button
 
 local Label = require((...):match("(.-)[^%.]+$") .. "label")
 
 local Button = {}
 Button.__index = Button
 
-local SEL_COLOR  = {1, 1, 0}   -- selection yellow (UNDERTALE FIGHT/ACT/ITEM/MERCY)
-local NORM_COLOR = {1, 1, 1}   -- unselected white
+local SEL_COLOR  = {1, 1, 0}
+local NORM_COLOR = {1, 1, 1}
 
 function Button.New(opts)
     opts = opts or {}
     local self = setmetatable({}, Button)
     self.x = opts.x or 0
     self.y = opts.y or 0
-    self.w = opts.w or 180       -- hit area width (mouse)
-    self.h = opts.h or 24        -- hit area height (mouse)
+    self.w = opts.w or 180
+    self.h = opts.h or 24
     self.text = opts.text or ""
     self.selected = (opts.selected == true)
     self.hovered  = false
     self.onSelect = opts.onSelect
     self.layer = opts.layer or 1000
-    self.prefix = opts.prefix or ">"      -- selection prefix
-    self.pad = opts.pad or "  "           -- unselected pad (default 2 spaces, equals "> " width)
+    self.prefix = opts.prefix or ">"
+    self.pad = opts.pad or "  "
     self.colorNormal = opts.colorNormal or NORM_COLOR
     self.colorSelected = opts.colorSelected or SEL_COLOR
     self._label = Label.New(self:_displayText(), {self.x, self.y}, self.layer)
@@ -40,9 +29,9 @@ function Button.New(opts)
     return self
 end
 
--- The text to display right now (with prefix / pad). Hover does NOT add a
--- prefix -- only keyboard selection does, so hover and selection stay visually
--- distinct when both are active.
+--- The text to display right now (with prefix / pad). Hover does NOT add a
+--- prefix -- only keyboard selection does, so hover and selection stay visually
+--- distinct when both are active.
 function Button:_displayText()
     if (self.selected) then
         return self.prefix .. " " .. self.text
@@ -92,6 +81,8 @@ function Button:SetOnSelect(fn)
 end
 
 --- Hit-test the mouse hit area (top-left + w x h).
+---@param px number
+---@param py number
 function Button:ContainsPoint(px, py)
     return px >= self.x and px <= self.x + self.w
        and py >= self.y and py <= self.y + self.h

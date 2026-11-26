@@ -1,14 +1,10 @@
--- Poseur animation — the monster of the sample encounter.
--- Contract: Game/Animations/_temp.lua. `require` caches the module, so `New(pos)`
--- is the only way to get an instance; Battle.BindAnimation binds the functions
--- for dot calls (`anim.Foo(...)`).
+--- Poseur animation — the monster of the sample encounter.
 
 local PoseurAnim = {}
 
 function PoseurAnim.New(pos)
     local self = {}
 
-    -- Back-reference to this module's function table. Do not rename it.
     self._class = PoseurAnim
 
     self.running = true
@@ -28,6 +24,13 @@ function PoseurAnim.Init(self, pos)
     local _pos = (pos or {320, 140})
     local poseur = Sprites.CreateSprite("poseur.png", "UI")
     poseur:MoveTo(_pos[1], _pos[2])
+
+    --[[local glow = ImportFile("Glow", "shader")
+    glow:send("glow_color", {1, 1, 1})
+    glow:send("glow_intensity", 1)
+    glow:send("threshold", 0.06)
+    glow:send("tex_size", {poseur.width, poseur.height})
+    poseur:SetShaders({glow})]]
 
     self.cpos = {poseur.x, poseur.y}
     self.poseur = poseur

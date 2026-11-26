@@ -1,14 +1,10 @@
--- Loox animation.
--- Contract: Game/Animations/_temp.lua. `require` caches the module, so `New(pos)`
--- is the only way to get an instance; Battle.BindAnimation binds the functions
--- for dot calls (`anim.Foo(...)`).
+--- Loox animation. Contract: Game/Animations/_temp.lua. `require` caches the module, so `New(pos)` is the only way to get an instance; Battle.BindAnimation binds the functions for dot calls (`anim.Foo(...)`).
 
 local Loox = {}
 
 function Loox.New(pos)
     local self = {}
 
-    -- Back-reference to this module's function table. Do not rename it.
     self._class = Loox
 
     self.running = true
@@ -65,7 +61,6 @@ function Loox.Update(self, dt)
         return
     end
 
-    -- Default hurt shake: knock the sprite sideways, decaying toward 0.
     if (self.hurting) then
         local p = self.sprite
         p.x = self.cpos[1] + self.intensity

@@ -5,6 +5,11 @@ local step = {
 local rho = 1
 local time_target = math.huge
 local _run = true
+--- Configures the encounter timer from the current flag progress.
+---@param flag string
+---@param start number
+---@param range number
+---@param amount number
 function step.Init(flag, start, range, amount)
     if (FLAG[flag] >= amount) then
         time_target = 60
@@ -18,6 +23,7 @@ function step.Init(flag, start, range, amount)
     print(time_target, rho, start, range)
 end
 
+--- Advances the idle timer and starts the nobody-came battle once it expires.
 function step.UpdateTime()
     step.time = step.time + 1
 
@@ -30,6 +36,7 @@ function step.UpdateTime()
     end
 end
 
+--- Advances the encounter timer and spawns a battle when it reaches the target.
 function step.Update()
     if (not _run) then return end
     if (step.time >= time_target) then

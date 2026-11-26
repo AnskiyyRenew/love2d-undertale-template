@@ -13,6 +13,8 @@ do
     sign:MoveTo(200 + i * 160, 100)
     sign._triggered = false
     sign._i = i
+    --- Lights the monitor up while touched and dims it again afterwards.
+    ---@param self table The monitor sprite instance.
     sign.Step = function (self)
         if (ow.getTouchResult("trigger", self._i, "rr")) then
             if (not self._triggered) then
@@ -35,6 +37,8 @@ local poseur = Sprites.CreateSprite("poseur.png", "UponPlayer")
 poseur.ypivot = 1
 poseur._fly = false
 poseur:Scale(0.5, 0.5)
+--- Flies the poseur across the screen and destroys it once it exits.
+---@param self table The poseur sprite instance.
 poseur.Step = function (self)
     if (self._fly) then
         self.velocity = {
@@ -56,6 +60,8 @@ end
 local trigger_1 = 0
 local trigger_7 = false
 
+--- Updates the overworld and handles all dialog, warp and chest interactions.
+---@param dt number Seconds elapsed since the previous frame.
 function scene.update(dt)
     ow.Update(dt)
 
@@ -146,10 +152,12 @@ function scene.update(dt)
     end
 end
 
+--- Draws the overworld map, sprites and UI.
 function scene.draw()
     ow.Draw()
 end
 
+--- Releases the overworld module state and clears all layers.
 function scene.clear()
     ow.Clear()
     package.loaded["Scripts.Libraries.Overworld"] = nil

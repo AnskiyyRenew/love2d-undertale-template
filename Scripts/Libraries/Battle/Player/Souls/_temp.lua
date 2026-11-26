@@ -1,29 +1,9 @@
---  PLAYER SOUL — TEMPLATE AND CONTRACT
---
---  A soul is a plain module table whose `Update(dt)` moves the player. Copy this
---  file to `Game/Souls/<name>.lua` (keep the local name `action`) and switch to
---  it with `Player.SetSoul("<name>")`. Lookup is Game-first; the engine copy in
---  `Scripts/Libraries/Battle/Player/Souls/<id>.lua` is the fallback.
---
---  Callbacks:
---    Init(sprite, can_move, args)  Once per switch: bind the sprite, pick the
---                                  tint, reset state, read `args`.
---    Update(dt)                    Every frame while this soul is active and
---                                  `Player.canMove` is true.
---
---  Fields: `sprite` (the driven sprite), `can_move` (mirrors Player.canMove),
---  `is_moving` (yours), `use_platforms` (optional: true = caught by
---  Player.BluePlatform surfaces, absent = passes through).
---
---  `Player.action` IS this module table and the file is re-executed on every
---  switch, so reset module-level values in Init. Read input through
---  `Controller.GetState("left")` and friends, never `Keyboard`.
+--- PLAYER SOUL — TEMPLATE AND CONTRACT
 
 local action = {
     sprite = nil,
     can_move = true,
     is_moving = false,
-    -- use_platforms = true,   -- uncomment to stand on Player.BluePlatform surfaces
 }
 
 local speed = 2
@@ -40,11 +20,9 @@ function action.Init(sprite, can_move, args)
     end
 
     if (sprite) then
-        -- TODO: this soul's tint, or drop the line to keep the sprite's colour.
         sprite.color = {1, 0, 0}
     end
 
-    -- TODO: reset your own counters / flags here (my_timer = 0, ...).
     speed = 2
 
     return action
@@ -69,9 +47,7 @@ function action.Update(dt)
     if (not can_move) then return end
     if (sprite) then
         if (Global.GetVariable("UseRealTime(dt)")) then
-            -- Put your dt logic here.
         else
-            -- Put your frames logic here.
         end
     end
 end

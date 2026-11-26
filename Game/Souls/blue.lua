@@ -2,7 +2,6 @@ local action = {
     sprite = nil,
     can_move = true,
     is_moving = false,
-    -- Opt in: without it the soul falls straight through Player.BluePlatform.
     use_platforms = true
 }
 
@@ -47,7 +46,7 @@ local function set_direction(direction)
     end
 end
 
--- Contract: _temp.lua. Init resets gravity/jump/slam state (rotation 0 = down).
+--- Contract: _temp.lua. Init resets gravity/jump/slam state (rotation 0 = down).
 ---@param sprite table|nil The player sprite driven by this soul.
 ---@param can_move boolean|nil Mirrors Player.canMove; nil keeps the current value.
 ---@param args table|nil Extra arguments from Player.SetSoul / Player.NewSoul.
@@ -216,7 +215,6 @@ function action.Update(dt)
     if (not can_move) then return end
     if (sprite) then
         if (Global.GetVariable("UseRealTime(dt)")) then
-            -- Put your dt logic here.
         else
             local cos, sin = math.cos(math.rad(sprite.rotation)), math.sin(math.rad(sprite.rotation))
 
@@ -237,7 +235,6 @@ function action.Update(dt)
                 first_jumped = false
             end
 
-            -- The gravity direction decides the jump key and the sideways keys.
             local jump_key = 0
             if (man_dir == "down") then
                 jump_key = up
@@ -312,8 +309,6 @@ function action.Update(dt)
                 end
             end
 
-            -- Head bonk: one glide tick, then drop `jumping` so the soul does not
-            -- stick to the ceiling while the key is held.
             if (jumping and Arenas.PlayerOnCeiling(sprite)) then
                 current_speed = -float
                 jumping = false
