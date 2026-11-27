@@ -12,7 +12,7 @@ discord.last_error = nil
 discord.JoinReply = { No = 0, Yes = 1, Ignore = 2 }
 
 --- Current unix timestamp, optionally shifted by `seconds` (activity start / finish).
----@param seconds number
+---@param seconds number | nil
 function discord.timestamp(seconds)
     return os.time() + (tonumber(seconds) or 0)
 end

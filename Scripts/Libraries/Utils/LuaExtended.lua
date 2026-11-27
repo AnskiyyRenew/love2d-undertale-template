@@ -18,7 +18,6 @@ end
 ---Print a table completely.
 ---@param t table
 ---@param indent number|nil
----@return string
 function luaextended.printTable(t, indent)
     indent = indent or 0
     local seen = {}

@@ -56,7 +56,6 @@ local error_types = {
 
 --- Decodes escaped unicode sequences in a string into lowercase UTF-8 characters.
 ---@param str string
----@return string
 local function normalize_unicode(str)
     return str:gsub("\\u([%da-fA-F][%da-fA-F][%da-fA-F][%da-fA-F])", function(u)
         return utf8.char(tonumber(u, 16)):lower()
@@ -236,7 +235,7 @@ end
 
 --- Serializes a Lua value into a JSON string.
 ---@param value any
----@return string
+---@return string|boolean
 function safejson.encode(value)
     return safejson.json.encode(value)
 end
