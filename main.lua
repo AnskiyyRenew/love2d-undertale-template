@@ -63,7 +63,7 @@ ImportFile("Engine.2_0")
 Localize = ImportFile("Localize")
 Localize.setFile(Global.GetVariable("Language"))
 Border = ImportFile("Utils.Border")
-Border.SetEnabled(false)
+Border.SetEnabled(true)
 Border.FadeIn(0)
 math.randomseed()
 
@@ -169,7 +169,7 @@ end
 -- two canvases, then bring up Discord Rich Presence.
 function love.load()
 
-    Border.SetImage("ruins")
+    Border.SetImage("snowy.png")
 
     Scenes.flushPendingSwitch()
     scene_ = Scenes.current

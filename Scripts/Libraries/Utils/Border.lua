@@ -3,6 +3,11 @@ local Border = {}
 local presets = {
     idle  = "idle.png",
     ruins = "ruins.png",
+    snowy = "snowy.png",
+    waterfall = "waterfall.png",
+    hotland = "hotland.png",
+    newhome = "newhome.png",
+    truelab = "truelab.png",
 }
 
 local cache = {}
