@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#registering-a-border" class="md-skip">
+        <a href="#two-modes-border_mode" class="md-skip">
           Skip to content
         </a>
       
@@ -1135,6 +1135,28 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-modes-border_mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two Modes (BORDER_MODE)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-outline-placeholder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Outline Placeholder
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#registering-a-border" class="md-nav__link">
@@ -3061,6 +3083,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#two-modes-border_mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two Modes (BORDER_MODE)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-outline-placeholder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Outline Placeholder
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#registering-a-border" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3117,38 +3161,140 @@ Besides a centered game screen, their game also has a ring of outer border.</p>
 <p>Border library location: <code>Scripts/Libraries/Utils/Border.lua</code></p>
 <p><img alt="" src="../../img/020_basic/040.png" /></p>
 <hr />
+<h2 id="two-modes-border_mode">Two Modes (BORDER_MODE)<a class="headerlink" href="#two-modes-border_mode" title="Permanent link">&para;</a></h2>
+<p><code>conf.lua</code> uses <code>BORDER_MODE</code> to decide which pair of dimensions the window takes; <code>love.conf</code> only performs the choice once:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">LOGICAL_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">LOGICAL_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span><span class="w">    </span><span class="c1">-- window size with BORDER_MODE off</span>
+<span class="nv">BORDER_WIDTH</span><span class="p">,</span><span class="w">  </span><span class="nv">BORDER_HEIGHT</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">960</span><span class="p">,</span><span class="w"> </span><span class="mi">540</span><span class="w">    </span><span class="c1">-- window size with BORDER_MODE on</span>
+<span class="nv">BORDER_MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="c1">-- inside love.conf</span>
+<span class="nv">t</span><span class="p">.</span><span class="py">window</span><span class="p">.</span><span class="py">width</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nv">BORDER_MODE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">BORDER_WIDTH</span><span class="w">  </span><span class="ow">or</span><span class="w"> </span><span class="nv">LOGICAL_WIDTH</span>
+<span class="nv">t</span><span class="p">.</span><span class="py">window</span><span class="p">.</span><span class="py">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">BORDER_MODE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">BORDER_HEIGHT</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">LOGICAL_HEIGHT</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th><code>BORDER_MODE</code></th>
+<th>Window size</th>
+<th>Where the screen goes</th>
+<th>Around the screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>false</code></td>
+<td><code>LOGICAL_WIDTH × LOGICAL_HEIGHT</code>, i.e. 640×480</td>
+<td>Scaled by <code>SCREEN_SCALE</code> and placed in the window</td>
+<td>No border art, only an outline</td>
+</tr>
+<tr>
+<td><code>true</code> (default)</td>
+<td><code>BORDER_WIDTH × BORDER_HEIGHT</code>, i.e. 960×540</td>
+<td>Placed in the border art's opening; by default a centered 640×480 area at offset <code>(160, 30)</code></td>
+<td>An outline until the border is enabled, then the border art</td>
+</tr>
+</tbody>
+</table>
+<p>The two modes only change the window size and the layout reference. The canvas is always <code>CANVAS_WIDTH × CANVAS_HEIGHT</code>, and in-game coordinates are unaffected by the window size, so scene code does not need to branch on the mode.</p>
+<p><code>BORDER_MODE</code> only sets the window size at startup; changing the variable at runtime does not recreate the window. When the window size changes at runtime (for example <code>F4</code> fullscreen), the engine re-fits the border art to the current window, so the screen and the frame never fall out of alignment.</p>
+<hr />
+<h2 id="the-outline-placeholder">The Outline Placeholder<a class="headerlink" href="#the-outline-placeholder" title="Permanent link">&para;</a></h2>
+<p><code>BORDER_MODE = true</code> does not mean the border art is drawn. The art needs <code>Border.enabled</code> to be <code>true</code> and <code>Border.Draw</code> to obtain an image (it falls back to <code>ruins</code> when <code>SetImage</code> was never called). Until then, <code>love.draw</code> in <code>main.lua</code> draws an outline around the screen:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">BORDER_MODE</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">Border</span><span class="p">.</span><span class="nf">Draw</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">push</span><span class="p">()</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">translate</span><span class="p">(</span><span class="nv">DrawX</span><span class="p">,</span><span class="w"> </span><span class="nv">DrawY</span><span class="p">)</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">scale</span><span class="p">(</span><span class="nv">ScreenScale</span><span class="p">,</span><span class="w"> </span><span class="nv">ScreenScale</span><span class="p">)</span>
+
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="nv">source</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">BORDER_MODE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">Border</span><span class="p">.</span><span class="py">enabled</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">r</span><span class="p">,</span><span class="w"> </span><span class="nv">g</span><span class="p">,</span><span class="w"> </span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">unpack</span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;MainColor&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">})</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setColor</span><span class="p">(</span><span class="nv">r</span><span class="p">,</span><span class="w"> </span><span class="nv">g</span><span class="p">,</span><span class="w"> </span><span class="nv">b</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setLineWidth</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">(</span><span class="s2">&quot;line&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">642</span><span class="p">,</span><span class="w"> </span><span class="mi">482</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="kr">end</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span>
+</code></pre></div>
+<p>The default startup screen is therefore: a 960×540 window, a 640×480 game screen in the middle, and border art around it. With the border disabled, the same screen sits inside a 2px outline on black. That outline is a placeholder for "border not in place yet"; it is not part of the border art, and it only appears while <code>Border.enabled</code> is <code>false</code>.</p>
+<p>The visible state is decided by <code>Border.enabled</code> together with <code>Border.alpha</code>:</p>
+<table>
+<thead>
+<tr>
+<th><code>enabled</code></th>
+<th><code>alpha</code></th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>false</code></td>
+<td>any value</td>
+<td>Outline</td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td>greater than 0</td>
+<td>Border art</td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td>0</td>
+<td>No decoration</td>
+</tr>
+</tbody>
+</table>
+<p><code>main.lua</code> calls <code>Border.SetEnabled(true)</code> and <code>Border.FadeIn(0)</code> at startup and picks the Snowdin frame with <code>Border.SetImage("snowy.png")</code> in <code>love.load</code>, so the default screen is the 640×480 game screen inside the border art, faded in over about one second. <code>FadeIn</code> treats a non-positive duration as one second; use <code>Border.SetAlpha(1)</code> for an instant border. Call <code>Border.SetEnabled(false)</code> to go back to the outline.</p>
+<div class="admonition note">
+<p class="admonition-title">The line follows the main colour</p>
+<p>Its colour comes from <code>MainColor</code> (see <code>conf_pure.lua</code>, default <code>{1, 1, 1}</code>), the same value used by the battle box and most other elements. For an AU such as <code>Underfell</code>, setting the main colour to pink tints this line as well.</p>
+</div>
+<p><code>Border.FadeOut</code> sets <code>enabled</code> to <code>false</code> when it finishes, so a finished fade-out returns to the outline. To stay undecorated after fading out, call <code>Border.SetEnabled(true)</code> once more afterwards ( <code>alpha</code> is already 0 at that point).</p>
+<hr />
 <h2 id="registering-a-border">Registering a Border<a class="headerlink" href="#registering-a-border" title="Permanent link">&para;</a></h2>
-<p>The engine registers a border, but only the ruins and default borders are usable.<br>
-The bad news is, due to offset and scaling issues, the <code>idle</code> border is not recommended. There used to be an alternative — drawing a 1px white line around the canvas — but it is now also turned off together with the border (see below).</p>
-<p>Setting that aside, use <code>Border.RegisterImage(name, path)</code> to register a border, similar to a global variable, and it will need to be called by <code>name</code> later.</p>
+<p>The engine ships seven border images in <code>Resources/Sprites/Border/</code>, all 960×540 with a 640×480 opening at <code>(160, 30)</code>, which matches the auto-centered calculation:</p>
+<ul>
+<li><code>idle</code> A handheld-console frame with a 1px white line around the screen area.</li>
+<li><code>ruins</code> Ruins.</li>
+<li><code>snowy</code> Snowdin.</li>
+<li><code>waterfall</code> Waterfall.</li>
+<li><code>hotland</code> Hotland.</li>
+<li><code>newhome</code> New Home.</li>
+<li><code>truelab</code> The True Lab.</li>
+</ul>
+<p>Everything except <code>idle</code> comes from the original <code>UNDERTALE</code> PS4 border set, one per area; <code>snowy</code> is the frame the engine starts with.</p>
+<p>Use <code>Border.RegisterImage(name, path)</code> to register a border, then refer to it by <code>name</code>.</p>
 <ul>
 <li><code>name</code> The border's code name.</li>
 <li><code>path</code> The border's path, counted from the <code>Resources/Sprites/Border/</code> folder.</li>
 </ul>
+<p><code>SetImage</code> also accepts a direct path; an unregistered path is loaded as is:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Border</span><span class="p">.</span><span class="nf">RegisterImage</span><span class="p">(</span><span class="s2">&quot;snow&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;user/snow.png&quot;</span><span class="p">)</span>
+<span class="nv">Border</span><span class="p">.</span><span class="nf">SetImage</span><span class="p">(</span><span class="s2">&quot;snow&quot;</span><span class="p">)</span>
+
+<span class="nv">Border</span><span class="p">.</span><span class="nf">SetImage</span><span class="p">(</span><span class="s2">&quot;user/other.png&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- skip registration, load directly</span>
+</code></pre></div>
+<p>A custom border image needs three things: the same aspect ratio as <code>BORDER_WIDTH × BORDER_HEIGHT</code>, a 640×480 screen area in the middle, and opaque surroundings. When the opening is not centered, point to its top-left corner with <code>Border.SetOpening(x, y)</code>.</p>
 <hr />
 <h2 id="enabling-the-border">Enabling the Border<a class="headerlink" href="#enabling-the-border" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">The border and that white line are not drawn now</p>
-<p>In <code>main.lua</code>'s <code>love.draw</code> <strong>both places are commented out</strong>:</p>
-<ul>
-<li><code>Border.Draw()</code> — the border image itself. It was originally drawn at a fixed window size, and the offset and scaling don't match.</li>
-<li>The <code>1px</code> white line around the canvas (<code>rectangle("line", -1, -1, CANVAS_WIDTH + 2, CANVAS_HEIGHT + 2)</code>) — the "big white frame" that used to replace the border image.</li>
-</ul>
-<p>So the current default screen is <strong>clean</strong>, with no decoration around it. To restore either one, uncomment the corresponding lines, or call <code>Border.Draw()</code> manually in a Scene. The library itself is perfectly fine: it scales with <code>SCREEN_SCALE</code> and centers with the canvas.</p>
-</div>
-<p>If you want to see the border effect in the fastest time, use the following two functions:</p>
-<p>Use <code>Border.SetEnabled(true)</code> to enable the border.<br>
-Use <code>Border.FadeIn(dur)</code> to set the fade-in duration (seconds).</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Border</span><span class="p">.</span><span class="nf">SetImage</span><span class="p">(</span><span class="s2">&quot;ruins&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">-- choose the art</span>
+<span class="nv">Border</span><span class="p">.</span><span class="nf">SetEnabled</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">     </span><span class="c1">-- enable it; the outline disappears</span>
+<span class="nv">Border</span><span class="p">.</span><span class="nf">FadeIn</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">            </span><span class="c1">-- 1 second fade-in</span>
+</code></pre></div>
+<p><code>Border.Draw</code> is not called when <code>BORDER_MODE = false</code>, so enabling the border shows nothing in that mode.</p>
 <div class="admonition example">
 <p class="admonition-title">Other functions</p>
 <ul>
-<li><code>SetImage(img)</code> Switches the border to a registered image name.</li>
-<li><code>SetAlpha(a)</code> Sets the border's transparency, also an important approach for fade in/out.</li>
-<li><code>FadeOut(dur)</code> Spends <code>dur</code> seconds fading out and disappearing.</li>
-<li><code>SetOpening(x, y)</code> Manually specifies the top-left pixel coordinate of the "window opening" (i.e. where the game image is) on the border image.</li>
-<li><code>GetOpening(imgW, imgH)</code> Returns the offset of the window opening relative to the border image's top-left. When not manually set, it is auto-computed by canvas centering.</li>
+<li><code>SetAlpha(a)</code> Sets the opacity, 0–1; fades are implemented by changing this value.</li>
+<li><code>FadeOut(dur)</code> Fades out over <code>dur</code> seconds, then calls <code>SetEnabled(false)</code> automatically.</li>
+<li><code>SetOpening(x, y)</code> Manually sets the top-left pixel coordinate of the opening, measured from the art's top-left corner.</li>
+<li><code>GetOpening(imgW, imgH)</code> Returns the opening's offset from the art's top-left corner. When not set manually it is computed by centering the canvas, i.e. <code>((artW − CANVAS_WIDTH) / 2, (artH − CANVAS_HEIGHT) / 2)</code>.</li>
 </ul>
 </div>
+<p>The art shares the same <code>ScreenScale</code> and <code>DrawX / DrawY</code> offset as the canvas, so it stays in sync under scaling and fullscreen. With <code>BORDER_MODE = true</code>, <code>SCREEN_SCALE</code> fits <code>BORDER_WIDTH × BORDER_HEIGHT</code> rather than the canvas size; see <a href="../070_screen/index.html">Canvas &amp; Screen</a> for details.</p>
 <hr />
 <h2 id="other-operations">Other Operations<a class="headerlink" href="#other-operations" title="Permanent link">&para;</a></h2>
 <p>If you want to draw something else in the border area, modify the <code>Border.Draw</code> function, but note you can only use <code>love2d</code>'s official drawing methods; see <a href="../../060_with_love/000_graphics/index.html">With LOVE Development → Graphics</a> for details.</p>

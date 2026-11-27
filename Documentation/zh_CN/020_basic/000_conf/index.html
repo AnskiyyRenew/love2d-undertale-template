@@ -3207,7 +3207,9 @@
 
 <span class="nv">LOGICAL_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">LOGICAL_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span>
 <span class="nv">CANVAS_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">CANVAS_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span>
-<span class="nv">SCREEN_SCALE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="w">        </span><span class="c1">-- 游戏画布的缩放方式</span>
+<span class="nv">BORDER_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">BORDER_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">960</span><span class="p">,</span><span class="w"> </span><span class="mi">540</span>
+<span class="nv">BORDER_MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">              </span><span class="c1">-- 是否使用带边框的窗口</span>
+<span class="nv">SCREEN_SCALE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;auto&quot;</span><span class="w">           </span><span class="c1">-- 游戏画布的缩放方式</span>
 <span class="nv">FILL_SCREEN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">              </span><span class="c1">-- 遗留开关，只在 SCREEN_SCALE 为 nil 时生效</span>
 <span class="nv">USE_ERRHANDLER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
@@ -3223,10 +3225,12 @@
 <li><code>WEBSITE</code> 游戏网站，可以是发布页或者一个能反馈的地址。（将会在报错界面展示）</li>
 </ul>
 </li>
-<li><code>LOGICAL_WIDTH / HEIGHT</code> 游戏窗口的大小，默认 <code>(640, 480)</code> 。另一组可用尺寸为 <code>(960, 540)</code> ，该尺寸对应带边框的情况。</li>
+<li><code>LOGICAL_WIDTH / HEIGHT</code> 不带边框（ <code>BORDER_MODE = false</code> ）时的窗口尺寸，默认 <code>(640, 480)</code> 。</li>
 <li><code>CANVAS_WIDTH / HEIGHT</code> 游戏画布的大小，默认 <code>(640, 480)</code> 。</li>
+<li><code>BORDER_WIDTH / HEIGHT</code> 带边框（ <code>BORDER_MODE = true</code> ）时的窗口尺寸，默认 <code>(960, 540)</code> 。边框图按该尺寸缩放，画面放进边框图中间 640×480 的开窗。</li>
+<li><code>BORDER_MODE</code> 是否使用带边框的窗口形态，默认 <code>true</code> 。为 <code>true</code> 时窗口按 <code>BORDER_WIDTH / HEIGHT</code> 建立；为 <code>false</code> 时按 <code>LOGICAL_WIDTH / HEIGHT</code> 建立，不绘制边框图，画面直接铺进窗口。两种形态的具体表现见 <a href="../090_border/index.html">边框</a> 。</li>
 <li><code>FILL_SCREEN</code> 是否让游戏随着全屏放大而按比例放大自身。 <u>现在只是遗留开关</u>：只有当 <code>SCREEN_SCALE</code> 没写（ <code>nil</code> ）时才生效，新项目请直接改下面这个。</li>
-<li><code>SCREEN_SCALE</code> 游戏画布的缩放方式，默认 <code>"integer"</code> 。画布<strong>始终居中</strong>，边框会跟着画布一起缩放，所以窗框和游戏画面不会错位。<ul>
+<li><code>SCREEN_SCALE</code> 游戏画布的缩放方式，默认 <code>"auto"</code> 。画布<strong>始终居中</strong>，边框会跟着画布一起缩放，所以窗框和游戏画面不会错位。开启 <code>BORDER_MODE</code> 时缩放基准是 <code>BORDER_WIDTH × BORDER_HEIGHT</code> 的整张边框图，而不是画布。<ul>
 <li><code>"integer"</code> 只按整数倍放大，像素完美。窗口比画布大 1.5 倍时用 1 倍，比 4 倍大时用 4 倍。</li>
 <li><code>"auto"</code> 尽量铺满窗口，允许小数倍。</li>
 <li>填数字则固定倍数，填 <code>false</code> 保持 1:1 不缩放。</li>
@@ -3279,7 +3283,7 @@
 </code></pre></div>
 <ul>
 <li><code>FirstRoom</code> 初始场景。启动游戏后的第一个场景为本场景。引擎默认给的是 <code>Battle.scene_battle_init</code> ；注意同一个变量在文件里被写了好几次，<strong>最后一次生效</strong>，修改为自定义场景时需写在文件末尾。</li>
-<li><code>MainColor</code> 主色调。若想制作 <code>Underfell</code> 等AU，可以将此值设置为粉红色，绝大部分元素都会遵循这个颜色。</li>
+<li><code>MainColor</code> 主色调。若想制作 <code>Underfell</code> 等AU，可以将此值设置为粉红色，绝大部分元素都会遵循这个颜色，包括边框未启用时画面外围的描边。</li>
 <li><code>EnableFriskDance</code> 在Overworld中启用屠杀之舞功能，引擎默认关闭（ <code>false</code> ）。</li>
 <li><code>Language</code> 语言文件，目前使用 <code>zh_CN</code> （简体中文）。</li>
 <li><code>UseRealTime(dt)</code> 使用现实时间。包括玩家移动在内均不会因卡顿造成影响。</li>

@@ -3431,6 +3431,85 @@ So you <strong>don't need</strong> and <strong>shouldn't</strong> manually chang
 <li><code>Destroy()</code> Destroy this blaster and all its beams early.</li>
 </ul>
 </div>
+<div class="admonition example">
+<p class="admonition-title">Private Step</p>
+<p>A blaster can carry a <code>Step(dt)</code> that runs after the shared logic, with the blaster as <code>self</code> and <code>time</code> already advanced to the current frame:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">gb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Blasters</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">100</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">180</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span>
+<span class="nv">gb</span><span class="p">.</span><span class="py">_default_fire</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="nv">gb</span><span class="p">.</span><span class="py">Step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">,</span><span class="w"> </span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">self</span><span class="p">:</span><span class="nf">Beam</span><span class="p">(</span><span class="nb">math.random</span><span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">))</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Approach, animation, auto fire and the beam sync run first, so <code>Step</code> can override the body position, angle and <code>HurtMode</code>, or call <code>Destroy()</code>. A beam fired from <code>Step</code> sits at the muzzle on the same frame; its <code>yscale</code> pulse starts following on the next one.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Frame Callbacks</p>
+<p>Common moments do not need a hand-written <code>Step</code> check; register a frame number instead. Frame numbers match <code>time</code> (the first <code>Update</code> is <code>1</code>), callbacks run after the shared logic and before <code>Step</code>, and the signature is <code>fn(blaster, dt)</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">W</span><span class="p">,</span><span class="w"> </span><span class="nv">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gb</span><span class="p">.</span><span class="py">wait_time</span><span class="p">,</span><span class="w"> </span><span class="nv">gb</span><span class="p">.</span><span class="py">fire_total</span><span class="w">   </span><span class="c1">-- fire_time counts down, fire_total keeps the initial value</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="nv">W</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">        </span><span class="c1">-- mouth opens</span>
+<span class="w">    </span><span class="nv">Audio</span><span class="p">.</span><span class="nf">PlaySound</span><span class="p">(</span><span class="nv">self</span><span class="p">.</span><span class="py">sounds_path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;/snd_warning_0.wav&quot;</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="nv">W</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">             </span><span class="c1">-- the firing frame</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">:</span><span class="nf">Beam</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="nv">W</span><span class="p">,</span><span class="w"> </span><span class="nv">W</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">F</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">   </span><span class="c1">-- beam damage window</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">rotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">rotation</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="nv">W</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">F</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">     </span><span class="c1">-- fade, until destroyed</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">alpha</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.02</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><code>OnFrame(frame, fn)</code> Fires once on that frame. If the frame has already passed, it fires once on the next <code>Update</code>; a frame below <code>1</code> fires on the first <code>Update</code>.</li>
+<li><code>During(from_frame, to_frame, fn)</code> Runs every frame, both ends inclusive; omit <code>to_frame</code> to keep running until the blaster is destroyed.</li>
+<li>Callbacks registered for the same frame run in registration order; both return the blaster, so calls chain.</li>
+<li>A callback may register more callbacks or call <code>Destroy()</code>; once destroyed, the remaining callbacks and <code>Step</code> are skipped for that frame.</li>
+</ul>
+<p>The first argument can also be a phase name instead of a frame number. Names are case-insensitive and their bounds match the timeline above:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Meaning</th>
+<th>Frames</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Waiting</code></td>
+<td>approach / aim</td>
+<td><code>1</code> – <code>W</code></td>
+</tr>
+<tr>
+<td><code>Charging</code></td>
+<td>mouth opens</td>
+<td><code>max(1, W - 12)</code> – <code>W - 1</code></td>
+</tr>
+<tr>
+<td><code>Firing</code></td>
+<td>beam damage</td>
+<td><code>W</code> – <code>W + F - 1</code></td>
+</tr>
+<tr>
+<td><code>Fading</code></td>
+<td>beam fades</td>
+<td><code>W + F</code> – destruction</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="s2">&quot;Charging&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">   </span><span class="c1">-- the frame the mouth opens</span>
+<span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="s2">&quot;Firing&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">     </span><span class="c1">-- the firing frame</span>
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="s2">&quot;Firing&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">      </span><span class="c1">-- every frame of the firing window</span>
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="s2">&quot;Fading&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">      </span><span class="c1">-- the fade, until destruction</span>
+</code></pre></div>
+<p><code>F</code> comes from <code>gb.fire_total</code>, a copy of the construction-time <code>fire_time</code> (<code>fire_time</code> itself counts down). <code>Charging</code> clamps to frame 1 when <code>wait_time &lt;= 12</code>. <code>Fading</code> ends at destruction, so a blaster with <code>_default_fire = false</code> and no manual beams disappears at <code>W + F</code> and that callback never runs.</p>
+</div>
 <p>The engine auto-plays <code>snd_intro.wav</code> (entrance) and <code>snd_fire.wav</code> (firing).</p>
 <p><img alt="BA-08" src="../../img/030_battle_system/ba_08_blaster_fire.png" /></p>
 <hr />

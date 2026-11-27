@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
+        <a href="#border_mode" class="md-skip">
           跳转至
         </a>
       
@@ -1137,10 +1137,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#border_mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        两种形态（BORDER_MODE）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        注册边框
+        描边占位
       
     </span>
   </a>
@@ -1151,7 +1162,7 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        启用边框
+        注册边框
       
     </span>
   </a>
@@ -1160,6 +1171,17 @@
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        启用边框
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         其他操作
@@ -3061,10 +3083,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#border_mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        两种形态（BORDER_MODE）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        注册边框
+        描边占位
       
     </span>
   </a>
@@ -3075,7 +3108,7 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        启用边框
+        注册边框
       
     </span>
   </a>
@@ -3084,6 +3117,17 @@
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        启用边框
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         其他操作
@@ -3116,40 +3160,142 @@
 <p>边框库位置： <code>Scripts/Libraries/Utils/Border.lua</code></p>
 <p><img alt="" src="../../img/020_basic/040.png" /></p>
 <hr />
-<h2 id="_1">注册边框<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>引擎注册了一个边框，其中只有遗迹边框与默认边框可用。<br>
-由于存在偏移与缩放问题， <code>idle</code> 边框不适用。曾在画布外圈绘制一圈 1px 白线作为替代方案，但该白线现已与边框一同关闭（见下）。</p>
+<h2 id="border_mode">两种形态（BORDER_MODE）<a class="headerlink" href="#border_mode" title="Permanent link">&para;</a></h2>
+<p><code>conf.lua</code> 用 <code>BORDER_MODE</code> 决定窗口使用哪一组尺寸， <code>love.conf</code> 中只做一次二选一：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">LOGICAL_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">LOGICAL_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span><span class="w">    </span><span class="c1">-- BORDER_MODE 关闭时的窗口尺寸</span>
+<span class="nv">BORDER_WIDTH</span><span class="p">,</span><span class="w">  </span><span class="nv">BORDER_HEIGHT</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">960</span><span class="p">,</span><span class="w"> </span><span class="mi">540</span><span class="w">    </span><span class="c1">-- BORDER_MODE 开启时的窗口尺寸</span>
+<span class="nv">BORDER_MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="c1">-- love.conf 内</span>
+<span class="nv">t</span><span class="p">.</span><span class="py">window</span><span class="p">.</span><span class="py">width</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nv">BORDER_MODE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">BORDER_WIDTH</span><span class="w">  </span><span class="ow">or</span><span class="w"> </span><span class="nv">LOGICAL_WIDTH</span>
+<span class="nv">t</span><span class="p">.</span><span class="py">window</span><span class="p">.</span><span class="py">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">BORDER_MODE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">BORDER_HEIGHT</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">LOGICAL_HEIGHT</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th><code>BORDER_MODE</code></th>
+<th>窗口尺寸</th>
+<th>画面摆放</th>
+<th>画面四周</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>false</code></td>
+<td><code>LOGICAL_WIDTH × LOGICAL_HEIGHT</code> ，即 640×480</td>
+<td>按 <code>SCREEN_SCALE</code> 缩放后放进窗口</td>
+<td>不绘制边框图，只有一圈描边</td>
+</tr>
+<tr>
+<td><code>true</code> （默认）</td>
+<td><code>BORDER_WIDTH × BORDER_HEIGHT</code> ，即 960×540</td>
+<td>放进边框图的开窗，默认开窗为居中的 640×480 区域，偏移 <code>(160, 30)</code></td>
+<td>未启用边框时只有一圈描边，启用后为边框图</td>
+</tr>
+</tbody>
+</table>
+<p>两种形态只改变窗口尺寸与摆放基准。画布始终是 <code>CANVAS_WIDTH × CANVAS_HEIGHT</code> ，游戏内坐标不受窗口尺寸影响，场景代码无需区分这两种情况。</p>
+<p><code>BORDER_MODE</code> 只在启动时决定窗口大小，运行中修改该变量不会重建窗口。窗口尺寸运行时发生变化（例如 <code>F4</code> 全屏）时，引擎按当前窗口重新贴合边框图，画面与边框不会错位。</p>
+<hr />
+<h2 id="_1">描边占位<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><code>BORDER_MODE = true</code> 不等于已经绘制边框图。边框图需要 <code>Border.enabled</code> 为 <code>true</code> ，并且 <code>Border.Draw</code> 能取到图片（未调用过 <code>SetImage</code> 时自动使用 <code>ruins</code> ）。在此之前， <code>main.lua</code> 的 <code>love.draw</code> 在画面外围画一圈描边（颜色取自 <code>MainColor</code> ，默认白色）：</p>
+<div class="highlight"><pre><span></span><code><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">BORDER_MODE</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">Border</span><span class="p">.</span><span class="nf">Draw</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">push</span><span class="p">()</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">translate</span><span class="p">(</span><span class="nv">DrawX</span><span class="p">,</span><span class="w"> </span><span class="nv">DrawY</span><span class="p">)</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">scale</span><span class="p">(</span><span class="nv">ScreenScale</span><span class="p">,</span><span class="w"> </span><span class="nv">ScreenScale</span><span class="p">)</span>
+
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="nv">source</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">BORDER_MODE</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">Border</span><span class="p">.</span><span class="py">enabled</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">r</span><span class="p">,</span><span class="w"> </span><span class="nv">g</span><span class="p">,</span><span class="w"> </span><span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">unpack</span><span class="p">(</span><span class="nv">Global</span><span class="p">.</span><span class="nf">GetVariable</span><span class="p">(</span><span class="s2">&quot;MainColor&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">})</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setColor</span><span class="p">(</span><span class="nv">r</span><span class="p">,</span><span class="w"> </span><span class="nv">g</span><span class="p">,</span><span class="w"> </span><span class="nv">b</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setLineWidth</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">(</span><span class="s2">&quot;line&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">642</span><span class="p">,</span><span class="w"> </span><span class="mi">482</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">setColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="kr">end</span>
+<span class="nv">SE</span><span class="p">.</span><span class="py">graphics</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span>
+</code></pre></div>
+<p>默认启动后的画面：960×540 的窗口内，中间一块 640×480 的游戏画面，外围为边框图。未启用边框时画面外围是一圈 2px 描边，描边以外为黑底。这圈描边是边框尚未就位时的占位，不属于边框图，只有 <code>Border.enabled</code> 为 <code>false</code> 时才出现。</p>
+<p>可见状态由 <code>Border.enabled</code> 与 <code>Border.alpha</code> 共同决定：</p>
+<table>
+<thead>
+<tr>
+<th><code>enabled</code></th>
+<th><code>alpha</code></th>
+<th>画面</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>false</code></td>
+<td>任意值</td>
+<td>描边</td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td>大于 0</td>
+<td>边框图</td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td>0</td>
+<td>无装饰</td>
+</tr>
+</tbody>
+</table>
+<p><code>main.lua</code> 在启动时调用 <code>Border.SetEnabled(true)</code> 与 <code>Border.FadeIn(0)</code> ，并在 <code>love.load</code> 中用 <code>Border.SetImage("snowy.png")</code> 选定雪镇边框，因此默认画面是 960×540 窗口中间的 640×480 游戏画面，外围为边框图，开局约 1 秒淡入。<code>FadeIn</code> 的时长参数不为正数时按 1 秒处理，需要瞬时显示时用 <code>Border.SetAlpha(1)</code> 。想让画面回到描边状态，调用 <code>Border.SetEnabled(false)</code> 即可。</p>
+<div class="admonition note">
+<p class="admonition-title">描边跟随主色调</p>
+<p>描边的颜色取自 <code>MainColor</code> （见 <code>conf_pure.lua</code> ，默认 <code>{1, 1, 1}</code> ），与战斗框等元素保持一致。制作 <code>Underfell</code> 等 AU 时把主色调改为粉色，这圈描边会一起变色。</p>
+</div>
+<p><code>Border.FadeOut</code> 结束后会把 <code>enabled</code> 置为 <code>false</code> ，因此淡出完成即回到描边状态。需要在淡出后保持无装饰时，在淡出完成后调用一次 <code>Border.SetEnabled(true)</code> （此时 <code>alpha</code> 已为 0 ）。</p>
+<hr />
+<h2 id="_2">注册边框<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>引擎预置七张边框图，位于 <code>Resources/Sprites/Border/</code> ，尺寸均为 960×540 ，开窗位于 <code>(160, 30)</code> 、大小 640×480 ，与自动居中的计算结果一致：</p>
+<ul>
+<li><code>idle</code> 掌机外形边框，画面区带 1px 白线。</li>
+<li><code>ruins</code> 遗迹。</li>
+<li><code>snowy</code> 雪镇。</li>
+<li><code>waterfall</code> 瀑布。</li>
+<li><code>hotland</code> 热地。</li>
+<li><code>newhome</code> 新家。</li>
+<li><code>truelab</code> 真实验室。</li>
+</ul>
+<p>除 <code>idle</code> 外，六张区域边框取自原版 <code>UNDERTALE</code> PS4 版，按游戏区域划分；<code>snowy</code> 为引擎启动时的默认边框。</p>
 <p>使用 <code>Border.RegisterImage(name, path)</code> 注册边框，注册后通过 <code>name</code> 调用。</p>
 <ul>
 <li><code>name</code> 边框的代号。</li>
 <li><code>path</code> 边框的路径，从 <code>Resources/Sprites/Border/</code> 文件夹开始算起。</li>
 </ul>
+<p><code>SetImage</code> 也接受直接路径，未注册过的路径按原样加载：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">Border</span><span class="p">.</span><span class="nf">RegisterImage</span><span class="p">(</span><span class="s2">&quot;snow&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;user/snow.png&quot;</span><span class="p">)</span>
+<span class="nv">Border</span><span class="p">.</span><span class="nf">SetImage</span><span class="p">(</span><span class="s2">&quot;snow&quot;</span><span class="p">)</span>
+
+<span class="nv">Border</span><span class="p">.</span><span class="nf">SetImage</span><span class="p">(</span><span class="s2">&quot;user/other.png&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 绕过注册，直接加载</span>
+</code></pre></div>
+<p>自制边框图需满足三项：与 <code>BORDER_WIDTH × BORDER_HEIGHT</code> 同比例，中间留出 640×480 的画面区，其余部分不透明。开窗不在正中时用 <code>Border.SetOpening(x, y)</code> 指定左上角坐标。</p>
 <hr />
-<h2 id="_2">启用边框<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">边框和那圈白线，现在都没在画</p>
-<p><code>main.lua</code> 的 <code>love.draw</code> 里<strong>两处都被注释掉了</strong>：</p>
-<ul>
-<li><code>Border.Draw()</code> —— 边框图本身。它当初是按固定窗口尺寸画的，偏移和缩放对不上。</li>
-<li>画布外圈那圈 <code>1px</code> 白线（ <code>rectangle("line", -1, -1, CANVAS_WIDTH + 2, CANVAS_HEIGHT + 2)</code> ）—— 曾经用来代替边框图的那圈白框。</li>
-</ul>
-<p>因此默认画面四周没有任何装饰。需要恢复时，取消对应行的注释，或在场景中手动调用 <code>Border.Draw()</code> 。库本身可正常工作：它会跟随 <code>SCREEN_SCALE</code> 缩放，并与画布一起居中。</p>
-</div>
-<p>查看边框效果时使用以下两个函数：</p>
-<p>使用 <code>Border.SetEnabled(true)</code> 来启用边框。<br>
-使用 <code>Border.FadeIn(dur)</code> 来设置淡入持续时长（秒）。</p>
+<h2 id="_3">启用边框<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nv">Border</span><span class="p">.</span><span class="nf">SetImage</span><span class="p">(</span><span class="s2">&quot;ruins&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">-- 选择边框图</span>
+<span class="nv">Border</span><span class="p">.</span><span class="nf">SetEnabled</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 启用，描边消失</span>
+<span class="nv">Border</span><span class="p">.</span><span class="nf">FadeIn</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">            </span><span class="c1">-- 1 秒淡入</span>
+</code></pre></div>
+<p><code>Border.Draw</code> 在 <code>BORDER_MODE = false</code> 时不会被调用，此时启用边框不会显示任何内容。</p>
 <div class="admonition example">
 <p class="admonition-title">其他函数</p>
 <ul>
-<li><code>SetImage(img)</code> 将边框切换到注册过的图片名字。</li>
-<li><code>SetAlpha(a)</code> 设置边框的透明度，淡入淡出通过改变该值实现。</li>
-<li><code>FadeOut(dur)</code> 花费 <code>dur</code> 秒淡出消失。</li>
-<li><code>SetOpening(x, y)</code> 手动指定边框图上开窗（即游戏画面所在位置）的左上角像素坐标。</li>
-<li><code>GetOpening(imgW, imgH)</code> 返回开窗相对边框图左上角的偏移。没手动设置过时，会按画布居中自动算出来。</li>
+<li><code>SetAlpha(a)</code> 设置透明度，取值 0–1 ，淡入淡出均通过修改该值实现。</li>
+<li><code>FadeOut(dur)</code> 在 <code>dur</code> 秒内淡出，结束后自动 <code>SetEnabled(false)</code> 。</li>
+<li><code>SetOpening(x, y)</code> 手动指定开窗左上角的像素坐标，坐标以边框图左上角为原点。</li>
+<li><code>GetOpening(imgW, imgH)</code> 返回开窗相对边框图左上角的偏移。未手动设置过时按画布居中计算，即 <code>((图宽 − CANVAS_WIDTH) / 2, (图高 − CANVAS_HEIGHT) / 2)</code> 。</li>
 </ul>
 </div>
+<p>边框图与画布共用同一个 <code>ScreenScale</code> 与 <code>DrawX / DrawY</code> 偏移，因此缩放、全屏下均与画面同步。 <code>BORDER_MODE = true</code> 时 <code>SCREEN_SCALE</code> 贴合的是 <code>BORDER_WIDTH × BORDER_HEIGHT</code> ，而非画布尺寸，详见 <a href="../070_screen/index.html">画布与屏幕</a> 。</p>
 <hr />
-<h2 id="_3">其他操作<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_4">其他操作<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>若需在边框区域绘制其他内容，可修改 <code>Border.Draw</code> 函数，其中只能使用 <code>love2d</code> 的官方绘制方法，详见 <a href="../../060_with_love/000_graphics/index.html">与LOVE开发 → 图像绘制</a> 。</p>
 
 

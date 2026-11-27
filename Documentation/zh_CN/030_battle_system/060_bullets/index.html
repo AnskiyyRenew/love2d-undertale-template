@@ -3431,6 +3431,85 @@
 <li><code>Destroy()</code> 提前销毁这门炮和它的所有光束。</li>
 </ul>
 </div>
+<div class="admonition example">
+<p class="admonition-title">私有 Step</p>
+<p>每门炮可以挂一个 <code>Step(dt)</code> ，在共享逻辑跑完之后调用，<code>self</code> 是这门炮，<code>time</code> 已累加到当前帧：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">gb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Blasters</span><span class="p">.</span><span class="nf">New</span><span class="p">({</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">100</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">320</span><span class="p">,</span><span class="w"> </span><span class="mi">240</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">180</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span>
+<span class="nv">gb</span><span class="p">.</span><span class="py">_default_fire</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="nv">gb</span><span class="p">.</span><span class="py">Step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">,</span><span class="w"> </span><span class="nv">dt</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">.</span><span class="py">time</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">self</span><span class="p">:</span><span class="nf">Beam</span><span class="p">(</span><span class="nb">math.random</span><span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">))</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>接近、动画、自动开火与光束跟随先执行，所以 <code>Step</code> 可以覆盖炮身坐标、角度与 <code>HurtMode</code> ，也可以直接 <code>Destroy()</code> 。在 <code>Step</code> 中通过 <code>Beam()</code> 发出的光束当帧已位于炮口，<code>yscale</code> 脉冲从下一帧开始跟随。</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">按帧回调</p>
+<p>常用时间点不必手写 <code>Step</code> 判断，用帧号注册即可。帧号口径与 <code>time</code> 一致，第一次 <code>Update</code> 之后为 <code>1</code> ；回调在共享逻辑之后、<code>Step</code> 之前执行，签名是 <code>fn(blaster, dt)</code> 。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">W</span><span class="p">,</span><span class="w"> </span><span class="nv">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">gb</span><span class="p">.</span><span class="py">wait_time</span><span class="p">,</span><span class="w"> </span><span class="nv">gb</span><span class="p">.</span><span class="py">fire_total</span><span class="w">   </span><span class="c1">-- fire_time 会被递减，初值看 fire_total</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="nv">W</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">        </span><span class="c1">-- 张嘴预警</span>
+<span class="w">    </span><span class="nv">Audio</span><span class="p">.</span><span class="nf">PlaySound</span><span class="p">(</span><span class="nv">self</span><span class="p">.</span><span class="py">sounds_path</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;/snd_warning_0.wav&quot;</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="nv">W</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">             </span><span class="c1">-- 开火瞬间</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">:</span><span class="nf">Beam</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="nv">W</span><span class="p">,</span><span class="w"> </span><span class="nv">W</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">F</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 光束硬伤害期</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">rotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">rotation</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="nv">W</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">F</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 消散期，持续到销毁</span>
+<span class="w">    </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">self</span><span class="p">.</span><span class="py">image</span><span class="p">.</span><span class="py">alpha</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.02</span>
+<span class="kr">end</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><code>OnFrame(frame, fn)</code> 在该帧触发一次。帧号已经过去时，在下一个 <code>Update</code> 补触发一次；帧号小于 <code>1</code> 时在第一次 <code>Update</code> 触发。</li>
+<li><code>During(from_frame, to_frame, fn)</code> 逐帧触发，两端都包含；<code>to_frame</code> 省略表示持续到销毁。</li>
+<li>同一帧的多个回调按注册顺序执行；两者都返回炮对象，可以链式调用。</li>
+<li>回调里可以继续注册回调，也可以 <code>Destroy()</code> ；销毁后本帧不再执行剩余回调与 <code>Step</code> 。</li>
+</ul>
+<p>第一参也可以直接写阶段名，不用自己算帧号。名字不区分大小写，边界与上面的时间轴一致：</p>
+<table>
+<thead>
+<tr>
+<th>名字</th>
+<th>含义</th>
+<th>帧区间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Waiting</code></td>
+<td>接近 / 瞄准</td>
+<td><code>1</code> – <code>W</code></td>
+</tr>
+<tr>
+<td><code>Charging</code></td>
+<td>张嘴预警</td>
+<td><code>max(1, W - 12)</code> – <code>W - 1</code></td>
+</tr>
+<tr>
+<td><code>Firing</code></td>
+<td>光束伤害</td>
+<td><code>W</code> – <code>W + F - 1</code></td>
+</tr>
+<tr>
+<td><code>Fading</code></td>
+<td>光束消散</td>
+<td><code>W + F</code> – 炮身销毁</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="s2">&quot;Charging&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">   </span><span class="c1">-- 张嘴那一帧</span>
+<span class="nv">gb</span><span class="p">:</span><span class="nf">OnFrame</span><span class="p">(</span><span class="s2">&quot;Firing&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">     </span><span class="c1">-- 开火那一帧</span>
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="s2">&quot;Firing&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 整个开火期逐帧</span>
+<span class="nv">gb</span><span class="p">:</span><span class="nf">During</span><span class="p">(</span><span class="s2">&quot;Fading&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="kr">end</span><span class="p">)</span><span class="w">      </span><span class="c1">-- 消散期，到销毁为止</span>
+</code></pre></div>
+<p><code>F</code> 取 <code>gb.fire_total</code> ，它是构造时 <code>fire_time</code> 的副本（<code>fire_time</code> 会被逐帧递减）。<code>wait_time &lt;= 12</code> 时 <code>Charging</code> 钳到第 1 帧。<code>Fading</code> 的终点是销毁，因此 <code>_default_fire = false</code> 且没有手动发束的炮会在 <code>W + F</code> 直接消失，这一段的回调不会执行。</p>
+</div>
 <p>引擎会自动播放 <code>snd_intro.wav</code> （出场）与 <code>snd_fire.wav</code> （开火）。</p>
 <p><img alt="BA-08" src="../../img/030_battle_system/ba_08_blaster_fire.png" /></p>
 <hr />

@@ -3207,7 +3207,9 @@ In most cases, you only need to look at the content before the <code>love.conf(t
 
 <span class="nv">LOGICAL_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">LOGICAL_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span>
 <span class="nv">CANVAS_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">CANVAS_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span>
-<span class="nv">SCREEN_SCALE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="w">        </span><span class="c1">-- how the game canvas is scaled</span>
+<span class="nv">BORDER_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="nv">BORDER_HEIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">960</span><span class="p">,</span><span class="w"> </span><span class="mi">540</span>
+<span class="nv">BORDER_MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">              </span><span class="c1">-- whether to use the bordered window</span>
+<span class="nv">SCREEN_SCALE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;auto&quot;</span><span class="w">           </span><span class="c1">-- how the game canvas is scaled</span>
 <span class="nv">FILL_SCREEN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">              </span><span class="c1">-- legacy switch, only takes effect when SCREEN_SCALE is nil</span>
 <span class="nv">USE_ERRHANDLER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
@@ -3223,10 +3225,12 @@ In most cases, you only need to look at the content before the <code>love.conf(t
 <li><code>WEBSITE</code> Game website, which can be a release page or an address for feedback. (Will be shown on the error screen)</li>
 </ul>
 </li>
-<li><code>LOGICAL_WIDTH / HEIGHT</code> Size of the game window, default <code>(640, 480)</code>. A second recommended size is <code>(960, 540)</code>; this size is for the case with a border.</li>
+<li><code>LOGICAL_WIDTH / HEIGHT</code> Window size without a border ( <code>BORDER_MODE = false</code> ), default <code>(640, 480)</code>.</li>
 <li><code>CANVAS_WIDTH / HEIGHT</code> Size of the game canvas, default <code>(640, 480)</code>. Modifying the size is not recommended; just keep the default.</li>
+<li><code>BORDER_WIDTH / HEIGHT</code> Window size with a border ( <code>BORDER_MODE = true</code> ), default <code>(960, 540)</code>. The border art is scaled to this size and the screen goes into its central 640×480 opening.</li>
+<li><code>BORDER_MODE</code> Whether to use the bordered window, default <code>true</code>. When <code>true</code> the window is created at <code>BORDER_WIDTH / HEIGHT</code>; when <code>false</code> it is created at <code>LOGICAL_WIDTH / HEIGHT</code>, no border art is drawn, and the screen fills the window directly. See <a href="../090_border/index.html">Border</a> for how both modes look.</li>
 <li><code>FILL_SCREEN</code> Whether to let the game scale itself proportionally as the window is enlarged to fullscreen. <u>Now only a legacy switch</u>: it only takes effect when <code>SCREEN_SCALE</code> is not written (<code>nil</code>); for new projects, change the following one directly.</li>
-<li><code>SCREEN_SCALE</code> How the game canvas is scaled, default <code>"integer"</code>. The canvas is <strong>always centered</strong>; the border scales together with the canvas, so the window frame and the game image will not be misaligned.<ul>
+<li><code>SCREEN_SCALE</code> How the game canvas is scaled, default <code>"auto"</code>. The canvas is <strong>always centered</strong>; the border scales together with the canvas, so the window frame and the game image will not be misaligned. With <code>BORDER_MODE</code> on, the scaling reference is the whole <code>BORDER_WIDTH × BORDER_HEIGHT</code> frame rather than the canvas.<ul>
 <li><code>"integer"</code> Only scales by integer multiples, pixel-perfect. When the window is 1.5× larger than the canvas, use 1×; when more than 4× larger, use 4×.</li>
 <li><code>"auto"</code> Tries to fill the window, allowing fractional multiples.</li>
 <li>A number means a fixed multiple; <code>false</code> keeps 1:1 with no scaling.</li>
@@ -3279,7 +3283,7 @@ In most cases, you only need to look at the content before the <code>love.conf(t
 </code></pre></div>
 <ul>
 <li><code>FirstRoom</code> Initial Scene. The first Scene after launching the game is this one. The engine default is <code>Battle.scene_battle_init</code>; note that the same variable is written several times in the file, <strong>the last one wins</strong> — when changing it to your own Scene, remember to write it at the very bottom.</li>
-<li><code>MainColor</code> Main color. If you want to make an AU like <code>Underfell</code>, you can set this value to pink; the vast majority of elements will follow this color.</li>
+<li><code>MainColor</code> Main color. If you want to make an AU like <code>Underfell</code>, you can set this value to pink; the vast majority of elements will follow this color, including the outline drawn around the screen while the border is disabled.</li>
 <li><code>EnableFriskDance</code> Enables the "genocide dance" feature in the Overworld; the engine disables it by default (<code>false</code>).</li>
 <li><code>Language</code> Language file, currently using <code>zh_CN</code> (Simplified Chinese).</li>
 <li><code>UseRealTime(dt)</code> Use real-world time. Including Player movement, nothing is affected by lag.</li>
