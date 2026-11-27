@@ -135,6 +135,189 @@ local function resolveSoundFolder(gb_sounds)
     return FLAT_BLASTER_SOUND_FOLDER
 end
 
+--- Named frame windows, keyed by lowercase name; `from` and `to` are resolved per
+--- blaster because they depend on `wait_time` and the initial `fire_time`.
+--- "Fading" has no upper bound: it ends when the blaster is destroyed, which also
+--- covers extra beams and custom alpha.
+local PHASES = {
+    waiting = {
+        from = function (b) return 1 end,
+        to = function (b) return b.wait_time end,
+    },
+    charging = {
+        from = function (b) return math.max(1, b.wait_time - 12) end,
+        to = function (b) return b.wait_time - 1 end,
+    },
+    firing = {
+        from = function (b) return b.wait_time end,
+        to = function (b) return b.wait_time + b.fire_total - 1 end,
+    },
+    fading = {
+        from = function (b) return b.wait_time + b.fire_total end,
+        to = function () return math.huge end,
+    },
+}
+
+local PHASE_NAMES = "'Waiting', 'Charging', 'Firing' or 'Fading'"
+
+--- Looks up a phase name case-insensitively.
+---@param name string
+---@return table|nil
+local function resolvePhase(name)
+    if (type(name) ~= "string") then return nil end
+    return PHASES[name:lower()]
+end
+
+--- Runs the callbacks registered through `OnFrame` and `During`, in registration
+--- order. Frame numbers are compared with `>=` / `<=` instead of `==`, so a
+--- callback registered for a frame that has already passed still fires once and a
+--- range ends on the first update past `to_frame`. Callbacks may register more
+--- callbacks or destroy the blaster; the pass stops as soon as it is destroyed.
+---@param blaster table
+---@param dt number
+local function run_schedule(blaster, dt)
+    local once = blaster._onces
+    if (once) then
+        local due = false
+        for i = 1, #once do
+            if (blaster.time >= once[i].frame) then due = true break end
+        end
+
+        if (due) then
+            local list, rest = {}, {}
+            for i = 1, #once do
+                local task = once[i]
+                if (blaster.time >= task.frame) then
+                    list[#list + 1] = task
+                else
+                    rest[#rest + 1] = task
+                end
+            end
+
+            blaster._onces = rest
+            for i = 1, #list do
+                list[i].fn(blaster, dt)
+                if (blaster._destroyed) then return end
+            end
+        end
+    end
+
+    local spans = blaster._spans
+    if (spans) then
+        for i = 1, #spans do
+            if (blaster.time > spans[i].to) then
+                local keep = {}
+                for j = 1, #spans do
+                    if (blaster.time <= spans[j].to) then
+                        keep[#keep + 1] = spans[j]
+                    end
+                end
+                blaster._spans = keep
+                spans = keep
+                break
+            end
+        end
+
+        for i = 1, #spans do
+            local task = spans[i]
+            if (blaster.time >= task.from) then
+                task.fn(blaster, dt)
+                if (blaster._destroyed) then return end
+            end
+        end
+    end
+end
+
+--- Fires `fn` once, on the frame where `blaster.time` first reaches `frame`.
+--- `frame` is a number (counted like `blaster.time`, the first update is 1) or a
+--- phase name, which uses the phase's first frame: `"Waiting"` is 1,
+--- `"Charging"` is `wait_time - 12`, `"Firing"` is `wait_time` and `"Fading"` is
+--- `wait_time + fire_total`.
+--- The callback receives `(blaster, dt)`; `blaster.time` is the frame it actually
+--- fired on, which is later than `frame` when it was registered after that frame.
+---@param self table
+---@param frame number|string Frame number or one of the phase names.
+---@param fn function Called as `fn(blaster, dt)`.
+---@return table|nil blaster Returned for chaining; nil when an argument is invalid.
+local function blasterOnFrame(self, frame, fn)
+    if (type(frame) == "string") then
+        local phase = resolvePhase(frame)
+        if (not phase) then
+            print("[Attacks - Blasters] OnFrame: unknown phase '" .. frame .. "', expected " .. PHASE_NAMES .. ".")
+            return nil
+        end
+
+        frame = phase.from(self)
+    end
+
+    if (type(frame) ~= "number") then
+        print("[Attacks - Blasters] OnFrame: 'frame' must be a number or a phase name, the call is ignored.")
+        return nil
+    end
+    if (type(fn) ~= "function") then
+        print("[Attacks - Blasters] OnFrame: 'fn' must be a function, the call is ignored.")
+        return nil
+    end
+
+    self._onces = self._onces or {}
+    self._onces[#self._onces + 1] = {frame = frame, fn = fn}
+    return self
+end
+
+--- Runs `fn` on every frame from `from_frame` to `to_frame`, both inclusive.
+--- Either pass two frame numbers, or a single phase name: `During("Firing", fn)`
+--- covers the whole firing window and `During("Fading", fn)` runs until the
+--- blaster is destroyed. In the numeric form, omit `to_frame` (or pass
+--- `math.huge`) to keep running until destruction. A range that has already ended
+--- before the call never runs.
+---@param self table
+---@param from_frame number|string First frame, or one of the phase names.
+---@param to_frame number|function|nil Last frame; in the phase form `fn` sits here.
+---@param fn function Called as `fn(blaster, dt)`.
+---@return table|nil blaster Returned for chaining; nil when an argument is invalid.
+local function blasterDuring(self, from_frame, to_frame, fn)
+    if (type(from_frame) == "string") then
+        local phase = resolvePhase(from_frame)
+        if (not phase) then
+            print("[Attacks - Blasters] During: unknown phase '" .. from_frame .. "', expected " .. PHASE_NAMES .. ".")
+            return nil
+        end
+
+        if (type(to_frame) == "function") then
+            fn = to_frame
+        end
+        if (type(fn) ~= "function") then
+            print("[Attacks - Blasters] During: 'fn' must be a function, the call is ignored.")
+            return nil
+        end
+
+        from_frame, to_frame = phase.from(self), phase.to(self)
+    end
+
+    if (type(from_frame) ~= "number") then
+        print("[Attacks - Blasters] During: 'from_frame' must be a number or a phase name, the call is ignored.")
+        return nil
+    end
+    if (to_frame ~= nil and type(to_frame) ~= "number") then
+        print("[Attacks - Blasters] During: 'to_frame' must be a number or nil, the call is ignored.")
+        return nil
+    end
+    if (type(fn) ~= "function") then
+        print("[Attacks - Blasters] During: 'fn' must be a function, the call is ignored.")
+        return nil
+    end
+
+    local to = (to_frame == nil) and math.huge or to_frame
+    if (to < from_frame) then
+        print("[Attacks - Blasters] During: 'to_frame' is before 'from_frame', the call is ignored.")
+        return nil
+    end
+
+    self._spans = self._spans or {}
+    self._spans[#self._spans + 1] = {from = from_frame, to = to, fn = fn}
+    return self
+end
+
 function blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_sprites, gb_sounds)
     local blaster = {
         _path = resolveSpriteFolder(gb_sprites),
@@ -198,6 +381,7 @@ function blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_spr
     blaster.final_angle = _angles[2]
     blaster.wait_time = _wait
     blaster.fire_time = _fire
+    blaster.fire_total = _fire
 
     Audio.PlaySound(blaster.sounds_path .. "/snd_intro.wav")
 
@@ -213,6 +397,9 @@ function blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_spr
     end
 
     function blaster:Destroy()
+        if (blaster._destroyed) then return end
+        blaster._destroyed = true
+
         for k, v in ipairs(blasters.insts)
         do
             if (v == blaster) then
@@ -228,6 +415,9 @@ function blasters.New(start_pos, final_pos, angles, wait_time, fire_time, gb_spr
             end
         end
     end
+
+    blaster.OnFrame = blasterOnFrame
+    blaster.During = blasterDuring
 
     table.insert(blasters.insts, blaster)
     return blaster
@@ -288,6 +478,7 @@ function blasters.NewTween(pos_tween, angles_tween, move_time, fire_time, gb_spr
     blaster.final_angle = _angles[2]
     blaster.wait_time = _wait
     blaster.fire_time = _fire
+    blaster.fire_total = _fire
 
     Tween.CreateTween(function (v) sprite.x = v end, _pos[3], "", sprite.x, _pos[2][1], _wait)
     Tween.CreateTween(function (v) sprite.y = v end, _pos[3], "", sprite.y, _pos[2][2], _wait)
@@ -307,20 +498,36 @@ function blasters.NewTween(pos_tween, angles_tween, move_time, fire_time, gb_spr
     end
 
     function blaster:Destroy()
+        if (blaster._destroyed) then return end
+        blaster._destroyed = true
+
         for i = #blasters.insts, 1, -1
         do
             local b = blasters.insts[i]
             if (b == blaster) then
+                for j = #b.beams, 1, -1
+                do
+                    b.beams[j]:Destroy()
+                end
+
                 b.image:Destroy()
                 table.remove(blasters.insts, i)
             end
         end
     end
 
+    blaster.OnFrame = blasterOnFrame
+    blaster.During = blasterDuring
+
     table.insert(blasters.insts, blaster)
     return blaster
 end
 
+--- Advances every active blaster: approach, sprite animation, auto fire and the
+--- beam sync all happen here. Callbacks registered through `OnFrame` and `During`
+--- run next, then the blaster's own `Step(dt)`; both see the final state of the
+--- shared pass, so they can override position, angle, beams, or destroy it.
+---@param dt number Delta time in seconds, forwarded to the callbacks and `Step`.
 function blasters.Update(dt)
     for i = #blasters.insts, 1, -1
     do
@@ -393,6 +600,14 @@ function blasters.Update(dt)
                             table.remove(b.beams, j)
                         end
                     end
+                end
+            end
+
+            if (not b._destroyed) then
+                run_schedule(b, dt)
+
+                if (not b._destroyed and b.Step) then
+                    b:Step(dt)
                 end
             end
         end
