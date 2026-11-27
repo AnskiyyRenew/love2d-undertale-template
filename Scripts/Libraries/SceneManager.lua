@@ -216,6 +216,7 @@ end
 ---@param ... any|nil (optional) Additional arguments to pass to the new scene's load function.
 function scenes.switchTo(sceneName, ...)
     scenes._pending_switch = {sceneName, {...}}
+    Camera:reset()
 end
 
 --- Resolve a scene argument to the module name that would be required for it,
